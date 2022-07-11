@@ -1,30 +1,52 @@
-::
 /-  nest
-/+  shoe, verb, dbug, default-agent, handle
+/+  shoe, verb, dbug, default-agent, agentio
+/+  gol-cli-goals, gol-cli-handles, gol-cli-views, gol-cli-printer
+/+  dates=gol-cli-dates, compar=gol-cli-command-parser
 |%
 +$  versioned-state
   $%  state-0
   ==
-+$  state-0  [%0 =goals:nest =handles:nest =context:nest]
++$  state-0
+  $:  %0 
+      =goals:nest
+      =handles:nest
+      =views:nest
+      context=(unit id:nest)
+      utc-offset=[hours=@dr ahead=?]
+  ==
 +$  command
-  $?  [%clearall ~]
-      [%ng c=(unit @t) p=(unit @t)] :: perhaps better ns?
-      [%fg c=(unit @t) p=(unit @t)] :: perhaps better un?
-      [%ag desc=@t]
-      [%rg h=(unit @t)]
-      [%cc c=(unit @t)]
-      [%pg h=(unit @t)]
-      [%pp h=(unit @t)]
-      :: %eg  edit goal
-      :: %cp  collapse goal
-      :: %uc  uncollapse goal
-      :: %hd  hide goal
-      :: %uh  unhide goal
-      :: %ph  print hidden
-      :: %mv  move (nest and unnest simultaneously)
-      :: %pr  print progenitors (unpreceded, actionable goals)
-      :: %pd  print deadline
-      [%pc ~]
+  $?  [%clearall ~]                 :: clearall
+      [%cc c=(unit @t)]             :: change context
+      [%pg h=(unit @t)]             :: print goal
+      [%ng c=@t p=@t]               :: nest goal (perhaps better ns?)
+      [%fg c=@t p=@t]               :: flee/unnest goal (perhaps better un?)
+      [%ap l=@t r=@t]               :: precede goal (add precedence)
+      [%rp l=@t r=@t]               :: unprecede goal (remove precedence)
+      [%ag desc=@t]                 :: add goal
+      [%rg h=@t]                    :: remove goal
+      [%pp h=@t]                    :: print parents
+      [%cp h=@t rec=?]              :: collapse goal with respect to current context
+      [%uc h=@t rec=?]              :: uncollapse goal
+      [%sd h=@t d=(unit @d)]        :: set deadline
+      [%tz hours=@dr ahead=?]       :: change utc-offset
+      [%bf h=@t]                    :: print befores
+      [%af h=@t]                    :: print afters
+      [%hv h=@t]                    :: print harvest
+      [%an h=@t]                    :: actionate goal
+      [%ct h=@t]                    :: mark goal completed
+      [%av h=@t]                    :: activate goal
+      :: %eg                        :: edit goal
+      :: %hd                        :: hide goal
+      :: %uh                        :: unhide goal
+      :: %ph                        :: print hidden
+      :: %mv                        :: move (nest and unnest simultaneously)
+      :: %pd                        :: print deadline (or other
+      ::                            ::   goal-specific information)
+      [%pc ~]                       :: print context
+      [%pz ~]                       :: print current utc-offset
+      [%pa ~]                       :: print all as list
+      [%ps ~]                       :: print all sorted
+      [%ds ~]                       :: sort by deadline
   ==
 +$  card  card:shoe
 --
@@ -41,11 +63,16 @@
 +*  this  .
     def   ~(. (default-agent this %.n) bowl)
     des   ~(. (default:shoe this command) bowl)
+    io    ~(. agentio bowl)
     qo    ~(. +> bowl)
+    gols  ~(. gol-cli-goals goals)
+    hdls  ~(. gol-cli-handles goals handles)
+    vyuz  ~(. gol-cli-views goals views)
+    prtr  ~(. gol-cli-printer goals handles views context utc-offset)
 ::
 ++  on-init
   ^-  (quip card _this)
-  `this
+  `this(views (~(put by views) ~ *goal-view:nest))
 ::
 ++  on-save
   ^-  vase
@@ -67,34 +94,53 @@
     =/  action  !<(action:nest vase)
     ?-  -.action
         %add
-      =/  gol  *goal:nest
-      =.  desc.gol  desc.action
-      ?:  (~(has by goals) [our.bowl now.bowl])
-        $(now.bowl (add now.bowl ~s0..0001))
-      =/  gid  [our.bowl now.bowl]
-      =/  hdl  (make-handle gid)
+      =/  id  (unique-id:gols bowl)
+      =/  hdl  (make-handle:hdls id)
       :-  ~
       %=  this
-        goals  ?~  par.action  (~(put by goals) gid gol)
-               (nestify (~(put by goals) gid gol) u.par.action gid)
-        hi.handles  (~(put by hi.handles) hdl gid)
-        ih.handles  (~(put by ih.handles) gid hdl)
+        goals  (add-goal:gols id desc.action par.action)
+        hi.handles  (~(put by hi.handles) hdl id)
+        ih.handles  (~(put by ih.handles) id hdl)
+        views  (~(put by views) (some id) *goal-view:nest)
       ==
         %del
       :-  ~
       %=  this
-        goals  (purge-goals id.action)
-        handles  (purge-handles id.action)
+        goals  (purge-goals:gols id.action)
+        handles  (purge-handles:hdls id.action)
+        views  (~(del by views) id.action)
       ==
         %nest
-      `this(goals (nestify goals par.action kid.action))
+      `this(goals (nestify:gols par.action kid.action))
         %flee
-      `this(goals (unnest goals par.action kid.action))
+      `this(goals (unnest:gols par.action kid.action))
+        %prec
+      `this(goals (precede:gols ryt.action lef.action))
+        %unpr
+      `this(goals (unprecede:gols ryt.action lef.action))
         %clearall
       `this(state *state-0)
         %cc
       `this(context c.action)
-    ==
+        %clps
+      `this(views (collapsify:vyuz ctx.action clp.action rec.action %.n))
+        %uncl
+      `this(views (collapsify:vyuz ctx.action clp.action rec.action %.y))
+        %tz
+      `this(utc-offset utc-offset.action)
+        %sd
+      :-  ~
+      %=  this
+        goals   %+  ~(jab by goals)  id.action
+                |=(=goal:nest goal(deadline deadline.action))
+      ==
+        %actionate
+      `this(goals (~(jab by goals) id.action actionate:gols))
+        %complete
+      `this(goals (~(jab by goals) id.action complete:gols))
+        %activate
+      `this(goals (~(jab by goals) id.action activate:gols))
+      ==
   ==
 ++  on-watch  on-watch:def
 ++  on-leave  on-leave:def
@@ -104,21 +150,37 @@
 ++  on-fail   on-fail:def
 ::
 ++  command-parser
-  |=  sole-id=@ta  :: takes a session id
+  |=  sole-id=@ta
   ^+  |~(nail *(like [? command]))  
   %+  stag  |
   ;~  pose
-    (cold [%clearall ~] (jest 'clearall'))
-    ;~((glue ace) (cold %ag (jest 'ag')) qut)
-    ;~((glue ace) (cold %ng (jest 'ng')) (parse-hndl) (parse-hndl))
-    ;~((glue ace) (cold %fg (jest 'fg')) (parse-hndl) (parse-hndl))
-    ;~((glue ace) (cold %rg (jest 'rg')) (parse-hndl))
-    ;~((glue ace) (cold %cc (jest 'cc')) (parse-hndl))
-    ;~((glue ace) (cold %pg (jest 'pg')) (parse-hndl))
-    ;~((glue ace) (cold %pp (jest 'pp')) (parse-hndl))
-    (cold [%pc ~] (jest ''))
+    parse-clearall:compar                            :: %clearall
+    parse-add-goal:compar                            :: %ag
+    parse-nest-goal:compar                           :: %ng
+    parse-flee-goal:compar                           :: %fg
+    parse-precede-goal:compar                        :: %ap
+    parse-unprecede-goal:compar                      :: %rp
+    parse-remove-goal:compar                         :: %rg
+    parse-change-context:compar                      :: %cc
+    parse-change-utc-offset:compar                   :: %tz
+    parse-print-goal:compar                          :: %pg
+    parse-print-parents:compar                       :: %pp
+    parse-collapse:compar                            :: %cp
+    parse-uncollapse:compar                          :: %uc
+    (parse-set-deadline:compar now.bowl utc-offset)  :: %sd
+    parse-print-utc-offset:compar                    :: %pz
+    parse-print-all:compar                           :: %pa
+    parse-print-sorted:compar                        :: %ps
+    parse-deadline-sort:compar                       :: %ds
+    parse-print-befs:compar                          :: %bf
+    parse-print-afts:compar                          :: %af
+    parse-actionate:compar                           :: %an
+    parse-complete:compar                            :: %ct
+    parse-activate:compar                            :: %av
+    parse-harvest-progenitors:compar                 :: %hv
+    parse-print-context:compar                       :: %pc
   ==
-   
+::
 ::
 ++  tab-list
   |=  sole-id=@ta
@@ -131,6 +193,18 @@
       ['cc' leaf+"change context goal"]
       ['pg' leaf+"print goal substructure"]
       ['pp' leaf+"print parents"]
+      ['sd' leaf+"set deadline"]
+      ['tz' leaf+"change utc-offset"]
+      ['pz' leaf+"print utc-offset"]
+      ['ap' leaf+"add precedence"]
+      ['rp' leaf+"remove precedence"]
+      ['pa' leaf+"print all"]
+      ['bf' leaf+"print befs"]
+      ['af' leaf+"print afts"]
+      ['an' leaf+"actionate"]
+      ['av' leaf+"activate"]
+      ['ct' leaf+"complete"]
+      ['hv' leaf+"harvest progenitors"]
   ==
 ::
 ++  on-command
@@ -139,93 +213,216 @@
   =;  cards=(list card)
     [cards this]
   ?-  -.command
+      ::
+      ::  [%clearall ~]                
       %clearall
+    =*  poke-self  ~(poke-self pass:io /clearall/wire)
     ;:  weld
-      (print-cards ~["Cleared data structure...."])
-      (poke-cards ~[[/clearall/wire [%clearall ~]]])
+      ~[(poke-self nest-action+!>([%clearall ~]))]
+      (print-cards:prtr ~["Cleared data structure...."])
     ==
+      ::
+      ::  [%ag desc=@t]                
       %ag
+    =*  poke-self  ~(poke-self pass:io /ag/wire)
     ;:  weld
-      (poke-cards ~[[/ag/wire [%add desc.command context]]])
-      %-  print-cards
+      ~[(poke-self nest-action+!>([%add desc.command context]))]
+      %-  print-cards:prtr
       :~  "Adding goal:"
           "   {(trip desc.command)}"
       ==
     ==
+      ::
+      ::  [%ng c=@t p=@t]
       %ng
-    ?~  p.command  (print-cards ~["ERROR: Null parent handle." ""])
-    ?~  c.command  (print-cards ~["ERROR: Null child handle." ""])
-    =/  p=(unit [=id:nest =goal:nest])  (hg-catch u.p.command)
-    =/  c=(unit [=id:nest =goal:nest])  (hg-catch u.c.command)
-    ?~  p  (print-cards ~["ERROR: Invalid parent handle." ""])
-    ?~  c  (print-cards ~["ERROR: Invalid child handle." ""])
+    =*  poke-self  ~(poke-self pass:io /ng/wire)
+    =+  [msg p]=(catch-handle:prtr p.command)  ?.  =(~ msg)  msg
+    =+  [msg c]=(catch-handle:prtr c.command)  ?.  =(~ msg)  msg
     ;:  weld
-      %-  print-cards
-      :~  "Nesting goal:   [{(trip u.c.command)}]   {(trip desc.goal.u.c)}"
-          "under goal:     [{(trip u.p.command)}]   {(trip desc.goal.u.p)}"
+      ~[(poke-self nest-action+!>([%nest id.p id.c]))]
+      %-  print-cards:prtr
+      :~  "Nesting goal:   [{(trip c.command)}]   {(trip desc.goal.c)}"
+          "under goal:     [{(trip p.command)}]   {(trip desc.goal.p)}"
       ==
-      (poke-cards ~[[/ng/wire [%nest id.u.p id.u.c]]])
     ==
+      ::
+      ::  [%ap l=@t r=@t]
+      %ap
+    =*  poke-self  ~(poke-self pass:io /ap/wire)
+    =+  [msg r]=(catch-handle:prtr r.command)  ?.  =(~ msg)  msg
+    =+  [msg l]=(catch-handle:prtr l.command)  ?.  =(~ msg)  msg
+    ;:  weld
+      ~[(poke-self nest-action+!>([%prec id.r id.l]))]
+      %-  print-cards:prtr
+      :~  "Preceding goal:   [{(trip l.command)}]   {(trip desc.goal.l)}"
+          "ahead of goal:     [{(trip r.command)}]   {(trip desc.goal.r)}"
+      ==
+    ==
+      ::
+      ::  [%fg c=@t p=@t]
       %fg
-    ?~  p.command  (print-cards ~["ERROR: Null parent handle." ""])
-    ?~  c.command  (print-cards ~["ERROR: Null child handle." ""])
-    =/  p=(unit [=id:nest =goal:nest])  (hg-catch u.p.command)
-    =/  c=(unit [=id:nest =goal:nest])  (hg-catch u.c.command)
-    ?~  p  (print-cards ~["ERROR: Invalid parent handle." ""])
-    ?~  c  (print-cards ~["ERROR: Invalid child handle." ""])
+    =*  poke-self  ~(poke-self pass:io /fg/wire)
+    =+  [msg p]=(catch-handle:prtr p.command)  ?.  =(~ msg)  msg
+    =+  [msg c]=(catch-handle:prtr c.command)  ?.  =(~ msg)  msg
     ;:  weld
-      %-  print-cards
-      :~  "Unnesting goal:    [{(trip u.c.command)}]   {(trip desc.goal.u.c)}"
-          "from under goal:   [{(trip u.p.command)}]   {(trip desc.goal.u.p)}"
+      ~[(poke-self nest-action+!>([%flee id.p id.c]))]
+      %-  print-cards:prtr
+      :~  "Unnesting goal:    [{(trip c.command)}]   {(trip desc.goal.c)}"
+          "from under goal:   [{(trip p.command)}]   {(trip desc.goal.p)}"
       ==
-      (poke-cards ~[[/ng/wire [%flee id.u.p id.u.c]]])
     ==
-      %rg
-    ?~  h.command  (print-cards ~["ERROR: Null goal." ""])
-    =/  g=(unit [=id:nest =goal:nest])  (hg-catch u.h.command)
-    ?~  g  (print-cards ~["ERROR: Invalid handle." ""])
+      ::
+      ::  [%rp l=@t r=@t]
+      %rp
+    =*  poke-self  ~(poke-self pass:io /rp/wire)
+    =+  [msg r]=(catch-handle:prtr r.command)  ?.  =(~ msg)  msg
+    =+  [msg l]=(catch-handle:prtr l.command)  ?.  =(~ msg)  msg
     ;:  weld
-      %-  print-cards
+      ~[(poke-self nest-action+!>([%unpr id.r id.l]))]
+      %-  print-cards:prtr
+      :~  "Unpreceding goal:    [{(trip l.command)}]   {(trip desc.goal.l)}"
+          "from ahead of goal:   [{(trip r.command)}]   {(trip desc.goal.r)}"
+      ==
+    ==
+      ::
+      ::  [%rg h=@t]            
+      %rg
+    =*  poke-self  ~(poke-self pass:io /rg/wire)
+    =+  [msg res]=(catch-handle:prtr h.command)  ?.  =(~ msg)  msg
+    ;:  weld
+      ~[(poke-self nest-action+!>([%del id.res]))]
+      %-  print-cards:prtr
       :~  "Removing:"
           "   [hdl]"
-          "   [{(trip u.h.command)}]   {(trip desc.goal.u.g)}"
+          "   [{(trip h.command)}]   {(trip desc.goal.res)}"
       ==
-      (poke-cards ~[[/rg/wire [%del id.u.g]]])
     ==
+      ::
+      :: [%pc ~]
       %pc
-    (print context %c)
+    (print:prtr context %c)
+      ::
+      ::  [%cc c=(unit @t)]            
       %cc
+    =*  poke-self  ~(poke-self pass:io /cc/wire)
+    ::
+    :: ~ context
     ?~  c.command  
-      %+  weld
-        (poke-cards ~[[/cc/wire [%cc ~]]])
-      %-  print-cards
-      :~  "Context changed to:"
-          "   [hdl]"
-          "   [ ~ ]   All"
+      ;:  weld
+        ~[(poke-self nest-action+!>([%cc ~]))]
+        %-  print-cards:prtr
+        :~  "Context changed to:"
+            "   [hdl]"
+            "   [ ~ ]   All"
+        ==
       ==
-    =/  g=(unit [=id:nest =goal:nest])  (hg-catch u.c.command)
-    ?~  g  (print-cards ~["ERROR: Invalid handle."])
+    =+  [msg res]=(catch-handle:prtr u.c.command)  ?.  =(~ msg)  msg
     ;:  weld
-      (poke-cards ~[[/cc/wire [%cc [~ id.u.g]]]])
-      %-  print-cards
+      ~[(poke-self nest-action+!>([%cc ~ id.res]))]
+      %-  print-cards:prtr
       :~  "Context changed to:"
           "   [hdl]"
-          "   [{(trip u.c.command)}   {(trip desc.goal.u.g)}"
+          "   [{(trip u.c.command)}]   {(trip desc.goal.res)}"
       ==
     ==
+      ::
+      ::  [%pg h=(unit @t)]            
       %pg
-    ?~  h.command
-      (print ~ %c)
-    =/  g=(unit [=id:nest =goal:nest])  (hg-catch u.h.command)
-    ?~  g  (print-cards ~["ERROR: Invalid handle."])
-    (print [~ id.u.g] %c)
+    ?~  h.command  (print:prtr ~ %c)
+    =+  [msg res]=(catch-handle:prtr u.h.command)  ?.  =(~ msg)  msg
+    (print:prtr [~ id.res] %c)
+      ::
+      ::  [%pp h=@t]
       %pp
-    ?~  h.command
-      (weld (print-cards ~["Printing parents..."]) (print ~ %p))
-    =/  g=(unit [=id:nest =goal:nest])  (hg-catch u.h.command)
-    ?~  g  (print-cards ~["ERROR: Invalid handle."])
-    (weld (print-cards ~["Printing parents..."]) (print [~ id.u.g] %p))
-==
+    =+  [msg res]=(catch-handle:prtr h.command)  ?.  =(~ msg)  msg
+    (weld (print-cards:prtr ~["Printing parents..."]) (print:prtr [~ id.res] %p))
+      ::
+      ::  [%cp h=@t rec=?]             
+      %cp
+    =*  poke-self  ~(poke-self pass:io /cp/wire)
+    =+  [msg res]=(catch-handle:prtr h.command)  ?.  =(~ msg)  msg
+    ;:  weld
+      ~[(poke-self nest-action+!>([%clps context id.res rec.command]))]
+      (print-cards:prtr ~["Collapsed {(trip h.command)}."])
+    ==
+      ::
+      ::  [%uc h=@t rec=?]             
+      %uc
+    =*  poke-self  ~(poke-self pass:io /uc/wire)
+    =+  [msg res]=(catch-handle:prtr h.command)  ?.  =(~ msg)  msg
+    ;:  weld
+      ~[(poke-self nest-action+!>([%uncl context id.res rec.command]))]
+      (print-cards:prtr ~["Uncollapsed {(trip h.command)}."])
+    ==
+      ::
+      ::  [%sd h=@t d=(unit @da)]
+      %sd
+    =*  poke-self  ~(poke-self pass:io /sd/wire)
+    =+  [msg res]=(catch-handle:prtr h.command)  ?.  =(~ msg)  msg
+    =/  date  (format-local-udate:dates d.command utc-offset)
+    ;:  weld
+      ~[(poke-self nest-action+!>([%sd id.res d.command]))]
+      (print-cards:prtr ~[date])
+    ==
+      ::
+      :: [%tz hours=@dr ahead=?]
+      %tz
+    =*  poke-self  ~(poke-self pass:io /tz/wire)
+    ;:  weld
+      ~[(poke-self nest-action+!>([%tz hours.command ahead.command]))]
+      %-  print-cards:prtr
+      ~["UTC {(trip (~(got by utc-offsets:dates) [hours.command ahead.command]))}"]
+    ==
+      ::
+      :: [%pz ~]
+      %pz
+    (print-utc:prtr)
+      ::
+      :: [%pa ~]
+      %pa
+    (print-goal-list:prtr ~(tap in ~(key by goals)))
+      ::
+      :: [%ps ~]
+      %ps
+    (print-goal-list:prtr (newest-to-oldest:gols ~(tap in ~(key by goals))))
+      ::
+      :: [%ds ~]
+      %ds
+    (print-goal-list:prtr (sooner-to-later:gols ~(tap in ~(key by goals))))
+      ::
+      :: [%bf h=@t]
+      %bf
+    =+  [msg res]=(catch-handle:prtr h.command)  ?.  =(~ msg)  msg
+    (print-goal-list:prtr ~(tap in befs.goal.res))
+      ::
+      :: [%af h=@t]
+      %af
+    =+  [msg res]=(catch-handle:prtr h.command)  ?.  =(~ msg)  msg
+    (print-goal-list:prtr ~(tap in afts.goal.res))
+      ::
+      :: [%hv h=@t]
+      %hv
+    =+  [msg res]=(catch-handle:prtr h.command)  ?.  =(~ msg)  msg
+    (print-goal-list:prtr ~(tap in (harvest-unpreceded:gols id.res)))
+      ::
+      :: [%an h=@t]
+      %an
+    =*  poke-self  ~(poke-self pass:io /an/wire)
+    =+  [msg res]=(catch-handle:prtr h.command)  ?.  =(~ msg)  msg
+    ~[(poke-self nest-action+!>([%actionate id.res]))]
+      ::
+      :: [%ct h=@t]
+      %ct
+    =*  poke-self  ~(poke-self pass:io /ct/wire)
+    =+  [msg res]=(catch-handle:prtr h.command)  ?.  =(~ msg)  msg
+    ~[(poke-self nest-action+!>([%complete id.res]))]
+      ::
+      :: [%av h=@t]
+      %av
+    =*  poke-self  ~(poke-self pass:io /av/wire)
+    =+  [msg res]=(catch-handle:prtr h.command)  ?.  =(~ msg)  msg
+    ~[(poke-self nest-action+!>([%activate id.res]))]
+  ==
 ::
 ++  can-connect
 |=  sole-id=@ta
@@ -240,288 +437,5 @@
 ::
 ::
 |_  =bowl:gall
-::
-::
-++  parse-hndl
-  |.  
-  ;~  pose
-    (cook |=(a=tape [~ (crip a)]) (stun [3 100] (shim 33 126)))
-    (cold %~ (just '~'))
-  ==
-::
-:: make a unique handle based on the goal id
-++  make-handle
-  |=  =id:nest 
-  ^-  @t
-  =/  grp=tape  (grip:handle id)
-  =/  idx=@  3
-  |-
-  ?:  =(idx (lent grp))  ~&('Handle uniqueness error!' !!)
-  ?:  (~(has by hi.handles) (crip (swag [0 idx] grp)))
-    $(idx +(idx))
-  (crip (swag [0 idx] grp))
-::
-:: get goal from handle ([gid gol]) and crash if does not exist
-++  hg-crash
-  |=  hdl=@t
-  ^-  [id:nest goal:nest]
-  =/  gid  (~(got by hi.handles) hdl)
-  [gid (~(got by goals) gid)]
-::
-:: get goal from handle (?(~ [~ [gid gol]])) returning null if does not
-:: exist
-++  hg-catch
-  |=  hdl=@t
-  ^-  (unit [id:nest goal:nest])
-  =/  gid  (~(get by hi.handles) hdl)
-  ?~  gid  ~
-  [~ u.gid (~(got by goals) u.gid)]
-::
-:: get roots
-++  roots
-  |.
-  ^-  (list id:nest)
-  %:  turn
-  (skim ~(tap by goals) |=([=id:nest =goal:nest] =(0 ~(wyt in pars.goal))))
-  |=(a=[id:nest goal:nest] -.a)
-  ==
-::
-:: get leaves
-++  leaves
-  |.
-  ^-  (list id:nest)
-  %:  turn
-  (skim ~(tap by goals) |=([=id:nest =goal:nest] =(0 ~(wyt in kids.goal))))
-  |=(a=[id:nest goal:nest] -.a)
-  ==
-::
-:: Check if did is descendent of aid
-++  descends
-  |=  [=goals:nest aid=id:nest did=id:nest]
-  =/  anc  (~(get by goals) aid)
-  ?~  anc  ~&('Invalid aid.' !!)
-  ?~  (~(get by goals) did)  ~&('Invalid did.' !!)
-  ^-  ?
-  ?:  =(0 ~(wyt in kids.u.anc))  %.n  :: if a has no children, d not descendent
-  ?:  (~(has in kids.u.anc) did)  %.y  :: if d is child of a, d is descendent
-  (~(any in kids.u.anc) (curr (cury descends goals) did))  :: apply descends to all children
-::
-:: Nest cid under pid
-++  nestify
- |=  [=goals:nest pid=id:nest cid=id:nest]
- ?:  =(pid cid)  ~&('Cannot nest goal under itself.' !!)
- =/  par  (~(get by goals) pid)
- ?~  par  ~&('Invalid pid.' !!) :: pid must exist in goals
- ?~  (~(get by goals) cid)  ~&('Invalid cid.' !!) :: cid must exist in goals
- ?:  (~(has in kids.u.par) cid)  goals  :: if already nested, leave unchanged
- ?:  (descends goals cid pid)  !!  :: if p is descendent of c, cannot nest
- :: if already nested, does nothing
- :: return goals updated with nesting
- %-
- %~  jab  by
- (~(jab by goals) pid |=(par=goal:nest par(kids (~(put in kids.par) cid))))
- :-  cid
- |=(kid=goal:nest kid(pars (~(put in pars.kid) pid)))
-::
-:: Unnest cid from under pid
-++  unnest
-  |=  [=goals:nest pid=id:nest cid=id:nest]
-  %-
-  %~  jab  by
-  (~(jab by goals) pid |=(par=goal:nest par(kids (~(del in kids.par) cid))))
-  :-  cid
-  |=(kid=goal:nest kid(pars (~(del in pars.kid) pid)))
-::
-::  get depth of a given goal (lowest level is depth of 1)
-++  plumb
-  |=  =id:nest
-  =/  gol=(unit goal:nest)  (~(get by goals) id)
-  ?~  gol  ~&('Goal does not exist.' !!)
-  ^-  @
-  =/  upr=@  1
-  ?:  =(0 ~(wyt in kids.u.gol))
-    upr
-  =/  idx=@  0
-  =/  kids  ~(tap in kids.u.gol)
-  |-
-  ?:  =(idx (lent kids))
-    (add 1 upr)
-  $(idx +(idx), upr (max upr (plumb (snag idx kids))))
-::
-:: get max depth + 1
-++  anchor
-  |.
-  +((roll (turn (roots) plumb) max))
-::
-:: purge goal from goals and from children and parents
-++  purge-goals
-  |=  =id:nest
-  ^-  goals:nest
-  %-  %~  del
-        by
-      %-  ~(run by goals)
-      |=  =goal:nest
-      %=  goal
-        kids  (~(del in kids.goal) id)
-        pars  (~(del in pars.goal) id)
-      ==
-  id
-::
-:: purge goal from handles
-++  purge-handles
-  |=  =id:nest
-  ^-  handles:nest
-  :_  (~(del by ih.handles) id)
-      (~(del by hi.handles) (~(got by ih.handles) id))
-::
-:: get cards to print goal substructure, catch if goal does not exist
-++  print-catch
-  |=  [id=(unit id:nest) dir=?(%p %c)]
-  ?~  id  (print id dir)
-    ?:  (~(has in ~(key by goals)) u.id)
-      (print id dir)
-    (print-cards ~["" "Specified goal does not exist."])
-::
-:: get cards to print goal substructure, crash if goal does not exist
-++  print
-  |=  [id=(unit id:nest) dir=?(%p %c)]
-  ^-  (list card)
-  %-  print-cards 
-  =/  lvl
-    ?-  dir
-      %p  (dec (get-lvl id dir))
-      %c  +((get-lvl id dir))
-    ==
-  ;:  weld
-    :~  `tape`(reap 80 '-')
-        "   [hdl]"
-    ==
-    (print-family id %.y dir "" lvl)
-    ~[`tape`(reap 80 '-')]
-  ==
-::
-::
-++  poke-cards
-  |=  pokes=(list [wire action:nest])
-  ^-  (list card)
-  %+  turn
-    pokes
-  |=([=wire =action:nest] [%pass wire %agent [our.bowl %gol-cli] %poke %nest-action !>(action)])
-::
-::
-++  print-cards
-  |=  tapes=(list tape)
-  ^-  (list card)
-  (turn tapes |=(=tape [%shoe ~ %sole %klr [[~ ~ `%w] [(crip tape)]~]~]))
-::
-::
-++  print-family
-  |=  [id=(unit id:nest) last=? dir=?(%p %c) indent=tape lvl=@]
-  ^-  (list tape)
-  =/  line  (liner id last dir indent lvl)
-  =/  indent  (indenter id last dir indent lvl)
-  =/  fam  (get-fam id dir)
-  =/  lvl  (get-lvl id dir)
-  =/  output=(list tape)  ~[line]
-  ?~  fam
-    ?.  last
-      output
-    ?:  (levy indent |=(a=@t =(a ' ')))
-      output
-    (weld output ~[(weld "           " indent)])
-  =/  idx=@  0
-  |-
-  =/  id  [~ (snag idx `(list id:nest)`fam)]
-  ?:  =(+(idx) (lent fam))
-    (weld output (print-family id %.y dir indent lvl))
-  $(idx +(idx), output (weld output (print-family id %.n dir indent lvl)))
-::
-::
-++  spacer  3
-::
-::
-++  get-lvl
-  |=  [id=(unit id:nest) dir=?(%p %c)]
-  ^-  @
-  ?-  dir
-      %p
-    ?~  id  !!
-    (plumb u.id)
-      %c
-    ?~  id  (anchor)
-    (plumb u.id)
-  ==
-::
-::
-++  get-fam
-  |=  [id=(unit id:nest) dir=?(%p %c)]
-  ^-  (list id:nest)
-  ?-  dir
-      %p  
-    ?~  id  (leaves)
-    =/  goal  (~(got by goals) u.id)
-    ~(tap in pars.goal)
-      %c
-    ?~  id  (roots)
-    =/  goal  (~(got by goals) u.id)
-    ~(tap in kids.goal)
-  ==
-::
-::
-++  liner
-  |=  [id=(unit id:nest) last=? dir=?(%p %c) indent=tape lvl=@]
-  ^-  tape
-  (weld (prefix id dir) (brancher id last dir indent lvl))
-::
-::
-++  prefix
-  |=  [id=(unit id:nest) dir=?(%p %c)]
-  ^-  tape
-  ?~  id
-    ?-  dir
-      %p  !!
-      %c  (weld "   [ ~ ]" (reap spacer ' '))
-    ==
-  =/  hndl  (~(got by ih.handles) u.id)
-  (weld "   [{(trip hndl)}]" (reap spacer ' '))
-::
-:: branch structure based status as last subgoal and level shift
-++  brancher
-  |=  [id=(unit id:nest) last=? dir=?(%p %c) indent=tape lvl=@]
-  ^-  tape
-  ?~  id
-    ?-  dir
-      %p  !!
-      %c  "\\--All"
-    ==
-  =/  goal  (~(got by goals) u.id)
-  =/  output
-    ?:  last
-      :(weld indent "\\" (reap (dec (shift u.id dir lvl)) '-'))
-    :(weld indent "|" (reap (dec (shift u.id dir lvl)) '-'))
-  (weld output (trip desc.goal))
-::
-:: indent structure based on ancestors
-++  indenter
-  |=  [id=(unit id:nest) last=? dir=?(%p %c) indent=tape lvl=@]
-  ^-  tape
-  ?~  id
-    ?-  dir
-      %p  !!
-      %c  (reap spacer ' ')
-    ==
-  ?:  last
-    (weld indent (reap (shift u.id dir lvl) ' '))
-  :(weld indent "|" (reap (dec (shift u.id dir lvl)) ' '))
-::
-:: shift based on level difference from parent
-++  shift
-  |=  [=id:nest dir=?(%p %c) lvl=@]
-  ^-  @
-  ?-  dir
-      %p
-    (mul spacer (sub (plumb id) lvl))
-      %c
-    (mul spacer (sub lvl (plumb id)))
-  ==
+++  echo  |=(a=* a)
 --
