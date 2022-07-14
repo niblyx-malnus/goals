@@ -1,7 +1,44 @@
 |%
 ::
+++  goals-state-0
+  |%
+  +$  id  [@p @da]
+  ::
+  +$  goal
+    $:  desc=@t
+        deadline=(unit @da)
+        pars=(set id)
+        kids=(set id)
+        befs=(set id)
+        afts=(set id)
+        actionable=?
+        status=?(%active %completed %ghost)
+    ==
+  ::
+  +$  goal-view
+    $:  collapse=(set id)
+        hidden=(set id)
+    ==
+  ::
+  +$  goals  (map id goal)
+  ::
+  +$  views  (map (unit id) goal-view)
+  ::
+  +$  handles  [hi=(map @t id) ih=(map id @t)]
+  --
+::
 :: $id: identity of a goal; determined by creator and time of creation
 +$  id  [@p @da]
+::
+:: 
++$  dir
+  $?  %nest-left
+      %nest-ryte
+      %prec-left
+      %prec-ryte
+      %prio-left
+      %prio-ryte
+  ==
 ::
 :: $goal:        represents a single indivisible goal, task, or aim
 ::
@@ -16,6 +53,8 @@
 ::   .afts:        set of goals which come immediately after this goal
 ::                 this goal inherits its deadline from its afts
 ::                 afts should contain all pars
+::   .moar:        set of goals immediately more important (priority)
+::   .less:        set of goals immediately less important (priority)
 ::   .actionable:  actionable - can this goal be acted upon immediately?
 ::                 a goal cannot be marked actionable if .kids is not
 ::                 empty
@@ -35,6 +74,8 @@
       kids=(set id)
       befs=(set id)
       afts=(set id)
+      moar=(set id)
+      less=(set id)
       actionable=?
       status=?(%active %completed %ghost)
   ==
@@ -78,7 +119,8 @@
       [%flee par=id kid=id]
       [%prec ryt=id lef=id]
       [%unpr ryt=id lef=id]
-      :: [%dead =id]
+      [%prio ryt=id lef=id]
+      [%uprt ryt=id lef=id]
       [%clearall ~]
       [%cc c=(unit id)]
       [%clps ctx=(unit id) clp=id rec=?]

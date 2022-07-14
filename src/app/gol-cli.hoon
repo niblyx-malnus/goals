@@ -5,9 +5,18 @@
 |%
 +$  versioned-state
   $%  state-0
+      state-1
   ==
 +$  state-0
   $:  %0 
+      =goals:goals-state-0:nest
+      =handles:nest
+      =views:nest
+      context=(unit id:nest)
+      utc-offset=[hours=@dr ahead=?]
+  ==
++$  state-1
+  $:  %1
       =goals:nest
       =handles:nest
       =views:nest
@@ -22,9 +31,12 @@
       [%fg c=@t p=@t]               :: flee/unnest goal (perhaps better un?)
       [%ap l=@t r=@t]               :: precede goal (add precedence)
       [%rp l=@t r=@t]               :: unprecede goal (remove precedence)
+      [%pt l=@t r=@t]               :: prioritize
+      [%up l=@t r=@t]               :: unprioritize
       [%ag desc=@t]                 :: add goal
       [%rg h=@t]                    :: remove goal
       [%pp h=@t]                    :: print parents
+      [%ppc h=@t]                   :: print precedents
       [%cp h=@t rec=?]              :: collapse goal with respect to current context
       [%uc h=@t rec=?]              :: uncollapse goal
       [%sd h=@t d=(unit @d)]        :: set deadline
@@ -50,7 +62,7 @@
   ==
 +$  card  card:shoe
 --
-=|  state-0
+=|  state-1
 =*  state  -
 ::
 %+  verb  |
@@ -80,11 +92,33 @@
 ::
 ++  on-load
   |=  old-state=vase
-  ^-  (quip card _this)
   =/  old  !<(versioned-state old-state)
+  |^
   ?-  -.old
-    %0  `this(state old)
+    %1  `this(state old)
+    ::
+      %0
+    %_    $
+      -.old  %1
+      goals.old  (goals-0-to-1 goals.old)
+    ==
   ==
+  ++  goals-0-to-1
+    |=  =goals:goals-state-0:nest
+    ^-  goals:nest
+    %-  ~(run by goals)
+    |=  old-goal=goal:goals-state-0:nest
+    =|  =goal:nest
+    =.  desc.goal  desc.old-goal
+    =.  deadline.goal  deadline.old-goal
+    =.  pars.goal  pars.old-goal
+    =.  kids.goal  kids.old-goal
+    =.  befs.goal  befs.old-goal
+    =.  afts.goal  afts.old-goal
+    =.  actionable.goal  actionable.old-goal
+    =.  status.goal  status.old-goal
+    goal
+  --
 ::
 ++  on-poke
   |=  [=mark =vase]
@@ -111,15 +145,19 @@
         views  (~(del by views) id.action)
       ==
         %nest
-      `this(goals (nestify:gols par.action kid.action))
+      `this(goals (nest-yoke:gols kid.action par.action %0))
         %flee
-      `this(goals (unnest:gols par.action kid.action))
+      `this(goals (nest-rend:gols kid.action par.action))
         %prec
-      `this(goals (precede:gols ryt.action lef.action))
+      `this(goals (prec-yoke:gols lef.action ryt.action %0))
         %unpr
-      `this(goals (unprecede:gols ryt.action lef.action))
+      `this(goals (prec-rend:gols lef.action ryt.action))
+        %prio
+      `this(goals (prio-yoke:gols lef.action ryt.action %0))
+        %uprt
+      `this(goals (prio-rend:gols lef.action ryt.action))
         %clearall
-      `this(state *state-0)
+      `this(state *state-1)
         %cc
       `this(context c.action)
         %clps
@@ -165,6 +203,7 @@
     parse-change-utc-offset:compar                   :: %tz
     parse-print-goal:compar                          :: %pg
     parse-print-parents:compar                       :: %pp
+    parse-print-precedents:compar                    :: %ppc
     parse-collapse:compar                            :: %cp
     parse-uncollapse:compar                          :: %uc
     (parse-set-deadline:compar now.bowl utc-offset)  :: %sd
@@ -178,6 +217,8 @@
     parse-complete:compar                            :: %ct
     parse-activate:compar                            :: %av
     parse-harvest-progenitors:compar                 :: %hv
+    parse-prioritize-goal:compar                     :: %pt
+    parse-unprioritize-goal:compar                   :: %up
     parse-print-context:compar                       :: %pc
   ==
 ::
@@ -212,6 +253,7 @@
   ^-  (quip card _this)
   =;  cards=(list card)
     [cards this]
+  =/  def-cols  ~[%handle %level %deadline %priority]
   ?-  -.command
       ::
       ::  [%clearall ~]                
@@ -272,6 +314,32 @@
       ==
     ==
       ::
+      ::  [%pt l=@t r=@t]
+      %pt
+    =*  poke-self  ~(poke-self pass:io /pt/wire)
+    =+  [msg r]=(catch-handle:prtr r.command)  ?.  =(~ msg)  msg
+    =+  [msg l]=(catch-handle:prtr l.command)  ?.  =(~ msg)  msg
+    ;:  weld
+      ~[(poke-self nest-action+!>([%prio id.r id.l]))]
+      %-  print-cards:prtr
+      :~  "Prioritize goal:   [{(trip l.command)}]   {(trip desc.goal.l)}"
+          "over goal:     [{(trip r.command)}]   {(trip desc.goal.r)}"
+      ==
+    ==
+      ::
+      ::  [%up r=@t l=@t]
+      %up
+    =*  poke-self  ~(poke-self pass:io /up/wire)
+    =+  [msg r]=(catch-handle:prtr r.command)  ?.  =(~ msg)  msg
+    =+  [msg l]=(catch-handle:prtr l.command)  ?.  =(~ msg)  msg
+    ;:  weld
+      ~[(poke-self nest-action+!>([%uprt id.r id.l]))]
+      %-  print-cards:prtr
+      :~  "Unprioritize goal:    [{(trip l.command)}]   {(trip desc.goal.l)}"
+          "from over goal:   [{(trip r.command)}]   {(trip desc.goal.r)}"
+      ==
+    ==
+      ::
       ::  [%rp l=@t r=@t]
       %rp
     =*  poke-self  ~(poke-self pass:io /rp/wire)
@@ -300,7 +368,7 @@
       ::
       :: [%pc ~]
       %pc
-    (print:prtr context %c)
+    (nest-print:prtr context def-cols %nest-left)
       ::
       ::  [%cc c=(unit @t)]            
       %cc
@@ -328,14 +396,25 @@
       ::
       ::  [%pg h=(unit @t)]            
       %pg
-    ?~  h.command  (print:prtr ~ %c)
+    ?~  h.command  (nest-print:prtr ~ def-cols %nest-left)
     =+  [msg res]=(catch-handle:prtr u.h.command)  ?.  =(~ msg)  msg
-    (print:prtr [~ id.res] %c)
+    (nest-print:prtr [~ id.res] def-cols %nest-left)
       ::
       ::  [%pp h=@t]
       %pp
     =+  [msg res]=(catch-handle:prtr h.command)  ?.  =(~ msg)  msg
-    (weld (print-cards:prtr ~["Printing parents..."]) (print:prtr [~ id.res] %p))
+    ;:  weld
+      (print-cards:prtr ~["Printing parents..."])
+      (nest-print:prtr [~ id.res] def-cols %nest-ryte)
+    ==
+      ::
+      ::  [%ppc h=@t]
+      %ppc
+    =+  [msg res]=(catch-handle:prtr h.command)  ?.  =(~ msg)  msg
+    ;:  weld
+      (print-cards:prtr ~["Printing precedents..."])
+      (nest-print:prtr [~ id.res] def-cols %prec-left)
+    ==
       ::
       ::  [%cp h=@t rec=?]             
       %cp

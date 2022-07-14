@@ -11,60 +11,114 @@
     hdls  ~(. gol-cli-handles goals handles)
 +$  card  card:shoe
 ::
-::
-++  print-cards
-  |=  tapes=(list tape)
+:: get cards to print goal substructure
+++  nest-print
+  |=  [id=(unit id:nest) col-names=(list col-name) =dir:nest]
   ^-  (list card)
-  (turn tapes |=(=tape [%shoe ~ %sole %klr [[~ ~ ~] [(crip tape)]~]~]))
+  %-  print-cards 
+  =/  lvl :: initial level; printing from context
+    ?-  dir
+      %nest-ryte  (dec (get-lvl:gols id dir))
+      %nest-left  +((get-lvl:gols id dir))
+      %prec-ryte  (dec (get-lvl:gols id dir))
+      %prec-left  +((get-lvl:gols id dir))
+      %prio-ryte  !!
+      %prio-left  !!
+    ==
+  ;:  weld
+    ~[hrz]
+    ~[(weld (reap toggle-len ' ') (headers col-names))]
+    tapes:(print-family id col-names %.y %.n *(set (unit id:nest)) dir "" lvl)
+    ~[hrz]
+  ==
 ::
 ::
 ++  print-family
-  |=  [id=(unit id:nest) last=? clps=? dir=?(%p %c) indent=tape lvl=@]
-  ^-  (list tape)
-  =/  line  (liner id last clps dir indent lvl)
-  =/  indent  (indenter id last dir indent lvl)
-  =/  fam  (get-fam:gols id dir)
-  =/  lvl  (get-lvl:gols id dir)
-  =/  output=(list tape)  ~[line]
+  |=  $:  id=(unit id:nest)
+          col-names=(list col-name)
+          last=?
+          clps=?
+          prtd-set=(set (unit id:nest))
+          =dir:nest
+          indent=tape
+          lvl=@
+      ==
+  ^-  [tapes=(list tape) prtd-set=(set (unit id:nest))]
+  =/  line  (liner id col-names last clps prtd-set dir indent lvl)
+  =.  indent  (indenter id last dir indent lvl)
+  =/  fam  (hi-to-lo:gols (get-fam:gols id dir))
+  =.  lvl  (get-lvl:gols id dir)
+  =/  output=[tapes=(list tape) prtd-set=(set (unit id:nest))]
+    [~[line] (~(put in prtd-set) id)]
   ?~  fam
-    ?.  last
-      output
-    ?:  (levy indent |=(a=@t =(a ' ')))
-      output
-    (weld output ~[(weld "                     " indent)])
+    ?.  last  output
+    :: if the indent is all spaces, this is the last printed line
+    :: in the whole printed family
+    ?:  (levy indent |=(a=@t =(a ' ')))  output
+    :: otherwise it is last printed line in a sub-family
+    :: add empty line after last line of a sub-family
+    :-  (weld tapes:output ~[(weld (empty-prefix col-names) indent)])
+    prtd-set:output
   ?:  clps  output
+  ?:  (~(has in prtd-set) id)  output
   =/  idx=@  0
   |-
-  =/  id  [~ (snag idx `(list id:nest)`fam)]
-  =/  clps=?  (~(has in collapse:(~(got by views) context)) +.id)
+  =/  id  [~ u=(snag idx `(list id:nest)`fam)]
+  =.  clps  (~(has in collapse:(~(got by views) context)) u.id)
   ?:  =(+(idx) (lent fam))
-    (weld output (print-family id %.y clps dir indent lvl))
-  $(idx +(idx), output (weld output (print-family id %.n clps dir indent lvl)))
+    =/  newest  (print-family id col-names %.y clps prtd-set:output dir indent lvl)
+    :-  (weld tapes:output tapes:newest)
+    prtd-set:newest
+  =/  newest  (print-family id col-names %.n clps prtd-set:output dir indent lvl)
+  %=  $
+    idx  +(idx)
+    output  :-  (weld tapes:output tapes:newest)
+            prtd-set:newest
+  ==
+::
+::
+++  empty-prefix
+  |=  col-names=(list col-name)
+  (reap :(add toggle-len (cols-lent col-names) spacer) ' ')
 ::
 ::
 ++  spacer  3
 ::
+:: space between prefix and branches
+++  buffer  (reap spacer ' ')
 ::
+:: get an entire line
 ++  liner
-  |=  [id=(unit id:nest) last=? clps=? dir=?(%p %c) indent=tape lvl=@]
+  |=  $:  id=(unit id:nest)
+          col-names=(list col-name)
+          last=?
+          clps=?
+          prtd-set=(set (unit id:nest))
+          =dir:nest
+          indent=tape
+          lvl=@
+      ==
   ^-  tape
-  (weld (prefix id dir) (brancher id last clps dir indent lvl))
+  ;:  weld
+    (toggles id)
+    (columns id col-names)
+    buffer
+    (brancher id last clps prtd-set dir indent lvl)
+  ==
 ::
 ::
-++  prefix
-  |=  [id=(unit id:nest) dir=?(%p %c)]
+++  toggle-len  4
+::
+::
+++  toggles
+  |=  id=(unit id:nest)
   ^-  tape
-  ?~  id
-    ?-  dir
-      %p  !!
-      %c  (weld "    [ ~     ~~   ]" (reap spacer ' '))
-    ==
-  =/  hndl  (~(got by ih.handles) u.id)
+  =/  toggles  (reap toggle-len ' ')
+  ?~  id  toggles
   =/  goal  (~(got by goals) u.id)
-  =/  actionable  ?:(actionable.goal "@" " ")
-  =/  completed  ?:(=(status.goal %completed) "x" " ")
-
-  :(weld " " actionable completed " " "[{(trip hndl)} {(deadline-text -:(inherit-deadline:gols u.id))}]" (reap spacer ' '))
+  =/  actionable  ?:(actionable.goal '@' ' ')
+  =/  completed  ?:(=(status.goal %completed) 'x' ' ')
+  (snap `tape`(snap toggles 1 actionable) 2 completed)
 ::
 ::
 ++  deadline-text
@@ -75,32 +129,63 @@
 ::
 :: branch structure based on status as last subgoal and level shift
 ++  brancher
-  |=  [id=(unit id:nest) last=? clps=? dir=?(%p %c) indent=tape lvl=@]
+  |=  $:  id=(unit id:nest)
+          last=?
+          clps=?
+          prtd-set=(set (unit id:nest))
+          =dir:nest
+          indent=tape
+          lvl=@
+      ==
   ^-  tape
-  =/  branch-char
-    ?:  clps
-      '>'
-    '-'
   ?~  id
     ?-  dir
-      %p  !!
-      %c  "\\--All"
+      %nest-ryte  !! :: Can't print parents of virtual root node
+      %nest-left  "\\--All"
+      %prec-ryte  !!
+      %prec-left  !!
+      %prio-ryte  !!
+      %prio-left  !!
     ==
   =/  goal  (~(got by goals) u.id)
-  =/  output
-    ?:  last
-      :(weld indent "\\" (reap (dec (shift u.id dir lvl)) branch-char))
-    :(weld indent "|" (reap (dec (shift u.id dir lvl)) branch-char))
-  (weld output (trip desc.goal))
+  =/  elbow  ?:(last "\\" "|")
+  =/  branch-char
+    ?:  &(clps !=(0 ~(wyt in kids.goal)))
+      '>'
+    ?:  &((~(has in prtd-set) id) !=(0 ~(wyt in kids.goal)))
+      '<'
+    ?-  dir
+      %nest-ryte  '_'
+      %nest-left  '-'
+      %prec-ryte  '-'
+      %prec-left  '-'
+      %prio-ryte  !!
+      %prio-left  !!
+    ==
+  =/  forearm
+    ?-  dir
+      %nest-ryte  (reap (dec (shift u.id dir lvl)) branch-char)
+      %nest-left  (reap (dec (shift u.id dir lvl)) branch-char)
+      %prec-ryte  (weld (reap (sub (shift u.id dir lvl) 2) branch-char) ">")
+      %prec-left  (weld "<" (reap (sub (shift u.id dir lvl) 2) branch-char))
+      %prio-ryte  !!
+      %prio-left  !!
+    ==
+  =/  branch  :(weld indent elbow forearm)
+  (weld branch (trip desc.goal))
 ::
 :: indent structure based on ancestors
 ++  indenter
-  |=  [id=(unit id:nest) last=? dir=?(%p %c) indent=tape lvl=@]
+  |=  [id=(unit id:nest) last=? =dir:nest indent=tape lvl=@]
   ^-  tape
   ?~  id
     ?-  dir
-      %p  !!
-      %c  (reap spacer ' ')
+      %nest-ryte  !! :: Can't print parents of virtual root node
+      %nest-left  buffer
+      %prec-ryte  !!
+      %prec-left  !!
+      %prio-ryte  !!
+      %prio-left  !!
     ==
   ?:  last
     (weld indent (reap (shift u.id dir lvl) ' '))
@@ -108,53 +193,36 @@
 ::
 :: shift based on level difference from parent
 ++  shift
-  |=  [=id:nest dir=?(%p %c) lvl=@]
+  |=  [=id:nest =dir:nest lvl=@]
   ^-  @
   ?-  dir
-      %p
-    (mul spacer (sub (plumb:gols id) lvl))
-      %c
-    (mul spacer (sub lvl (plumb:gols id)))
+      %nest-ryte
+    (mul spacer (sub (nest-plumb:gols id) lvl))
+      %nest-left
+    (mul spacer (sub lvl (nest-plumb:gols id)))
+      %prec-ryte
+    (mul spacer (sub (prec-plumb:gols id) lvl))
+      %prec-left
+    (mul spacer (sub lvl (prec-plumb:gols id)))
+    %prio-ryte  !!
+    %prio-left  !!
   ==
 ::
 ::
 ++  print-utc
   |.  (print-cards ~[(weld "UTC " (trip (~(got by utc-offsets:dates) utc-offset)))])
 ::
-:: get cards to print goal substructure, catch if goal does not exist
-++  print-catch
-  |=  [id=(unit id:nest) dir=?(%p %c)]
-  ?~  id  (print id dir)
-    ?:  (~(has in ~(key by goals)) u.id)
-      (print id dir)
-    (print-cards ~["" "Specified goal does not exist."])
 ::
-:: get cards to print goal substructure, crash if goal does not exist
-++  print
-  |=  [id=(unit id:nest) dir=?(%p %c)]
-  ^-  (list card)
-  %-  print-cards 
-  =/  lvl
-    ?-  dir
-      %p  (dec (get-lvl:gols id dir))
-      %c  +((get-lvl:gols id dir))
-    ==
-  ;:  weld
-    :~  `tape`(reap 80 '-')
-        "    [hdl deadline]"
-    ==
-    (print-family id %.y %.n dir "" lvl)
-    ~[`tape`(reap 80 '-')]
-  ==
+++  hrz  `tape`(reap 80 '-')
 ::
 ::
 ++  print-goal-list
   |=  ids=(list id:nest)
   %-  print-cards
   ;:  weld
-    ~[`tape`(reap 80 '-') "[hdl deadline]"]
+    ~[hrz "[hdl]"]
     (turn ids print-single-goal)
-    ~[`tape`(reap 80 '-')]
+    ~[hrz]
   ==
 ::
 ::
@@ -162,7 +230,98 @@
   |=  =id:nest
   =/  goal  (~(got by goals) id)
   =/  hndl  (~(got by ih.handles) id)
-  "[{(trip hndl)} {(deadline-text -:(inherit-deadline:gols id))}]   {(trip desc.goal)}"
+  "[{(trip hndl)}]   {(trip desc.goal)}"
+::
+::
+++  print-cards
+  |=  tapes=(list tape)
+  ^-  (list card)
+  (turn tapes |=(=tape [%shoe ~ %sole %klr [[~ ~ ~] [(crip tape)]~]~]))
+:: 
+:: ----------------------------------------------------------------------------
+:: column functionality
+::
+:: column type definitions
++$  col-name
+  $?  %handle
+      %deadline
+      %level
+      %priority
+  ==
+::
+:: header for each column type
+++  col-head
+  |=  name=col-name
+  ^-  tape
+  ?-  name
+    %handle    "hdl"
+    %deadline  "deadline"
+    %level     "lvl"
+    %priority  "pty"
+  ==
+::
+:: data for each column type
+++  col-data
+  |=  [id=(unit id:nest) name=col-name]
+  ^-  tape
+  ?-  name
+      %handle
+    ?~  id  " ~ "
+    =/  hdl  (trip (~(got by ih.handles) u.id))
+    ?:  (gth (lent hdl) 3)  ~&('Unusually long handle.' !!)  hdl
+      %deadline
+    ?~  id  "   ~~   "
+    (deadline-text -:(inherit-deadline:gols u.id))
+      %level
+    ?~  id  (zfill:dates 3 (trip (scot %ud anchor:gols)))
+    (zfill:dates 3 (trip (scot %ud (nest-plumb:gols u.id))))
+      %priority
+    ?~  id  (zfill:dates 3 (trip (scot %ud lowpri:gols)))
+    (zfill:dates 3 (trip (scot %ud (priority:gols u.id))))
+  ==
+::
+:: lengths of each column type
+++  col-lent
+  |=  name=col-name
+  ^-  @
+  ?-  name
+    %handle    3
+    %deadline  8
+    %level     3
+    %priority  3
+  ==
+::
+:: length of all columns together with spacing
+++  cols-lent
+  |=  names=(list col-name)
+  =/  len  +((lent names))
+  =/  idx  0
+  |-
+  ?:  =(idx (lent names))
+    len
+  $(idx +(idx), len (add len (col-lent (snag idx names))))
+::
+:: columns output for specific id on specific columns
+++  columns
+  |=  [id=(unit id:nest) names=(list col-name)]
+  ^-  tape
+  =/  idx  0
+  =/  output  "["
+  |-
+  ?:  =(+(idx) (lent names))
+    :(weld output (col-data id (snag idx names)) "]")
+  $(idx +(idx), output :(weld output (col-data id (snag idx names)) " "))
+::
+:: columns output for specific id on specific columns
+++  headers
+  |=  names=(list col-name)
+  ^-  tape
+  =/  idx  0
+  =/  output  "["
+  |-
+  ?:  =(+(idx) (lent names))
+    :(weld output (col-head (snag idx names)) "]")
+  $(idx +(idx), output :(weld output (col-head (snag idx names)) " "))
 :: 
 :: ----------------------------------------------------------------------------
 :: error handling

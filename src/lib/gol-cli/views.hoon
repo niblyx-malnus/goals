@@ -7,7 +7,7 @@
 ++  collapsify
   |=  [ctx=(unit id:nest) clp=id:nest rec=? inv=?]
   =/  view  (~(got by views) ctx)
-  =/  fam  (get-fam:gols `clp %c)
+  =/  fam  (get-fam:gols `clp %nest-left)
   =.  views
     ?:  inv
       (~(put by views) ctx [(~(del in collapse.view) clp) hidden.view])

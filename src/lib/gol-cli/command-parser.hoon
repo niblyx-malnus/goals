@@ -12,7 +12,7 @@
 ++  parse-add-goal
   ;~  (glue ace)
     (cold %ag (jest 'ag'))    :: command 'ag'
-    qut                       :: argument text as cord
+    (cook crip (star prn))    :: argument text as cord
   ==
 ::
 :: nest a child goal under a parent goal
@@ -29,6 +29,22 @@
     (cold %fg (jest 'fg'))    :: command 'fg'
     (cook crip parse-handle)  :: first handle argument (child)
     (cook crip parse-handle)  :: second handle argument (parent)
+  ==
+::
+::
+++  parse-prioritize-goal
+  ;~  (glue ace)
+    (cold %pt (jest 'pt'))    ::
+    (cook crip parse-handle)  ::
+    (cook crip parse-handle)  ::
+  ==
+::
+::
+++  parse-unprioritize-goal
+  ;~  (glue ace)
+    (cold %up (jest 'up'))    ::
+    (cook crip parse-handle)  ::
+    (cook crip parse-handle)  ::
   ==
 ::
 :: precede a left goal ahead of a right goal
@@ -80,6 +96,13 @@
 ++  parse-print-parents
   ;~  (glue ace)
     (cold %pp (jest 'pp'))    :: command 'pp'
+    (cook crip parse-handle)  :: handle of goal whose parents to print
+  ==
+::
+:: will print precedents of given goal
+++  parse-print-precedents
+  ;~  (glue ace)
+    (cold %ppc (jest 'ppc'))    :: command 'ppc'
     (cook crip parse-handle)  :: handle of goal whose parents to print
   ==
 ::
