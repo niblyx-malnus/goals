@@ -9,6 +9,13 @@
   =/  grip  [%goal id]
   (~(put by views) grip *view:vyu)
 ::
+++  update-views-initial
+  |=  [=pin:gol =directory:gol =projects:gol]
+  =.  views  (update-views store)
+  =.  views  (collapsify [%all ~] [%project pin] %normal %.y %.n)
+  (collapsify [%project pin] [%project pin] %normal %.y %.n)
+
+::
 ++  update-views
   |=  [=directory:gol =projects:gol]
   ^-  views:vyu
@@ -27,6 +34,7 @@
 :: 
 ++  collapsify
   |=  [ctx=grip:vyu clp=grip:vyu =mode:gol rec=? inv=?]
+  ^-  views:vyu
   ?<  =(-.clp %all)
   =/  view  (~(got by views) ctx)
   =/  fam  (get-fam:gols clp mode)

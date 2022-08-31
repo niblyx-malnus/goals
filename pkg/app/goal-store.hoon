@@ -221,18 +221,24 @@
       [%goals ~]
     ?>  =(our.bowl src.bowl)
     :_  this
-    [%give %fact ~ %goal-update !>(store-update+store)]~
+    [%give %fact ~ %goal-update !>(initial+store)]~
       [@ @ ~]
     =/  origin  `@p`i.path
     =/  birth  `@da`i.t.path
     =/  pin  `pin:gol`[%pin origin birth]
     =/  project  (~(got by projects) pin)
     :_  this
-    [%give %fact ~ %goal-update !>(project-update+project)]~
+    [%give %fact ~ %goal-update !>(initial-project-update+project)]~
   ==
 ::
 ++  on-leave  on-leave:def
-++  on-peek   on-peek:def
+++  on-peek
+  |=  =path
+  ^-  (unit (unit cage))
+  ?+    path  (on-peek:def path)
+      [%x %initial ~]
+    ``goal-update+!>(initial+store)
+  ==
 ::
 ++  on-agent
   |=  [=wire =sign:agent:gall]
@@ -247,11 +253,7 @@
         %watch-ack
       ?~  p.sign
         =*  poke-our  ~(poke-our pass:io /invite)
-        %-  (slog 'You\'ve been invited to view a goal!' ~)
-        :_  this
-        :~  (poke-our %gol-cli view-action+!>([%collapse [%all ~] [%project pin] %.y]))
-            (poke-our %gol-cli view-action+!>([%collapse [%project pin] [%project pin] %.y]))
-        ==
+        ((slog 'You\'ve been invited to view a goal!' ~) `this)
       ((slog 'Invite failure.' ~) `this)
         %kick
       %-  (slog '%goal-store: Got kick, resubscribing...' ~)

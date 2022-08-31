@@ -44,7 +44,9 @@
 ::
 +$  update
   $%  [%project-update =project]
+      [%initial-project-update =project]
       [%store-update =store]
+      [%initial =store]
       [%new-goal =pin mod=ship =id =goal]
       [%add-under =pin mod=ship pid=id cid=id =goal]
       [%yoke-sequence =pin mod=ship =yoke-sequence]

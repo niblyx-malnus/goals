@@ -1,4 +1,5 @@
 /-  *goal-store
+/+  *gol-cli-json
 |_  upd=update
 ++  grow
   |%
@@ -7,6 +8,7 @@
 ++  grab
   |%
   ++  noun  update
+  ++  json  (enjs-update upd)
   --
 ++  grad  %noun
 --
