@@ -1,3 +1,4 @@
+/+  *gol-cli-help
 |%
 ::
 :: $id: identity of a goal; determined by creator and time of creation
@@ -70,8 +71,8 @@
       [%dag-rend e1=eid e2=eid]
   ==
 ::
-+$  yoke-tag
-  $?  %prio-rend
+++  yoke-tags
+  :~  %prio-rend
       %prio-yoke
       %prec-rend
       %prec-yoke
@@ -80,7 +81,11 @@
       %held-rend
       %held-yoke
   ==
+::
++$  yoke-tag  (union-from-list yoke-tags)
+::
 +$  composite-yoke  $%([yoke-tag lid=id rid=id])
+::
 +$  yoke-sequence  (list ?(core-yoke composite-yoke))
 ::
 +$  goal-perm

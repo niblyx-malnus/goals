@@ -1,5 +1,143 @@
 /-  *goal, *goal-store
+/+  *gol-cli-help
 |%
+++  dejs-action
+  =,  dejs:format
+  |=  jon=json
+  ^-  action
+  %.  jon
+  %-  of
+  :~  :-  %new-project
+      %-  ot
+      :~  title+so
+          chefs+dejs-set-ships
+          peons+dejs-set-ships
+          viewers+dejs-set-ships
+      ==
+      ::
+      :-  %copy-project
+      %-  ot
+      :~  old-pin+dejs-pin
+          title+so
+          chefs+dejs-set-ships
+          peons+dejs-set-ships
+          viewers+dejs-set-ships
+      ==
+      ::
+      :-  %new-goal
+      %-  ot
+      :~  pin+dejs-pin
+          desc+so
+          chefs+dejs-set-ships
+          peons+dejs-set-ships
+          deadline+dejs-unit-date
+          actionable+bo
+      ==
+      ::
+      :-  %add-under
+      %-  ot
+      :~  id+dejs-id
+          desc+so
+          chefs+dejs-set-ships
+          peons+dejs-set-ships
+          deadline+dejs-unit-date
+          actionable+bo
+      ==
+      [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
+      [%edit-project-title (ot ~[pin+dejs-pin title+so])]
+      [%delete-project (ot ~[pin+dejs-pin])]
+      [%delete-goal (ot ~[id+dejs-id])]
+      [%yoke-sequence (ot ~[pin+dejs-pin yoke-sequence+dejs-yoke-seq])]
+      [%set-deadline (ot ~[id+dejs-id deadline+dejs-unit-date])]
+      [%mark-actionable (ot ~[id+dejs-id])]
+      [%unmark-actionable (ot ~[id+dejs-id])]
+      [%mark-complete (ot ~[id+dejs-id])]
+      [%unmark-complete (ot ~[id+dejs-id])]
+      [%make-chef (ot ~[chef+dejs-ship id+dejs-id])]
+      [%make-peon (ot ~[peon+dejs-ship id+dejs-id])]
+  ==
+::
+++  dejs-unit-date  |=(jon=json ?~(jon ~ (some (ni:dejs:format jon))))
+++  dejs-pin  (pe:dejs:format %pin dejs-id)
+++  dejs-id  (ot ~[owner+(su fed:ag) birth+ni]):dejs:format
+++  dejs-set-ships  (as:dejs:format dejs-ship)
+++  dejs-ship  (su fed:ag):dejs:format
+++  dejs-yoke-seq  (ar:dejs:format dejs-yoke)
+++  dejs-yoke  (ot:dejs:format ~[yoke+dejs-yoke-tag lid+dejs-id rid+dejs-id])
+++  parse-yoke-tag
+  ;~  pose
+    (cold %prio-rend (jest 'prio-rend'))
+    (cold %prio-yoke (jest 'prio-yoke'))
+    (cold %prec-rend (jest 'prec-rend'))
+    (cold %prec-yoke (jest 'prec-yoke'))
+    (cold %nest-rend (jest 'nest-rend'))
+    (cold %nest-yoke (jest 'nest-yoke'))
+    (cold %held-rend (jest 'held-rend'))
+    (cold %held-yoke (jest 'held-yoke'))
+  ==
+++  dejs-yoke-tag  (su:dejs:format parse-yoke-tag)
+::
+++  dejs-tests
+  |%
+  ++  new-project
+    =,  enjs:format
+    ^-  json
+    %+  frond
+      %new-project
+    %-  pairs
+    :~  [%title s+'test']
+        [%chefs a+~[s+'zod' s+'nec' s+'bud']]
+        [%peons a+~[s+'zod' s+'nec' s+'bud']]
+        [%viewers a+~[s+'zod' s+'nec' s+'bud']]
+    ==
+  ++  copy-project
+    =,  enjs:format
+    ^-  json
+    %+  frond
+      %copy-project
+    %-  pairs
+    :~  [%old-pin (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
+        [%title s+'test']
+        [%chefs a+~[s+'zod' s+'nec' s+'bud']]
+        [%peons a+~[s+'zod' s+'nec' s+'bud']]
+        [%viewers a+~[s+'zod' s+'nec' s+'bud']]
+    ==
+  ++  new-goal
+    =,  enjs:format
+    ^-  json
+    %+  frond
+      %new-goal
+    %-  pairs
+    :~  [%pin (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
+        [%desc s+'test desc']
+        [%chefs a+~[s+'zod' s+'nec' s+'bud']]
+        [%peons a+~[s+'zod' s+'nec' s+'bud']]
+        [%deadline (numb (add ~2000.1.1 ~s1..0001))]
+        [%actionable b+%.n]
+    ==
+  ++  yoke-sequence
+    =,  enjs:format
+    ^-  json
+    %+  frond
+      %yoke-sequence
+    %-  pairs
+    :~  [%pin (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
+        :-  %yoke-sequence
+        :-  %a
+        :~  %-  pairs
+            :~  [%yoke s+'nest-yoke']
+                [%lid (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
+                [%rid (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
+            ==
+            %-  pairs
+            :~  [%yoke s+'prec-rend']
+                [%lid (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
+                [%rid (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
+            ==
+        ==
+    ==
+  --
+::
 ++  enjs-update
   =,  enjs:format
   |=  =update
@@ -88,7 +226,7 @@
    |=  =split
    ^-  json
    %-  pairs
-   :~  [%moment ?~(moment.split ~ (time u.moment.split))]
+   :~  [%moment ?~(moment.split ~ (numb `@`u.moment.split))]
        [%inflow a+(turn ~(tap in inflow.split) enjs-eid)]
        [%outflow a+(turn ~(tap in outflow.split) enjs-eid)]
    ==
@@ -97,33 +235,23 @@
   =,  enjs:format
   |=  =eid
   ^-  json
-  %+  frond
-    %eid
   %-  pairs
   :~  [%edge s+-.eid]
-      [%owner (ship owner.id.eid)]
-      [%birth (time birth.id.eid)]
+      [%id (enjs-id +.eid)]
   ==
 ::
 ++  enjs-pin
   =,  enjs:format
   |=  =pin
   ^-  json
-  %+  frond
-    %pin
-  %-  pairs
-  :~  [%owner (ship owner.pin)]
-      [%birth (time birth.pin)]
-  ==
+  (enjs-id +.pin)
 ::
 ++  enjs-id
   =,  enjs:format
   |=  =id
   ^-  json
-  %+  frond
-    %id
   %-  pairs
   :~  [%owner (ship owner.id)]
-      [%birth (time birth.id)]
+      [%birth (numb `@`birth.id)]
   ==
 --

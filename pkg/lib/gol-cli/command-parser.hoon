@@ -1,4 +1,4 @@
-/+  dates=gol-cli-dates
+/+  dates=gol-cli-dates, *gol-cli-help
 |%
 ++  command-parser
   |=  [now=@da =utc-offset:dates]
@@ -364,8 +364,4 @@
     (cook |=(a=tape (some (crip a))) parse-handle) :: cook handle to unit
     (cold %~ (just '~'))                           :: if input ~, output ~
   ==
-::
-:: stolen from Fang's suite/lib/pal.hoon
-++  may  |*([else=* =rule] ;~(pose rule (easy else)))
-++  opt  |*(=rule (may rule ~))
 --
