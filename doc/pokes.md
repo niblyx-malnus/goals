@@ -1,6 +1,27 @@
 # Pokes 
 Available pokes for `%goal-store` as nouns and as JSON.
 
+### poke-list
+
+```
+%new-project
+%copy-project
+%new-goal                                                                       
+%add-under                                                                      
+%edit-goal-desc                                                                 
+%edit-project-title                                                             
+%delete-project                                                                 
+%delete-goal                                                                    
+%yoke-sequence                                                                  
+%set-deadline                                                                   
+%mark-actionable                                                                
+%unmark-actionable                                                              
+%mark-complete                                                                  
+%unmark-complete                                                                
+%make-chef
+%make-peon
+```
+
 ## %new-project
 
 ### Description
@@ -36,20 +57,167 @@ Create a new project.
 }
 ```
 
-## copy-project
+## %copy-project
+### Description
 
-%copy-project                                                                   
-%new-goal                                                                       
-%add-under                                                                      
-%edit-goal-desc                                                                 
-%edit-project-title                                                             
-%delete-project                                                                 
-%delete-goal                                                                    
-%yoke-sequence                                                                  
-%set-deadline                                                                   
-%mark-actionable                                                                
-%unmark-actionable                                                              
-%mark-complete                                                                  
-%unmark-complete                                                                
-%make-chef
-%make-peon
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %new-goal  
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %add-under
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %edit-goal-desc
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %edit-project-title
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %delete-project
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %delete-goal
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %yoke-sequence
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %set-deadline
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %mark-actionable
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %unmark-actionable
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %mark-complete
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %unmark-complete
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %make-chef
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
+
+## %make-peon
+### Description
+
+### Noun
+```
+```
+
+### JSON
+```
+```
