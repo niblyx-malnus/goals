@@ -1,3 +1,7 @@
+|  Noun  |  JSON  |
+| ------ | ------ |
+| `[%new-project title=@t chefs=(set ship) peons=(set ship) viewers=(set ship)` | *** |
+
 %new-project                                                                                                                                                  
 %copy-project                                                                   
 %new-goal                                                                       
