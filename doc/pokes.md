@@ -287,6 +287,20 @@ Delete a goal.
 
 ## %yoke-sequence
 ### Description
+Apply a sequence of graph transformations on the DAG data structure (if all are successful; if any fail, none go through).
+
+There are 8 kinds of "yokes":
+
+```
+[%held-yoke lid rid]  creates an ownership/containment relationship: lid is owned/contained by rid
+[%held-rend lid rid]  breaks an ownership/containment relationship: lid is no longer owned/contained by rid
+[%nest-yoke lid rid]  creates a "virtual nesting" relationship; lid is virtually nested under rid
+[%nest-rend lid rid]  breaks a "virtual nesting" relationship; lid is no longer directly virtually nested under rid
+[%prec-yoke lid rid]  creates a precedence relationship; lid precedes rid
+[%prec-rend lid rid]  breaks a precedence relationship; lid no longer directly precedes rid
+[%prio-yoke lid rid]  creates a priority relationship; lid is prioritized over rid
+[%prio-rend lid rid]  breaks a priority relationship; lid is no longer directly prioritized over rid
+```
 
 ### Noun
 ```
@@ -295,6 +309,49 @@ Delete a goal.
 
 ### JSON
 ```
+{
+  "yoke-sequence": {
+    "pin": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    },
+    "yoke-sequence": [
+      {
+        "yoke": "nest-yoke",
+        "lid": {
+          "owner": "zod"
+          "birth": 12345134551113451361
+        },
+        "rid": {
+          "owner": "zod"
+          "birth": 12345134514371751115
+        }
+      },
+      {
+        "yoke": "prec-yoke",
+        "lid": {
+          "owner": "zod"
+          "birth": 12345134551113451361
+        },
+        "rid": {
+          "owner": "zod"
+          "birth": 12345134514371751115
+        }
+      },
+      {
+        "yoke": "prio-rend",
+        "lid": {
+          "owner": "zod"
+          "birth": 12345134551113451361
+        },
+        "rid": {
+          "owner": "zod"
+          "birth": 12345134514371751115
+        }
+      }
+    ]
+  }
+}
 ```
 
 ## %set-deadline
