@@ -1,0 +1,16 @@
+%new-project                                                                                                                                                  
+%copy-project                                                                   
+%new-goal                                                                       
+%add-under                                                                      
+%edit-goal-desc                                                                 
+%edit-project-title                                                             
+%delete-project                                                                 
+%delete-goal                                                                    
+%yoke-sequence                                                                  
+%set-deadline                                                                   
+%mark-actionable                                                                
+%unmark-actionable                                                              
+%mark-complete                                                                  
+%unmark-complete                                                                
+%make-chef
+%make-peon
