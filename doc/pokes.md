@@ -1,6 +1,6 @@
 |  Noun  |  JSON  |
 | ------ | ------ |
-| `[%new-project title=@t chefs=(set ship) peons=(set ship) viewers=(set ship)]` | `{new-project:`<br>`    {title:"title",chefs:{{"zod"},{"nec"},{"bud"}},peons:{{"zod"},{"nec"},{"bud"}},viewers:{{"zod"},{"nec"},{"bud"}}` |
+| `:*  %new-project`<br>`title=@t`<br>`chefs=(set ship)`<br>`peons=(set ship)`<br>`viewers=(set ship)`<br>`==` | `{new-project:`<br>`    {title:"title",chefs:{{"zod"},{"nec"},{"bud"}},peons:{{"zod"},{"nec"},{"bud"}},viewers:{{"zod"},{"nec"},{"bud"}}` |
 
 %new-project                                                                                                                                                  
 %copy-project                                                                   
