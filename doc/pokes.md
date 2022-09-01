@@ -20,9 +20,7 @@ Available pokes for `%goal-store` as nouns and as JSON.
     "title": "title of new project",
     "chefs": ["zod", "nec", "bud"],
     "peons": ["zod", "nec", "bud"],
-    "viewers": ["zod", "nec", "bud"],
-      }
-    ]
+    "viewers": ["zod", "nec", "bud"]
   }
 }
 ```
