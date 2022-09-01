@@ -36,7 +36,7 @@ Create a new project.
 
 ### Noun
 ```
-:*  %new-project
+$:  %new-project
     title=@t
     chefs=(set ship)
     peons=(set ship)
@@ -61,10 +61,29 @@ Create a new project.
 
 ### Noun
 ```
+$:  %copy-project
+    =old=pin
+    title=@t
+    chefs=(set ship)
+    peons=(set ship)
+    viewers=(set ship)
+==
 ```
 
 ### JSON
 ```
+{
+  "copy-project": {
+    "old-pin": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    }
+    "title": "title of new project",
+    "chefs": ["zod", "nec", "bud"],
+    "peons": ["zod", "nec", "bud"],
+    "viewers": ["zod", "nec", "bud"]
+  }
+}
 ```
 
 ## %new-goal  
