@@ -2,7 +2,7 @@
 Available pokes for `%goal-store` as nouns and as JSON.
 
 ### Poke List
-[link-test](%new-project)
+[link-test](#%new-project)
 ```
 %new-project
 %copy-project
