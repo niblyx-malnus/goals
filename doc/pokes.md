@@ -77,7 +77,7 @@ $:  %copy-project
     "old-pin": {
       "owner": "zod"
       "birth": 12345134551113451361
-    }
+    },
     "title": "title of new project",
     "chefs": ["zod", "nec", "bud"],
     "peons": ["zod", "nec", "bud"],
@@ -103,6 +103,19 @@ $:  %new-goal
 
 ### JSON
 ```
+{
+  "new-goal": {
+    "pin": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    },
+    "desc": "description of new goal",
+    "chefs": ["zod", "nec", "bud"],
+    "peons": ["zod", "nec", "bud"],
+    "deadline": (null or 12345134551113451361)
+    "actionable": true
+  }
+}
 ```
 
 ## %add-under
@@ -122,6 +135,19 @@ $:  %add-under
 
 ### JSON
 ```
+{
+  "add-under": {
+    "id": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    },
+    "desc": "description of new goal",
+    "chefs": ["zod", "nec", "bud"],
+    "peons": ["zod", "nec", "bud"],
+    "deadline": (null or 12345134551113451361)
+    "actionable": true
+  }
+}
 ```
 
 ## %edit-goal-desc
@@ -134,6 +160,15 @@ $:  %add-under
 
 ### JSON
 ```
+{
+  "edit-goal-desc": {
+    "id": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    },
+    "desc": "new description of goal"
+  }
+}
 ```
 
 ## %edit-project-title
@@ -146,6 +181,15 @@ $:  %add-under
 
 ### JSON
 ```
+{
+  "edit-project-title": {
+    "pin": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    },
+    "title": "new title of project"
+  }
+}
 ```
 
 ## %delete-project
@@ -158,6 +202,14 @@ $:  %add-under
 
 ### JSON
 ```
+{
+  "delete-project": {
+    "pin": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    }
+  }
+}
 ```
 
 ## %delete-goal
@@ -170,6 +222,14 @@ $:  %add-under
 
 ### JSON
 ```
+{
+  "delete-goal": {
+    "id": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    }
+  }
+}
 ```
 
 ## %yoke-sequence
@@ -194,6 +254,15 @@ $:  %add-under
 
 ### JSON
 ```
+{
+  "set-deadline": {
+    "id": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    },
+    "deadline": (null or 12345134551113451361)
+  }
+}
 ```
 
 ## %mark-actionable
@@ -206,6 +275,14 @@ $:  %add-under
 
 ### JSON
 ```
+{
+  "mark-actionable": {
+    "id": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    }
+  }
+}
 ```
 
 ## %unmark-actionable
@@ -218,6 +295,14 @@ $:  %add-under
 
 ### JSON
 ```
+{
+  "unmark-actionable": {
+    "id": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    }
+  }
+}
 ```
 
 ## %mark-complete
@@ -230,6 +315,14 @@ $:  %add-under
 
 ### JSON
 ```
+{
+  "mark-complete": {
+    "id": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    }
+  }
+}
 ```
 
 ## %unmark-complete
@@ -242,6 +335,14 @@ $:  %add-under
 
 ### JSON
 ```
+{
+  "unmark-complete": {
+    "id": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    }
+  }
+}
 ```
 
 ## %make-chef
@@ -254,6 +355,15 @@ $:  %add-under
 
 ### JSON
 ```
+{
+  "make-chef": {
+    "chef": "zod",
+    "id": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    }
+  }
+}
 ```
 
 ## %make-peon
@@ -266,4 +376,13 @@ $:  %add-under
 
 ### JSON
 ```
+{
+  "make-peon": {
+    "peon": "zod",
+    "id": {
+      "owner": "zod"
+      "birth": 12345134551113451361
+    }
+  }
+}
 ```
