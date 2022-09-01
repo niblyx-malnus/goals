@@ -2,8 +2,8 @@
 Available pokes for `%goal-store` as nouns and as JSON.
 
 ### Poke List
-[%new-project](#%new-project)
-
+```
+%new-project
 %copy-project
 %new-goal                                                                       
 %add-under                                                                      
@@ -19,6 +19,7 @@ Available pokes for `%goal-store` as nouns and as JSON.
 %unmark-complete                                                                
 %make-chef
 %make-peon
+```
 
 ## %new-project
 
