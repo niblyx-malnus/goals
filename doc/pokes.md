@@ -58,6 +58,17 @@ $:  %new-project
 
 ## %copy-project
 ### Description
+Make a copy of an existing project.
+
+`old-pin` is the "pin" or project id of the project you want to copy.
+
+`title` is the title of the new project copy.
+
+`chefs` are essentially admins; they have full permissions to add/edit/delete any goal in the project.
+
+`peons` can mark (and unmark) any goal in the project complete. This is the only kind of permissions they have.
+
+`viewers` can view the project and store a copy of the project on their own ship.
 
 ### Noun
 ```
@@ -88,6 +99,19 @@ $:  %copy-project
 
 ## %new-goal  
 ### Description
+Create a new root goal in a given project.
+
+`pin` is the "pin" or project id of the project you want to add a goal to.
+
+`desc` is the description of the new goal.
+
+`chefs` are essentially admins; they have full permissions to add/edit/delete this goal, or any of its descendents.
+
+`peons` can mark (and unmark) this goal and any of its descendents complete. This is the only kind of permissions they have.
+
+`deadline` is an optional datetime marking the deadline for the goal.
+
+`actionable` denotes whether a goal is allowed to contain further goals or not. An actionable goal cannot contain subgoals.
 
 ### Noun
 ```
@@ -120,6 +144,19 @@ $:  %new-goal
 
 ## %add-under
 ### Description
+Create a goal under/owned-by/contained-by an existing goal.
+
+`id` is the goal id of the goal you want to add a goal under.
+
+`desc` is the description of the new goal.
+
+`chefs` are essentially admins; they have full permissions to add/edit/delete this goal, or any of its descendents.
+
+`peons` can mark (and unmark) this goal and any of its descendents complete. This is the only kind of permissions they have.
+
+`deadline` is an optional datetime marking the deadline for the goal.
+
+`actionable` denotes whether a goal is allowed to contain further goals or not. An actionable goal cannot contain subgoals.
 
 ### Noun
 ```
@@ -152,6 +189,11 @@ $:  %add-under
 
 ## %edit-goal-desc
 ### Description
+Edit the description of an existing goal.
+
+`id` is the goal id of the goal whose description you want to edit.
+
+`desc` is the new description of the goal.
 
 ### Noun
 ```
@@ -173,6 +215,11 @@ $:  %add-under
 
 ## %edit-project-title
 ### Description
+Edit the title of an existing project.
+
+`pin` is the "pin" or project id of the project whose title you want to edit.
+
+`title` is the new title of the project.
 
 ### Noun
 ```
@@ -194,6 +241,9 @@ $:  %add-under
 
 ## %delete-project
 ### Description
+Delete a project.
+
+`pin` is the "pin" or project id of the project you want to delete.
 
 ### Noun
 ```
@@ -214,6 +264,9 @@ $:  %add-under
 
 ## %delete-goal
 ### Description
+Delete a goal.
+
+`id` is the goal id of the goal you want to delete.
 
 ### Noun
 ```
@@ -246,6 +299,11 @@ $:  %add-under
 
 ## %set-deadline
 ### Description
+Set the deadline of a goal.
+
+`id` is the goal id of the goal whose deadline you want to set.
+
+`deadline` is the optional datetime you will use to set the deadline.
 
 ### Noun
 ```
@@ -267,6 +325,9 @@ $:  %add-under
 
 ## %mark-actionable
 ### Description
+Mark a goal actionable. An actionable goal can have no subgoals.
+
+`id` is the goal id of the goal you want to mark actionable.
 
 ### Noun
 ```
@@ -287,6 +348,9 @@ $:  %add-under
 
 ## %unmark-actionable
 ### Description
+Unmark a goal actionable. An actionable goal can have no subgoals.
+
+`id` is the goal id of the goal you want to unmark actionable.
 
 ### Noun
 ```
@@ -307,6 +371,9 @@ $:  %add-under
 
 ## %mark-complete
 ### Description
+Mark a goal complete. All preceding goals must already be marked complete.
+
+`id` is the goal id of the goal you want to mark complete.
 
 ### Noun
 ```
@@ -327,6 +394,9 @@ $:  %add-under
 
 ## %unmark-complete
 ### Description
+Unmark a goal complete. No succeeding goals can already be marked complete.
+
+`id` is the goal id of the goal you want to unmark complete.
 
 ### Noun
 ```
@@ -347,6 +417,11 @@ $:  %add-under
 
 ## %make-chef
 ### Description
+Make a ship a "chef" on a given goal. A "chef" has broad permissions on a goal and all its descendents.
+
+`chef` is the ship you want to make a "chef".
+
+`id` is the goal id of the goal you want to make `chef` a "chef" of.
 
 ### Noun
 ```
@@ -368,6 +443,11 @@ $:  %add-under
 
 ## %make-peon
 ### Description
+Make a ship a "peon" on a given goal. A "peon" can mark (and unmark) a goal and all its descendents complete.
+
+`peon` is the ship you want to make a "peon".
+
+`id` is the goal id of the goal you want to make `peon` a "peon" of.
 
 ### Noun
 ```
