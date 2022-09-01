@@ -91,6 +91,14 @@ $:  %copy-project
 
 ### Noun
 ```
+$:  %new-goal                                                                   
+  =pin                                                                             
+  desc=@t                                                                       
+  chefs=(set ship)                                                                 
+  peons=(set ship)                                                              
+  deadline=(unit @da)                                                           
+  actionable=?                                                                  
+==                                                                                 
 ```
 
 ### JSON
@@ -102,6 +110,14 @@ $:  %copy-project
 
 ### Noun
 ```
+$:  %add-under                                                                  
+  =id                                                                           
+  desc=@t                                                                       
+  chefs=(set ship)                                                              
+  peons=(set ship)                                                              
+  deadline=(unit @da)                                                           
+  actionable=?                                                                  
+==                                                                              
 ```
 
 ### JSON
@@ -113,6 +129,7 @@ $:  %copy-project
 
 ### Noun
 ```
+[%edit-goal-desc =id desc=@t]                                                   
 ```
 
 ### JSON
@@ -124,6 +141,7 @@ $:  %copy-project
 
 ### Noun
 ```
+[%edit-project-title =pin title=@t]                                             
 ```
 
 ### JSON
@@ -135,6 +153,7 @@ $:  %copy-project
 
 ### Noun
 ```
+[%delete-project =pin]                                                          
 ```
 
 ### JSON
@@ -146,6 +165,7 @@ $:  %copy-project
 
 ### Noun
 ```
+[%delete-goal =id]                                                              
 ```
 
 ### JSON
@@ -157,6 +177,7 @@ $:  %copy-project
 
 ### Noun
 ```
+[%yoke-sequence =pin =yoke-sequence]                                               
 ```
 
 ### JSON
@@ -168,6 +189,7 @@ $:  %copy-project
 
 ### Noun
 ```
+[%set-deadline =id deadline=(unit @da)]                                         
 ```
 
 ### JSON
@@ -179,6 +201,7 @@ $:  %copy-project
 
 ### Noun
 ```
+[%mark-actionable =id]                                                          
 ```
 
 ### JSON
@@ -190,6 +213,7 @@ $:  %copy-project
 
 ### Noun
 ```
+[%unmark-actionable =id]                                                        
 ```
 
 ### JSON
@@ -201,6 +225,7 @@ $:  %copy-project
 
 ### Noun
 ```
+[%mark-complete =id]
 ```
 
 ### JSON
@@ -212,6 +237,7 @@ $:  %copy-project
 
 ### Noun
 ```
+[%unmark-complete =id]                                                          
 ```
 
 ### JSON
@@ -223,6 +249,7 @@ $:  %copy-project
 
 ### Noun
 ```
+[%make-chef chef=ship =id]
 ```
 
 ### JSON
@@ -234,6 +261,7 @@ $:  %copy-project
 
 ### Noun
 ```
+[%make-peon peon=ship =id]                                                      
 ```
 
 ### JSON
