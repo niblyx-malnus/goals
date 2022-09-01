@@ -3,6 +3,17 @@ Available pokes for `%goal-store` as nouns and as JSON.
 
 ## %new-project
 
+### Description
+Create a new project.
+
+`title` is the title of the new project.
+
+`chefs` are essentially admins; they have full permissions to add/edit/delete any goal in the project.
+
+`peons` can mark (and unmark) any goal in the project complete. This is the only kind of permissions they have.
+
+`viewers` can view the project and store a copy of the project on their own ship.
+
 ### Noun
 ```
 :*  %new-project
