@@ -1,8 +1,34 @@
-|  Noun  |  JSON  |
-| ------ | ------ |
-| `:*  %new-project`<br>`title=@t`<br>`chefs=(set ship)`<br>`peons=(set ship)`<br>`viewers=(set ship)`<br>`==` | `{new-project:{`<br>`title:"title",`<br>`chefs:{`<br>`{"zod"},{"nec"},{"bud"}`<br>`},`<br>`peons:{`<br>`{"zod"},{"nec"},{"bud"}`<br>`},`<br>`viewers:{`<br>`{"zod"},{"nec"},{"bud"}`<br>`}` |
+# Pokes 
+Available pokes for `%goal-store` as nouns and as JSON.
 
-%new-project                                                                                                                                                  
+## %new-project
+
+### Noun
+```
+:*  %new-project
+    title=@t
+    chefs=(set ship)
+    peons=(set ship)
+    viewers=(set ship)
+==
+```
+
+### JSON
+```
+{
+  "new-project": {
+    "title": "title of new project",
+    "chefs": ["zod", "nec", "bud"],
+    "peons": ["zod", "nec", "bud"],
+    "viewers": ["zod", "nec", "bud"],
+      }
+    ]
+  }
+}
+```
+
+## copy-project
+
 %copy-project                                                                   
 %new-goal                                                                       
 %add-under                                                                      
