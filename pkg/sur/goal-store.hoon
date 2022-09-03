@@ -56,6 +56,8 @@
   $%  [%harvest harvest=(list id)]
       [%get-goal ugoal=(unit goal)]
       [%ryte-bound moment=(unit @da) hereditor=eid]
+      [%plumb depth=@ud]
+      [%seniority u-senior=(unit id)]
   ==
 ::
 +$  store-update  [=pin =update =store]

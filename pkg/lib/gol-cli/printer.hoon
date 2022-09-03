@@ -50,6 +50,46 @@
   ?+  -.pyk  !!
     %ryte-bound  moment.pyk
   ==
+::
+++  plumb
+  |=  =id:gol
+  ^-  @ud
+  =/  pyk=peek:goal-store
+    .^  peek:goal-store
+      %gx
+      :~  (scot %p our.bowl)
+          %goal-store
+          (scot %da now.bowl)
+          %plumb
+          (scot %p owner.id)
+          (scot %da birth.id)
+          %goal-peek
+      ==
+    ==
+  ?+  -.pyk  !!
+    %plumb  depth.pyk
+  ==
+::
+++  seniority
+  |=  [mod=ship =id:gol cp=?(%c %p)]
+  ^-  (unit id:gol)
+  =/  pyk=peek:goal-store
+    .^  peek:goal-store
+      %gx
+      :~  (scot %p our.bowl)
+          %goal-store
+          (scot %da now.bowl)
+          %seniority
+          (scot %p mod)
+          (scot %p owner.id)
+          (scot %da birth.id)
+          [cp]
+          %goal-peek
+      ==
+    ==
+  ?+  -.pyk  !!
+    %seniority  u-senior.pyk
+  ==
 :: TODO:
 :: different harvesting...
 ::
@@ -103,8 +143,8 @@
     =/  chefs  (~(put in chefs:(~(got by pools.store) (~(got by directory.store) id.grip))) owner.id.grip)
     ?:  (~(has in chefs) our.bowl)
       "c"
-    =/  c-sen  (seniority:gols our.bowl id.grip ~ ~ %c)
-    =/  p-sen  (seniority:gols our.bowl id.grip ~ ~ %p)
+    =/  c-sen  (seniority our.bowl id.grip %c)
+    =/  p-sen  (seniority our.bowl id.grip %p)
     ?~  c-sen
       ?~  p-sen
         "~"
@@ -322,7 +362,7 @@
       %goal
     ?+    mode.block  !!
         normal-mode:gol
-      (mul spacer (sub lvl.block (plumb:gols +.grip.block)))
+      (mul spacer (sub lvl.block (plumb +.grip.block)))
     ==
   ==
 :: 

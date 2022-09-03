@@ -268,13 +268,24 @@
     =/  pool  (~(got by pools) pin)
     ``goal-peek+!>(ryte-bound+(~(ryte-bound pl pin pool) [%d id]))
     ::
-    ::  [%x %plumb @ @ ~]
-    ::=/  owner  (slav %p i.t.t.path)
-    ::=/  birth  (slav %da i.t.t.t.path)
-    ::=/  id  `id:gol`[owner birth]
-    ::=/  pin  (~(got by directory) id)
-    ::=/  pool  (~(got by pools) pin)
-    ::``goal-peek+!>(ryte-bound+(~(ryte-bound pl pin pool) [%d id]))
+      [%x %plumb @ @ ~]
+    =/  owner  (slav %p i.t.t.path)
+    =/  birth  (slav %da i.t.t.t.path)
+    =/  id  `id:gol`[owner birth]
+    =/  pin  (~(got by directory) id)
+    =/  pool  (~(got by pools) pin)
+    ``goal-peek+!>(plumb+(~(plumb pl pin pool) id))
+    ::
+      [%x %seniority @ @ @ @ ~]
+    =/  mod  (slav %p i.t.t.path)
+    =/  owner  (slav %p i.t.t.t.path)
+    =/  birth  (slav %da i.t.t.t.t.path)
+    =/  cp  i.t.t.t.t.t.path
+    ?>  ?=(?(%c %p) cp)
+    =/  id  `id:gol`[owner birth]
+    =/  pin  (~(got by directory) id)
+    =/  pool  (~(got by pools) pin)
+    ``goal-peek+!>(seniority+(~(seniority pl pin pool) mod id cp))
   ==
 ::
 ++  on-agent

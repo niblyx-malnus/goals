@@ -1,4 +1,5 @@
 /-  *goal-store
+/+  *gol-cli-json
 |_  act=action
 ++  grow
   |%

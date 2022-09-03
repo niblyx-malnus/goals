@@ -1,4 +1,5 @@
 /-  gol=goal
+/+  *gol-cli-goal
 |_  [=pin:gol p=pool:gol]
 ++  got-edge
   |=  =eid:gol
@@ -179,6 +180,54 @@
       visited  visited.cmp
     ==
   --
+::
+::  get depth of a given goal (lowest level is depth of 1)
+++  plumb
+  |=  =id:gol
+  ^-  @ud
+  =/  goal  (~(got by goals.p) id)
+  =/  lvl  1
+  =/  gots  (yung goal)
+  ?:  =(0 ~(wyt in gots))  lvl :: if childless, depth of 1
+  =/  idx  0
+  =/  gots  ~(tap in gots)
+  |-
+  ?:  =(idx (lent gots))  +(lvl) :: add 1 to maximum child depth
+  $(idx +(idx), lvl (max lvl (plumb (snag idx gots))))
+::
+:: get roots
+++  roots
+  |=  =goals:gol
+  ^-  (list id:gol)
+  %+  turn
+    %+  skim  ~(tap by goals)
+    |=  [id:gol =goal:gol]
+    ?&  =(~ par.goal)
+        .=  0
+        %-  lent
+        %+  murn
+          ~(tap in outflow.deadline.goal)
+        |=  =eid:gol
+        ?-  -.eid
+          %k  ~
+          %d  (some id.eid)
+        ==
+    ==
+  |=([=id:gol goal:gol] id)
+::
+++  uncompleted-roots
+  |=  =goals:gol
+  %+  murn  (roots goals)
+  |=  =id:gol
+  ?:  complete:(~(got by goals) id)
+    ~
+  (some id)
+::
+:: get max depth + 1; depth of "virtual" root node
+++  anchor  
+  |=  =goals:gol
+  ^-  @ud
+  +((roll (turn (roots goals) plumb) max))
 ::
 :: is e1 before e2
 ++  before
