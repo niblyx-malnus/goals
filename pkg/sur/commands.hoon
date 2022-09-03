@@ -25,20 +25,13 @@
       [%nest-left l=@t r=@t]
       [%prec-left l=@t r=@t]
       [%prio-left l=@t r=@t]
-      [%ng c=@t p=@t]               :: nest goal (perhaps better ns?)
-      [%mv c=@t p=@t]               :: move goal (nest under specified, unnest from current context)
-      [%fg c=@t p=@t]               :: flee/unnest goal (perhaps better un?)
-      [%ap l=@t r=@t]               :: precede goal (add precedence)
-      [%rp l=@t r=@t]               :: unprecede goal (remove precedence)
-      [%up l=@t r=@t]               :: unprioritize
-      [%new-project title=@t]                :: new project
-      [%delete-project-goal h=@t]
-      [%copy-project h=@t title=@t]                :: new project
+      [%new-pool title=@t]                :: new pool
+      [%delete-pool-goal h=@t]
+      [%copy-pool h=@t title=@t]                :: new pool
       [%add-goal desc=@t]                 :: add goal
       [%at desc=@t]                 :: add task (actionable goal)
       [%edit-goal-desc h=@t desc=@t]            :: edit goal (replace description)
-      [%edit-project-title h=@t title=@t]           :: edit project (replace title)
-      [%rg h=@t]                    :: remove goal
+      [%edit-pool-title h=@t title=@t]           :: edit pool (replace title)
       [%pp h=@t]                    :: print parents
       [%ppc h=@t]                   :: print precedents
       [%collapse h=@t rec=?]              :: collapse goal with respect to current context

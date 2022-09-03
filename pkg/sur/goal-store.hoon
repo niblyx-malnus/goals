@@ -2,8 +2,8 @@
 |%
 ::
 +$  action
-  $%  [%new-project title=@t chefs=(set ship) peons=(set ship) viewers=(set ship)]
-      $:  %copy-project 
+  $%  [%new-pool title=@t chefs=(set ship) peons=(set ship) viewers=(set ship)]
+      $:  %copy-pool 
         =old=pin
         title=@t
         chefs=(set ship)
@@ -27,8 +27,8 @@
         actionable=?
       ==
       [%edit-goal-desc =id desc=@t]
-      [%edit-project-title =pin title=@t]
-      [%delete-project =pin]
+      [%edit-pool-title =pin title=@t]
+      [%delete-pool =pin]
       [%delete-goal =id]
       [%yoke-sequence =pin =yoke-sequence]
       [%set-deadline =id deadline=(unit @da)]
@@ -43,13 +43,19 @@
   ==
 ::
 +$  update
-  $%  [%project-update =project]
-      [%initial-project-update =project]
+  $%  [%pool-update =pool]
+      [%initial-pool-update =pool]
       [%store-update =store]
       [%initial =store]
       [%new-goal =pin mod=ship =id =goal]
       [%add-under =pin mod=ship pid=id cid=id =goal]
       [%yoke-sequence =pin mod=ship =yoke-sequence]
+  ==
+::
++$  peek
+  $%  [%harvest harvest=(list id)]
+      [%get-goal ugoal=(unit goal)]
+      [%ryte-bound moment=(unit @da) hereditor=eid]
   ==
 ::
 +$  store-update  [=pin =update =store]

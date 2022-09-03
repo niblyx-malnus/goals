@@ -1,6 +1,6 @@
-/-  gol=goal, vyu=view
+/-  gol=goal, vyu=view, goal-store
 /+  shoe, dates=gol-cli-dates,
-    *gol-cli-goal, gol-cli-goals, gol-cli-handles, gol-cli-goal-store
+    *gol-cli-goal, gol-cli-goals, gol-cli-handles
 |_  $:  =store:gol
         =handles:vyu
         =views:vyu
@@ -10,11 +10,47 @@
     ==
 +*  gols  ~(. gol-cli-goals store)
     hdls  ~(. gol-cli-handles store handles)
-    gs    ~(. gol-cli-goal-store store)
 +$  card  card:shoe
+:: scries into %goal-store
+::
+++  got-goal
+  |=  =id:gol
+  ^-  goal:gol
+  =/  pyk=peek:goal-store
+    .^  peek:goal-store
+      %gx
+      :~  (scot %p our.bowl)
+          %goal-store
+          (scot %da now.bowl)
+          %get-goal
+          (scot %p owner.id)
+          (scot %da birth.id)
+          %goal-peek
+      ==
+    ==
+  ?+  -.pyk  !!
+    %get-goal  ?~(ugoal.pyk !! u.ugoal.pyk)
+  ==
+::
+++  ryte-bound
+  |=  =id:gol
+  ^-  (unit @da)
+  =/  pyk=peek:goal-store
+    .^  peek:goal-store
+      %gx
+      :~  (scot %p our.bowl)
+          %goal-store
+          (scot %da now.bowl)
+          %ryte-bound
+          (scot %p owner.id)
+          (scot %da birth.id)
+          %goal-peek
+      ==
+    ==
+  ?+  -.pyk  !!
+    %ryte-bound  moment.pyk
+  ==
 :: TODO:
-:: do not print goals marked completed unless otherwise specified
-:: print completed goals...
 :: different harvesting...
 ::
 ++  hrz  `tape`(reap 80 '-')
@@ -28,11 +64,11 @@
   =/  par-hdl  
     ?-    -.grip
       %all  "   "
-      %project  " ~ "
+      %pool  " ~ "
         %goal
-      =/  goal  (got-goal:gols +.grip)
+      =/  goal  (got-goal +.grip)
       ?~  par.goal
-        "{(col-data [%project (~(got by directory.store) +.grip)] %handle)}"
+        "{(col-data [%pool (~(got by directory.store) +.grip)] %handle)}"
       "{(col-data [%goal u.par.goal] %handle)}"
     ==
   :~  ;:  weld
@@ -51,20 +87,20 @@
   |=  =grip:vyu
   ?-    -.grip
     %all  "o~"
-    %project  (weld "o" (trip (scot %p owner.pin.grip)))
+    %pool  (weld "o" (trip (scot %p owner.pin.grip)))
     %goal  (weld "o" (trip (scot %p owner.id.grip)))
   ==
 ++  perms
   |=  =grip:vyu
   ?-    -.grip
     %all  "~"
-      %project
-    =/  chefs  (~(put in chefs:(~(got by projects.store) pin.grip)) owner.pin.grip)
+      %pool
+    =/  chefs  (~(put in chefs:(~(got by pools.store) pin.grip)) owner.pin.grip)
     ?:  (~(has in chefs) our.bowl)
       "c"
     "~"
       %goal
-    =/  chefs  (~(put in chefs:(~(got by projects.store) (~(got by directory.store) id.grip))) owner.id.grip)
+    =/  chefs  (~(put in chefs:(~(got by pools.store) (~(got by directory.store) id.grip))) owner.id.grip)
     ?:  (~(has in chefs) our.bowl)
       "c"
     =/  c-sen  (seniority:gols our.bowl id.grip ~ ~ %c)
@@ -79,19 +115,19 @@
   |=  =grip:vyu
   ?-    -.grip
     %all  "c~ p~"
-      %project
-    =/  chefs  (~(put in chefs:(~(got by projects.store) pin.grip)) owner.pin.grip)
+      %pool
+    =/  chefs  (~(put in chefs:(~(got by pools.store) pin.grip)) owner.pin.grip)
     ?:  =(1 ~(wyt in chefs))  :(weld "c" (trip (scot %p owner.pin.grip)) " p~")
     "c+ p~"
       %goal
-    =/  chefs  chefs:(got-goal:gols id.grip)
+    =/  chefs  chefs:(got-goal id.grip)
     =/  chef
       ?:  =(0 ~(wyt in chefs))
         "c~"
       ?.  =(1 ~(wyt in chefs))
         "c+"
       (weld "c" (trip (scot %p (snag 0 ~(tap in chefs)))))
-    =/  peons  peons:(got-goal:gols id.grip)
+    =/  peons  peons:(got-goal id.grip)
     =/  peon
       ?:  =(0 ~(wyt in peons))
         "p~"
@@ -139,12 +175,12 @@
   =/  virtual
     ?.  ?=(normal-mode:gol mode.block)  %|
     ?-    -.grip.block
-      ?(%all %project)  %|
+      ?(%all %pool)  %|
         %goal
       ?-    -.grip
-        ?(%all %project)  %|
+        ?(%all %pool)  %|
           %goal
-        =/  goal  (got-goal:gols id.grip.block)
+        =/  goal  (got-goal id.grip.block)
         ?&  (~(has in (yung goal)) id.grip)
             !(~(has in kids.goal) id.grip)
         ==
@@ -194,7 +230,7 @@
   ^-  tape
   ;:  weld
     (toggles grip.block)
-    (columns grip.block col-names.block =(-.grip.block %project))
+    (columns grip.block col-names.block =(-.grip.block %pool))
     buffer
     (brancher block prtd)
   ==
@@ -209,9 +245,9 @@
   =/  toggles  (reap toggle-len ' ')
   ?-    -.grip
     %all  toggles
-    %project  (snap toggles 3 (crip (perms grip)))
+    %pool  (snap toggles 3 (crip (perms grip)))
       %goal
-    =/  goal  (got-goal:gols +.grip)
+    =/  goal  (got-goal +.grip)
     =/  actionable  ?:(actionable.goal '@' ' ')
     =/  completed  ?:(complete.goal 'x' ' ')
     =/  perms  (crip (perms grip))
@@ -235,12 +271,12 @@
   ++  text  
     ?-  -.grip.block
       %all  "Projects"
-      %project  (trip title:(~(got by projects.store) +.grip.block))
-      %goal  (trip desc:(got-goal:gols +.grip.block))
+      %pool  (trip title:(~(got by pools.store) +.grip.block))
+      %goal  (trip desc:(got-goal +.grip.block))
     ==
   ++  elbow
     ?-    -.grip.block
-      ?(%all %project)  ?:(last.block "\\" "|")
+      ?(%all %pool)  ?:(last.block "\\" "|")
         %goal  ?:(virtual.block "*" ?:(last.block "\\" "|"))
     ==
   ++  branch-char
@@ -257,7 +293,7 @@
   ++  forearm
     ?-    -.grip.block
       %all  "--"
-      %project  `tape`(reap 2 branch-char)
+      %pool  `tape`(reap 2 branch-char)
         %goal
       ?+  mode.block  !!
         %nest-ryte  (reap (dec (shift block)) branch-char)
@@ -282,7 +318,7 @@
   |=  =block:vyu
   ^-  @
   ?-    -.grip.block
-    ?(%all %project)  spacer
+    ?(%all %pool)  spacer
       %goal
     ?+    mode.block  !!
         normal-mode:gol
@@ -308,7 +344,7 @@
 ::
 ++  print-single-goal
   |=  [=id:gol col-names=(list col-name)]
-  =/  goal  (got-goal:gols id)
+  =/  goal  (got-goal id)
   =/  hndl  (~(got by gh.handles) [%goal id])
   :(weld (toggles [%goal id]) (columns [%goal id] col-names %.n) buffer (trip desc.goal))
 ::
@@ -340,26 +376,26 @@
       %handle
     ?-    -.grip
       %all  " ~ "
-      %project  (trip (~(got by gh.handles) grip))
+      %pool  (trip (~(got by gh.handles) grip))
       %goal  (trip (~(got by gh.handles) grip))
     ==
       %deadline
     ?-    -.grip
       %all  "   ~~   "
-      %project  "   ~~   "
+      %pool  "   ~~   "
         %goal
-      (deadline-text -:(inherit-deadline:gols +.grip))
+      (deadline-text (ryte-bound +.grip))
     ==
       %level
     ?-  -.grip
       %all  (zfill:dates 3 (trip (scot %ud (get-lvl:gols grip %normal))))
-      %project  (zfill:dates 3 (trip (scot %ud (get-lvl:gols grip %normal))))
+      %pool  (zfill:dates 3 (trip (scot %ud (get-lvl:gols grip %normal))))
       %goal  (zfill:dates 3 (trip (scot %ud (get-lvl:gols grip %normal))))
     ==
       %priority
     ?-  -.grip
       %all  " ~ "
-      %project  " ~ "
+      %pool  " ~ "
       %goal  (zfill:dates 3 (trip (scot %ud (priority:gols +.grip))))
     ==
   ==
@@ -425,22 +461,22 @@
   ?~  g  [(print-cards ~["ERROR: Invalid goal handle [{(trip hdl)}]."]) *id:gol *goal:gol]
   [~ u.g]
 ::
-:: catch invalid project handle error
-++  invalid-project-error
+:: catch invalid pool handle error
+++  invalid-pool-error
   |=  hdl=@t
-  ^-  [(list card) [=pin:gol =project:gol]]
-  =/  p  (handle-to-project:hdls hdl)
-  ?~  p  [(print-cards ~["ERROR: Invalid project handle [{(trip hdl)}]."]) *pin:gol *project:gol]
+  ^-  [(list card) [=pin:gol =pool:gol]]
+  =/  p  (handle-to-pool:hdls hdl)
+  ?~  p  [(print-cards ~["ERROR: Invalid pool handle [{(trip hdl)}]."]) *pin:gol *pool:gol]
   [~ u.p]
 ::
-:: catch invalid project or goal handle error
-++  invalid-goal-project-error
+:: catch invalid pool or goal handle error
+++  invalid-goal-pool-error
   |=  hdl=@t
   ^-  [(list card) grip:vyu]
   =/  grip  (~(get by hg.handles) hdl)
   ?~  grip
-    [(print-cards ~["ERROR: Invalid goal or project handle [{(trip hdl)}]."]) *grip:vyu]
+    [(print-cards ~["ERROR: Invalid goal or pool handle [{(trip hdl)}]."]) *grip:vyu]
   ?:  =(-.u.grip %all)
-    [(print-cards ~["ERROR: Invalid goal or project handle [{(trip hdl)}]."]) *grip:vyu]
+    [(print-cards ~["ERROR: Invalid goal or pool handle [{(trip hdl)}]."]) *grip:vyu]
   [~ u.grip]
 --

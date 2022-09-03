@@ -12,6 +12,6 @@
   ==
 ::
 +$  update
-  $%  [%update =project]
+  $%  [%update =pool]
   ==
 --

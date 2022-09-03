@@ -4,20 +4,20 @@
 +*  gols  ~(. gol-cli-goals store)
 ::
 ++  add-new-goal
-  |=  [=id:gol =directory:gol =projects:gol]
+  |=  [=id:gol =directory:gol =pools:gol]
   ^-  handles:vyu
   =/  grip  [%goal id]
   =/  hdl  (make-handle grip)
   [(~(put by hg.handles) hdl grip) (~(put by gh.handles) grip hdl)]
 ::
 ++  generate
-  |=  [=directory:gol =projects:gol]
+  |=  [=directory:gol =pools:gol]
   ^-  handles:vyu
   =.  handles  *handles:vyu :: from scratch
   =/  ids=(list grip:vyu)
     (turn ~(tap in ~(key by directory)) |=(=id:gol [%goal id]))
   =/  pins=(list grip:vyu)
-    (turn ~(tap in ~(key by projects)) |=(=pin:gol [%project pin]))
+    (turn ~(tap in ~(key by pools)) |=(=pin:gol [%pool pin]))
   =/  grips  (weld ids pins)
   =/  idx  0
   |-
@@ -32,7 +32,7 @@
   ^-  tape
   ?-  -.grip
     %all  !!
-    %project  (handle (scow %ud (shad (cat 0 %pin (cat 0 +>-.grip +>+.grip)))))
+    %pool  (handle (scow %ud (shad (cat 0 %pin (cat 0 +>-.grip +>+.grip)))))
     %goal  (handle (scow %ud (shad (cat 0 +<.grip +>.grip))))
   ==
 ::
@@ -87,18 +87,18 @@
   =/  grip  (~(get by hg.handles) hdl)
   ?~  grip  ~
   ?-  -.u.grip
-    ?(%all %project)  ~
+    ?(%all %pool)  ~
     %goal  (some [+.u.grip (got-goal:gols +.u.grip)])
   ==
 ::
-++  handle-to-project
+++  handle-to-pool
   |=  hdl=@t
-  ^-  (unit [pin:gol project:gol])
+  ^-  (unit [pin:gol pool:gol])
   =/  grip  (~(get by hg.handles) hdl)
   ?~  grip  ~
   ?-  -.u.grip
     ?(%all %goal)  ~
-    %project  (some [+.u.grip (~(got by projects.store) +.u.grip)])
+    %pool  (some [+.u.grip (~(got by pools.store) +.u.grip)])
   ==
 ::
 :: purge goal from handles

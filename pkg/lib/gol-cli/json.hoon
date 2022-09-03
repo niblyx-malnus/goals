@@ -7,7 +7,7 @@
   ^-  action
   %.  jon
   %-  of
-  :~  :-  %new-project
+  :~  :-  %new-pool
       %-  ot
       :~  title+so
           chefs+dejs-set-ships
@@ -15,7 +15,7 @@
           viewers+dejs-set-ships
       ==
       ::
-      :-  %copy-project
+      :-  %copy-pool
       %-  ot
       :~  old-pin+dejs-pin
           title+so
@@ -44,8 +44,8 @@
           actionable+bo
       ==
       [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
-      [%edit-project-title (ot ~[pin+dejs-pin title+so])]
-      [%delete-project (ot ~[pin+dejs-pin])]
+      [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
+      [%delete-pool (ot ~[pin+dejs-pin])]
       [%delete-goal (ot ~[id+dejs-id])]
       [%yoke-sequence (ot ~[pin+dejs-pin yoke-sequence+dejs-yoke-seq])]
       [%set-deadline (ot ~[id+dejs-id deadline+dejs-unit-date])]
@@ -57,11 +57,12 @@
       [%make-peon (ot ~[peon+dejs-ship id+dejs-id])]
   ==
 ::
-++  dejs-unit-date  |=(jon=json ?~(jon ~ (some (ni:dejs:format jon))))
+++  dejs-unit-date  |=(jon=json ?~(jon ~ (some (dejs-date jon))))
 ++  dejs-pin  (pe:dejs:format %pin dejs-id)
-++  dejs-id  (ot ~[owner+(su fed:ag) birth+ni]):dejs:format
+++  dejs-id  (ot:dejs:format ~[owner+dejs-ship birth+ni:dejs:format])
 ++  dejs-set-ships  (as:dejs:format dejs-ship)
-++  dejs-ship  (su fed:ag):dejs:format
+++  dejs-ship  (su:dejs:format fed:ag)
+++  dejs-date  (su:dejs:format (cook |*(a=* (year +.a)) ;~(plug (just '~') when:so)))
 ++  dejs-yoke-seq  (ar:dejs:format dejs-yoke)
 ++  dejs-yoke  (ot:dejs:format ~[yoke+dejs-yoke-tag lid+dejs-id rid+dejs-id])
 ++  parse-yoke-tag
@@ -79,24 +80,25 @@
 ::
 ++  dejs-tests
   |%
-  ++  new-project
+  ++  test-date  s+(scot %da (add ~2000.1.1 ~s1..0001))
+  ++  new-pool
     =,  enjs:format
     ^-  json
     %+  frond
-      %new-project
+      %new-pool
     %-  pairs
     :~  [%title s+'test']
         [%chefs a+~[s+'zod' s+'nec' s+'bud']]
         [%peons a+~[s+'zod' s+'nec' s+'bud']]
         [%viewers a+~[s+'zod' s+'nec' s+'bud']]
     ==
-  ++  copy-project
+  ++  copy-pool
     =,  enjs:format
     ^-  json
     %+  frond
-      %copy-project
+      %copy-pool
     %-  pairs
-    :~  [%old-pin (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
+    :~  [%old-pin (pairs ~[[%owner s+'zod'] [%birth test-date]])]
         [%title s+'test']
         [%chefs a+~[s+'zod' s+'nec' s+'bud']]
         [%peons a+~[s+'zod' s+'nec' s+'bud']]
@@ -108,11 +110,11 @@
     %+  frond
       %new-goal
     %-  pairs
-    :~  [%pin (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
+    :~  [%pin (pairs ~[[%owner s+'zod'] [%birth test-date]])]
         [%desc s+'test desc']
         [%chefs a+~[s+'zod' s+'nec' s+'bud']]
         [%peons a+~[s+'zod' s+'nec' s+'bud']]
-        [%deadline (numb (add ~2000.1.1 ~s1..0001))]
+        [%deadline test-date]
         [%actionable b+%.n]
     ==
   ++  yoke-sequence
@@ -121,22 +123,28 @@
     %+  frond
       %yoke-sequence
     %-  pairs
-    :~  [%pin (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
+    :~  [%pin (pairs ~[[%owner s+'zod'] [%birth test-date]])]
         :-  %yoke-sequence
         :-  %a
         :~  %-  pairs
             :~  [%yoke s+'nest-yoke']
-                [%lid (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
-                [%rid (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
+                [%lid (pairs ~[[%owner s+'zod'] [%birth test-date]])]
+                [%rid (pairs ~[[%owner s+'zod'] [%birth test-date]])]
             ==
             %-  pairs
             :~  [%yoke s+'prec-rend']
-                [%lid (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
-                [%rid (pairs ~[[%owner s+'zod'] [%birth (numb (add ~2000.1.1 ~s1..0001))]])]
+                [%lid (pairs ~[[%owner s+'zod'] [%birth test-date]])]
+                [%rid (pairs ~[[%owner s+'zod'] [%birth test-date]])]
             ==
         ==
     ==
   --
+::
+++  enjs-peek
+  =,  enjs:format
+  |=  =peek
+  ^-  json
+  ~
 ::
 ++  enjs-update
   =,  enjs:format
@@ -157,7 +165,7 @@
   ^-  json
   %-  pairs
   :~  [%directory (enjs-directory directory.store)]
-      [%projects (enjs-projects projects.store)]
+      [%pools (enjs-pools pools.store)]
   ==
 ::
 ++  enjs-directory
@@ -170,27 +178,27 @@
       [%pin (enjs-pin pin)]
   ==
   
-++  enjs-projects
+++  enjs-pools
   =,  enjs:format
-  |=  =projects
-  :-  %a  %+  turn  ~(tap by projects) 
-  |=  [=pin =project] 
+  |=  =pools
+  :-  %a  %+  turn  ~(tap by pools) 
+  |=  [=pin =pool] 
   %-  pairs
   :~  [%pin (enjs-pin pin)]
-      [%project (enjs-project project)]
+      [%pool (enjs-pool pool)]
   ==
 ::
-++  enjs-project
+++  enjs-pool
   =,  enjs:format
-  |=  =project
+  |=  =pool
   %-  pairs
-  :~  [%title s+title.project]
-      [%creator (ship creator.project)]
-      [%goals (enjs-goals goals.project)]
-      [%chefs a+(turn ~(tap in chefs.project) ship)]
-      [%peons a+(turn ~(tap in peons.project) ship)]
-      [%viewers a+(turn ~(tap in viewers.project) ship)]
-      [%archived b+archived.project]
+  :~  [%title s+title.pool]
+      [%creator (ship creator.pool)]
+      [%goals (enjs-goals goals.pool)]
+      [%chefs a+(turn ~(tap in chefs.pool) ship)]
+      [%peons a+(turn ~(tap in peons.pool) ship)]
+      [%viewers a+(turn ~(tap in viewers.pool) ship)]
+      [%archived b+archived.pool]
   ==
 ::
 ++  enjs-goals
@@ -214,21 +222,21 @@
       [%peons a+(turn ~(tap in peons.goal) ship)]
       [%par ?~(par.goal ~ (enjs-id u.par.goal))]
       [%kids a+(turn ~(tap in kids.goal) enjs-id)]
-      [%kickoff (enjs-split kickoff.goal)]
-      [%deadline (enjs-split deadline.goal)]
+      [%kickoff (enjs-edge kickoff.goal)]
+      [%deadline (enjs-edge deadline.goal)]
       [%complete b+complete.goal]
       [%actionable b+actionable.goal]
       [%archived b+archived.goal]
   ==
 ::
-++  enjs-split
+++  enjs-edge
    =,  enjs:format
-   |=  =split
+   |=  =edge:goal
    ^-  json
    %-  pairs
-   :~  [%moment ?~(moment.split ~ (numb `@`u.moment.split))]
-       [%inflow a+(turn ~(tap in inflow.split) enjs-eid)]
-       [%outflow a+(turn ~(tap in outflow.split) enjs-eid)]
+   :~  [%moment ?~(moment.edge ~ s+(scot %da u.moment.edge))]
+       [%inflow a+(turn ~(tap in inflow.edge) enjs-eid)]
+       [%outflow a+(turn ~(tap in outflow.edge) enjs-eid)]
    ==
 ::
 ++  enjs-eid
@@ -252,6 +260,6 @@
   ^-  json
   %-  pairs
   :~  [%owner (ship owner.id)]
-      [%birth (numb `@`birth.id)]
+      [%birth s+(scot %da birth.id)]
   ==
 --

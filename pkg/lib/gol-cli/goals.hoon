@@ -7,22 +7,22 @@
   |=  [our=ship now=@da]
   ^-  id:gol
   ?.  ?|  (~(has by directory) [our now])
-          (~(has by projects) [%pin our now])
+          (~(has by pools) [%pin our now])
       ==
     [our now]
   $(now (add now ~s0..0001))
 ::
-++  new-project
+++  new-pool
   |=  [title=@t chefs=(set ship) peons=(set ship) viewers=(set ship) own=ship now=@da]
-  ^-  [pin:gol project:gol]
+  ^-  [pin:gol pool:gol]
   =/  pin  [%pin (unique-id own now)]
-  =|  =project:gol
-  =.  title.project  title
-  =.  creator.project  own
-  =.  chefs.project  chefs
-  =.  peons.project  peons
-  =.  viewers.project  (~(uni in viewers) (~(uni in chefs) peons))
-  [pin project]
+  =|  =pool:gol
+  =.  title.pool  title
+  =.  creator.pool  own
+  =.  chefs.pool  chefs
+  =.  peons.pool  peons
+  =.  viewers.pool  (~(uni in viewers) (~(uni in chefs) peons))
+  [pin pool]
 ::
 ++  new-ids
   |=  [=(list id:gol) our=ship now=@da]
@@ -39,7 +39,7 @@
     map  (~(put by map) (snag idx list) new-id)
   ==
 ::
-++  copy-project
+++  copy-pool
   |=  $:  =old=pin:gol
           title=@t
           chefs=(set ship)
@@ -48,16 +48,16 @@
           own=ship
           now=@da
       ==
-  ^-  [pin:gol project:gol]
-  =/  old-project  (~(got by projects) old-pin)
-  =+  [pin project]=(new-project title chefs peons viewers own now)
-  =.  projects  (~(put by projects) pin project(creator owner.old-pin))
-  =/  id-map  (new-ids ~(tap in ~(key by goals.old-project)) own now)
+  ^-  [pin:gol pool:gol]
+  =/  old-pool  (~(got by pools) old-pin)
+  =+  [pin pool]=(new-pool title chefs peons viewers own now)
+  =.  pools  (~(put by pools) pin pool(creator owner.old-pin))
+  =/  id-map  (new-ids ~(tap in ~(key by goals.old-pool)) own now)
   :-  pin
-  %=  project
+  %=  pool
     goals
-      %-  ~(gas by goals.project)
-      %+  turn  ~(tap by goals.old-project)
+      %-  ~(gas by goals.pool)
+      %+  turn  ~(tap by goals.old-pool)
       |=  [=id:gol =goal:gol]
       :-  (~(got by id-map) id)
       %=  goal
@@ -124,9 +124,9 @@
   ^-  (each ? term)
   =/  pin  (~(got by directory) lid)
   ?.  =(pin (~(got by directory) rid))  [%& %.n]
-  =/  project-owner  +<:pin
-  =/  project-chefs  chefs:(~(got by projects) pin)
-  ?:  |(=(project-owner mod) (~(has in project-chefs) mod))  [%& %.y]
+  =/  pool-owner  +<:pin
+  =/  pool-chefs  chefs:(~(got by pools) pin)
+  ?:  |(=(pool-owner mod) (~(has in pool-chefs) mod))  [%& %.y]
   =/  l  (seniority mod lid ~ ~ %c)
   =/  r  (seniority mod rid ~ ~ %c)
   ?.  =(senior.l senior.r)  [%| %diff-sen-perm-fail]
@@ -139,15 +139,15 @@
   |=  =id:gol
   ^-  goal:gol
   =/  pin  (~(got by directory) id)
-  =/  project  (~(got by projects.store) pin)
-  (~(got by goals.project) id)
+  =/  pool  (~(got by pools.store) pin)
+  (~(got by goals.pool) id)
 ::
-++  got-split
+++  got-edge
   |=  =eid:gol
-  ^-  split:gol
+  ^-  edge:gol
   =/  pin  (~(got by directory) id.eid)
-  =/  project  (~(got by projects.store) pin)
-  =/  goal  (~(got by goals.project) id.eid)
+  =/  pool  (~(got by pools.store) pin)
+  =/  goal  (~(got by goals.pool) id.eid)
   ?-  -.eid
     %k  kickoff.goal
     %d  deadline.goal
@@ -156,21 +156,21 @@
 :: replace the goal at given id with given goal
 ++  put-goal
   |=  [=id:gol =goal:gol]
-  ^-  [pin:gol project:gol]
+  ^-  [pin:gol pool:gol]
   =/  pin  (~(got by directory) id)
-  =/  project  (~(got by projects) pin)
-  [pin project(goals (~(put by goals.project) id goal))]
+  =/  pool  (~(got by pools) pin)
+  [pin pool(goals (~(put by goals.pool) id goal))]
 ::
-:: put a new goal in a specific project
-++  put-in-project
+:: put a new goal in a specific pool
+++  put-in-pool
   |=  [=pin:gol =id:gol =goal:gol]
   ^-  store:gol
-  =/  project  (~(got by projects) pin)
-  =.  goals.project  (~(put by goals.project) id goal)
-  :_  (~(put by projects) pin project)
+  =/  pool  (~(got by pools) pin)
+  =.  goals.pool  (~(put by goals.pool) id goal)
+  :_  (~(put by pools) pin pool)
   (~(put by directory) id pin)
 ::
-:: update directory to reflect new goals in a project
+:: update directory to reflect new goals in a pool
 ++  update-dir
   |=  [target=pin:gol sources=(set id:gol)]
   ^-  directory:gol
@@ -181,258 +181,6 @@
     ?:(=(b target) ~ (some [a b]))
   =/  pairs  (turn ~(tap in sources) |=(=id:gol [id target]))
   (~(gas by dir) pairs)
-::
-:: is e1 before e2
-++  before
-  |=  [e1=eid:gol e2=eid:gol]
-  ^-  ?
-  |^
-  -:(before e1 e2 ~ ~)
-  ++  before
-    |=  $:  e1=eid:gol
-            e2=eid:gol
-            path=(list eid:gol)
-            visited=(set eid:gol)
-        ==
-    ^-  [? visited=(set eid:gol)]
-    =/  new-path=(list eid:gol)  [e2 path]
-    =/  i  (find [e2]~ path) 
-    ?.  =(~ i)  ?~(i !! ~&([%cycle (flop (scag u.i new-path))] !!))
-    =/  inflow  inflow:(got-split e2)
-    ?:  (~(has in inflow) e1)  [%& visited]
-    =.  visited  (~(put in visited) e2)
-    =/  idx  0
-    =/  inflow  ~(tap in inflow)
-    |-
-    ?:  =(idx (lent inflow))
-      [%| visited]
-    ?:  (~(has in visited) (snag idx inflow))
-      $(idx +(idx))
-    =/  cmp  (before e1 (snag idx inflow) new-path visited)
-    ?:  -.cmp
-      [%& visited.cmp]
-    $(idx +(idx), visited visited.cmp)
-  --
-::
-++  own-yoke
-  |=  [lid=id:gol rid=id:gol]
-  ^-  (each projects:gol term)
-  =/  l  (got-goal lid)
-  =/  r  (got-goal rid)
-  =/  output
-    ?~  par.l
-      [%& projects]
-    (own-rend lid u.par.l)
-  ?-    -.output
-    %|  output
-      %&
-    =.  projects  +.output
-    =/  pin  (~(got by directory) lid)
-    =/  project  (~(got by projects) pin)
-    =.  goals.project  (~(put in goals.project) lid l(par (some rid)))
-    =.  goals.project  (~(put in goals.project) rid r(kids (~(put in kids.r) lid)))
-    [%& (~(put in projects) pin project)]
-  ==
-::
-++  own-rend
-  |=  [lid=id:gol rid=id:gol]
-  ^-  (each projects:gol term)
-  =/  l  (got-goal lid)
-  =/  r  (got-goal rid)
-  =/  pin  (~(got by directory) lid)
-  =/  project  (~(got by projects) pin)
-  =.  goals.project  (~(put in goals.project) lid l(par ~))
-  =.  goals.project  (~(put in goals.project) rid r(kids (~(del in kids.r) lid)))
-  [%& (~(put in projects) pin project)]
-::
-++  dag-yoke
-  |=  [e1=eid:gol e2=eid:gol]
-  ^-  (each projects:gol term)
-  =/  pin  (~(got by directory) id.e1)
-  =/  project  (~(got by projects) pin)
-  =/  split1  (got-split e1)
-  =/  split2  (got-split e2)
-  ?:  (before e2 e1)  [%| %before-e2-e1]
-  =.  outflow.split1  (~(put in outflow.split1) e2)
-  =.  inflow.split2  (~(put in inflow.split2) e1)
-  =.  goals.project  (~(put in goals.project) id.e1 (update-split e1 split1))
-  =.  goals.project  (~(put in goals.project) id.e2 (update-split e2 split2))
-  [%& (~(put by projects) pin project)]
-::
-++  dag-rend
-  |=  [e1=eid:gol e2=eid:gol]
-  ^-  (each projects:gol term)
-  =/  pin  (~(got by directory) id.e1)
-  =/  project  (~(got by projects) pin)
-  =/  l  (got-goal id.e1)
-  =/  r  (got-goal id.e2)
-  =/  split1  (got-split e1)
-  =/  split2  (got-split e2)
-  ?:  =(id.e1 id.e2)  [%| %same-goal]
-  ?:  ?|  &(=(-.e1 %d) =(-.e2 %d) (~(has in kids.r) id.e1))
-          &(=(-.e1 %k) =(-.e2 %k) (~(has in kids.l) id.e2))
-      ==
-    [%| %owned-goal]
-  =.  outflow.split1  (~(del in outflow.split1) e2)
-  =.  inflow.split2  (~(del in inflow.split2) e1)
-  =.  goals.project  (~(put in goals.project) id.e1 (update-split e1 split1))
-  =.  goals.project  (~(put in goals.project) id.e2 (update-split e2 split2))
-  [%& (~(put by projects) pin project)]
-::
-++  prio-yoke
-  |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each projects:gol term)
-  =/  perm  (check-pair-perm lid rid mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    ?:  =(lid rid)  [%| %yoke-self]
-    ?:  |(complete:(got-goal lid) complete:(got-goal rid))
-      [%| %complete]
-    (dag-yoke [%k lid] [%k rid])
-  ==
-::
-++  prio-rend
-  |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each projects:gol term)
-  =/  perm  (check-pair-perm lid rid mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    ?:  =(lid rid)  [%| %rend-self]
-    (dag-rend [%k lid] [%k rid])
-  ==
-::
-++  prec-yoke
-  |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each projects:gol term)
-  =/  perm  (check-pair-perm lid rid mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    ?:  =(lid rid)  [%| %yoke-self]
-    ?:  |(complete:(got-goal lid) complete:(got-goal rid))
-      [%| %complete]
-    (dag-yoke [%d lid] [%k rid])
-  ==
-::
-++  prec-rend
-  |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each projects:gol term)
-  =/  perm  (check-pair-perm lid rid mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    ?:  =(lid rid)  [%| %rend-self]
-    (dag-rend [%d lid] [%k rid])
-  ==
-::
-++  nest-yoke
-  |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each projects:gol term)
-  =/  perm  (check-pair-perm lid rid mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    ?:  =(lid rid)  [%| %yoke-self]
-    =/  l  (got-goal lid)
-    =/  r  (got-goal rid)
-    ?:  |(complete:(got-goal lid) complete:(got-goal rid))
-      [%| %complete]
-    ?:  actionable.r
-      [%| %actionable]
-    (dag-yoke [%d lid] [%d rid])
-  ==
-::
-++  nest-rend
-  |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each projects:gol term)
-  =/  perm  (check-pair-perm lid rid mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    ?:  =(lid rid)  [%| %rend-self]
-    (dag-rend [%d lid] [%d rid])
-  ==
-::
-++  held-yoke
-  |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each projects:gol term)
-  =/  perm  (check-pair-perm lid rid mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    ?:  =(lid rid)  [%| %yoke-self]
-    =/  l  (got-goal lid)
-    =/  r  (got-goal rid)
-    ?:  |(complete:(got-goal lid) complete:(got-goal rid))
-      [%| %complete]
-    ?:  actionable.r
-      [%| %actionable]
-    =|  output=(each projects:gol term)
-    =.  output
-      ?~  par.l
-        [%& projects]
-      (held-rend lid u.par.l mod)
-    ?-    -.output
-      %|  output
-        %&
-      %+  apply-sequence  mod
-      :~  [%dag-yoke [%d lid] %d rid]
-          [%dag-yoke [%k rid] %k lid]
-          [%own-yoke lid rid]
-      ==
-    ==
-  ==
-::
-++  held-rend
-  |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each projects:gol term)
-  =/  perm  (check-pair-perm lid rid mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    ?:  =(lid rid)  [%| %rend-self]
-    %+  apply-sequence  mod
-    :~  [%dag-rend [%d lid] %d rid]
-        [%dag-rend [%k rid] %k lid]
-        [%own-rend lid rid]
-    ==
-  ==
-::
-++  update-split
-  |=  [=eid:gol =split:gol]
-  ^-  goal:gol
-  =/  goal  (got-goal id.eid)
-  ?-  -.eid
-    %k  goal(kickoff split)
-    %d  goal(deadline split)
-  ==
-::
-++  apply-sequence
-  |=  [mod=ship seq=yoke-sequence:gol]
-  ^-  (each projects:gol term)
-  ?~  seq
-    [%& projects]
-  =/  yoke-output=(each projects:gol term)
-    ?-  -.i.seq
-      %dag-yoke   (dag-yoke e1.i.seq e2.i.seq)
-      %dag-rend   (dag-rend e1.i.seq e2.i.seq)
-      %own-yoke   (own-yoke lid.i.seq rid.i.seq)
-      %own-rend   (own-rend lid.i.seq rid.i.seq)
-      %prio-rend  (prio-rend lid.i.seq rid.i.seq mod)
-      %prio-yoke  (prio-yoke lid.i.seq rid.i.seq mod)
-      %prec-rend  (prec-rend lid.i.seq rid.i.seq mod)
-      %prec-yoke  (prec-yoke lid.i.seq rid.i.seq mod) 
-      %nest-rend  (nest-rend lid.i.seq rid.i.seq mod) 
-      %nest-yoke  (nest-yoke lid.i.seq rid.i.seq mod) 
-      %held-rend  (held-rend lid.i.seq rid.i.seq mod) 
-      %held-yoke  (held-yoke lid.i.seq rid.i.seq mod) 
-    ==
-  ?-  -.yoke-output
-    %|  yoke-output
-    %&  $(seq t.seq, projects p.yoke-output)  
-  ==
 ::
 ::  get depth of a given goal (lowest level is depth of 1)
 ++  plumb
@@ -482,12 +230,6 @@
   ^-  @ud
   +((roll (turn (roots goals) plumb) max))
 ::
-++  project-anchor
-  ^-  @ud
-  %+  roll
-  (turn ~(val by (~(run by projects) |=(=project:gol goals.project))) anchor)
-  max
-::
 :: get priority of a given goal (highest priority is 0)
 :: priority is the number of goals prioritized ahead of a given goal
 ++  priority
@@ -522,7 +264,7 @@
       normal-mode:gol
     ?-    -.grip
       %all  ~
-      %project  (anchor goals:(~(got by projects) +.grip))
+      %pool  (anchor goals:(~(got by pools) +.grip))
       %goal  (plumb +.grip)
     ==
   ==
@@ -534,16 +276,16 @@
   ?+    mode  !!
       %normal
     ?-    -.grip
-      %all  (turn ~(tap in ~(key by projects)) |=(=pin:gol [%project pin]))
-      %project  (turn (hi-to-lo (uncompleted-roots goals:(~(got by projects) +.grip))) |=(=id:gol [%goal id]))
+      %all  (turn ~(tap in ~(key by pools)) |=(=pin:gol [%pool pin]))
+      %pool  (turn (hi-to-lo (uncompleted-roots goals:(~(got by pools) +.grip))) |=(=id:gol [%goal id]))
         %goal
       =/  goal  (got-goal +.grip)
       (turn (hi-to-lo ~(tap in ((uncompleted yung) goal))) |=(=id:gol [%goal id]))
     ==
       %normal-completed
     ?-    -.grip
-      %all  (turn ~(tap in ~(key by projects)) |=(=pin:gol [%project pin]))
-      %project  (turn (hi-to-lo (roots goals:(~(got by projects) +.grip))) |=(=id:gol [%goal id]))
+      %all  (turn ~(tap in ~(key by pools)) |=(=pin:gol [%pool pin]))
+      %pool  (turn (hi-to-lo (roots goals:(~(got by pools) +.grip))) |=(=id:gol [%goal id]))
         %goal
       =/  goal  (got-goal +.grip)
       (turn (hi-to-lo ~(tap in (yung goal))) |=(=id:gol [%goal id]))
@@ -578,22 +320,22 @@
 :: get goals with no actionable subgoals
 ::
 ::
-++  later-to-sooner
-  |=  lst=(list id:gol)
-  |^  (sort lst cmp)
-  ++  cmp
-    |=  [a=id:gol b=id:gol]
-    (unit-lth deadline:(inherit-deadline b) deadline:(inherit-deadline a))
-  --
-::
-::
-++  sooner-to-later
-  |=  lst=(list id:gol)
-  |^  (sort lst cmp)
-  ++  cmp
-    |=  [a=id:gol b=id:gol]
-    (unit-lth deadline:(inherit-deadline a) deadline:(inherit-deadline b))
-  --
+:: ++  later-to-sooner
+::   |=  lst=(list id:gol)
+::   |^  (sort lst cmp)
+::   ++  cmp
+::     |=  [a=id:gol b=id:gol]
+::     (unit-lth deadline:(inherit-deadline b) deadline:(inherit-deadline a))
+::   --
+:: ::
+:: ::
+:: ++  sooner-to-later
+::   |=  lst=(list id:gol)
+::   |^  (sort lst cmp)
+::   ++  cmp
+::     |=  [a=id:gol b=id:gol]
+::     (unit-lth deadline:(inherit-deadline a) deadline:(inherit-deadline b))
+::   --
 ::
 ::
 ++  newest-to-oldest
@@ -613,35 +355,4 @@
     |=  [a=id:gol b=id:gol]
     (lth (priority a) (priority b))
   --
-::
-:: inherit deadline
-++  inherit-deadline
-  |=  =id:gol
-  (rightbound [%d id])
-
-++  rightbound
-  |=  =eid:gol
-  ^-  [deadline=(unit @da) hereditor=eid:gol]
-  =/  split  (got-split eid)
-  ?:  =(0 ~(wyt in outflow.split))
-    [moment.split eid]
-  %-  list-min-head
-  %+  weld
-    ~[[moment.split eid]]
-  %+  turn
-    ~(tap in outflow.split)
-  rightbound
-::
-++  unit-lth
-  |=  [a=(unit @) b=(unit @)]
-  ?~  a  %.n
-  ?~  b  %.y
-  (lth u.a u.b)
-::
-++  list-min-head
-  |*  lst=(list [(unit @) *])
-  %+  roll
-    ^+  lst  +.lst
-  |:  [a=i.-.lst b=i.-.lst]
-  ?:  (unit-lth -.a -.b)  a  b
 --

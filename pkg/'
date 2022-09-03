@@ -242,39 +242,14 @@
   ?+    path  (on-peek:def path)
       [%x %initial ~]
     ``goal-update+!>(initial+store)
-    ::
       [%x %harvest @ @ ~]
-    =/  owner  (slav %p i.t.t.path)
-    =/  birth  (slav %da i.t.t.t.path)
+    =/  owner  `@p`i.t.t.path
+    =/  birth  `@da`i.t.t.t.path
     =/  id  `id:gol`[owner birth]
     =/  pin  (~(got by directory) id)
     =/  pool  (~(got by pools) pin)
-    ``goal-peek+!>(harvest+~(tap in (~(leaf-precedents pl pin pool) id)))
-    ::
-      [%x %get-goal @ @ ~]
-    =/  owner  (slav %p i.t.t.path)
-    =/  birth  (slav %da i.t.t.t.path)
-    =/  id  `id:gol`[owner birth]
-    =/  pin  (~(got by directory) id)
-    =/  pool  (~(got by pools) pin)
-    ``goal-peek+!>(get-goal+(~(get by goals.pool) id))
-    ::
-      :: [%x %get-goal-lvl @ @ ~]
-      [%x %ryte-bound @ @ ~]
-    =/  owner  (slav %p i.t.t.path)
-    =/  birth  (slav %da i.t.t.t.path)
-    =/  id  `id:gol`[owner birth]
-    =/  pin  (~(got by directory) id)
-    =/  pool  (~(got by pools) pin)
-    ``goal-peek+!>(ryte-bound+(~(ryte-bound pl pin pool) [%d id]))
-    ::
-    ::  [%x %plumb @ @ ~]
-    ::=/  owner  (slav %p i.t.t.path)
-    ::=/  birth  (slav %da i.t.t.t.path)
-    ::=/  id  `id:gol`[owner birth]
-    ::=/  pin  (~(got by directory) id)
-    ::=/  pool  (~(got by pools) pin)
-    ::``goal-peek+!>(ryte-bound+(~(ryte-bound pl pin pool) [%d id]))
+    ``goal-update+!>(harvest+id)
+    :: ``goal-update+!>(harvest+~(tap in (~(leaf-precedents pl pin pool) id)))
   ==
 ::
 ++  on-agent

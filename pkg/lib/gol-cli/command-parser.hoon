@@ -16,16 +16,15 @@
     parse-nest-left                           
     parse-prec-left                           
     parse-prio-left                           
-    parse-new-project                         :: %np
-    parse-delete-project-goal
-    parse-copy-project                         
+    parse-new-pool                         :: %np
+    parse-delete-pool-goal
+    parse-copy-pool                         
     parse-make-chef                           :: %mc
     parse-make-peon                           :: %mp
     parse-add-goal                            :: %ag
     parse-add-task                            :: %at
     parse-edit-goal-desc                      :: %eg
-    parse-edit-project-title                  :: %ep
-    parse-remove-goal                         :: %rg
+    parse-edit-pool-title                  :: %ep
     parse-change-context                      :: %cc
     parse-hide-completed
     parse-unhide-completed
@@ -163,24 +162,24 @@
     (cook crip (star prn))    :: argument text as cord
   ==
 ::
-:: add a new project to the data structure
-++  parse-new-project
+:: add a new pool to the data structure
+++  parse-new-pool
   ;~  (glue ace)
-    (cold %new-project (jest 'np'))    :: command 'np'
-    (cook crip (star prn))    :: title of new project
+    (cold %new-pool (jest 'np'))    :: command 'np'
+    (cook crip (star prn))    :: title of new pool
   ==
 ::
-++  parse-delete-project-goal
+++  parse-delete-pool-goal
   ;~  (glue ace)
-    (cold %delete-project-goal (jest 'del'))
+    (cold %delete-pool-goal (jest 'del'))
     (cook crip parse-handle)  :: handle argument
   ==
 ::
-++  parse-copy-project
+++  parse-copy-pool
   ;~  (glue ace)
-    (cold %copy-project (jest 'copy'))
+    (cold %copy-pool (jest 'copy'))
     (cook crip parse-handle)  :: handle argument
-    (cook crip (star prn))    :: title of copied project
+    (cook crip (star prn))    :: title of copied pool
   ==
 ::
 :: add a goal to the data structure
@@ -198,10 +197,10 @@
     (cook crip (star prn))    :: argument text as cord
   ==
 ::
-:: edit a project's title in the data structure
-++  parse-edit-project-title
+:: edit a pool's title in the data structure
+++  parse-edit-pool-title
   ;~  (glue ace)
-    (cold %edit-project-title (jest 'ep'))    :: command 'eg'
+    (cold %edit-pool-title (jest 'ep'))    :: command 'eg'
     (cook crip parse-handle)  :: handle argument
     (cook crip (star prn))    :: argument text as cord
   ==

@@ -4,23 +4,23 @@
 +*  gols  ~(. gol-cli-goals store)
 ::
 ++  add-new-goal
-  |=  [=id:gol =directory:gol =projects:gol]
+  |=  [=id:gol =directory:gol =pools:gol]
   ^-  views:vyu
   =/  grip  [%goal id]
   (~(put by views) grip *view:vyu)
 ::
 ++  update-views-initial
-  |=  [=pin:gol =directory:gol =projects:gol]
+  |=  [=pin:gol =directory:gol =pools:gol]
   =.  views  (update-views store)
-  =.  views  (collapsify [%all ~] [%project pin] %normal %.y %.n)
-  (collapsify [%project pin] [%project pin] %normal %.y %.n)
+  =.  views  (collapsify [%all ~] [%pool pin] %normal %.y %.n)
+  (collapsify [%pool pin] [%pool pin] %normal %.y %.n)
 
 ::
 ++  update-views
-  |=  [=directory:gol =projects:gol]
+  |=  [=directory:gol =pools:gol]
   ^-  views:vyu
   =/  ids=(list grip:vyu)  (turn ~(tap in ~(key by directory)) |=(=id:gol [%goal id]))
-  =/  pins=(list grip:vyu)  (turn ~(tap in ~(key by projects)) |=(=pin:gol [%project pin]))
+  =/  pins=(list grip:vyu)  (turn ~(tap in ~(key by pools)) |=(=pin:gol [%pool pin]))
   =/  grips  (weld ids pins)
   =/  idx  0
   |-
