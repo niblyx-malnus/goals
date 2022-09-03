@@ -3,13 +3,13 @@ Available pokes for `%goal-store` as nouns and as JSON.
 
 ### Poke List
 ```
-%new-project
-%copy-project
+%new-pool
+%copy-pool
 %new-goal                                                                       
 %add-under                                                                      
 %edit-goal-desc                                                                 
-%edit-project-title                                                             
-%delete-project                                                                 
+%edit-pool-title                                                             
+%delete-pool                                                                 
 %delete-goal                                                                    
 %yoke-sequence                                                                  
 %set-deadline                                                                   
@@ -21,22 +21,25 @@ Available pokes for `%goal-store` as nouns and as JSON.
 %make-peon
 ```
 
-## %new-project
+## %new-pool
 
 ### Description
-Create a new project.
+Create a new pool.
 
-`title` is the title of the new project.
+A `pool` is simply a collection of goals which can be interrelated with one another.
+Anyone who is a viewer on a pool can see all goals in that pool.
 
-`chefs` are essentially admins; they have full permissions to add/edit/delete any goal in the project.
+`title` is the title of the new pool.
 
-`peons` can mark (and unmark) any goal in the project complete. This is the only kind of permissions they have.
+`chefs` are essentially admins; they have full permissions to add/edit/delete any goal in the pool.
 
-`viewers` can view the project and store a copy of the project on their own ship.
+`peons` can mark (and unmark) any goal in the pool complete. This is the only kind of permissions they have.
+
+`viewers` can view the pool and store a copy of the pool on their own ship.
 
 ### Noun
 ```
-$:  %new-project
+$:  %new-pool
     title=@t
     chefs=(set ship)
     peons=(set ship)
@@ -47,8 +50,8 @@ $:  %new-project
 ### JSON
 ```
 {
-  "new-project": {
-    "title": "title of new project",
+  "new-pool": {
+    "title": "title of new pool",
     "chefs": ["zod", "nec", "bud"],
     "peons": ["zod", "nec", "bud"],
     "viewers": ["zod", "nec", "bud"]
@@ -56,23 +59,23 @@ $:  %new-project
 }
 ```
 
-## %copy-project
+## %copy-pool
 ### Description
-Make a copy of an existing project.
+Make a copy of an existing pool.
 
-`old-pin` is the "pin" or project id of the project you want to copy.
+`old-pin` is the "pin" or pool id of the pool you want to copy.
 
-`title` is the title of the new project copy.
+`title` is the title of the new pool copy.
 
-`chefs` are essentially admins; they have full permissions to add/edit/delete any goal in the project.
+`chefs` are essentially admins; they have full permissions to add/edit/delete any goal in the pool.
 
-`peons` can mark (and unmark) any goal in the project complete. This is the only kind of permissions they have.
+`peons` can mark (and unmark) any goal in the pool complete. This is the only kind of permissions they have.
 
-`viewers` can view the project and store a copy of the project on their own ship.
+`viewers` can view the pool and store a copy of the pool on their own ship.
 
 ### Noun
 ```
-$:  %copy-project
+$:  %copy-pool
     =old=pin
     title=@t
     chefs=(set ship)
@@ -84,12 +87,12 @@ $:  %copy-project
 ### JSON
 ```
 {
-  "copy-project": {
+  "copy-pool": {
     "old-pin": {
       "owner": "zod"
       "birth": 12345134551113451361
     },
-    "title": "title of new project",
+    "title": "title of new pool",
     "chefs": ["zod", "nec", "bud"],
     "peons": ["zod", "nec", "bud"],
     "viewers": ["zod", "nec", "bud"]
@@ -99,9 +102,9 @@ $:  %copy-project
 
 ## %new-goal  
 ### Description
-Create a new root goal in a given project.
+Create a new root goal in a given pool.
 
-`pin` is the "pin" or project id of the project you want to add a goal to.
+`pin` is the "pin" or pool id of the pool you want to add a goal to.
 
 `desc` is the description of the new goal.
 
@@ -213,47 +216,47 @@ Edit the description of an existing goal.
 }
 ```
 
-## %edit-project-title
+## %edit-pool-title
 ### Description
-Edit the title of an existing project.
+Edit the title of an existing pool.
 
-`pin` is the "pin" or project id of the project whose title you want to edit.
+`pin` is the "pin" or pool id of the pool whose title you want to edit.
 
-`title` is the new title of the project.
+`title` is the new title of the pool.
 
 ### Noun
 ```
-[%edit-project-title =pin title=@t]                                             
+[%edit-pool-title =pin title=@t]                                             
 ```
 
 ### JSON
 ```
 {
-  "edit-project-title": {
+  "edit-pool-title": {
     "pin": {
       "owner": "zod"
       "birth": 12345134551113451361
     },
-    "title": "new title of project"
+    "title": "new title of pool"
   }
 }
 ```
 
-## %delete-project
+## %delete-pool
 ### Description
-Delete a project.
+Delete a pool.
 
-`pin` is the "pin" or project id of the project you want to delete.
+`pin` is the "pin" or pool id of the pool you want to delete.
 
 ### Noun
 ```
-[%delete-project =pin]                                                          
+[%delete-pool =pin]                                                          
 ```
 
 ### JSON
 ```
 {
-  "delete-project": {
+  "delete-pool": {
     "pin": {
       "owner": "zod"
       "birth": 12345134551113451361
