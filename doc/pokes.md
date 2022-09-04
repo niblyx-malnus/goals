@@ -89,8 +89,8 @@ $:  %copy-pool
 {
   "copy-pool": {
     "old-pin": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     },
     "title": "title of new pool",
     "chefs": ["zod", "nec", "bud"],
@@ -133,13 +133,13 @@ $:  %new-goal
 {
   "new-goal": {
     "pin": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     },
     "desc": "description of new goal",
     "chefs": ["zod", "nec", "bud"],
     "peons": ["zod", "nec", "bud"],
-    "deadline": (null or 12345134551113451361)
+    "deadline": (null or "~2000.1.1")
     "actionable": true
   }
 }
@@ -178,13 +178,13 @@ $:  %add-under
 {
   "add-under": {
     "id": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     },
     "desc": "description of new goal",
     "chefs": ["zod", "nec", "bud"],
     "peons": ["zod", "nec", "bud"],
-    "deadline": (null or 12345134551113451361)
+    "deadline": (null or "~2000.1.1")
     "actionable": true
   }
 }
@@ -208,8 +208,8 @@ Edit the description of an existing goal.
 {
   "edit-goal-desc": {
     "id": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     },
     "desc": "new description of goal"
   }
@@ -234,8 +234,8 @@ Edit the title of an existing pool.
 {
   "edit-pool-title": {
     "pin": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     },
     "title": "new title of pool"
   }
@@ -258,8 +258,8 @@ Delete a pool.
 {
   "delete-pool": {
     "pin": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     }
   }
 }
@@ -281,8 +281,8 @@ Delete a goal.
 {
   "delete-goal": {
     "id": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     }
   }
 }
@@ -315,41 +315,41 @@ There are 8 kinds of "yokes":
 {
   "yoke-sequence": {
     "pin": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     },
     "yoke-sequence": [
       {
         "yoke": "nest-yoke",
         "lid": {
-          "owner": "zod"
-          "birth": 12345134551113451361
+          "owner": "zod",
+          "birth": "~2000.1.1"
         },
         "rid": {
-          "owner": "zod"
-          "birth": 12345134514371751115
+          "owner": "zod",
+          "birth": "~2000.1.1"
         }
       },
       {
         "yoke": "prec-yoke",
         "lid": {
-          "owner": "zod"
-          "birth": 12345134551113451361
+          "owner": "zod",
+          "birth": "~2000.1.1"
         },
         "rid": {
-          "owner": "zod"
-          "birth": 12345134514371751115
+          "owner": "zod",
+          "birth": "~2000.1.1"
         }
       },
       {
         "yoke": "prio-rend",
         "lid": {
-          "owner": "zod"
-          "birth": 12345134551113451361
+          "owner": "zod",
+          "birth": "~2000.1.1"
         },
         "rid": {
-          "owner": "zod"
-          "birth": 12345134514371751115
+          "owner": "zod",
+          "birth": "~2000.1.1"
         }
       }
     ]
@@ -375,10 +375,10 @@ Set the deadline of a goal.
 {
   "set-deadline": {
     "id": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     },
-    "deadline": (null or 12345134551113451361)
+    "deadline": (null or "~2000.1.1")
   }
 }
 ```
@@ -399,8 +399,8 @@ Mark a goal actionable. An actionable goal can have no subgoals.
 {
   "mark-actionable": {
     "id": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     }
   }
 }
@@ -422,8 +422,8 @@ Unmark a goal actionable. An actionable goal can have no subgoals.
 {
   "unmark-actionable": {
     "id": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     }
   }
 }
@@ -445,8 +445,8 @@ Mark a goal complete. All preceding goals must already be marked complete.
 {
   "mark-complete": {
     "id": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     }
   }
 }
@@ -468,8 +468,8 @@ Unmark a goal complete. No succeeding goals can already be marked complete.
 {
   "unmark-complete": {
     "id": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     }
   }
 }
@@ -494,8 +494,8 @@ Make a ship a "chef" on a given goal. A "chef" has broad permissions on a goal a
   "make-chef": {
     "chef": "zod",
     "id": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     }
   }
 }
@@ -520,8 +520,8 @@ Make a ship a "peon" on a given goal. A "peon" can mark (and unmark) a goal and 
   "make-peon": {
     "peon": "zod",
     "id": {
-      "owner": "zod"
-      "birth": 12345134551113451361
+      "owner": "zod",
+      "birth": "~2000.1.1"
     }
   }
 }
