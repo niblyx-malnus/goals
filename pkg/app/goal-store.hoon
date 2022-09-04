@@ -275,6 +275,12 @@
     =/  pin  (~(got by directory) id)
     =/  pool  (~(got by pools) pin)
     ``goal-peek+!>(plumb+(~(plumb pl pin pool) id))
+      [%x %anchor @ @ ~]
+    =/  owner  (slav %p i.t.t.path)
+    =/  birth  (slav %da i.t.t.t.path)
+    =/  pin  `pin:gol`[%pin owner birth]
+    =/  pool  (~(got by pools) pin)
+    ``goal-peek+!>(anchor+~(anchor pl pin pool))
     ::
       [%x %seniority @ @ @ @ ~]
     =/  mod  (slav %p i.t.t.path)

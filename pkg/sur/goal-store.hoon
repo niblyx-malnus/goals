@@ -57,6 +57,7 @@
       [%get-goal ugoal=(unit goal)]
       [%ryte-bound moment=(unit @da) hereditor=eid]
       [%plumb depth=@ud]
+      [%anchor depth=@ud]
       [%seniority u-senior=(unit id)]
   ==
 ::

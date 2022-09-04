@@ -197,10 +197,9 @@
 ::
 :: get roots
 ++  roots
-  |=  =goals:gol
   ^-  (list id:gol)
   %+  turn
-    %+  skim  ~(tap by goals)
+    %+  skim  ~(tap by goals.p)
     |=  [id:gol =goal:gol]
     ?&  =(~ par.goal)
         .=  0
@@ -216,18 +215,16 @@
   |=([=id:gol goal:gol] id)
 ::
 ++  uncompleted-roots
-  |=  =goals:gol
-  %+  murn  (roots goals)
+  %+  murn  roots
   |=  =id:gol
-  ?:  complete:(~(got by goals) id)
+  ?:  complete:(~(got by goals.p) id)
     ~
   (some id)
 ::
 :: get max depth + 1; depth of "virtual" root node
 ++  anchor  
-  |=  =goals:gol
   ^-  @ud
-  +((roll (turn (roots goals) plumb) max))
+  +((roll (turn roots plumb) max))
 ::
 :: is e1 before e2
 ++  before

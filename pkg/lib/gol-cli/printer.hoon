@@ -70,6 +70,25 @@
     %plumb  depth.pyk
   ==
 ::
+++  anchor
+  |=  =pin:gol
+  ^-  @ud
+  =/  pyk=peek:goal-store
+    .^  peek:goal-store
+      %gx
+      :~  (scot %p our.bowl)
+          %goal-store
+          (scot %da now.bowl)
+          %anchor
+          (scot %p owner.pin)
+          (scot %da birth.pin)
+          %goal-peek
+      ==
+    ==
+  ?+  -.pyk  !!
+    %anchor  depth.pyk
+  ==
+::
 ++  seniority
   |=  [mod=ship =id:gol cp=?(%c %p)]
   ^-  (unit id:gol)
@@ -89,6 +108,19 @@
     ==
   ?+  -.pyk  !!
     %seniority  u-senior.pyk
+  ==
+::
+:: get the number representing the deepest path to a leaf node
+++  get-lvl
+  |=  [=grip:vyu =mode:gol]
+  ^-  @
+  ?+    mode  !!
+      normal-mode:gol
+    ?-    -.grip
+      %all  ~
+      %pool  (anchor +.grip)
+      %goal  (plumb +.grip)
+    ==
   ==
 :: TODO:
 :: different harvesting...
@@ -184,10 +216,10 @@
   %-  print-cards 
   =/  lvl :: initial level; printing from context
     ?+  mode  !!
-      %nest-ryte  (dec (get-lvl:gols grip mode))
-      normal-mode:gol  +((get-lvl:gols grip mode))
-      %prec-ryte  (dec (get-lvl:gols grip mode))
-      %prec-left  +((get-lvl:gols grip mode))
+      %nest-ryte  (dec (get-lvl grip mode))
+      normal-mode:gol  +((get-lvl grip mode))
+      %prec-ryte  (dec (get-lvl grip mode))
+      %prec-left  +((get-lvl grip mode))
     ==
   =/  first-block  [grip "" mode lvl %.y %.n %.n *(set grip:vyu) col-names]
   =/  tapes  tapes:(print-family first-block ~)
@@ -203,7 +235,7 @@
   |=  =block:vyu
   ^-  (list block:vyu)
   =/  fam  (get-fam:gols grip.block mode.block)
-  =/  lvl  (get-lvl:gols grip.block mode.block)
+  =/  lvl  (get-lvl grip.block mode.block)
   =/  prtd-set  (~(put in prtd-set.block) grip.block)
   =/  indent  (indenter block)
   =/  idx=@  0
@@ -428,9 +460,9 @@
     ==
       %level
     ?-  -.grip
-      %all  (zfill:dates 3 (trip (scot %ud (get-lvl:gols grip %normal))))
-      %pool  (zfill:dates 3 (trip (scot %ud (get-lvl:gols grip %normal))))
-      %goal  (zfill:dates 3 (trip (scot %ud (get-lvl:gols grip %normal))))
+      %all  (zfill:dates 3 (trip (scot %ud (get-lvl grip %normal))))
+      %pool  (zfill:dates 3 (trip (scot %ud (get-lvl grip %normal))))
+      %goal  (zfill:dates 3 (trip (scot %ud (get-lvl grip %normal))))
     ==
       %priority
     ?-  -.grip

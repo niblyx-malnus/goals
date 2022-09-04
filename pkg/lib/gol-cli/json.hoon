@@ -59,7 +59,7 @@
 ::
 ++  dejs-unit-date  |=(jon=json ?~(jon ~ (some (dejs-date jon))))
 ++  dejs-pin  (pe:dejs:format %pin dejs-id)
-++  dejs-id  (ot:dejs:format ~[owner+dejs-ship birth+ni:dejs:format])
+++  dejs-id  (ot:dejs:format ~[owner+dejs-ship birth+dejs-date])
 ++  dejs-set-ships  (as:dejs:format dejs-ship)
 ++  dejs-ship  (su:dejs:format fed:ag)
 ++  dejs-date  (su:dejs:format (cook |*(a=* (year +.a)) ;~(plug (just '~') when:so)))
