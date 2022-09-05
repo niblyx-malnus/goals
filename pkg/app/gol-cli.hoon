@@ -30,9 +30,9 @@
     hc    ~(. +> bowl)
     gs    ~(. gol-cli-goal-store store)
     gols  ~(. gol-cli-goals store)
-    hdls  ~(. gol-cli-handles store handles)
-    vyuz  ~(. gol-cli-views store views)
-    prtr  ~(. gol-cli-printer store handles views context utc-offset bowl)
+    hdls  ~(. gol-cli-handles handles bowl)
+    vyuz  ~(. gol-cli-views store views bowl)
+    prtr  ~(. gol-cli-printer handles views context utc-offset bowl)
     directory  directory.store
     pools  pools.store
 ::
@@ -132,7 +132,7 @@
           %=  this
             store  new-store
             handles  (add-new-goal:hdls id.update new-store)
-            views  (add-new-goal:vyuz id.update new-store)
+            views  (add-new-goal:vyuz id.update)
           ==
             %add-under
           =/  new-store  (add-under:update:gs +.update)
@@ -140,7 +140,7 @@
           %=  this
             store  new-store
             handles  (add-new-goal:hdls cid.update new-store)
-            views  (add-new-goal:vyuz cid.update new-store)
+            views  (add-new-goal:vyuz cid.update)
           ==
             %yoke-sequence
           :_  this(store (yoke-sequence:update:gs +.update))
@@ -388,9 +388,10 @@
         :~  (scot %p our.bowl)
             %goal-store
             (scot %da now.bowl)
-            %harvest
+            %goal
             (scot %p owner.id.res)
             (scot %da birth.id.res)
+            %harvest
             %goal-peek
         ==
       ==
@@ -452,8 +453,7 @@
 ::
 |_  =bowl:gall
 +*  io    ~(. agentio bowl)
-    prtr  ~(. gol-cli-printer store handles views context utc-offset bowl)
-    gols  ~(. gol-cli-goals store)
+    prtr  ~(. gol-cli-printer handles views context utc-offset bowl)
 ::
 ++  pass
   |_  =wire

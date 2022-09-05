@@ -243,55 +243,83 @@
       [%x %initial ~]
     ``goal-update+!>(initial+store)
     ::
-      [%x %harvest @ @ ~]
-    =/  owner  (slav %p i.t.t.path)
-    =/  birth  (slav %da i.t.t.t.path)
-    =/  id  `id:gol`[owner birth]
-    =/  pin  (~(got by directory) id)
-    =/  pool  (~(got by pools) pin)
-    ``goal-peek+!>(harvest+~(tap in (~(leaf-precedents pl pin pool) id)))
+      [%x %pool-keys ~]
+    ``goal-peek+!>(pool-keys+~(key by pools))
     ::
-      [%x %get-goal @ @ ~]
-    =/  owner  (slav %p i.t.t.path)
-    =/  birth  (slav %da i.t.t.t.path)
-    =/  id  `id:gol`[owner birth]
-    =/  pin  (~(got by directory) id)
-    =/  pool  (~(got by pools) pin)
-    ``goal-peek+!>(get-goal+(~(get by goals.pool) id))
+      [%x %all-goal-keys ~]
+    ``goal-peek+!>(all-goal-keys+~(key by directory))
     ::
-      :: [%x %get-goal-lvl @ @ ~]
-      [%x %ryte-bound @ @ ~]
+      [%x %goal @ @ *]
     =/  owner  (slav %p i.t.t.path)
     =/  birth  (slav %da i.t.t.t.path)
     =/  id  `id:gol`[owner birth]
     =/  pin  (~(got by directory) id)
     =/  pool  (~(got by pools) pin)
-    ``goal-peek+!>(ryte-bound+(~(ryte-bound pl pin pool) [%d id]))
-    ::
-      [%x %plumb @ @ ~]
-    =/  owner  (slav %p i.t.t.path)
-    =/  birth  (slav %da i.t.t.t.path)
-    =/  id  `id:gol`[owner birth]
-    =/  pin  (~(got by directory) id)
-    =/  pool  (~(got by pools) pin)
-    ``goal-peek+!>(plumb+(~(plumb pl pin pool) id))
-      [%x %anchor @ @ ~]
+    =/  goal  (~(got by goals.pool) id)
+    ?+    t.t.t.t.path  (on-peek:def path)
+        [%harvest ~]
+      ``goal-peek+!>(harvest+~(tap in (~(leaf-precedents pl pin pool) id)))
+      ::
+        [%get-goal ~]
+      ``goal-peek+!>(get-goal+(~(get by goals.pool) id))
+      ::
+        [%get-pin ~]
+      ``goal-peek+!>(get-pin+(~(get by directory) id))
+      ::
+        [%yung *]
+      ?+    t.t.t.t.t.path  (on-peek:def path)
+          ~
+        ``goal-peek+!>(yung+(hi-to-lo ~(tap in (yung goal))):[~(. pl pin pool) .])
+        ::
+          [%uncompleted ~]
+        :-  ~  :-  ~  :-  %goal-peek
+        !>  :-  %yung-uncompleted
+            =+  ~(. pl pin pool)
+            (hi-to-lo ~(tap in ((uncompleted yung) goal)))
+        ::
+          [%virtual ~]
+        :-  ~  :-  ~  :-  %goal-peek
+        !>  :-  %yung-virtual
+            =+  ~(. pl pin pool)
+            (hi-to-lo ~(tap in (~(dif in (yung goal)) kids.goal)))
+      ==
+      ::
+        [%ryte-bound ~]
+      ``goal-peek+!>(ryte-bound+(~(ryte-bound pl pin pool) [%d id]))
+      ::
+        [%plumb ~]
+      ``goal-peek+!>(plumb+(~(plumb pl pin pool) id))
+      ::
+        [%priority ~]
+      ``goal-peek+!>(priority+(~(priority pl pin pool) id))
+      ::
+        [%seniority @ @ ~]
+      =/  mod  (slav %p i.t.t.t.t.t.path)
+      =/  cp  i.t.t.t.t.t.t.path
+      ?>  ?=(?(%c %p) cp)
+      ``goal-peek+!>(seniority+(~(seniority pl pin pool) mod id cp))
+    ==
+      [%x %pool @ @ *]
     =/  owner  (slav %p i.t.t.path)
     =/  birth  (slav %da i.t.t.t.path)
     =/  pin  `pin:gol`[%pin owner birth]
     =/  pool  (~(got by pools) pin)
-    ``goal-peek+!>(anchor+~(anchor pl pin pool))
-    ::
-      [%x %seniority @ @ @ @ ~]
-    =/  mod  (slav %p i.t.t.path)
-    =/  owner  (slav %p i.t.t.t.path)
-    =/  birth  (slav %da i.t.t.t.t.path)
-    =/  cp  i.t.t.t.t.t.path
-    ?>  ?=(?(%c %p) cp)
-    =/  id  `id:gol`[owner birth]
-    =/  pin  (~(got by directory) id)
-    =/  pool  (~(got by pools) pin)
-    ``goal-peek+!>(seniority+(~(seniority pl pin pool) mod id cp))
+    ?+    t.t.t.t.path  (on-peek:def path)
+        [%get-pool ~]
+      ``goal-peek+!>(get-pool+(~(get by pools) pin))
+      ::
+        [%anchor ~]
+      ``goal-peek+!>(anchor+~(anchor pl pin pool))
+      ::
+        [%roots *]
+      ?+    t.t.t.t.t.path  (on-peek:def path)
+          ~
+        ``goal-peek+!>(roots+~(roots pl pin pool))
+        ::
+          [%uncompleted ~]
+        ``goal-peek+!>(roots-uncompleted+~(uncompleted-roots pl pin pool))
+      ==
+    ==
   ==
 ::
 ++  on-agent

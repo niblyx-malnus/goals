@@ -1,6 +1,7 @@
 /+  *gol-cli-help
 |%
 ::
++$  state-2  [%2 =store:s2]
 +$  state-1  [%1 =store:s1]
 +$  state-0  [%0 =store:s0]
 ::
@@ -15,11 +16,64 @@
 +$  directory  directory:s1
 +$  store      store:s1
 ::
+++  s2
+  |%
+  +$  id  id:s1
+  +$  eid  eid:s1
+  +$  pin  pin:s1
+  +$  directory  directory:s1
+  ::
+  +$  edge
+    $:  moment=(unit @da)
+        inflow=(set eid)
+        outflow=(set eid)
+    ==
+  ::
+  +$  goal
+    $:  ::  fluid
+        $:  desc=@t
+        ==
+        ::  fixed
+        $:  owner=ship
+            birth=@da
+            author=ship
+        ==
+        ::  nexus
+        $:  chefs=(set ship)
+            peons=(set ship)
+            par=(unit id)
+            kids=(set id)
+            kickoff=edge
+            deadline=edge
+            complete=?(%.y %.n)
+            actionable=?(%.y %.n)
+            archived=?(%.y %.n)
+        ==
+    ==
+  ::
+  +$  goals  (map id goal)
+  ::
+  +$  pool
+    $:  title=@t
+        creator=ship
+        =goals
+        chefs=(set ship)
+        peons=(set ship)
+        viewers=(set ship)
+        archived=?(%.y %.n)
+    ==
+  ::
+  +$  pools  (map pin pool)
+  ::
+  +$  store  [=directory =pools]
+  --
+::
 ++  s1
   |%
   +$  id  id:s0
   +$  eid  eid:s0
   +$  pin  pin:s0
+  +$  directory  directory:s0
   ::
   +$  edge
     $:  moment=(unit @da)
@@ -54,8 +108,6 @@
     ==
   ::
   +$  pools  (map pin pool)
-  ::
-  +$  directory  directory:s0
   ::
   +$  store  [=directory =pools]
   --

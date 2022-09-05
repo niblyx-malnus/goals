@@ -1,7 +1,7 @@
 /-  gol=goal, vyu=view
-/+  gol-cli-goals
-|_  [=store:gol =handles:vyu]
-+*  gols  ~(. gol-cli-goals store)
+/+  gol-cli-scries
+|_  [=handles:vyu =bowl:gall]
++*  scry  ~(. gol-cli-scries bowl)
 ::
 ++  add-new-goal
   |=  [=id:gol =directory:gol =pools:gol]
@@ -88,7 +88,7 @@
   ?~  grip  ~
   ?-  -.u.grip
     ?(%all %pool)  ~
-    %goal  (some [+.u.grip (got-goal:gols +.u.grip)])
+    %goal  (some [+.u.grip (got-goal:scry +.u.grip)])
   ==
 ::
 ++  handle-to-pool
@@ -98,7 +98,7 @@
   ?~  grip  ~
   ?-  -.u.grip
     ?(%all %goal)  ~
-    %pool  (some [+.u.grip (~(got by pools.store) +.u.grip)])
+    %pool  (some [+.u.grip (got-pool:scry +.u.grip)])
   ==
 ::
 :: purge goal from handles

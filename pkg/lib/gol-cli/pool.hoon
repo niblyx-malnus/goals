@@ -226,6 +226,47 @@
   ^-  @ud
   +((roll (turn roots plumb) max))
 ::
+++  empt
+  |=  getter=$-(goal:gol (set id:gol))
+  |=  =id:gol
+  =(0 ~(wyt in (getter (~(got by goals.p) id))))
+::
+++  uncompleted
+  |=  getter=$-(goal:gol (set id:gol))
+  |=  =goal:gol
+  %-  ~(gas in *(set id:gol))
+  (skim ~(tap in (getter goal)) |=(=id:gol !complete:(~(got by goals.p) id)))
+::
+:: get priority of a given goal (highest priority is 0)
+:: priority is the number of goals prioritized ahead of a given goal
+++  priority
+  |=  =id:gol
+  |^
+  ~(wyt in (priors id ~))
+  ++  priors
+    |=  [=id:gol path=(list id:gol)]
+    ^-  (set id:gol)
+    =/  new-path=(list id:gol)  [id path]
+    =/  i  (find [id]~ path) 
+    ?.  =(~ i)  ?~(i !! ~&([%cycle (flop (scag u.i new-path))] !!))
+    =/  goal  (~(got by goals.p) id)
+    =/  prio  (prio goal)
+    =/  idx  0
+    =/  output  prio
+    =/  prio  ~(tap in prio)
+    |-
+    ?:  =(idx (lent prio))
+      output
+    $(idx +(idx), output (~(uni in output) (priors (snag idx prio) new-path)))
+  --
+::
+:: highest to lowest priority (highest being smallest number)
+++  hi-to-lo
+  |=  lst=(list id:gol)
+  %+  sort  lst
+  |=  [a=id:gol b=id:gol]
+  (lth (priority a) (priority b))
+::
 :: is e1 before e2
 ++  before
   |=  [e1=eid:gol e2=eid:gol]
