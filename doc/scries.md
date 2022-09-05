@@ -2,7 +2,7 @@
 
 ## %goal-update
 
-### `/initial`
+#### `/initial`
 
 ## %goal-peek
 
@@ -13,6 +13,8 @@
 -----------------------
 
 ### Goal Queries
+
+*Don't forget the sig `~` at the beginning of the pat-p `@p`: `.../~zod/...`, not `.../zod/...`.*
 
 #### `/goal/[owner.id]/[birth.id]/harvest`
 
