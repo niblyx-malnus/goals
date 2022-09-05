@@ -3,7 +3,7 @@ import styled from "@emotion/styled/macro";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Box from "@mui/material/Box";
-import { Tree } from "../types/types";
+import { PinId, Tree } from "../types/types";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import IconButton from "@mui/material/IconButton";
 import NewGoalInput from "./NewGoalInput";
@@ -18,10 +18,13 @@ interface TreeItemProps {
   readonly children: ReadonlyArray<JSX.Element>;
   readonly idObject: any;
   readonly goal: any;
+  pin: PinId;
 }
 
 export interface RecursiveTreeProps {
   readonly goalList: Tree;
+  pin: PinId;
+
   readonly onSelectCallback: (id: number) => void;
 }
 
@@ -34,6 +37,7 @@ const TreeItem = memo(
     id,
     idObject,
     goal,
+    pin,
   }: TreeItemProps) => {
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
     const [selected, setSelected] = useState(isSelected);
@@ -43,7 +47,12 @@ const TreeItem = memo(
       <div>
         <StyledTreeItem>
           <StyledMenuButtonContainer sx={{ position: "absolute", left: -30 }}>
-            <IconMenu type="goal" complete={goal.complete} id={idObject} />
+            <IconMenu
+              type="goal"
+              complete={goal.complete}
+              id={idObject}
+              pin={pin}
+            />
           </StyledMenuButtonContainer>
           {children && children.length > 0 && (
             <Box
@@ -98,7 +107,7 @@ const TreeItem = memo(
   }
 );
 
-const RecursiveTree = ({ goalList, onSelectCallback }: any) => {
+const RecursiveTree = ({ goalList, pin, onSelectCallback }: any) => {
   const createTree = (goal: any) => {
     const currentGoal = goal.goal;
     const currentGoalId = goal.id.birth;
@@ -115,6 +124,7 @@ const RecursiveTree = ({ goalList, onSelectCallback }: any) => {
           isSelected={currentGoal.selected}
           label={currentGoal.desc}
           goal={currentGoal}
+          pin={pin}
         >
           {childGoals.map((goal: any) => {
             const currentChildGoalId = goal.id.birth;

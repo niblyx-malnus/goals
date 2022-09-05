@@ -15,15 +15,19 @@ import InputBase from "@mui/material/InputBase";
 import DoneIcon from "@mui/icons-material/Done";
 import NewGoalInput from "./components/NewGoalInput";
 import IconMenu from "./components/IconMenu";
+import useStore from "./store";
+import { log } from "./helpers";
 
 //TODO: hovering elements also bring a + icon button to nest structure
 //TODO: add the contect menu
 //TODO: make memo work for our structure
 
 function App() {
-  const [fetchedPools, setFetchedPools] = useState<any>([]);
+  const fetchedPools = useStore((store) => store.pools);
+  const setFetchedPools = useStore((store) => store.setPools);
+
   const [pools, setPools] = useState([]);
-  console.log("fetchedPools", fetchedPools);
+  log("fetchedPools", fetchedPools);
   const onSelect = (id: number) => {
     // You can put whatever here
     console.log("you clicked: " + id);
@@ -98,7 +102,11 @@ function App() {
         const goalList = pool.pool.goals;
         return (
           <Project title={poolTitle} key={poolId} pin={pool.pin}>
-            <RecursiveTree goalList={goalList} onSelectCallback={onSelect} />
+            <RecursiveTree
+              goalList={goalList}
+              onSelectCallback={onSelect}
+              pin={pool.pin}
+            />
           </Project>
         );
       })}

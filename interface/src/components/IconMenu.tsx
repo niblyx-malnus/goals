@@ -16,6 +16,11 @@ import ClearIcon from "@mui/icons-material/Clear";
 import { GoalId, PinId } from "../types/types";
 import { log } from "../helpers";
 import api from "../api";
+import {
+  deletePoolAction,
+  deleteGoalAction,
+  toggleCompleteAction,
+} from "../store/actions";
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -85,6 +90,10 @@ export default function IconMenu({
     try {
       const result = await api.markComplete(id);
       log("markComplete result => ", result);
+      if (result && id && pin) {
+        //if success, go ahead an update the state via actions
+        toggleCompleteAction(id, pin, true);
+      }
     } catch (e) {
       log("markComplete error => ", e);
     }
@@ -94,6 +103,10 @@ export default function IconMenu({
     try {
       const result = await api.unmarkComplete(id);
       log("unmarkComplete result => ", result);
+      if (result && id && pin) {
+        //if success, go ahead an update the state via actions
+        toggleCompleteAction(id, pin, false);
+      }
     } catch (e) {
       log("unmarkComplete error => ", e);
     }
@@ -103,6 +116,10 @@ export default function IconMenu({
     try {
       const result = await api.deletePool(pin);
       log("deletePool result => ", result);
+      if (result && pin) {
+        //if success, go ahead an update the state via actions
+        deletePoolAction(pin);
+      }
     } catch (e) {
       log("deletePool error => ", e);
     }
@@ -112,12 +129,17 @@ export default function IconMenu({
     try {
       const result = await api.deleteGoal(id);
       log("deleteGoal result => ", result);
+      if (result && id && pin) {
+        //if success, go ahead an update the state via actions
+        deleteGoalAction(id, pin);
+      }
     } catch (e) {
       log("deleteGoal error => ", e);
     }
   };
   //TODO: in open state it should still display the icon button
   //TODO: in trying mode it should disable the button and goal/project and show a loading element (spinner)
+  //TODO: add a callback to control trying/succes/error state in parent component of this one
   return (
     <div>
       <IconButton
