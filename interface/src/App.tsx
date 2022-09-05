@@ -11,9 +11,10 @@ import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-const log = () => {
-  //do the isDev console log stuff
-};
+import InputBase from "@mui/material/InputBase";
+import DoneIcon from "@mui/icons-material/Done";
+import NewGoalInput from "./components/NewGoalInput";
+import IconMenu from "./components/IconMenu";
 
 //TODO: hovering elements also bring a + icon button to nest structure
 //TODO: add the contect menu
@@ -96,7 +97,7 @@ function App() {
         const poolId = pool.pin.birth;
         const goalList = pool.pool.goals;
         return (
-          <Project title={poolTitle} key={poolId}>
+          <Project title={poolTitle} key={poolId} pin={pool.pin}>
             <RecursiveTree goalList={goalList} onSelectCallback={onSelect} />
           </Project>
         );
@@ -104,37 +105,53 @@ function App() {
     </Container>
   );
 }
-function Project({ title, children }: any) {
-  //isOpen && children is probably not goin to work forever
+function Project({ title, children, pin }: any) {
   const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
-
+  const [addingGoal, setAddingGoal] = useState<boolean>(false);
   return (
     <div>
       <StyledTreeItem>
-        <StyledMenuButton
+        <StyledMenuButtonContainer sx={{ position: "absolute", left: -35 }}>
+          <IconMenu type="pool" pin={pin} />
+        </StyledMenuButtonContainer>
+        {/*    <StyledMenuButton
           className="menu-button"
           sx={{ position: "absolute", left: -35 }}
-          aria-label="fingerprint"
+          aria-label="menu button"
           size="small"
         >
           <MoreHorizIcon />
         </StyledMenuButton>
+        */}
         <StyledLabel
           className="label"
           /* onClick={(e: React.MouseEvent<HTMLInputElement>) => {
             onSelectCallback(id);
           }}*/
-          style={{
-            marginLeft: `${children && children.length === 0 ? "24px" : ""}`,
-            //  background: `${selected ? "#d5d5d5" : ""}`,
-          }}
         >
           {title}
         </StyledLabel>
         <Box className="icon-container" onClick={() => toggleItemOpen(!isOpen)}>
           {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
         </Box>
+        {/*TODO: make this into it's own component(so we don't have to rerender the children)*/}
+        <StyledMenuButton
+          className="add-goal-button"
+          // sx={{ position: "absolute", right: 35 }}
+          aria-label="add goal button"
+          size="small"
+          onClick={() => setAddingGoal(true)}
+        >
+          <AddIcon />
+        </StyledMenuButton>
       </StyledTreeItem>
+      {addingGoal && (
+        <NewGoalInput
+          id={pin}
+          under={false}
+          callback={() => console.log("lol")}
+        />
+      )}
       <StyledTreeChildren
         style={{
           // backgroundColor:"orange",
@@ -185,8 +202,15 @@ function Header() {
     </Box>
   );
 }
+
 export default App;
 const StyledMenuButton = styled(IconButton)({
+  opacity: 0,
+  "&:hover": {
+    opacity: 1,
+  },
+});
+const StyledMenuButtonContainer = styled(Box)({
   opacity: 0,
   "&:hover": {
     opacity: 1,
@@ -202,10 +226,13 @@ const StyledTreeItem = styled(Box)({
     [`${StyledMenuButton}`]: {
       opacity: 1,
     },
+    [`${StyledMenuButtonContainer}`]: {
+      opacity: 1,
+    },
   },
 });
 const StyledTreeChildren = styled(Box)({
-  paddingLeft: "10px",
+  // paddingLeft: "10px",
 });
 
 const StyledLabel = styled(Box)({

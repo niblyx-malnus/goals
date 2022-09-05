@@ -1,8 +1,6 @@
 import memoize from "lodash/memoize";
 import Urbit from "@urbit/http-api";
-/*ENV HELPERS*/
-const isDev = () =>
-  !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+import { isDev } from "./helpers";
 const api = {
   createApi: memoize(() => {
     /*
@@ -26,6 +24,7 @@ const api = {
   }),
 
   getData: async () => {
+    //gets our main data we display (pools/goals)
     return api.createApi().scry({ app: "goal-store", path: "/initial" });
   },
   addPool: async (title) => {
@@ -40,6 +39,88 @@ const api = {
     return api
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: newPool });
+  },
+  deletePool: async (pin) => {
+    //TODO: ask niblyx about order of stuff
+    const poolToDelete = {
+      "delete-pool": {
+        pin,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: poolToDelete });
+  },
+  addGoal: async (desc, pin) => {
+    //adds a goal directly under a pool
+    const { owner, birth } = pin;
+    const newGoal = {
+      "new-goal": {
+        pin: {
+          owner,
+          birth,
+        },
+        desc,
+        chefs: [],
+        peons: [],
+        deadline: null,
+        actionable: false,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: newGoal });
+  },
+  deleteGoal: async (id) => {
+    //TODO: ask niblyx about order of stuff
+    const goalToDelete = {
+      "delete-goal": {
+        id,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: goalToDelete });
+  },
+  addGoalUnderGoal: async (desc, id) => {
+    //adds a goal under another goal
+    const { owner, birth } = id;
+    const newNestedGoal = {
+      "add-under": {
+        id: {
+          owner,
+          birth,
+        },
+        desc,
+        chefs: [],
+        peons: [],
+        deadline: null,
+        actionable: false,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: newNestedGoal });
+  },
+  markComplete: async (id) => {
+    const goalToMark = {
+      "mark-complete": {
+        id,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: goalToMark });
+  },
+  unmarkComplete: async (id) => {
+    const goalToMark = {
+      "unmark-complete": {
+        id,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: goalToMark });
   },
 };
 export default api;
