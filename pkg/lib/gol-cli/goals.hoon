@@ -304,12 +304,10 @@
     out
   $(idx +(idx), out (~(uni in out) ((harvest-gen getter check) (snag idx gots))))
 ::
-::
 ++  empt
   |=  getter=$-(goal:gol (set id:gol))
   |=  =id:gol
   =(0 ~(wyt in (getter (got-goal id))))
-::
 ::
 ++  uncompleted
   |=  getter=$-(goal:gol (set id:gol))

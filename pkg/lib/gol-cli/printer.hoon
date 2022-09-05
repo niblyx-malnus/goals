@@ -1,129 +1,14 @@
 /-  gol=goal, vyu=view, goal-store
-/+  shoe, dates=gol-cli-dates,
-    *gol-cli-goal, gol-cli-goals, gol-cli-handles
-|_  $:  =store:gol
-        =handles:vyu
+/+  shoe, dates=gol-cli-dates, gol-cli-handles, gol-cli-scries
+|_  $:  =handles:vyu
         =views:vyu
         context=grip:vyu
         utc-offset=[hours=@dr ahead=?]
         =bowl:gall
     ==
-+*  gols  ~(. gol-cli-goals store)
-    hdls  ~(. gol-cli-handles store handles)
++*  hdls  ~(. gol-cli-handles handles bowl)
+    scry  ~(. gol-cli-scries bowl)
 +$  card  card:shoe
-:: scries into %goal-store
-::
-++  got-goal
-  |=  =id:gol
-  ^-  goal:gol
-  =/  pyk=peek:goal-store
-    .^  peek:goal-store
-      %gx
-      :~  (scot %p our.bowl)
-          %goal-store
-          (scot %da now.bowl)
-          %get-goal
-          (scot %p owner.id)
-          (scot %da birth.id)
-          %goal-peek
-      ==
-    ==
-  ?+  -.pyk  !!
-    %get-goal  ?~(ugoal.pyk !! u.ugoal.pyk)
-  ==
-::
-++  ryte-bound
-  |=  =id:gol
-  ^-  (unit @da)
-  =/  pyk=peek:goal-store
-    .^  peek:goal-store
-      %gx
-      :~  (scot %p our.bowl)
-          %goal-store
-          (scot %da now.bowl)
-          %ryte-bound
-          (scot %p owner.id)
-          (scot %da birth.id)
-          %goal-peek
-      ==
-    ==
-  ?+  -.pyk  !!
-    %ryte-bound  moment.pyk
-  ==
-::
-++  plumb
-  |=  =id:gol
-  ^-  @ud
-  =/  pyk=peek:goal-store
-    .^  peek:goal-store
-      %gx
-      :~  (scot %p our.bowl)
-          %goal-store
-          (scot %da now.bowl)
-          %plumb
-          (scot %p owner.id)
-          (scot %da birth.id)
-          %goal-peek
-      ==
-    ==
-  ?+  -.pyk  !!
-    %plumb  depth.pyk
-  ==
-::
-++  anchor
-  |=  =pin:gol
-  ^-  @ud
-  =/  pyk=peek:goal-store
-    .^  peek:goal-store
-      %gx
-      :~  (scot %p our.bowl)
-          %goal-store
-          (scot %da now.bowl)
-          %anchor
-          (scot %p owner.pin)
-          (scot %da birth.pin)
-          %goal-peek
-      ==
-    ==
-  ?+  -.pyk  !!
-    %anchor  depth.pyk
-  ==
-::
-++  seniority
-  |=  [mod=ship =id:gol cp=?(%c %p)]
-  ^-  (unit id:gol)
-  =/  pyk=peek:goal-store
-    .^  peek:goal-store
-      %gx
-      :~  (scot %p our.bowl)
-          %goal-store
-          (scot %da now.bowl)
-          %seniority
-          (scot %p mod)
-          (scot %p owner.id)
-          (scot %da birth.id)
-          [cp]
-          %goal-peek
-      ==
-    ==
-  ?+  -.pyk  !!
-    %seniority  u-senior.pyk
-  ==
-::
-:: get the number representing the deepest path to a leaf node
-++  get-lvl
-  |=  [=grip:vyu =mode:gol]
-  ^-  @
-  ?+    mode  !!
-      normal-mode:gol
-    ?-    -.grip
-      %all  ~
-      %pool  (anchor +.grip)
-      %goal  (plumb +.grip)
-    ==
-  ==
-:: TODO:
-:: different harvesting...
 ::
 ++  hrz  `tape`(reap 80 '-')
 ::
@@ -138,9 +23,9 @@
       %all  "   "
       %pool  " ~ "
         %goal
-      =/  goal  (got-goal +.grip)
+      =/  goal  (got-goal:scry +.grip)
       ?~  par.goal
-        "{(col-data [%pool (~(got by directory.store) +.grip)] %handle)}"
+        "{(col-data [%pool (got-pin:scry +.grip)] %handle)}"
       "{(col-data [%goal u.par.goal] %handle)}"
     ==
   :~  ;:  weld
@@ -167,16 +52,16 @@
   ?-    -.grip
     %all  "~"
       %pool
-    =/  chefs  (~(put in chefs:(~(got by pools.store) pin.grip)) owner.pin.grip)
+    =/  chefs  (~(put in chefs:(got-pool:scry pin.grip)) owner.pin.grip)
     ?:  (~(has in chefs) our.bowl)
       "c"
     "~"
       %goal
-    =/  chefs  (~(put in chefs:(~(got by pools.store) (~(got by directory.store) id.grip))) owner.id.grip)
+    =/  chefs  (~(put in chefs:(got-pool:scry (got-pin:scry id.grip))) owner.id.grip)
     ?:  (~(has in chefs) our.bowl)
       "c"
-    =/  c-sen  (seniority our.bowl id.grip %c)
-    =/  p-sen  (seniority our.bowl id.grip %p)
+    =/  c-sen  (seniority:scry our.bowl id.grip %c)
+    =/  p-sen  (seniority:scry our.bowl id.grip %p)
     ?~  c-sen
       ?~  p-sen
         "~"
@@ -188,18 +73,18 @@
   ?-    -.grip
     %all  "c~ p~"
       %pool
-    =/  chefs  (~(put in chefs:(~(got by pools.store) pin.grip)) owner.pin.grip)
+    =/  chefs  (~(put in chefs:(got-pool:scry pin.grip)) owner.pin.grip)
     ?:  =(1 ~(wyt in chefs))  :(weld "c" (trip (scot %p owner.pin.grip)) " p~")
     "c+ p~"
       %goal
-    =/  chefs  chefs:(got-goal id.grip)
+    =/  chefs  chefs:(got-goal:scry id.grip)
     =/  chef
       ?:  =(0 ~(wyt in chefs))
         "c~"
       ?.  =(1 ~(wyt in chefs))
         "c+"
       (weld "c" (trip (scot %p (snag 0 ~(tap in chefs)))))
-    =/  peons  peons:(got-goal id.grip)
+    =/  peons  peons:(got-goal:scry id.grip)
     =/  peon
       ?:  =(0 ~(wyt in peons))
         "p~"
@@ -216,10 +101,10 @@
   %-  print-cards 
   =/  lvl :: initial level; printing from context
     ?+  mode  !!
-      %nest-ryte  (dec (get-lvl grip mode))
-      normal-mode:gol  +((get-lvl grip mode))
-      %prec-ryte  (dec (get-lvl grip mode))
-      %prec-left  +((get-lvl grip mode))
+      %nest-ryte  (dec (get-lvl:scry grip mode))
+      normal-mode:gol  +((get-lvl:scry grip mode))
+      %prec-ryte  (dec (get-lvl:scry grip mode))
+      %prec-left  +((get-lvl:scry grip mode))
     ==
   =/  first-block  [grip "" mode lvl %.y %.n %.n *(set grip:vyu) col-names]
   =/  tapes  tapes:(print-family first-block ~)
@@ -234,8 +119,8 @@
 ++  next-gen
   |=  =block:vyu
   ^-  (list block:vyu)
-  =/  fam  (get-fam:gols grip.block mode.block)
-  =/  lvl  (get-lvl grip.block mode.block)
+  =/  fam  (get-fam:scry grip.block mode.block)
+  =/  lvl  (get-lvl:scry grip.block mode.block)
   =/  prtd-set  (~(put in prtd-set.block) grip.block)
   =/  indent  (indenter block)
   =/  idx=@  0
@@ -252,10 +137,8 @@
       ?-    -.grip
         ?(%all %pool)  %|
           %goal
-        =/  goal  (got-goal id.grip.block)
-        ?&  (~(has in (yung goal)) id.grip)
-            !(~(has in kids.goal) id.grip)
-        ==
+        =/  goal  (got-goal:scry id.grip.block)
+        (~(has in (sy (yung-virtual:scry id.grip.block))) id.grip)
       ==
     ==
   =/  last  =(+(idx) (lent fam))
@@ -319,7 +202,7 @@
     %all  toggles
     %pool  (snap toggles 3 (crip (perms grip)))
       %goal
-    =/  goal  (got-goal +.grip)
+    =/  goal  (got-goal:scry +.grip)
     =/  actionable  ?:(actionable.goal '@' ' ')
     =/  completed  ?:(complete.goal 'x' ' ')
     =/  perms  (crip (perms grip))
@@ -343,8 +226,8 @@
   ++  text  
     ?-  -.grip.block
       %all  "Projects"
-      %pool  (trip title:(~(got by pools.store) +.grip.block))
-      %goal  (trip desc:(got-goal +.grip.block))
+      %pool  (trip title:(got-pool:scry +.grip.block))
+      %goal  (trip desc:(got-goal:scry +.grip.block))
     ==
   ++  elbow
     ?-    -.grip.block
@@ -352,9 +235,9 @@
         %goal  ?:(virtual.block "*" ?:(last.block "\\" "|"))
     ==
   ++  branch-char
-    ?:  &(clps.block !=(0 (lent (get-fam:gols grip.block mode.block))))
+    ?:  &(clps.block !=(0 (lent (get-fam:scry grip.block mode.block))))
       '>'
-    ?:  &(prtd !=(0 (lent (get-fam:gols grip.block mode.block))))
+    ?:  &(prtd !=(0 (lent (get-fam:scry grip.block mode.block))))
       '<'
     ?+  mode.block  !!
       %nest-ryte  '_'
@@ -394,7 +277,7 @@
       %goal
     ?+    mode.block  !!
         normal-mode:gol
-      (mul spacer (sub lvl.block (plumb +.grip.block)))
+      (mul spacer (sub lvl.block (plumb:scry +.grip.block)))
     ==
   ==
 :: 
@@ -416,7 +299,7 @@
 ::
 ++  print-single-goal
   |=  [=id:gol col-names=(list col-name)]
-  =/  goal  (got-goal id)
+  =/  goal  (got-goal:scry id)
   =/  hndl  (~(got by gh.handles) [%goal id])
   :(weld (toggles [%goal id]) (columns [%goal id] col-names %.n) buffer (trip desc.goal))
 ::
@@ -456,19 +339,19 @@
       %all  "   ~~   "
       %pool  "   ~~   "
         %goal
-      (deadline-text (ryte-bound +.grip))
+      (deadline-text (ryte-bound:scry +.grip))
     ==
       %level
     ?-  -.grip
-      %all  (zfill:dates 3 (trip (scot %ud (get-lvl grip %normal))))
-      %pool  (zfill:dates 3 (trip (scot %ud (get-lvl grip %normal))))
-      %goal  (zfill:dates 3 (trip (scot %ud (get-lvl grip %normal))))
+      %all  (zfill:dates 3 (trip (scot %ud (get-lvl:scry grip %normal))))
+      %pool  (zfill:dates 3 (trip (scot %ud (get-lvl:scry grip %normal))))
+      %goal  (zfill:dates 3 (trip (scot %ud (get-lvl:scry grip %normal))))
     ==
       %priority
     ?-  -.grip
       %all  " ~ "
       %pool  " ~ "
-      %goal  (zfill:dates 3 (trip (scot %ud (priority:gols +.grip))))
+      %goal  (zfill:dates 3 (trip (scot %ud (priority:scry +.grip))))
     ==
   ==
 ::

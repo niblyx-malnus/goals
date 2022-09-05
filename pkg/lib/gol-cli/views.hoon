@@ -1,20 +1,19 @@
 /-  gol=goal, vyu=view
-/+  gol-cli-goals
-|_  [=store:gol =views:vyu]
-+*  gols  ~(. gol-cli-goals store)
+/+  gol-cli-scries
+|_  [=store:gol =views:vyu =bowl:gall]
++*  scry  ~(. gol-cli-scries bowl)
 ::
 ++  add-new-goal
-  |=  [=id:gol =directory:gol =pools:gol]
+  |=  =id:gol
   ^-  views:vyu
   =/  grip  [%goal id]
   (~(put by views) grip *view:vyu)
 ::
 ++  update-views-initial
-  |=  [=pin:gol =directory:gol =pools:gol]
-  =.  views  (update-views store)
+  |=  =pin:gol
+  =.  views  (update-views directory.store pools.store)
   =.  views  (collapsify [%all ~] [%pool pin] %normal %.y %.n)
   (collapsify [%pool pin] [%pool pin] %normal %.y %.n)
-
 ::
 ++  update-views
   |=  [=directory:gol =pools:gol]
@@ -37,7 +36,7 @@
   ^-  views:vyu
   ?<  =(-.clp %all)
   =/  view  (~(got by views) ctx)
-  =/  fam  (get-fam:gols clp mode)
+  =/  fam  (get-fam:scry clp mode)
   =.  views
     ?:  inv
       (~(put by views) ctx [(~(del in collapse.view) clp) hidden.view])

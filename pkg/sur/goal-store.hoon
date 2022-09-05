@@ -53,12 +53,22 @@
   ==
 ::
 +$  peek
-  $%  [%harvest harvest=(list id)]
+  $%  [%pool-keys keys=(set pin)]
+      [%all-goal-keys keys=(set id)]
+      [%harvest harvest=(list id)]
       [%get-goal ugoal=(unit goal)]
+      [%get-pin upin=(unit pin)]
+      [%get-pool upool=(unit pool)]
       [%ryte-bound moment=(unit @da) hereditor=eid]
       [%plumb depth=@ud]
       [%anchor depth=@ud]
+      [%priority priority=@ud]
       [%seniority u-senior=(unit id)]
+      [%yung yung=(list id)]
+      [%yung-uncompleted yung-uc=(list id)]
+      [%yung-virtual yung-vr=(list id)]
+      [%roots roots=(list id)]
+      [%roots-uncompleted roots-uc=(list id)]
   ==
 ::
 +$  store-update  [=pin =update =store]
