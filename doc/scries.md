@@ -10,6 +10,10 @@
 
 ### `/all-goal-keys`
 
+-----------------------
+
+### Goal Queries
+
 ### `/goal/[owner.id]/[birth.id]/harvest`
 
 ### `/goal/[owner.id]/[birth.id]/get-goal`
