@@ -41,7 +41,7 @@ Get the goals whose deadlines immediately precede the given goal's deadline, as 
 
 #### `/goal/[owner.id]/[birth.id]/yung/virtual`
 
-Get the goals whose deadlines immediately precede the given goal's deadline, but are not in the given goals kids (ie are not "owned" by the given goal, and are thus "virtually nested")
+Get the goals whose deadlines immediately precede the given goal's deadline, but are not in the given goal's kids (ie are not "owned" by the given goal, and are thus "virtually nested").
 
 #### `/goal/[owner.id]/[birth.id]/ryte-bound`
 
