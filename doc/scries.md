@@ -4,6 +4,8 @@
 
 #### `/initial`
 
+Get the entire data structure.
+
 ## %goal-peek
 
 #### `/pool-keys`
