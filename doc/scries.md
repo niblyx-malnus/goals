@@ -28,7 +28,7 @@
 
 ### `/goal/[owner.id]/[birth.id]/priority`
 
-### `/goal/[owner.id]/[birth.id]/seniority`
+### `/goal/[owner.id]/[birth.id]/seniority/[ship]/[?(%c %p)]`
 
 ### `/pool/[owner.pin]/[birth.pin]/get-pool`
 
