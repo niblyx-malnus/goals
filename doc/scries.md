@@ -6,17 +6,17 @@
 
 ## %goal-peek
 
-### `/pool-keys`
+#### `/pool-keys`
 
-### `/all-goal-keys`
+#### `/all-goal-keys`
 
 -----------------------
 
 ### Goal Queries
 
-### `/goal/[owner.id]/[birth.id]/harvest`
+#### `/goal/[owner.id]/[birth.id]/harvest`
 
-### `/goal/[owner.id]/[birth.id]/get-goal`
+#### `/goal/[owner.id]/[birth.id]/get-goal`
 
 ### `/goal/[owner.id]/[birth.id]/get-pin`
 
