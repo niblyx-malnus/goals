@@ -57,7 +57,7 @@ Get the "priority" of the given goal; the number of goals which must be started 
 
 #### `/goal/[owner.id]/[birth.id]/seniority/[ship]/[?(%c %p)]`
 
-Given a goal id, a ship, and either 'c' or 'p', determine the goal which gives the given ship their highest level of influence over the given goal.
+Given a goal id, a ship, and either 'c' or 'p' (for "chef" or "peon"), determine the goal which gives the given ship their highest level of influence over the given goal. In other words, get the most senior goal which contains the given goal on which the given ship is either a "chef" or a "peon".
 
 #### `/goal/[owner.id]/[birth.id]/harvest`
 
