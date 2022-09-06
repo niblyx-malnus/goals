@@ -25,7 +25,7 @@
   :-  (update-dir:gols pin ~)
   (~(del by pools.store) pin)
 ::
-++  archive-pool  10
+++  archive-pool  !!
 ::
 ++  copy-pool
   |=  [=old=pin:gol title=@t chefs=(set ship) peons=(set ship) viewers=(set ship) own=ship now=@da]
@@ -102,7 +102,7 @@
   ?-    -.as
     %|  ~&(+.as !!)
       %&
-    =.  pools.store  (~(put by pools.store) pin p.as)
+    =.  pools.store  (~(put by pools.store) pin pool.p.as)
     [pin [%add-under pin mod pid cid goal] store]
   ==
 ::
@@ -224,8 +224,9 @@
   ?-    -.as
     %|  ~&(+.as !!)
       %&
-    =.  pools.store  (~(put by pools.store) pin p.as)
-    [pin [%yoke-sequence pin mod seq] store]
+    =.  pools.store  (~(put by pools.store) pin pool.p.as)
+    =/  nex  (~(get-nex pr pin pool) set.p.as)
+    [pin [%yoke-sequence pin mod nex] store(pools (~(put by pools.store) pin pool))]
   ==
 ::
 ++  check-goal-perm
@@ -385,15 +386,11 @@
 ++  update
   |%
   ++  yoke-sequence
-    |=  [=pin:gol mod=ship seq=yoke-sequence:gol]
+    |=  [=pin:gol mod=ship =nex:gol]
+    ^-  store:gol
     =/  pool  (~(got by pools.store) pin)
-    =/  as  (~(apply-sequence pr pin pool) mod seq)
-    ?-    -.as
-      %|  ~&(+.as !!)
-        %&
-      =.  pools.store  (~(put by pools.store) pin p.as)
-      store
-    ==
+    =.  pool  (~(apply-nex pr pin pool) nex)
+    store(pools (~(put by pools.store) pin pool))
   ::
   ++  new-goal
     |=  [=pin:gol mod=ship =id:gol =goal:gol]
@@ -409,7 +406,7 @@
     ?-    -.as
       %|  ~&(+.as !!)
         %&
-      =.  pools.store  (~(put by pools.store) pin p.as)
+      =.  pools.store  (~(put by pools.store) pin pool.p.as)
       store
     ==
   --

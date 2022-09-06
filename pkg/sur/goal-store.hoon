@@ -42,6 +42,16 @@
       [%subscribe owner=ship =pin]
   ==
 ::
+:: Each update is associated with a single pool
+:: (1) Adding new pool
+:: (2) Adding new goal to a pool 
+:: (3) Updating existing goal in a pool
+:: (4) Deleting goal in a pool
+:: (5) Deleting a pool
+:: Each update has a datetime at which it occurred
+:: Each update has a src ship which initiated the update
+:: [pin time src ]
+::
 +$  update
   $%  [%pool-update =pool]
       [%initial-pool-update =pool]
@@ -49,7 +59,24 @@
       [%initial =store]
       [%new-goal =pin mod=ship =id =goal]
       [%add-under =pin mod=ship pid=id cid=id =goal]
-      [%yoke-sequence =pin mod=ship =yoke-sequence]
+      [%yoke-sequence =pin mod=ship =nex]
+     ::  [%new-pool [mod=ship =pin] =pool]
+     ::  [%copy-pool [mod=ship =pin] =pool]
+     ::  [%delete-pool mod=ship =pin]
+     ::  [%new-goal [mod=ship =pin] =id =goal]
+     ::  [%add-under [mod=ship =pin] pid=id cid=id =goal]
+     ::  [%edit-goal-desc [mod=ship =pin] =id desc=@t]
+     ::  [%edit-pool-title [mod=ship =pin] title=@t]
+     ::  [%delete-goal [mod=ship =pin] =id]
+     ::  [%set-deadline [mod=ship =pin] =id deadline=(unit @da)]
+     ::  [%mark-actionable [mod=ship =pin] =id]
+     ::  [%unmark-actionable [mod=ship =pin] =id]
+     ::  [%mark-complete [mod=ship =pin] =id]
+     ::  [%unmark-complete [mod=ship =pin] =id]
+     ::  [%make-chef [mod=ship =pin] chef=ship =id]
+     ::  [%make-peon [mod=ship =pin] peon=ship =id]
+     ::  [%yoke-sequence [mod=ship =pin] (map id [par kids kickoff deadline])]
+     ::  [%failed =action err=@tas]
   ==
 ::
 +$  peek

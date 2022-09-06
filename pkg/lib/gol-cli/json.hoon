@@ -151,6 +151,16 @@
     %-  pairs
     :~  [%store (enjs-store store.upd)]
     ==
+    ::
+      %new-goal
+    %+  frond
+      %new-goal
+    %-  pairs
+    :~  [%pin (enjs-pin pin.upd)]
+        [%mod (ship mod.upd)]
+        [%id (enjs-id id.upd)]
+        [%goal (enjs-goal goal.upd)]
+    ==
   ==
 ::
 ++  enjs-peek

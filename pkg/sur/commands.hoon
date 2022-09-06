@@ -14,7 +14,7 @@
       [%print-context ~]                       :: print context
       [%pg h=(unit @t) cpt=?]       :: print goal
       [%held-yoke l=@t r=@t]
-      [%held-rend l=@t r=@t]
+      [%held-rend-strict l=@t r=@t]
       [%nest-yoke l=@t r=@t]
       [%nest-rend l=@t r=@t]
       [%prec-yoke l=@t r=@t]
