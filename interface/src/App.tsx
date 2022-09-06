@@ -14,9 +14,12 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import InputBase from "@mui/material/InputBase";
 import DoneIcon from "@mui/icons-material/Done";
 import NewGoalInput from "./components/NewGoalInput";
+import EditInput from "./components/EditInput";
 import IconMenu from "./components/IconMenu";
 import useStore from "./store";
 import { log } from "./helpers";
+import Typography from "@mui/material/Typography";
+import { PinId } from "./types/types";
 
 //TODO: hovering elements also bring a + icon button to nest structure
 //TODO: add the contect menu
@@ -94,7 +97,7 @@ function App() {
   }, []);
 
   return (
-    <Container sx={{ marginTop: 2 }} maxWidth="sm">
+    <Container sx={{ marginTop: 2 }}>
       <Header />
       {pools.map((pool: any, index: any) => {
         const poolTitle = pool.pool.title;
@@ -113,32 +116,46 @@ function App() {
     </Container>
   );
 }
-function Project({ title, children, pin }: any) {
+
+function Project({
+  title,
+  children,
+  pin,
+}: {
+  title: string;
+  pin: PinId;
+  children: any;
+}) {
   const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
   const [addingGoal, setAddingGoal] = useState<boolean>(false);
+  const [editingTitle, setEditingTitle] = useState(false);
+
   return (
     <div>
       <StyledTreeItem>
         <StyledMenuButtonContainer sx={{ position: "absolute", left: -35 }}>
           <IconMenu type="pool" pin={pin} />
         </StyledMenuButtonContainer>
-        {/*    <StyledMenuButton
-          className="menu-button"
-          sx={{ position: "absolute", left: -35 }}
-          aria-label="menu button"
-          size="small"
-        >
-          <MoreHorizIcon />
-        </StyledMenuButton>
-        */}
-        <StyledLabel
-          className="label"
-          /* onClick={(e: React.MouseEvent<HTMLInputElement>) => {
-            onSelectCallback(id);
-          }}*/
-        >
-          {title}
-        </StyledLabel>
+
+        {!editingTitle ? (
+          <Typography
+            variant="h4"
+            onDoubleClick={() => {
+              setEditingTitle(true);
+            }}
+          >
+            {title}sss
+          </Typography>
+        ) : (
+          <EditInput
+            type="pool"
+            title={title}
+            onSubmit={() => {
+              setEditingTitle(false);
+            }}
+            pin={pin}
+          />
+        )}
         <Box className="icon-container" onClick={() => toggleItemOpen(!isOpen)}>
           {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
         </Box>

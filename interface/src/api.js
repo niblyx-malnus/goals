@@ -40,6 +40,17 @@ const api = {
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: newPool });
   },
+  editPoolTitle: async (pin, newTitle) => {
+    const poolToEdit = {
+      "edit-pool-title": {
+        pin,
+        title: newTitle,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: poolToEdit });
+  },
   deletePool: async (pin) => {
     //TODO: ask niblyx about order of stuff
     const poolToDelete = {
@@ -82,6 +93,18 @@ const api = {
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: goalToDelete });
   },
+  editGoalDesc: async (id, newDesc) => {
+    const goalToEdit = {
+      "edit-goal-desc": {
+        id,
+        desc: newDesc,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: goalToEdit });
+  },
+
   addGoalUnderGoal: async (desc, id) => {
     //adds a goal under another goal
     const { owner, birth } = id;

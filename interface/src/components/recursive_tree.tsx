@@ -6,8 +6,10 @@ import Box from "@mui/material/Box";
 import { PinId, Tree } from "../types/types";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
 import NewGoalInput from "./NewGoalInput";
 import IconMenu from "./IconMenu";
+import EditInput from "./EditInput";
 import AddIcon from "@mui/icons-material/Add";
 
 interface TreeItemProps {
@@ -42,6 +44,7 @@ const TreeItem = memo(
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
     const [selected, setSelected] = useState(isSelected);
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
+    const [editingTitle, setEditingTitle] = useState(false);
 
     return (
       <div>
@@ -62,21 +65,33 @@ const TreeItem = memo(
               {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
             </Box>
           )}
-          <StyledLabel
-            className="label"
-            onClick={(e: React.MouseEvent<HTMLInputElement>) => {
-              setSelected(!selected);
-              onSelectCallback(id);
-            }}
-            style={{
-              marginLeft: `${children && children.length === 0 ? "24px" : ""}`,
-              background: `${selected ? "#d5d5d5" : ""}`,
-              textDecoration: goal.complete ? "line-through" : "auto",
-            }}
-          >
-            {label}
-            {/*TODO: make this into it's own component(so we don't have to rerender the children)*/}
-          </StyledLabel>
+          {!editingTitle ? (
+            <Typography
+              variant="h6"
+              onDoubleClick={() => {
+                setEditingTitle(true);
+              }}
+              style={{
+                marginLeft: `${
+                  children && children.length === 0 ? "24px" : ""
+                }`,
+                background: `${selected ? "#d5d5d5" : ""}`,
+                textDecoration: goal.complete ? "line-through" : "auto",
+              }}
+            >
+              {label}
+            </Typography>
+          ) : (
+            <EditInput
+              type="goal"
+              title={label}
+              onSubmit={() => {
+                setEditingTitle(false);
+              }}
+              pin={pin}
+              id={idObject}
+            />
+          )}
           <StyledMenuButton
             className="add-goal-button"
             // sx={{ position: "absolute", right: 35 }}
