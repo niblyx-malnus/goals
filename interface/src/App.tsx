@@ -20,6 +20,7 @@ import useStore from "./store";
 import { log } from "./helpers";
 import Typography from "@mui/material/Typography";
 import { PinId } from "./types/types";
+import { newGoalAction } from "./store/actions";
 
 //TODO: hovering elements also bring a + icon button to nest structure
 //TODO: add the contect menu
@@ -30,7 +31,6 @@ function App() {
   const setFetchedPools = useStore((store) => store.setPools);
 
   const [pools, setPools] = useState([]);
-  log("fetchedPools", fetchedPools);
   const onSelect = (id: number) => {
     // You can put whatever here
     console.log("you clicked: " + id);
@@ -68,11 +68,44 @@ function App() {
   const getGoals = async () => {
     try {
       const result = await api.getData();
+
       console.log("result", result);
       const resultProjects = result.initial.store.pools;
       setFetchedPools(resultProjects);
     } catch (e) {
       console.log("e", e);
+    }
+  };
+  const subToUpdates = async () => {
+    //we sub to updates here
+    const updateHandler = (update: any) => {
+      const actionName: any = Object.keys(update)[0];
+      if (actionName) {
+        switch (actionName) {
+          case "new-goal": {
+            let { goal, id, pin }: any = update[actionName];
+            newGoalAction(id, pin, goal);
+            break;
+          }
+          case "add-under": {
+            let { goal, cid, pid, pin }: any = update[actionName];
+            newGoalAction(cid, pin, goal);
+            break;
+          }
+        }
+      }
+    };
+    try {
+      const value = await api.createApi().subscribe({
+        app: "goal-store",
+        path: "/updates",
+        event: updateHandler,
+        err: () => console.log("Subscription rejected"),
+        quit: () => console.log("Kicked from subscription"),
+      });
+      console.log("value", value);
+    } catch (e) {
+      log("subToUpdates error => ", e);
     }
   };
   const createDataTree = (dataset: any) => {
@@ -94,6 +127,7 @@ function App() {
   };
   useEffect(() => {
     getGoals();
+    subToUpdates();
   }, []);
 
   return (
@@ -144,7 +178,7 @@ function Project({
               setEditingTitle(true);
             }}
           >
-            {title}sss
+            {title}
           </Typography>
         ) : (
           <EditInput
@@ -174,7 +208,7 @@ function Project({
         <NewGoalInput
           id={pin}
           under={false}
-          callback={() => console.log("lol")}
+          callback={() => setAddingGoal(false)}
         />
       )}
       <StyledTreeChildren

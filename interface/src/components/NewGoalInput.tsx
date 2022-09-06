@@ -23,6 +23,7 @@ function NewGoalInput({
     }
   };
   const onSubmit = async () => {
+    callback();
     try {
       setTrying(true);
       //we switch between addGoal(add goal to pool) and addGoalUnderGoal (add goal under another goal)

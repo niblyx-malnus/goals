@@ -106,7 +106,7 @@ const TreeItem = memo(
           <NewGoalInput
             id={idObject}
             under={true}
-            callback={() => console.log("lol")}
+            callback={() => setAddingGoal(false)}
           />
         )}
         <StyledTreeChildren

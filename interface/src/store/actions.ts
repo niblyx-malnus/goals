@@ -113,10 +113,27 @@ function toggleCompleteAction(toMarkId: GoalId, pinId: PinId, status: boolean) {
 
   setPools(newPools);
 }
+function newGoalAction(newGoalId: GoalId, pinId: PinId, newGoal: any) {
+  const state = useStore.getState();
+  const pools = state.pools;
+  const setPools = state.setPools;
+  //select project using pinId and then add the goal to the goal list
+  const newPools = pools.map((poolItem: any, poolIndex: number) => {
+    const { pin } = poolItem;
+    if (pin.birth === pinId.birth) {
+      const newGoals = poolItem.pool.goals;
+      newGoals.push({ goal: newGoal, id: newGoalId });
+      return { ...poolItem, pool: { ...poolItem.pool, goals: newGoals } };
+    }
+    return poolItem;
+  });
+  setPools(newPools);
+}
 export {
   deletePoolAction,
   deleteGoalAction,
   toggleCompleteAction,
   updatePoolTitleAction,
   updateGoalDescAction,
+  newGoalAction,
 };

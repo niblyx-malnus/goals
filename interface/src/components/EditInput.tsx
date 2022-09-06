@@ -22,6 +22,8 @@ function EditInput({
   type: "pool" | "goal";
 }) {
   //TODO: fix flickering issue
+  //TODO: add edit to menu also
+  //TODO: press ESCP while focusing on the input to close it
   const [value, setValue] = useState<string>("");
   const [newTitleInputWidth, setNewTitleInputWidth] = useState<number>(0);
   const [metaVars, setMetaVars] = useState<any>({
