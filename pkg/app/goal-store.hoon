@@ -103,6 +103,7 @@
               goal-update+!>(update.ng)
             ~[/[`@`+<.pin.ng]/[`@`+>.pin.ng]]
             (fact:io goal-update+!>(update.ng) ~[/goals])
+            (fact:io goal-update+!>(update.ng) ~[/updates])
         ==
           ::
           :: [%add-under =id desc=@t chefs=(set ship) peons=(set ship) deadline=(unit @da) actionable=?]
@@ -155,6 +156,7 @@
               goal-update+!>(update.as)
             ~[/[`@`+<.pin.as]/[`@`+>.pin.as]]
             (fact:io goal-update+!>(update.as) ~[/goals])
+            (fact:io goal-update+!>(update.as) ~[/updates])
         ==
           ::
           :: [%set-deadline =id deadline=(unit @da)]
@@ -222,6 +224,7 @@
   |=  =path
   ^-  (quip card _this)
   ?+    path  (on-watch:def path)
+      [%updates ~]  `this
       [%goals ~]
     ?>  =(our.bowl src.bowl)
     :_  this

@@ -181,8 +181,8 @@
     ~[(poke-self view-action+!>([%unhide-completed ~]))]
       %held-yoke
     (yoke-command:hc command %held-yoke)
-      %held-rend
-    (yoke-command:hc command %held-rend)
+      %held-rend-strict
+    (yoke-command:hc command %held-rend-strict)
       %nest-yoke
     (yoke-command:hc command %nest-yoke)
       %nest-rend

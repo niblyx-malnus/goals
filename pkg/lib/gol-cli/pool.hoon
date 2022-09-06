@@ -327,6 +327,14 @@
     (seniority mod u.par senior path cp)
   --
 ::
+++  check-pool-perm
+  |=  mod=ship
+  ^-  (each ? term)
+  =/  pool-owner  +<:pin
+  =/  pool-chefs  chefs.p
+  ?:  |(=(pool-owner mod) (~(has in pool-chefs) mod))  [%& %.y]
+  [%| %perm-fail]
+::
 ++  check-pair-perm
   |=  [lid=id:gol rid=id:gol mod=ship]
   ^-  (each ? term)
@@ -338,37 +346,38 @@
   ?.  =(senior.l senior.r)  [%| %diff-sen-perm-fail]
   ?~  senior.l  [%| %null-sen-perm-fail]
   ?:  =(lid u.senior.l)  [%| %no-left-perm-fail]  [%& %.y]
+
 ::
 ++  own-yoke
   |=  [lid=id:gol rid=id:gol]
-  ^-  (each pool:gol term)
+  ^-  (each [=pool:gol =(set id:gol)] term)
   =/  l  (~(got by goals.p) lid)
   =/  r  (~(got by goals.p) rid)
-  =/  output
+  =/  output=(each [=pool:gol =(set id:gol)] term)
     ?~  par.l
-      [%& p]
+      [%& p ~]
     (own-rend lid u.par.l)
   ?-    -.output
     %|  output
       %&
-    =.  p  +.output
+    =.  p  pool.p.output
     =.  goals.p  (~(put by goals.p) lid l(par (some rid)))
     =.  goals.p  (~(put by goals.p) rid r(kids (~(put in kids.r) lid)))
-    [%& p]
+    [%& p (~(gas in set.p.output) ~[lid rid])]
   ==
 ::
 ++  own-rend
   |=  [lid=id:gol rid=id:gol]
-  ^-  (each pool:gol term)
+  ^-  (each [=pool:gol =(set id:gol)] term)
   =/  l  (~(got by goals.p) lid)
   =/  r  (~(got by goals.p) rid)
   =.  goals.p  (~(put by goals.p) lid l(par ~))
   =.  goals.p  (~(put by goals.p) rid r(kids (~(del in kids.r) lid)))
-  [%& p]
+  [%& p (~(gas in *(set id:gol)) ~[lid rid])]
 ::
 ++  dag-yoke
   |=  [e1=eid:gol e2=eid:gol]
-  ^-  (each pool:gol term)
+  ^-  (each [=pool:gol =(set id:gol)] term)
   =/  edge1  (got-edge e1)
   =/  edge2  (got-edge e2)
   ?:  complete:(~(got by goals.p) id.e2)  [%| %complete]
@@ -379,11 +388,11 @@
   =.  inflow.edge2  (~(put in inflow.edge2) e1)
   =.  goals.p  (~(put by goals.p) id.e1 (update-edge e1 edge1))
   =.  goals.p  (~(put by goals.p) id.e2 (update-edge e2 edge2))
-  [%& p]
+  [%& p (~(gas in *(set id:gol)) ~[id.e1 id.e2])]
 ::
 ++  dag-rend
   |=  [e1=eid:gol e2=eid:gol]
-  ^-  (each pool:gol term)
+  ^-  (each [=pool:gol =(set id:gol)] term)
   =/  l  (~(got by goals.p) id.e1)
   =/  r  (~(got by goals.p) id.e2)
   =/  edge1  (got-edge e1)
@@ -397,11 +406,11 @@
   =.  inflow.edge2  (~(del in inflow.edge2) e1)
   =.  goals.p  (~(put by goals.p) id.e1 (update-edge e1 edge1))
   =.  goals.p  (~(put by goals.p) id.e2 (update-edge e2 edge2))
-  [%& p]
+  [%& p (~(gas in *(set id:gol)) ~[id.e1 id.e2])]
 ::
 ++  prio-yoke
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each pool:gol term)
+  ^-  (each [=pool:gol =(set id:gol)] term)
   =/  perm  (check-pair-perm lid rid mod)
   ?-    -.perm
     %|  perm
@@ -414,7 +423,7 @@
 ::
 ++  prio-rend
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each pool:gol term)
+  ^-  (each [=pool:gol =(set id:gol)] term)
   =/  perm  (check-pair-perm lid rid mod)
   ?-    -.perm
     %|  perm
@@ -425,7 +434,7 @@
 ::
 ++  prec-yoke
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each pool:gol term)
+  ^-  (each [=pool:gol =(set id:gol)] term)
   =/  perm  (check-pair-perm lid rid mod)
   ?-    -.perm
     %|  perm
@@ -438,7 +447,7 @@
 ::
 ++  prec-rend
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each pool:gol term)
+  ^-  (each [=pool:gol =(set id:gol)] term)
   =/  perm  (check-pair-perm lid rid mod)
   ?-    -.perm
     %|  perm
@@ -449,7 +458,7 @@
 ::
 ++  nest-yoke
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each pool:gol term)
+  ^-  (each [=pool:gol =(set id:gol)] term)
   =/  perm  (check-pair-perm lid rid mod)
   ?-    -.perm
     %|  perm
@@ -466,7 +475,7 @@
 ::
 ++  nest-rend
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each pool:gol term)
+  ^-  (each [=pool:gol =(set id:gol)] term)
   =/  perm  (check-pair-perm lid rid mod)
   ?-    -.perm
     %|  perm
@@ -477,7 +486,7 @@
 ::
 ++  held-yoke
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each pool:gol term)
+  ^-  (each [=pool:gol =(set id:gol)] term)
   =/  perm  (check-pair-perm lid rid mod)
   ?-    -.perm
     %|  perm
@@ -489,15 +498,15 @@
       [%| %complete]
     ?:  actionable.r
       [%| %actionable]
-    =|  output=(each pool:gol term)
+    =|  output=(each [=pool:gol =(set id:gol)] term)
     =.  output
       ?~  par.l
-        [%& p]
+        [%& p ~]
       (held-rend lid u.par.l mod)
     ?-    -.output
       %|  output
         %&
-      =.  p  +.output
+      =.  p  pool.p.output
       %+  apply-sequence  mod
       :~  [%own-yoke lid rid]
           [%dag-yoke [%d lid] %d rid]
@@ -508,7 +517,7 @@
 ::
 ++  held-rend
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each pool:gol term)
+  ^-  (each [=pool:gol =(set id:gol)] term)
   =/  perm  (check-pair-perm lid rid mod)
   ?-    -.perm
     %|  perm
@@ -521,12 +530,25 @@
     ==
   ==
 ::
+++  held-rend-strict
+  |=  [lid=id:gol rid=id:gol mod=ship]
+  ^-  (each [=pool:gol =(set id:gol)] term)
+  :: only allow held-rend for mod with pool permissions
+  =/  perm  (check-pool-perm mod)
+  ?-    -.perm
+    %|  perm
+    %&  (held-rend lid rid mod)
+  ==
+
+::
 ++  apply-sequence
   |=  [mod=ship seq=yoke-sequence:gol]
-  ^-  (each pool:gol term)
+  ^-  (each [=pool:gol =(set id:gol)] term)
+  =/  id-set  *(set id:gol)
+  |-
   ?~  seq
-    [%& p]
-  =/  yoke-output=(each pool:gol term)
+    [%& p id-set]
+  =/  yoke-output=(each [=pool:gol =(set id:gol)] term)
     ?-  -.i.seq
       %dag-yoke   (dag-yoke e1.i.seq e2.i.seq)
       %dag-rend   (dag-rend e1.i.seq e2.i.seq)
@@ -539,12 +561,57 @@
       %nest-rend  (nest-rend lid.i.seq rid.i.seq mod) 
       %nest-yoke  (nest-yoke lid.i.seq rid.i.seq mod) 
       %held-rend  (held-rend lid.i.seq rid.i.seq mod) 
+      %held-rend-strict  (held-rend-strict lid.i.seq rid.i.seq mod) 
       %held-yoke  (held-yoke lid.i.seq rid.i.seq mod) 
     ==
-  ?-  -.yoke-output
+  ?-    -.yoke-output
     %|  yoke-output
-    %&  $(seq t.seq, p p.yoke-output)  
+      %&
+      %=  $
+        seq  t.seq
+        p  pool.p.yoke-output
+        id-set  (~(uni in id-set) set.p.yoke-output)
+      ==
   ==
+::
+++  get-nex
+  |=  =(set id:gol)
+  ^-  nex:gol
+  =|  =nex:gol
+  =/  idx  0
+  =/  list  ~(tap in set)
+  |-
+  ?:  =(idx (lent list))
+    nex
+  =/  id  (snag idx list)
+  =/  goal  (~(got by goals.p) id)
+  =|  =nexus:gol
+  =.  par.nexus  par.goal
+  =.  kids.nexus  kids.goal
+  =.  kickoff.nexus  kickoff.goal
+  =.  deadline.nexus  deadline.goal
+  $(idx +(idx), nex (~(put in nex) id nexus))
+::
+++  apply-nexus
+  |=  [=id:gol =nexus:gol]
+  ^-  pool:gol
+  =/  goal  (~(got by goals.p) id)
+  =.  par.goal  par.nexus
+  =.  kids.goal  kids.nexus
+  =.  kickoff.goal  kickoff.nexus
+  =.  deadline.goal  deadline.nexus
+  p(goals (~(put by goals.p) id goal))
+::
+++  apply-nex
+  |=  =nex:gol
+  ^-  pool:gol
+  =/  idx  0
+  =/  ids  ~(tap in ~(key by nex))
+  |-
+  ?:  =(idx (lent ids))
+    p
+  =/  id  (snag idx ids)
+  $(idx +(idx), p (apply-nexus id (~(got by nex) id)))
 ::
 ++  mark-actionable
   |=  [=id:gol mod=ship]
