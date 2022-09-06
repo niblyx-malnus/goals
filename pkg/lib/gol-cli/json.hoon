@@ -73,7 +73,7 @@
     (cold %prec-yoke (jest 'prec-yoke'))
     (cold %nest-rend (jest 'nest-rend'))
     (cold %nest-yoke (jest 'nest-yoke'))
-    (cold %held-rend (jest 'held-rend'))
+    (cold %held-rend-strict (jest 'held-rend-strict'))
     (cold %held-yoke (jest 'held-yoke'))
   ==
 ++  dejs-yoke-tag  (su:dejs:format parse-yoke-tag)
@@ -159,6 +159,17 @@
     :~  [%pin (enjs-pin pin.upd)]
         [%mod (ship mod.upd)]
         [%id (enjs-id id.upd)]
+        [%goal (enjs-goal goal.upd)]
+    ==
+    ::
+      %add-under
+    %+  frond
+      %add-under
+    %-  pairs
+    :~  [%pin (enjs-pin pin.upd)]
+        [%mod (ship mod.upd)]
+        [%pid (enjs-id pid.upd)]
+        [%cid (enjs-id cid.upd)]
         [%goal (enjs-goal goal.upd)]
     ==
   ==

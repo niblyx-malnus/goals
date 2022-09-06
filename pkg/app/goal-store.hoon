@@ -125,6 +125,7 @@
               goal-update+!>(update.au)
             ~[/[`@`+<.pin.au]/[`@`+>.pin.au]]
             (fact:io goal-update+!>(update.au) ~[/goals])
+            (fact:io goal-update+!>(update.au) ~[/updates])
         ==
           ::
           :: [%delete-goal =id]
