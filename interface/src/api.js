@@ -10,9 +10,9 @@ const api = {
     //ropnys-batwyd-nossyt-mapwet => nec
     //lidlut-tabwed-pillex-ridrup => zod
     const urb = isDev()
-      ? new Urbit("http://localhost:80", "lidlut-tabwed-pillex-ridrup")
+      ? new Urbit("http://localhost:8080", "ritdur-hodlyn-wathut-rocmyn")
       : new Urbit("");
-    urb.ship = isDev() ? "zod" : window.ship;
+    urb.ship = isDev() ? "dorsup-pacsyn-niblyx-malnus" : window.ship;
     // Just log errors if we get any
     urb.onError = (message) => console.log("onError: ", message);
     urb.onOpen = () => console.log("urbit onOpen");

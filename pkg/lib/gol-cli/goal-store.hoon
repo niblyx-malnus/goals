@@ -102,7 +102,9 @@
   ?-    -.as
     %|  ~&(+.as !!)
       %&
-    =.  pools.store  (~(put by pools.store) pin pool.p.as)
+    =/  pool  pool.p.as
+    =.  pools.store  (~(put by pools.store) pin pool)
+    =.  goal  (~(got by goals.pool) cid)
     [pin [%add-under pin mod pid cid goal] store]
   ==
 ::
