@@ -159,68 +159,122 @@
           :: [%edit-goal-desc =id desc=@t]
           %edit-goal-desc
         ?>  =(our.bowl owner.id.action)
-        %+  convert-update:hc  ~
-        (edit-goal-desc:gs id.action desc.action src.bowl)
+        =/  upd  (edit-goal-desc:gs id.action desc.action src.bowl)
+        :_  state(store store.upd)
+        :~  %+  fact:io
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
+        ==
           ::
           :: [%edit-pool-title =pin title=@t]
           %edit-pool-title
         ?>  =(our.bowl owner.pin.action)
-        %+  convert-update:hc  ~
-        (edit-pool-title:gs pin.action title.action src.bowl)
+        =/  upd  (edit-pool-title:gs pin.action title.action src.bowl)
+        :_  state(store store.upd)
+        :~  %+  fact:io
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
+        ==
           ::
           :: [%yoke-sequence =pin =yoke-sequence]
           %yoke-sequence
         ?>  =(our.bowl owner.pin.action)
-        =/  as  (apply-sequence:gs pin.action src.bowl yoke-sequence.action)
-        :_  state(store store.as)
+        =/  upd  (apply-sequence:gs pin.action src.bowl yoke-sequence.action)
+        :_  state(store store.upd)
         :~  %+  fact:io
-              goal-update+!>(update.as)
-            ~[/[`@`+<.pin.as]/[`@`+>.pin.as]]
-            (fact:io goal-update+!>(update.as) ~[/goals])
-            (fact:io goal-update+!>(update.as) ~[/updates])
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%set-deadline =id deadline=(unit @da)]
           %set-deadline
         ?>  =(our.bowl owner.id.action)
-        %+  convert-update:hc  ~
-        (set-deadline:gs id.action deadline.action src.bowl)
+        =/  upd  (set-deadline:gs id.action deadline.action src.bowl)
+        :_  state(store store.upd)
+        :~  %+  fact:io
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
+        ==
           ::
           :: [%mark-actionable =id]
           %mark-actionable
         ?>  =(our.bowl owner.id.action)
-        %+  convert-update:hc  ~
-        (mark-actionable:gs id.action src.bowl)
+        =/  upd  (mark-actionable:gs id.action src.bowl)
+        :_  state(store store.upd)
+        :~  %+  fact:io
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
+        ==
           ::
           :: [%unmark-actionable =id]
           %unmark-actionable
         ?>  =(our.bowl owner.id.action)
-        %+  convert-update:hc  ~
-        (unmark-actionable:gs id.action src.bowl)
+        =/  upd  (unmark-actionable:gs id.action src.bowl)
+        :_  state(store store.upd)
+        :~  %+  fact:io
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
+        ==
           ::
           :: [%mark-complete =id]
           %mark-complete
         ?>  =(our.bowl owner.id.action)
-        %+  convert-update:hc  ~
-        (mark-complete:gs id.action src.bowl)
+        =/  upd  (mark-complete:gs id.action our.bowl)
+        :_  state(store store.upd)
+        :~  %+  fact:io
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
+        ==
           ::
           :: [%unmark-complete =id]
           %unmark-complete
         ?>  =(our.bowl owner.id.action)
-        %+  convert-update:hc  ~
-        (unmark-complete:gs id.action src.bowl)
+        =/  upd  (unmark-complete:gs id.action src.bowl)
+        :_  state(store store.upd)
+        :~  %+  fact:io
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
+        ==
           ::
           :: [%make-chef chef=ship =id]
           %make-chef
         ?>  =(our.bowl owner.id.action)
-        %+  convert-update:hc  ~
-        (make-chef:gs id.action chef.action src.bowl)
+        =/  upd  (make-chef:gs id.action chef.action src.bowl)
+        :_  state(store store.upd)
+        :~  %+  fact:io
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
+        ==
           ::
           :: [%make-peon peon=ship =id]
           %make-peon
         ?>  =(our.bowl owner.id.action)
-        %+  convert-update:hc  ~
-        (make-peon:gs id.action peon.action src.bowl)
+        =/  upd  (make-peon:gs id.action peon.action src.bowl)
+        :_  state(store store.upd)
+        :~  %+  fact:io
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
+        ==
           ::
           :: [%invite invitee=ship =pin]
           %invite
