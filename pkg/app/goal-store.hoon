@@ -85,7 +85,6 @@
               goal-update+!>(update.upd)
             ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
             (fact:io goal-update+!>(update.upd) ~[/goals])
-            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%delete-pool =pin]
@@ -165,7 +164,6 @@
               goal-update+!>(update.upd)
             ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
             (fact:io goal-update+!>(update.upd) ~[/goals])
-            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%edit-pool-title =pin title=@t]
@@ -177,7 +175,6 @@
               goal-update+!>(update.upd)
             ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
             (fact:io goal-update+!>(update.upd) ~[/goals])
-            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%yoke-sequence =pin =yoke-sequence]
@@ -201,7 +198,6 @@
               goal-update+!>(update.upd)
             ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
             (fact:io goal-update+!>(update.upd) ~[/goals])
-            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%mark-actionable =id]
@@ -213,7 +209,6 @@
               goal-update+!>(update.upd)
             ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
             (fact:io goal-update+!>(update.upd) ~[/goals])
-            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%unmark-actionable =id]
@@ -225,7 +220,6 @@
               goal-update+!>(update.upd)
             ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
             (fact:io goal-update+!>(update.upd) ~[/goals])
-            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%mark-complete =id]
@@ -237,7 +231,6 @@
               goal-update+!>(update.upd)
             ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
             (fact:io goal-update+!>(update.upd) ~[/goals])
-            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%unmark-complete =id]
@@ -249,7 +242,6 @@
               goal-update+!>(update.upd)
             ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
             (fact:io goal-update+!>(update.upd) ~[/goals])
-            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%make-chef chef=ship =id]
@@ -261,7 +253,6 @@
               goal-update+!>(update.upd)
             ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
             (fact:io goal-update+!>(update.upd) ~[/goals])
-            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%make-peon peon=ship =id]
@@ -273,7 +264,6 @@
               goal-update+!>(update.upd)
             ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
             (fact:io goal-update+!>(update.upd) ~[/goals])
-            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%invite invitee=ship =pin]

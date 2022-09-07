@@ -42,20 +42,22 @@
     [pin [%new-pool pin pool] (update-store pin pool)]
   == 
 ::
-:: ++  new-goal-temp
-::   |=  $:  =bowl:gall
-::           desc=@t           deadline=(unit @da)
-::           chefs=(set ship)  peons=(set ship)
-::           actionable=?
-::       ==
-::     ^-  [id:gol goal:gol]
-::     =/  id  (unique-id:gols [owner.pin now.bowl])
-::     =|  =goal:gol
-::     =.  desc.goal        desc          =.  chefs.goal            chefs
-::     =.  peons.goal       peons         =.  moment.deadline.goal  deadline
-::     =.  actionable.goal  actionable    =.  author.goal           mod
-::     =.  outflow.kickoff.goal  (~(put in *(set eid:gol)) [%d id])
-::     =.  inflow.deadline.goal  (~(put in *(set eid:gol)) [%k id])
+++  new-goal-temp
+  |=  $:  our=ship
+          now=@da
+          desc=@t           deadline=(unit @da)
+          chefs=(set ship)  peons=(set ship)
+          actionable=?
+      ==
+    ^-  [id:gol goal:gol]
+    =/  id  (unique-id:gols [our now])
+    =|  =goal:gol
+    =.  desc.goal        desc          =.  chefs.goal            chefs
+    =.  peons.goal       peons         =.  moment.deadline.goal  deadline
+    =.  actionable.goal  actionable    =.  author.goal           our
+    =.  outflow.kickoff.goal  (~(put in *(set eid:gol)) [%d id])
+    =.  inflow.deadline.goal  (~(put in *(set eid:gol)) [%k id])
+    [id goal]
 ::
 ++  new-goal
   |=  $:  =pin:gol             desc=@t
@@ -68,13 +70,11 @@
   ?-    -.check  
     %|  !! ::   [pin [%error +.check] store]
       %&
-    =/  id  (unique-id:gols [owner.pin now])
-    =|  =goal:gol
-    =.  desc.goal        desc          =.  chefs.goal            chefs
-    =.  peons.goal       peons         =.  moment.deadline.goal  deadline
-    =.  actionable.goal  actionable    =.  author.goal           mod
-    =.  outflow.kickoff.goal  (~(put in *(set eid:gol)) [%d id])
-    =.  inflow.deadline.goal  (~(put in *(set eid:gol)) [%k id])
+    =+  ^=  [id goal]
+      %:  new-goal-temp
+        owner.pin   now
+        desc  deadline  chefs  peons  actionable
+      ==
     =.  store  (put-in-pool:gols pin id goal)
     [pin [%new-goal pin mod id goal] store]
   ==
@@ -96,13 +96,10 @@
 :: create a new goal and add to goals, nesting under par
 ++  add-under
   |=  $:  pid=id:gol
-          desc=@t
-          chefs=(set ship)
-          peons=(set ship)
-          deadline=(unit @da)
+          desc=@t           chefs=(set ship)
+          peons=(set ship)  deadline=(unit @da)
           actionable=?
-          mod=ship
-          now=@da
+          mod=ship          now=@da
       ==
   ^-  store-update:goal-store
   =/  check  (add-under:check +<)
@@ -110,23 +107,18 @@
     %|  !! ::   [(~(got by directory.store) pid) [%error +.check] store]
       %&
     =/  pin  (~(got by directory.store) pid)
-    =/  cid  (unique-id:gols owner.pin now)
-    =|  =goal:gol
-    =.  desc.goal  desc
-    =.  chefs.goal  chefs
-    =.  peons.goal  peons
-    =.  moment.deadline.goal  deadline
-    =.  actionable.goal  actionable
-    =.  author.goal  mod
-    =.  outflow.kickoff.goal  (~(put in *(set eid:gol)) [%d cid])
-    =.  inflow.deadline.goal  (~(put in *(set eid:gol)) [%k cid])
+    =+  ^=  [cid goal]
+      %:  new-goal-temp
+        owner.pin   now
+        desc  deadline  chefs  peons  actionable
+      ==
     =.  store  (put-in-pool:gols pin cid goal)
     =/  pool  (~(got by pools.store) pin)
-    =/  as  (~(apply-sequence pr pin pool) mod [%held-yoke cid pid]~)
-    ?-    -.as
-      %|  [pin [%error +.as] store]
+    =/  out  (~(apply-sequence pr pin pool) mod [%held-yoke cid pid]~)
+    ?-    -.out
+      %|  [pin [%error p.out] store]
         %&
-      =/  pool  pool.p.as
+      =/  pool  pool.p.out
       =.  pools.store  (~(put by pools.store) pin pool)
       =.  goal  (~(got by goals.pool) cid)
       [pin [%add-under pin mod pid cid goal] store]
