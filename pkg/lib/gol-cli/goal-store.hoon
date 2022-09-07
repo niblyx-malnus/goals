@@ -16,7 +16,7 @@
   ^-  store-update:goal-store
   =/  check  (new-pool:check +<)
   ?-    -.check
-    %|  [*pin:gol [%error +.check] store]
+    %|  !! ::  [*pin:gol [%error +.check] store]
       %&
     =+  [pin pool]=(new-pool:gols title chefs peons viewers own now)
     [pin [%new-pool pin pool] store(pools (~(put by pools.store) pin pool))]
@@ -36,7 +36,7 @@
   ^-  store-update:goal-store
   =/  check  (copy-pool:check +<)
   ?-    -.check  
-    %|  [old-pin [%error +.check] store]
+    %|  !! ::  [old-pin [%error +.check] store]
       %&
     =+  [pin pool]=(copy-pool:gols old-pin title chefs peons viewers own now)
     [pin [%new-pool pin pool] (update-store pin pool)]
@@ -55,7 +55,7 @@
   ^-  store-update:goal-store
   =/  check  (new-goal:check +<)
   ?-    -.check  
-    %|  [pin [%error +.check] store]
+    %|  !! ::   [pin [%error +.check] store]
       %&
     =/  id  (unique-id:gols [owner.pin now])
     =|  =goal:gol
@@ -76,7 +76,7 @@
   ^-  store-update:goal-store
   =/  check  (delete-goal:check +<)
   ?-    -.check
-    %|  [(~(got by directory.store) id) [%error +.check] store]
+    %|  !! ::   [(~(got by directory.store) id) [%error +.check] store]
       %&
     =/  pin  (~(got by directory.store) id)
     =/  pool  (~(got by pools.store) pin)
@@ -99,7 +99,7 @@
   ^-  store-update:goal-store
   =/  check  (add-under:check +<)
   ?-    -.check  
-    %|  [(~(got by directory.store) pid) [%error +.check] store]
+    %|  !! ::   [(~(got by directory.store) pid) [%error +.check] store]
       %&
     =/  pin  (~(got by directory.store) pid)
     =/  cid  (unique-id:gols owner.pin now)
@@ -130,7 +130,7 @@
   ^-  store-update:goal-store
   =/  check  (edit-goal-desc:check +<)
   ?-    -.check
-    %|  [(~(got by directory.store) id) [%error +.check] store]
+    %|  !! ::   [(~(got by directory.store) id) [%error +.check] store]
       %&
     =/  goal  (got-goal:gols id)
     =+  [pin pool]=(put-goal:gols id goal(desc desc))
@@ -142,7 +142,7 @@
   ^-  store-update:goal-store
   =/  check  (edit-pool-title:check +<)
   ?-    -.check
-    %|  [pin [%error +.check] store]
+    %|  !! ::   [pin [%error +.check] store]
       %&
     =/  pool  (~(got by pools.store) pin)
     =.  pool  pool(title title)
@@ -156,7 +156,7 @@
   =/  pool  (~(got by pools.store) pin)
   =/  ma  (~(mark-actionable pr pin pool) id mod)
   ?-    -.ma
-    %|  [pin [%error +.ma] store]
+    %|  !! ::   [pin [%error +.ma] store]
       %&
     =.  pools.store  (~(put by pools.store) pin p.ma)
     [pin [%pool-update (~(got by pools.store) pin)] store]
@@ -169,7 +169,7 @@
   =/  pool  (~(got by pools.store) pin)
   =/  ua  (~(unmark-actionable pr pin pool) id mod)
   ?-    -.ua
-    %|  [pin [%error +.ua] store]
+    %|  !! ::   [pin [%error +.ua] store]
       %&
     =.  pools.store  (~(put by pools.store) pin p.ua)
     [pin [%pool-update (~(got by pools.store) pin)] store]
@@ -182,7 +182,7 @@
   =/  pool  (~(got by pools.store) pin)
   =/  mc  (~(mark-complete pr pin pool) id mod)
   ?-    -.mc
-    %|  [pin [%error +.mc] store]
+    %|  !! ::   [pin [%error +.mc] store]
       %&
     =.  pools.store  (~(put by pools.store) pin p.mc)
     [pin [%pool-update (~(got by pools.store) pin)] store]
@@ -195,7 +195,8 @@
   =/  pool  (~(got by pools.store) pin)
   =/  uc  (~(unmark-complete pr pin pool) id mod)
   ?-    -.uc
-    %|  [pin [%error +.uc] store]
+    %|   !! ::    [pin [%error +.uc] store]
+
       %&
     =.  pools.store  (~(put by pools.store) pin p.uc)
     [pin [%pool-update (~(got by pools.store) pin)] store]
@@ -208,7 +209,7 @@
   =/  pool  (~(got by pools.store) pin)
   =/  sd  (~(set-deadline pr pin pool) id moment mod)
   ?-    -.sd
-    %|  [pin [%error +.sd] store]
+    %|  !! ::   [pin [%error +.sd] store]
       %&
     =.  pools.store  (~(put by pools.store) pin p.sd)
     [pin [%pool-update p.sd] store]
@@ -219,7 +220,7 @@
   ^-  store-update:goal-store
   =/  check  (put-viewer:check +<)
   ?-    -.check  
-    %|  [pin [%error +.check] store]
+    %|  !! ::   [pin [%error +.check] store]
       %&
     =/  pool  (~(got by pools.store) pin)
     =.  pool  pool(viewers (~(put in viewers.pool) invitee))
@@ -231,7 +232,7 @@
   ^-  store-update:goal-store
   =/  check  (make-chef:check +<)
   ?-    -.check
-    %|  [(~(got by directory.store) id) [%error +.check] store]
+    %|  !! ::   [(~(got by directory.store) id) [%error +.check] store]
       %&
     =/  goal  (got-goal:gols id)
     =+  [pin pool]=(put-goal:gols id goal(chefs (~(put in chefs.goal) chef)))
@@ -243,7 +244,7 @@
   ^-  store-update:goal-store
   =/  check  (make-peon:check +<)
   ?-    -.check  
-    %|  [(~(got by directory.store) id) [%error +.check] store]
+    %|  !! ::   [(~(got by directory.store) id) [%error +.check] store]
       %&
     =/  goal  (got-goal:gols id)
     =+  [pin pool]=(put-goal:gols id goal(peons (~(put in peons.goal) peon)))
@@ -256,7 +257,7 @@
   =/  pool  (~(got by pools.store) pin)
   =/  as  (~(apply-sequence pr pin pool) mod seq)
   ?-    -.as
-    %|  [pin [%error +.as] store]
+    %|  !! ::   [pin [%error +.as] store]
       %&
     =.  pools.store  (~(put by pools.store) pin pool.p.as)
     =/  nex  (~(get-nex pr pin pool) set.p.as)
