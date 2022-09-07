@@ -50,44 +50,59 @@
           :: [%new-pool title=@t chefs=(set ship) peons=(set ship) viewers=(set ship)]
           %new-pool
         ?>  =(src.bowl our.bowl)
-        %+  convert-update:hc  ~
-        %:  new-pool:gs
-          title.action
-          chefs.action
-          peons.action
-          viewers.action
-          src.bowl
-          now.bowl
+        =/  upd
+          %:  new-pool:gs
+            title.action
+            chefs.action
+            peons.action
+            viewers.action
+            src.bowl
+            now.bowl
+          ==
+        :_  state(store store.upd)
+        :~  %+  fact:io
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%copy-pool =old=pin title=@t chefs=(set ship) peons=(set ship) viewers=(set ship)]
           %copy-pool
         ?>  =(src.bowl our.bowl)
-        %+  convert-update:hc  ~
-        %:  copy-pool:gs
-          old-pin.action
-          title.action
-          chefs.action
-          peons.action
-          viewers.action
-          src.bowl
-          now.bowl
+        =/  upd
+          %:  copy-pool:gs
+            old-pin.action
+            title.action
+            chefs.action
+            peons.action
+            viewers.action
+            src.bowl
+            now.bowl
+          ==
+        :_  state(store store.upd)
+        :~  %+  fact:io
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%delete-pool =pin]
           %delete-pool
         ?>  =(src.bowl our.bowl)
         ?>  =(our.bowl owner.pin.action)
-        =/  store-update  (delete-pool:gs pin.action our.bowl)
-        :_  state(store store-update)
+        =/  upd  (delete-pool:gs pin.action our.bowl)
+        :_  state(store store.upd)
         :~  [%give %kick ~[/[`@`+<.pin.action]/[`@`+>.pin.action]] ~]
-            (send-store-update store-update)
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%new-goal =pin desc=@t chefs=(set ship) peons=(set ship) deadline=(unit @da) actionable=?]
           %new-goal
         ?>  =(our.bowl owner.pin.action)
-        =/  ng
+        =/  upd
           %:  new-goal:gs
             pin.action
             desc.action
@@ -98,18 +113,18 @@
             src.bowl
             now.bowl
           ==
-        :_  state(store store.ng)
+        :_  state(store store.upd)
         :~  %+  fact:io
-              goal-update+!>(update.ng)
-            ~[/[`@`+<.pin.ng]/[`@`+>.pin.ng]]
-            (fact:io goal-update+!>(update.ng) ~[/goals])
-            (fact:io goal-update+!>(update.ng) ~[/updates])
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%add-under =id desc=@t chefs=(set ship) peons=(set ship) deadline=(unit @da) actionable=?]
           %add-under
         ?>  =(our.bowl owner.id.action)
-        =/  au
+        =/  upd
           %:  add-under:gs
             id.action
             desc.action
@@ -120,21 +135,26 @@
             src.bowl
             now.bowl
           ==
-        :_  state(store store.au)
+        :_  state(store store.upd)
         :~  %+  fact:io
-              goal-update+!>(update.au)
-            ~[/[`@`+<.pin.au]/[`@`+>.pin.au]]
-            (fact:io goal-update+!>(update.au) ~[/goals])
-            (fact:io goal-update+!>(update.au) ~[/updates])
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
         ==
           ::
           :: [%delete-goal =id]
           %delete-goal
         ?>  =(src.bowl our.bowl)
         ?>  =(our.bowl owner.id.action)
-        =/  store-update  (delete-goal:gs id.action our.bowl)
-        :_  state(store store-update)
-        [(send-store-update store-update)]~
+        =/  upd  (delete-goal:gs id.action our.bowl)
+        :_  state(store store.upd)
+        :~  %+  fact:io
+              goal-update+!>(update.upd)
+            ~[/[`@`+<.pin.upd]/[`@`+>.pin.upd]]
+            (fact:io goal-update+!>(update.upd) ~[/goals])
+            (fact:io goal-update+!>(update.upd) ~[/updates])
+        ==
           ::
           :: [%edit-goal-desc =id desc=@t]
           %edit-goal-desc
@@ -390,15 +410,35 @@
         ?>  =(pin pin.update)
         :_  this(store (new-goal:update:gs +.update))
         ~[(fact:io goal-update+!>(update) ~[/goals])]
+        ::
           %add-under
         %-  (slog 'goal-store on-agent add-under' ~)
         ?>  =(pin pin.update)
         :_  this(store (add-under:update:gs +.update))
         ~[(fact:io goal-update+!>(update) ~[/goals])]
+        ::
           %yoke-sequence
         %-  (slog 'goal-store on-agent yoke-sequence' ~)
         ?>  =(pin pin.update)
         :_  this(store (yoke-sequence:update:gs +.update))
+        ~[(fact:io goal-update+!>(update) ~[/goals])]
+        ::
+          %new-pool
+        %-  (slog 'goal-store on-agent new-pool' ~)
+        ?>  =(pin pin.update)
+        :_  this(store (new-pool:update:gs +.update))
+        ~[(fact:io goal-update+!>(update) ~[/goals])]
+        ::
+          %delete-pool
+        %-  (slog 'goal-store on-agent delete-pool' ~)
+        ?>  =(pin pin.update)
+        :_  this(store (delete-pool:update:gs +.update))
+        ~[(fact:io goal-update+!>(update) ~[/goals])]
+        ::
+          %delete-goal
+        %-  (slog 'goal-store on-agent delete-goal' ~)
+        ?>  =(pin pin.update)
+        :_  this(store (delete-goal:update:gs +.update))
         ~[(fact:io goal-update+!>(update) ~[/goals])]
       ==
     ==

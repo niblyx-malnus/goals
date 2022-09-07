@@ -10,6 +10,13 @@
   =/  hdl  (make-handle grip)
   [(~(put by hg.handles) hdl grip) (~(put by gh.handles) grip hdl)]
 ::
+++  add-new-pool
+  |=  [=pin:gol =directory:gol =pools:gol]
+  ^-  handles:vyu
+  =/  grip  [%pool pin]
+  =/  hdl  (make-handle grip)
+  [(~(put by hg.handles) hdl grip) (~(put by gh.handles) grip hdl)]
+::
 ++  generate
   |=  [=directory:gol =pools:gol]
   ^-  handles:vyu

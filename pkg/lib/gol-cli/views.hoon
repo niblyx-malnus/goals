@@ -9,6 +9,12 @@
   =/  grip  [%goal id]
   (~(put by views) grip *view:vyu)
 ::
+++  add-new-pool
+  |=  =pin:gol
+  ^-  views:vyu
+  =/  grip  [%pool pin]
+  (~(put by views) grip *view:vyu)
+::
 ++  update-views-initial
   |=  =pin:gol
   =.  views  (update-views directory.store pools.store)

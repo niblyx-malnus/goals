@@ -172,6 +172,34 @@
         [%cid (enjs-id cid.upd)]
         [%goal (enjs-goal goal.upd)]
     ==
+    ::
+      %new-pool
+    %+  frond
+      %new-pool
+    %-  pairs
+    :~  [%pin (enjs-pin pin.upd)]
+        [%pool (enjs-pool pool.upd)]
+    ==
+    ::
+    %delete-pool  (frond %delete-pool (pairs [%pin (enjs-pin pin.upd)]~))
+    ::
+      %delete-goal
+    %+  frond
+      %delete-goal
+    %-  pairs
+    :~  [%pin (enjs-pin pin.upd)]
+        [%mod (ship mod.upd)]
+        [%id (enjs-id id.upd)]
+    ==
+    ::
+      %yoke-sequence
+    %+  frond
+      %yoke-sequence
+    %-  pairs
+    :~  [%pin (enjs-pin pin.upd)]
+        [%mod (ship mod.upd)]
+        [%nex (enjs-nex nex.upd)]
+    ==
   ==
 ::
 ++  enjs-peek
@@ -311,6 +339,27 @@
   %-  pairs
   :~  [%id (enjs-id id)]
       [%goal (enjs-goal goal)]
+  ==
+::
+++  enjs-nex
+  =,  enjs:format
+  |=  =nex
+  :-  %a  %+  turn  ~(tap by nex) 
+  |=  [=id =nexus] 
+  %-  pairs
+  :~  [%id (enjs-id id)]
+      [%goal (enjs-nexus nexus)]
+  ==
+::
+++  enjs-nexus
+  =,  enjs:format
+  |=  =goal
+  ^-  json
+  %-  pairs
+  :~  [%par ?~(par.goal ~ (enjs-id u.par.goal))]
+      [%kids a+(turn ~(tap in kids.goal) enjs-id)]
+      [%kickoff (enjs-edge kickoff.goal)]
+      [%deadline (enjs-edge deadline.goal)]
   ==
 ::
 ++  enjs-goal

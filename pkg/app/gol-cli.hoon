@@ -134,6 +134,14 @@
             handles  (add-new-goal:hdls id.update new-store)
             views  (add-new-goal:vyuz id.update)
           ==
+            %new-pool
+          =/  new-store  (new-pool:update:gs +.update)
+          :-  [(poke-self view-action+!>(print+~))]~
+          %=  this
+            store  new-store
+            handles  (add-new-pool:hdls pin.update new-store)
+            views  (add-new-pool:vyuz pin.update)
+          ==
             %add-under
           =/  new-store  (add-under:update:gs +.update)
           :-  [(poke-self view-action+!>(print+~))]~

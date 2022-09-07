@@ -10,7 +10,7 @@ const api = {
     //ropnys-batwyd-nossyt-mapwet => nec
     //lidlut-tabwed-pillex-ridrup => zod
     const urb = isDev()
-      ? new Urbit("http://localhost:8080", "ritdur-hodlyn-wathut-rocmyn")
+      ? new Urbit("http://localhost:8080", "picdyl-sorlen-filtug-tinnel")
       : new Urbit("");
     urb.ship = isDev() ? "dorsup-pacsyn-niblyx-malnus" : window.ship;
     // Just log errors if we get any

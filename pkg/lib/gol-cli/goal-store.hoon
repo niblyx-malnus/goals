@@ -17,11 +17,12 @@
   =/  check  (new-pool:check +<)
   ?.  -.check  ~&(+.check !!)
   =+  [pin pool]=(new-pool:gols title chefs peons viewers own now)
-  [pin [%pool-update pool] store(pools (~(put by pools.store) pin pool))]
+  [pin [%new-pool pin pool] store(pools (~(put by pools.store) pin pool))]
 ::
 ++  delete-pool
   |=  [=pin:gol mod=ship]
-  ^-  store:gol
+  ^-  store-update:goal-store
+  :-  pin  :-  [%delete-pool pin]
   :-  (update-dir:gols pin ~)
   (~(del by pools.store) pin)
 ::
@@ -33,7 +34,7 @@
   =/  check  (copy-pool:check +<)
   ?.  -.check  ~&(+.check !!)
   =+  [pin pool]=(copy-pool:gols old-pin title chefs peons viewers own now)
-  [pin [%pool-update pool] (update-store pin pool)]
+  [pin [%new-pool pin pool] (update-store pin pool)]
 ::
 ++  new-goal
   |=  $:  =pin:gol
@@ -63,11 +64,12 @@
 ::
 ++  delete-goal
   |=  [=id:gol mod=ship]
-  ^-  store:gol
+  ^-  store-update:goal-store
   =/  check  (delete-goal:check +<)
   ?.  -.check  ~&(+.check !!)
   =/  pin  (~(got by directory.store) id)
   =/  pool  (~(got by pools.store) pin)
+  :-  pin  :-  [%delete-goal pin mod id]
   :-  (~(del by directory.store) id)
   (~(put by pools.store) pin pool(goals (purge-goals:gols goals.pool id)))
 ::
@@ -411,5 +413,28 @@
       =.  pools.store  (~(put by pools.store) pin pool.p.as)
       store
     ==
+  ::
+  ++  new-pool
+    |=  [=pin:gol =pool:gol]
+    ^-  store:gol
+    store(pools (~(put by pools.store) pin pool))
+  ::
+  ++  delete-pool
+    |=  =pin:gol
+    ^-  store:gol
+    :-  %-  ~(gas by *(map id:gol pin:gol))
+        %+  murn  ~(tap by directory.store)
+        |=  [=id:gol =pin:gol]
+        ?:  =(pin ^pin)
+          ~
+        (some [id pin])
+    (~(del by pools.store) pin)
+  ::
+  ++  delete-goal
+    |=  [=pin:gol mod=ship =id:gol]
+    ^-  store:gol
+    =/  pool  (~(got by pools.store) pin)
+    :-  (~(del by directory.store) id)
+    (~(put by pools.store) pin pool(goals (purge-goals:gols goals.pool id)))
   --
 --
