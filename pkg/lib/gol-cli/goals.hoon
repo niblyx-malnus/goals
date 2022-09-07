@@ -256,42 +256,6 @@
 :: get lowest priority; priority of "virtual" root node
 ++  lowpri  ~(wyt by directory)
 ::
-:: get the number representing the deepest path to a leaf node
-++  get-lvl
-  |=  [=grip:vyu =mode:gol]
-  ^-  @
-  ?+    mode  !!
-      normal-mode:gol
-    ?-    -.grip
-      %all  ~
-      %pool  (anchor goals:(~(got by pools) +.grip))
-      %goal  (plumb +.grip)
-    ==
-  ==
-::
-:: get either the children or the parents depending on dir
-++  get-fam
-  |=  [=grip:vyu =mode:gol]
-  ^-  (list grip:vyu)
-  ?+    mode  !!
-      %normal
-    ?-    -.grip
-      %all  (turn ~(tap in ~(key by pools)) |=(=pin:gol [%pool pin]))
-      %pool  (turn (hi-to-lo (uncompleted-roots goals:(~(got by pools) +.grip))) |=(=id:gol [%goal id]))
-        %goal
-      =/  goal  (got-goal +.grip)
-      (turn (hi-to-lo ~(tap in ((uncompleted yung) goal))) |=(=id:gol [%goal id]))
-    ==
-      %normal-completed
-    ?-    -.grip
-      %all  (turn ~(tap in ~(key by pools)) |=(=pin:gol [%pool pin]))
-      %pool  (turn (hi-to-lo (roots goals:(~(got by pools) +.grip))) |=(=id:gol [%goal id]))
-        %goal
-      =/  goal  (got-goal +.grip)
-      (turn (hi-to-lo ~(tap in (yung goal))) |=(=id:gol [%goal id]))
-    ==
-  ==
-::
 ++  harvest-gen
   |=  [getter=$-(goal:gol (set id:gol)) check=$-(id:gol ?)]
   |=  =id:gol

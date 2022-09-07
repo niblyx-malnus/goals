@@ -143,6 +143,20 @@
       utc-offset.state-0
   ==
 ::
++$  normal-mode
+  $?  %normal
+      %normal-completed
+  ==
++$  mode
+  $?  normal-mode
+      %nest-ryte
+      %nest-left
+      %prec-ryte
+      %prec-left
+      %prio-ryte
+      %prio-left
+  ==
+::
 +$  col-name
   $?  %handle
       %deadline

@@ -1,4 +1,4 @@
-/-  gol=goal, vyu=view, goal-store
+/-  gol=goal, vyu=view
 /+  shoe, dates=gol-cli-dates, gol-cli-handles, gol-cli-scries
 |_  $:  =handles:vyu
         =views:vyu
@@ -96,13 +96,13 @@
 ::
 :: get cards to print goal substructure
 ++  nest-print
-  |=  [=grip:vyu col-names=(list col-name) =mode:gol]
+  |=  [=grip:vyu col-names=(list col-name) =mode:vyu]
   ^-  (list card)
   %-  print-cards 
   =/  lvl :: initial level; printing from context
     ?+  mode  !!
       %nest-ryte  (dec (get-lvl:scry grip mode))
-      normal-mode:gol  +((get-lvl:scry grip mode))
+      normal-mode:vyu  +((get-lvl:scry grip mode))
       %prec-ryte  (dec (get-lvl:scry grip mode))
       %prec-left  +((get-lvl:scry grip mode))
     ==
@@ -130,7 +130,7 @@
     (flop list)
   =/  grip  (snag idx fam)
   =/  virtual
-    ?.  ?=(normal-mode:gol mode.block)  %|
+    ?.  ?=(normal-mode:vyu mode.block)  %|
     ?-    -.grip.block
       ?(%all %pool)  %|
         %goal
@@ -241,7 +241,7 @@
       '<'
     ?+  mode.block  !!
       %nest-ryte  '_'
-      normal-mode:gol  '-'
+      normal-mode:vyu  '-'
       %prec-ryte  '-'
       %prec-left  '-'
     ==
@@ -252,7 +252,7 @@
         %goal
       ?+  mode.block  !!
         %nest-ryte  (reap (dec (shift block)) branch-char)
-        normal-mode:gol  (reap (dec (shift block)) branch-char)
+        normal-mode:vyu  (reap (dec (shift block)) branch-char)
         %prec-ryte  (weld (reap (sub (shift block) 2) branch-char) ">")
         %prec-left  (weld "<" (reap (sub (shift block) 2) branch-char))
       ==
@@ -276,7 +276,7 @@
     ?(%all %pool)  spacer
       %goal
     ?+    mode.block  !!
-        normal-mode:gol
+        normal-mode:vyu
       (mul spacer (sub lvl.block (plumb:scry +.grip.block)))
     ==
   ==

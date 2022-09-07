@@ -196,20 +196,6 @@
       deadline=edge
   ==
 ::
-+$  normal-mode
-  $?  %normal
-      %normal-completed
-  ==
-+$  mode
-  $?  normal-mode
-      %nest-ryte
-      %nest-left
-      %prec-ryte
-      %prec-left
-      %prio-ryte
-      %prio-left
-  ==
-::
 +$  comparator  $-([id id] ?)
 ::
 +$  yoke  $-([id id] pools)

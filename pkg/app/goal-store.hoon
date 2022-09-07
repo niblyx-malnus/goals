@@ -462,27 +462,23 @@
        ::   %subscribe
        :: `this
           %new-goal
-        %-  (slog 'goal-store on-agent new-goal' ~)
         ?>  =(pin pin.update)
-        :_  this(store (new-goal:update:gs +.update))
+        :_  this(store (new-goal:update:gs [id goal]:update))
         ~[(fact:io goal-update+!>(update) ~[/goals])]
         ::
           %add-under
-        %-  (slog 'goal-store on-agent add-under' ~)
         ?>  =(pin pin.update)
         :_  this(store (add-under:update:gs +.update))
         ~[(fact:io goal-update+!>(update) ~[/goals])]
         ::
           %yoke-sequence
-        %-  (slog 'goal-store on-agent yoke-sequence' ~)
         ?>  =(pin pin.update)
-        :_  this(store (yoke-sequence:update:gs +.update))
+        :_  this(store (yoke-sequence:update:gs [pin nex]:update))
         ~[(fact:io goal-update+!>(update) ~[/goals])]
         ::
           %delete-goal
-        %-  (slog 'goal-store on-agent delete-goal' ~)
         ?>  =(pin pin.update)
-        :_  this(store (delete-goal:update:gs +.update))
+        :_  this(store (delete-goal:update:gs [id]:update))
         ~[(fact:io goal-update+!>(update) ~[/goals])]
       ==
     ==

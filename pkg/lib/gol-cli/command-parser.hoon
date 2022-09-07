@@ -12,7 +12,7 @@
     parse-prec-rend                           
     parse-prio-yoke                           
     parse-prio-rend                           
-    parse-new-pool                         :: %np
+    parse-new-pool                            :: %np
     parse-delete-pool-goal
     parse-copy-pool                         
     parse-make-chef                           :: %mc

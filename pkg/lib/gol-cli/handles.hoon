@@ -3,37 +3,66 @@
 |_  [=handles:vyu =bowl:gall]
 +*  scry  ~(. gol-cli-scries bowl)
 ::
-++  add-new-goal
+++  new-goal
   |=  =id:gol
   ^-  handles:vyu
-  =/  grip  [%goal id]
-  =/  hdl  (make-handle grip)
-  [(~(put by hg.handles) hdl grip) (~(put by gh.handles) grip hdl)]
+  (add-handles [%goal id]~)
 ::
-++  add-new-pool
+++  new-pool
+  |=  [=pin:gol =pool:gol]
+  ^-  handles:vyu
+  =/  ids=(list grip:vyu)
+    (turn ~(tap in ~(key by goals.pool)) |=(=id:gol [%goal id]))
+  (add-handles (weld ids `(list grip:vyu)`[%pool pin]~))
+::
+++  delete-goal
+  |=  =id:gol
+  ^-  handles:vyu
+  (delete-handles [%goal id]~)
+::
+++  delete-pool
   |=  =pin:gol
   ^-  handles:vyu
-  =/  grip  [%pool pin]
-  =/  hdl  (make-handle grip)
-  [(~(put by hg.handles) hdl grip) (~(put by gh.handles) grip hdl)]
+  =/  pool  (got-pool:scry pin)
+  =/  ids=(list grip:vyu)
+    (turn ~(tap in ~(key by goals.pool)) |=(=id:gol [%goal id]))
+  (delete-handles (weld ids `(list grip:vyu)`[%pool pin]~))
 ::
-++  generate
-  |-
+++  initial
   ^-  handles:vyu
+  =.  handles  *handles:vyu
   =/  store  initial:scry
-  =.  handles  *handles:vyu :: from scratch
   =/  ids=(list grip:vyu)
     (turn ~(tap in ~(key by directory.store)) |=(=id:gol [%goal id]))
   =/  pins=(list grip:vyu)
     (turn ~(tap in ~(key by pools.store)) |=(=pin:gol [%pool pin]))
-  =/  grips  (weld ids pins)
+  (add-handles (weld ids pins))
+::
+++  add-handles
+  |=  grips=(list grip:vyu)
+  ^-  handles:vyu
   =/  idx  0
   |-
   ?:  =(idx (lent grips))
     handles
   =/  grip  (snag idx grips)
+  ?:  (~(has by gh.handles) grip)
+    $(idx +(idx))
   =/  hdl  (make-handle grip)
   $(idx +(idx), handles [(~(put by hg.handles) hdl grip) (~(put by gh.handles) grip hdl)])
+::
+++  delete-handles
+  |=  grips=(list grip:vyu)
+  ^-  handles:vyu
+  =/  idx  0
+  |-
+  ?:  =(idx (lent grips))
+    handles
+  =/  grip  (snag idx grips)
+  ?.  (~(has by gh.handles) grip)
+    $(idx +(idx))
+  =/  hdl  (~(got by gh.handles) grip)
+  $(idx +(idx), handles [(~(del by hg.handles) hdl) (~(del by gh.handles) grip)])
 ::
 ++  grip-to-tape
   |=  =grip:vyu
@@ -43,7 +72,6 @@
     %pool  (handle (scow %ud (shad (cat 0 %pin (cat 0 +>-.grip +>+.grip)))))
     %goal  (handle (scow %ud (shad (cat 0 +<.grip +>.grip))))
   ==
-::
 ::
 ++  handle
   |=  nums=tape

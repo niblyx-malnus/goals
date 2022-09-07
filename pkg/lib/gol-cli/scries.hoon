@@ -313,6 +313,26 @@
   ?+  -.pyk  !!
     %seniority  u-senior.pyk
   ==
+::
+++  harvest
+  |=  =id
+  ^-  (list ^id)
+  =/  pyk=peek
+    .^  peek
+      %gx
+      :~  (scot %p our.bowl)
+          %goal-store
+          (scot %da now.bowl)
+          %goal
+          (scot %p owner.id)
+          (scot %da birth.id)
+          %harvest
+          %goal-peek
+      ==
+    ==
+  ?+  -.pyk  !!
+    %harvest  harvest.pyk
+  ==
 :: 
 :: ----------------------------------------------------------------------------
 :: composite helpers
