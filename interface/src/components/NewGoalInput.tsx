@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import api from "../api";
 import { log } from "../helpers";
 import InputBase from "@mui/material/InputBase";
-
+import { Box } from "@mui/material";
+//TODO: blur/ESCP button close this component
+//TODO: get this to grow like the pool title input
 function NewGoalInput({
   callback,
   id,
@@ -30,17 +32,16 @@ function NewGoalInput({
       const result = under
         ? await api.addGoalUnderGoal(value, id)
         : await api.addGoal(value, id);
-      console.log("result", result);
+      log("result", result);
       setTrying(false);
     } catch (e) {
       setTrying(false);
     }
   };
   return (
-    <div>
+    <Box style={{ paddingLeft: 44 }}>
       <InputBase
         sx={{ flex: 1 }}
-        style={{ marginLeft: 10 }}
         placeholder="new goal"
         inputProps={{ "aria-label": "add new goal input" }}
         autoFocus={true}
@@ -48,16 +49,14 @@ function NewGoalInput({
         value={value}
         onKeyDown={handleKeyDown}
         onChange={handleChange}
+        style={{
+          fontWeight: 500,
+          fontSize: "1.25rem",
+          lineHeight: 1.6,
+          letterSpacing: "0.0075em",
+        }}
       />
-      {/* <IconButton
-          aria-label="add goal input"
-          size="small"
-          onClick={onSubmit}
-          disabled={trying}
-        >
-          <AddIcon />
-        </IconButton>*/}
-    </div>
+    </Box>
   );
 }
 export default NewGoalInput;

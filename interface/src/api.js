@@ -10,9 +10,9 @@ const api = {
     //ropnys-batwyd-nossyt-mapwet => nec
     //lidlut-tabwed-pillex-ridrup => zod
     const urb = isDev()
-      ? new Urbit("http://localhost:8080", "picdyl-sorlen-filtug-tinnel")
+      ? new Urbit(process.env.REACT_APP_SHIP_URL, process.env.REACT_APP_SHIP_CODE)
       : new Urbit("");
-    urb.ship = isDev() ? "dorsup-pacsyn-niblyx-malnus" : window.ship;
+    urb.ship = isDev() ? process.env.REACT_APP_SHIP_NAME : window.ship;
     // Just log errors if we get any
     urb.onError = (message) => console.log("onError: ", message);
     urb.onOpen = () => console.log("urbit onOpen");
@@ -47,6 +47,7 @@ const api = {
         title: newTitle,
       },
     };
+    
     return api
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: poolToEdit });

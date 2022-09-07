@@ -64,7 +64,6 @@ function EditInput({
     //TODO: make it so you can edit through icon menu
     try {
       const result = await api.editPoolTitle(pin, value);
-      console.log("value", value);
       log("editPoolTitle result => ", result);
       if (result && pin && value) {
         updatePoolTitleAction(pin, value);
@@ -93,12 +92,12 @@ function EditInput({
     if (type === "pool") {
       setMetaVars({
         inputTextStyle: {
-          fontWeight: 400,
-          fontSize: "2.125rem",
-          lineHeight: 1.235,
-          letterSpacing: "0.00735em",
+          fontWeight: 700,
+          fontSize: "1.5rem",
+          lineHeight: 1.334,
+          letterSpacing: "0em",
         },
-        typographySize: "h4",
+        typographySize: "h5",
         inputMinWidth: 75,
         ariaLabel: "update pool title",
         widthIncrement: 20,
@@ -123,6 +122,7 @@ function EditInput({
     <>
       <Typography
         variant={metaVars.typographySize}
+        fontWeight="bold"
         ref={newTitleSpanRef}
         sx={{ visibility: "hidden", position: "absolute", left: -9999 }}
       >

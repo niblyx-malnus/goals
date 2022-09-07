@@ -2,7 +2,7 @@
 
 import useStore from ".";
 import { GoalId, PinId } from "../types/types";
-
+import cloneDeep from "lodash/cloneDeep";
 function deletePoolAction(toDeletePin: PinId) {
   const state = useStore.getState();
   const pools = state.pools;
@@ -129,6 +129,15 @@ function newGoalAction(newGoalId: GoalId, pinId: PinId, newGoal: any) {
   });
   setPools(newPools);
 }
+function newPoolAction(newPool: any) {
+  const state = useStore.getState();
+  const pools = state.pools;
+  const setPools = state.setPools;
+  //concat the new project to the pools
+  const newPools = cloneDeep(pools);
+  newPools.push(newPool);
+  setPools(newPools);
+}
 export {
   deletePoolAction,
   deleteGoalAction,
@@ -136,4 +145,5 @@ export {
   updatePoolTitleAction,
   updateGoalDescAction,
   newGoalAction,
+  newPoolAction,
 };
