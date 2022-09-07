@@ -1,19 +1,22 @@
 /-  gol=goal, vyu=view, commands,
     goal-store, view-store
 /+  shoe, verb, dbug, default-agent, agentio,
-    gol-cli-goals, gol-cli-handles, gol-cli-views, gol-cli-printer, gol-cli-goal-store,
+    gol-cli-goals, gol-cli-handles, gol-cli-views, gol-cli-printer,
+    gol-cli-goal-store, gol-cli-scries,
     dates=gol-cli-dates, compar=gol-cli-command-parser, pr=gol-cli-pool
 |%
 +$  versioned-state
   $%  state-0
       state-1
+      state-2
   ==
 +$  state-0  state-0:vyu
 +$  state-1  state-1:vyu
++$  state-2  state-2:vyu
 +$  command  command:commands
 +$  card  card:shoe
 --
-=|  state-1
+=|  state-2
 =*  state  -
 ::
 %+  verb  |
@@ -28,13 +31,10 @@
     des   ~(. (default:shoe this command) bowl)
     io    ~(. agentio bowl)
     hc    ~(. +> bowl)
-    gs    ~(. gol-cli-goal-store store)
     gols  ~(. gol-cli-goals store)
     hdls  ~(. gol-cli-handles handles bowl)
-    vyuz  ~(. gol-cli-views store views bowl)
+    vyuz  ~(. gol-cli-views views bowl)
     prtr  ~(. gol-cli-printer handles views context utc-offset bowl)
-    directory  directory.store
-    pools  pools.store
 ::
 ++  on-init
   ^-  (quip card _this)
@@ -49,12 +49,12 @@
   =/  old  !<(versioned-state old-state)
   |-
   ?-    -.old
+      %2
+    `this(state old)
       %1
-    :_  this(state old)
-    [%pass /goals %agent [our.bowl %goal-store] %watch /goals]~
+    $(old (convert-1-to-2:vyu old))
       %0
-    :_  this(state (convert-0-to-1:vyu old))
-    [%pass /goals %agent [our.bowl %goal-store] %watch /goals]~
+    $(old (convert-0-to-1:vyu old))
   ==
 ::
 ++  on-poke
@@ -122,44 +122,36 @@
             %store-update
           :-  [(poke-self view-action+!>(print+~))]~
           %=  this
-            store  +.update
-            handles  (generate:hdls +.update)
-            views  (update-views:vyuz +.update)
+            handles  generate:hdls
+            views  updated-views:vyuz
           ==
             %new-goal
-          =/  new-store  (new-goal:update:gs +.update)
           :-  [(poke-self view-action+!>(print+~))]~
           %=  this
-            store  new-store
-            handles  (add-new-goal:hdls id.update new-store)
+            handles  (add-new-goal:hdls id.update)
             views  (add-new-goal:vyuz id.update)
           ==
             %new-pool
-          =/  new-store  (new-pool:update:gs +.update)
           :-  [(poke-self view-action+!>(print+~))]~
           %=  this
-            store  new-store
-            handles  (add-new-pool:hdls pin.update new-store)
-            views  (add-new-pool:vyuz pin.update)
+            handles  (add-new-pool:hdls pin.update)
+            views  (update-views-new-pool:vyuz pin.update)
           ==
             %add-under
-          =/  new-store  (add-under:update:gs +.update)
           :-  [(poke-self view-action+!>(print+~))]~
           %=  this
-            store  new-store
-            handles  (add-new-goal:hdls cid.update new-store)
+            handles  (add-new-goal:hdls cid.update)
             views  (add-new-goal:vyuz cid.update)
           ==
             %yoke-sequence
-          :_  this(store (yoke-sequence:update:gs +.update))
+          :_  this
           [(poke-self view-action+!>(print+~))]~
+            %error
+          :_  this
+          (print-cards:prtr ~[(trip msg.update)])
         ==
       ==
     ==
-      [%view-command *]
-    =*  poke-self  ~(poke-self pass:io /)
-    :_  this
-    [(poke-self view-action+!>(print+~))]~
   ==
 ++  on-arvo   on-arvo:def
 ++  on-fail   on-fail:def
@@ -181,32 +173,38 @@
   =;  cards=(list card)
     [cards this]
   ?-    -.command
+      ::
       %hide-completed
     =*  poke-self  ~(poke-self pass:io /view-command/hide-completed)
     ~[(poke-self view-action+!>([%hide-completed ~]))]
+      ::
       %unhide-completed
     =*  poke-self  ~(poke-self pass:io /view-command/unhide-completed)
     ~[(poke-self view-action+!>([%unhide-completed ~]))]
+      ::
       %held-yoke
     (yoke-command:hc command %held-yoke)
+      ::
       %held-rend-strict
     (yoke-command:hc command %held-rend-strict)
+      ::
       %nest-yoke
     (yoke-command:hc command %nest-yoke)
+      ::
       %nest-rend
     (yoke-command:hc command %nest-rend)
+      ::
       %prec-yoke
     (yoke-command:hc command %prec-yoke)
+      ::
       %prec-rend
     (yoke-command:hc command %prec-rend)
+      ::
       %prio-yoke
     (yoke-command:hc command %prio-yoke)
+      ::
       %prio-rend
     (yoke-command:hc command %prio-rend)
-      %held-left  ~
-      %nest-left  ~
-      %prec-left  ~
-      %prio-left  ~
       ::
       ::  [%invite invitee=@p =id]
       %invite
@@ -218,16 +216,12 @@
       %make-chef
     =*  poke  ~(poke pass:io /command/mc)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    =/  check  (make-chef:check:gs id.res chef.command our.bowl)
-    ?.  -.check  (print-cards:prtr ~[(trip (scot %tas +.check))])
     ~[(poke [owner.id.res %goal-store] goal-action+!>([%make-chef chef.command id.res]))]
       ::
       ::  [%make-peon peon=@p =id]
       %make-peon
     =*  poke  ~(poke pass:io /command/mp)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    =/  check  (make-peon:check:gs id.res peon.command our.bowl)
-    ?.  -.check  (print-cards:prtr ~[(trip (scot %tas +.check))])
     ~[(poke [owner.id.res %goal-store] goal-action+!>([%make-peon peon.command id.res]))]
       ::
       :: [%new-pool title=@t]
@@ -243,8 +237,6 @@
       =+  [msg g]=(invalid-goal-error:prtr h.command)
       ?.  =(~ msg)
         (print-cards:prtr ~["Invalid handle."])
-      =/  check  (delete-goal:check:gs id.g our.bowl)
-      ?.  -.check  (print-cards:prtr ~[(trip (scot %tas +.check))])
       [(poke-our %goal-store goal-action+!>([%delete-goal id.g]))]~
     [(poke-our %goal-store goal-action+!>([%delete-pool pin.p]))]~
       ::
@@ -254,7 +246,7 @@
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
     [(poke-our %goal-store goal-action+!>([%copy-pool pin.res title.command ~ ~ ~]))]~
       ::
-      ::  [%ag desc=@t]                
+      ::  [%add-goal desc=@t]                
       %add-goal
     =*  poke  ~(poke pass:io /command/ag)
     ?-    -.context
@@ -281,19 +273,7 @@
     =*  poke-self  ~(poke-self pass:io /view-command/tz)
     ~[(poke-self view-action+!>([%set-utc-offset hours.command ahead.command]))]
       ::
-      ::  [%at desc=@t]                
-      %at
-    ~
-    :: =*  poke-self  ~(poke-self pass:io /)
-    :: ;:  weld
-    ::   ~[(poke-self view-action+!>([%add desc.command context %.y]))]
-    ::   %-  print-cards:prtr
-    ::   :~  "Adding actionable goal:"
-    ::       "   {(trip desc.command)}"
-    ::   ==
-    :: ==
-      ::
-      ::  [%eg h=@t desc=@t]                
+      ::  [%edit-goal-desc h=@t desc=@t]                
       %edit-goal-desc
     =*  poke  ~(poke pass:io /command/eg)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
@@ -324,33 +304,6 @@
     ?~  grip  (print-cards:prtr ~["Handle does not exist."])
     ~[(poke-self view-action+!>([%change-context u.grip]))]
       ::
-      ::  [%pg h=(unit @t) cpt=?]            
-      %pg
-    ~
-   ::  ?:  cpt.command
-   ::    ?~  h.command  (nest-print:prtr [%all ~] def-cols:hc %nest-left-completed)
-   ::    =+  [msg res]=(invalid-goal-error:prtr u.h.command)  ?.  =(~ msg)  msg
-   ::    (nest-print:prtr [%goal id.res] def-cols:hc %nest-left-completed)
-   ::  ?~  h.command  (nest-print:prtr [%all ~] def-cols:hc %nest-left)
-   ::  =+  [msg res]=(invalid-goal-error:prtr u.h.command)  ?.  =(~ msg)  msg
-   ::  (nest-print:prtr [%goal id.res] def-cols:hc %nest-left)
-      ::
-      ::  [%pp h=@t]
-      %pp
-    =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    ;:  weld
-      (print-cards:prtr ~["Printing parents..."])
-      (nest-print:prtr [%goal id.res] def-cols:hc %nest-ryte)
-    ==
-      ::
-      ::  [%ppc h=@t]
-      %ppc
-    =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    ;:  weld
-      (print-cards:prtr ~["Printing precedents..."])
-      (nest-print:prtr [%goal id.res] def-cols:hc %prec-left)
-    ==
-      ::
       ::  [%collapse h=@t rec=?]             
       %collapse
     =*  poke-self  ~(poke-self pass:io /view-command/cp)
@@ -363,32 +316,8 @@
     =+  [msg grip]=(invalid-goal-pool-error:prtr h.command)  ?.  =(~ msg)  msg
     ~[(poke-self view-action+!>([%uncollapse context grip rec.command]))]
       ::
-      :: [%pa ~]
-      %pa
-    ~ :: (print-goal-list:prtr ~(tap in ~(key by goals)) def-cols:hc)
-      ::
-      :: [%ps ~]
-      %ps
-    ~ :: (print-goal-list:prtr (newest-to-oldest:gols ~(tap in ~(key by goals))) def-cols:hc)
-      ::
-      :: [%ds ~]
-      %ds
-    ~  :: (print-goal-list:prtr (sooner-to-later:gols ~(tap in ~(key by goals))) def-cols:hc)
-      ::
-      :: [%bf h=@t]
-      %bf
-    ~
-    :: =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    :: (print-goal-list:prtr ~(tap in befs.goal.res) def-cols:hc)
-      ::
-      :: [%af h=@t]
-      %af
-    ~
-    :: =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    :: (print-goal-list:prtr ~(tap in afts.goal.res) def-cols:hc)
-      ::
-      :: [%hv h=@t]
-      %hv
+      :: [%harvest h=@t]
+      %harvest
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
     =/  pyk=peek:goal-store 
       .^  peek:goal-store
@@ -406,23 +335,6 @@
     ?+  -.pyk  !!
       %harvest  (print-goal-list:prtr harvest.pyk def-cols:hc)
     ==
-    :: ?-  hv-flag.command
-    ::     %actionable
-    ::   ;:  weld
-    ::     (print-cards:prtr ~["Harvesting actionable from {(trip h.command)}:"])
-    ::     (print-goal-list:prtr ~(tap in (harvest-actionable-active:gols id.res)) def-cols:hc)
-    ::   ==
-    ::     %completed
-    ::   ;:  weld
-    ::     (print-cards:prtr ~["Harvesting completed from {(trip h.command)}:"])
-    ::     (print-goal-list:prtr ~(tap in (harvest-completed:gols id.res)) def-cols:hc)
-    ::   ==
-    ::     %unpreceded
-    ::   ;:  weld
-    ::     (print-cards:prtr ~["Harvesting unpreceded from {(trip h.command)}:"])
-    ::     (print-goal-list:prtr ~(tap in (harvest-unpreceded:gols id.res)) def-cols:hc)
-    ::   ==
-    :: ==
       ::
       :: [%mark-actionable h=@t]
       %mark-actionable
@@ -462,6 +374,7 @@
 |_  =bowl:gall
 +*  io    ~(. agentio bowl)
     prtr  ~(. gol-cli-printer handles views context utc-offset bowl)
+    scry  ~(. gol-cli-scries bowl)
 ::
 ++  pass
   |_  =wire
@@ -475,7 +388,9 @@
     ^-  card
     (~(watch pass:io wire) [other dap.bowl] path)
   --
+::
 ++  def-cols  ~[%handle %level %deadline %priority]
+::
 ++  yoke-command
   |=  [command=[yoke-tag:gol l=@t r=@t] =yoke-tag:gol]
   ^-  (list card)
@@ -483,11 +398,5 @@
   =+  [msg l]=(invalid-goal-error:prtr l.command)  ?.  =(~ msg)  msg
   =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
   ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
-  =/  pin  (~(got by directory.store) id.l)
-  =/  pool  (~(got by pools.store) pin)
-  =/  check  (~(apply-sequence pr pin pool) our.bowl [yoke-tag id.l id.r]~)
-  ?-    -.check
-    %|  (print-cards:prtr ~[(trip (scot %tas +.check))])
-    %&  [(poke [owner.id.l %goal-store] goal-action+!>([%yoke-sequence pin [yoke-tag id.l id.r]~]))]~
-  ==
+  [(poke [owner.id.l %goal-store] goal-action+!>([%yoke-sequence (got-pin:scry id.l) [yoke-tag id.l id.r]~]))]~
 --

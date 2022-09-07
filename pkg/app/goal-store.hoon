@@ -36,7 +36,7 @@
       %1
     `this(state old)
       %0
-    `this(state (convert-0-to-1:gol old))
+    $(old (convert-0-to-1:gol old))
   ==
 ++  on-poke
   |=  [=mark =vase]
@@ -369,6 +369,8 @@
       ?>  =(p.cage.sign %goal-update)
       =/  update  !<(update:goal-store q.cage.sign)
       ?+    -.update  (on-agent:def wire sign)
+          %error  `this
+          ::
           %pool-update
         =/  new-store  (update-store:gs pin pool.update)
         :_  this(store new-store)
@@ -421,18 +423,6 @@
         %-  (slog 'goal-store on-agent yoke-sequence' ~)
         ?>  =(pin pin.update)
         :_  this(store (yoke-sequence:update:gs +.update))
-        ~[(fact:io goal-update+!>(update) ~[/goals])]
-        ::
-          %new-pool
-        %-  (slog 'goal-store on-agent new-pool' ~)
-        ?>  =(pin pin.update)
-        :_  this(store (new-pool:update:gs +.update))
-        ~[(fact:io goal-update+!>(update) ~[/goals])]
-        ::
-          %delete-pool
-        %-  (slog 'goal-store on-agent delete-pool' ~)
-        ?>  =(pin pin.update)
-        :_  this(store (delete-pool:update:gs +.update))
         ~[(fact:io goal-update+!>(update) ~[/goals])]
         ::
           %delete-goal

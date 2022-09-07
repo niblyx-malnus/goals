@@ -12,39 +12,26 @@
     parse-prec-rend                           
     parse-prio-yoke                           
     parse-prio-rend                           
-    parse-held-left
-    parse-nest-left                           
-    parse-prec-left                           
-    parse-prio-left                           
     parse-new-pool                         :: %np
     parse-delete-pool-goal
     parse-copy-pool                         
     parse-make-chef                           :: %mc
     parse-make-peon                           :: %mp
     parse-add-goal                            :: %ag
-    parse-add-task                            :: %at
     parse-edit-goal-desc                      :: %eg
-    parse-edit-pool-title                  :: %ep
+    parse-edit-pool-title                     :: %ep
     parse-change-context                      :: %cc
     parse-hide-completed
     parse-unhide-completed
     parse-set-utc-offset                      :: %tz
-    parse-print-goal                          :: %pg
-    parse-print-parents                       :: %pp
-    parse-print-precedents                    :: %ppc
     parse-collapse                            :: %cp
     parse-uncollapse                          :: %uc
     (parse-set-deadline now utc-offset)       :: %sd
-    parse-print-all                           :: %pa
-    parse-print-sorted                        :: %ps
-    parse-deadline-sort                       :: %ds
-    parse-print-befs                          :: %bf
-    parse-print-afts                          :: %af
     parse-mark-actionable
     parse-unmark-actionable
     parse-mark-complete
     parse-unmark-complete
-    parse-harvest-progenitors                 :: %hv
+    parse-harvest
     parse-print-context                       :: %pc
   ==
 :: ----------------------------------------------------------------------------
@@ -106,34 +93,6 @@
     (cook crip parse-handle)
   ==
 ::
-++  parse-held-left
-  ;~  (glue ace)
-    (cold %held-left (jest '?mv'))
-    (cook crip parse-handle)
-    (cook crip parse-handle)
-  ==
-::
-++  parse-nest-left
-  ;~  (glue ace)
-    (cold %nest-left (jest '?ns'))
-    (cook crip parse-handle)
-    (cook crip parse-handle)
-  ==
-::
-++  parse-prec-left
-  ;~  (glue ace)
-    (cold %prec-left (jest '?pr'))
-    (cook crip parse-handle)
-    (cook crip parse-handle)
-  ==
-::
-++  parse-prio-left
-  ;~  (glue ace)
-    (cold %prio-left (jest '?pt'))
-    (cook crip parse-handle)
-    (cook crip parse-handle)
-  ==
-::
 ++  parse-invite
   ;~  (glue ace)
     (cold %invite (jest 'invite'))
@@ -182,13 +141,6 @@
     (cook crip (star prn))    :: title of copied pool
   ==
 ::
-:: add a goal to the data structure
-++  parse-add-task
-  ;~  (glue ace)
-    (cold %at (jest 'at'))    :: command 'at'
-    (cook crip (star prn))    :: argument text as cord
-  ==
-::
 :: edit a goal's desc in the data structure
 ++  parse-edit-goal-desc
   ;~  (glue ace)
@@ -200,16 +152,9 @@
 :: edit a pool's title in the data structure
 ++  parse-edit-pool-title
   ;~  (glue ace)
-    (cold %edit-pool-title (jest 'ep'))    :: command 'eg'
+    (cold %edit-pool-title (jest 'ep'))    :: command 'ep'
     (cook crip parse-handle)  :: handle argument
     (cook crip (star prn))    :: argument text as cord
-  ==
-::
-:: permanently remove a goal from the data structure
-++  parse-remove-goal
-  ;~  (glue ace)
-    (cold %rg (jest 'rg'))    :: command 'rg'
-    (cook crip parse-handle)  :: handle of goal to remove
   ==
 ::
 :: change the current context from which data structure is printed in
@@ -233,28 +178,6 @@
     parse-utc-offsets:dates   :: parse utc-offset cord to cell of [@dr ?]
   ==
 ::
-:: will print context of a given goal
-++  parse-print-goal
-  ;~  plug
-    (cold %pg ;~(plug (jest 'pg') ace))  :: command 'pg'
-    parse-handle-unit                    :: handle of goal whose context to print
-    (may %.n (cold %.y ;~(plug ace (jest '-c')))) :: completed if -c flag present
-  ==
-::
-:: will print parents (and ancestors) of a given goal
-++  parse-print-parents
-  ;~  (glue ace)
-    (cold %pp (jest 'pp'))    :: command 'pp'
-    (cook crip parse-handle)  :: handle of goal whose parents to print
-  ==
-::
-:: will print precedents of given goal
-++  parse-print-precedents
-  ;~  (glue ace)
-    (cold %ppc (jest 'ppc'))    :: command 'ppc'
-    (cook crip parse-handle)  :: handle of goal whose parents to print
-  ==
-::
 :: collapse subgoals of a goal in a given context
 ++  parse-collapse
   ;~  plug
@@ -275,10 +198,6 @@
 ++  parse-print-context
   (cold [%print-context ~] (jest ''))
 ::
-:: print all as list
-++  parse-print-all
-  (cold [%pa ~] (jest 'pa'))
-::
 :: set deadline of a given goal
 ++  parse-set-deadline
   |=  [now=@da utc-offset=[@dr ?]]
@@ -286,13 +205,6 @@
     (cold %set-deadline (jest 'sd'))           :: command 'sd' (and following ace)
     (cook crip parse-handle)                   :: handle of goal to update deadline of
     (parse-deadline:dates now utc-offset)      :: get (unit @da) of deadline to update
-  ==
-::
-:: print "befores"; goals which precede this goal
-++  parse-print-befs
-  ;~  (glue ace)
-    (cold %bf (jest 'bf'))
-    (cook crip parse-handle)
   ==
 ::
 ++  parse-mark-actionable
@@ -321,32 +233,16 @@
     (cook crip parse-handle)
   ==
 ::
-:: harvest progenitors
-++  parse-harvest-progenitors
+++  parse-harvest
   ;~  plug
-    (cold %hv ;~(plug (jest 'hv') ace))
+    (cold %harvest ;~(plug (jest 'hv') ace))
     (cook crip parse-handle)
-    %+  may  %actionable
-    ;~  pose
-      (cold %completed ;~(plug ace (jest '-c')))
-      (cold %unpreceded ;~(plug ace (jest '-u')))
-    ==
+    :: %+  may  %actionable
+    :: ;~  pose
+    ::   (cold %completed ;~(plug ace (jest '-c')))
+    ::   (cold %unpreceded ;~(plug ace (jest '-u')))
+    :: ==
   ==
-::
-:: print "afters"; goals which are preceded by this goal
-++  parse-print-afts
-  ;~  (glue ace)
-    (cold %af (jest 'af'))
-    (cook crip parse-handle)
-  ==
-::
-:: print all goals sorted by creation date
-++  parse-print-sorted
-  (cold [%ps ~] (jest 'ps'))
-::
-:: print all goals sorted by inherited deadline
-++  parse-deadline-sort
-  (cold [%ds ~] (jest 'ds'))
 :: 
 :: end of individual command parsers
 :: ----------------------------------------------------------------------------

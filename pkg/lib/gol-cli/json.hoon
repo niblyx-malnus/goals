@@ -192,6 +192,8 @@
         [%id (enjs-id id.upd)]
     ==
     ::
+    %error  (frond %error s+msg.upd)
+    ::
       %yoke-sequence
     %+  frond
       %yoke-sequence
@@ -353,13 +355,13 @@
 ::
 ++  enjs-nexus
   =,  enjs:format
-  |=  =goal
+  |=  =nexus
   ^-  json
   %-  pairs
-  :~  [%par ?~(par.goal ~ (enjs-id u.par.goal))]
-      [%kids a+(turn ~(tap in kids.goal) enjs-id)]
-      [%kickoff (enjs-edge kickoff.goal)]
-      [%deadline (enjs-edge deadline.goal)]
+  :~  [%par ?~(par.nexus ~ (enjs-id u.par.nexus))]
+      [%kids a+(turn ~(tap in kids.nexus) enjs-id)]
+      [%kickoff (enjs-edge kickoff.nexus)]
+      [%deadline (enjs-edge deadline.nexus)]
   ==
 ::
 ++  enjs-goal

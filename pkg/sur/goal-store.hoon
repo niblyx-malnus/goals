@@ -63,6 +63,7 @@
       [%new-pool =pin =pool]
       [%delete-pool =pin]
       [%delete-goal =pin mod=ship =id]
+      [%error msg=@tas]
      ::  [%edit-goal-desc [mod=ship =pin] =id desc=@t]
      ::  [%edit-pool-title [mod=ship =pin] title=@t]
      ::  [%set-deadline [mod=ship =pin] =id deadline=(unit @da)]

@@ -1,6 +1,6 @@
 /-  gol=goal, vyu=view
 /+  gol-cli-scries
-|_  [=store:gol =views:vyu =bowl:gall]
+|_  [=views:vyu =bowl:gall]
 +*  scry  ~(. gol-cli-scries bowl)
 ::
 ++  add-new-goal
@@ -15,17 +15,18 @@
   =/  grip  [%pool pin]
   (~(put by views) grip *view:vyu)
 ::
-++  update-views-initial
+++  update-views-new-pool
   |=  =pin:gol
-  =.  views  (update-views directory.store pools.store)
+  =.  views  updated-views
   =.  views  (collapsify [%all ~] [%pool pin] %normal %.y %.n)
   (collapsify [%pool pin] [%pool pin] %normal %.y %.n)
 ::
-++  update-views
-  |=  [=directory:gol =pools:gol]
+++  updated-views
+  |-
   ^-  views:vyu
-  =/  ids=(list grip:vyu)  (turn ~(tap in ~(key by directory)) |=(=id:gol [%goal id]))
-  =/  pins=(list grip:vyu)  (turn ~(tap in ~(key by pools)) |=(=pin:gol [%pool pin]))
+  =/  store  initial:scry
+  =/  ids=(list grip:vyu)  (turn ~(tap in ~(key by directory.store)) |=(=id:gol [%goal id]))
+  =/  pins=(list grip:vyu)  (turn ~(tap in ~(key by pools.store)) |=(=pin:gol [%pool pin]))
   =/  grips  (weld ids pins)
   =/  idx  0
   |-

@@ -1,5 +1,14 @@
 /-  *goal, *dates
 |%
++$  state-2
+  $:  %2
+      =handles:s1
+      =views:s1
+      context=grip:s1
+      hide-completed=?
+      =utc-offset
+  ==
+::
 +$  state-1
   $:  %1
       =store
@@ -79,6 +88,12 @@
   +$  handles  [hg=(map @t grip) gh=(map grip @t)]
   --
 ::
+++  convert-1-to-2
+  |=  =state-1
+  ^-  state-2
+  [%2 +.+.state-1]
+
+::
 ++  grip-0-to-1
   |=  =grip:s0
   ^-  grip:s1
@@ -117,7 +132,7 @@
 ::   - grip was changed so that %project headtag was converted to %pool headtag
 ::
 ++  convert-0-to-1
-  |=  [=state-0]
+  |=  =state-0
   ^-  state-1
   :*  %1
       store.state-0

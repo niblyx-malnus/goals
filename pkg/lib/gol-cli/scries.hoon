@@ -1,8 +1,20 @@
 /-  *goal-store, *view
 |_  =bowl:gall
-:: 
-:: ----------------------------------------------------------------------------
-:: scries into %goal-store
+++  initial
+  ^-  store
+  =/  upd=update
+    .^  update
+      %gx
+      :~  (scot %p our.bowl)
+          %goal-store
+          (scot %da now.bowl)
+          %initial
+          %goal-update
+      ==
+    ==
+  ?+  -.upd  !!
+    %initial  store.upd
+  ==
 ::
 ++  pool-keys
   ^-  (set pin)

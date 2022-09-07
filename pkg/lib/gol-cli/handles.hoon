@@ -4,27 +4,28 @@
 +*  scry  ~(. gol-cli-scries bowl)
 ::
 ++  add-new-goal
-  |=  [=id:gol =directory:gol =pools:gol]
+  |=  =id:gol
   ^-  handles:vyu
   =/  grip  [%goal id]
   =/  hdl  (make-handle grip)
   [(~(put by hg.handles) hdl grip) (~(put by gh.handles) grip hdl)]
 ::
 ++  add-new-pool
-  |=  [=pin:gol =directory:gol =pools:gol]
+  |=  =pin:gol
   ^-  handles:vyu
   =/  grip  [%pool pin]
   =/  hdl  (make-handle grip)
   [(~(put by hg.handles) hdl grip) (~(put by gh.handles) grip hdl)]
 ::
 ++  generate
-  |=  [=directory:gol =pools:gol]
+  |-
   ^-  handles:vyu
+  =/  store  initial:scry
   =.  handles  *handles:vyu :: from scratch
   =/  ids=(list grip:vyu)
-    (turn ~(tap in ~(key by directory)) |=(=id:gol [%goal id]))
+    (turn ~(tap in ~(key by directory.store)) |=(=id:gol [%goal id]))
   =/  pins=(list grip:vyu)
-    (turn ~(tap in ~(key by pools)) |=(=pin:gol [%pool pin]))
+    (turn ~(tap in ~(key by pools.store)) |=(=pin:gol [%pool pin]))
   =/  grips  (weld ids pins)
   =/  idx  0
   |-
