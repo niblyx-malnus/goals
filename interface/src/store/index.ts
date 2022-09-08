@@ -1,4 +1,5 @@
 import create from "zustand";
+import { FilterGoals } from "../types/types";
 
 interface Store {
   /*
@@ -9,11 +10,18 @@ interface Store {
    */
   pools: any;
   setPools: (state: any) => void;
+
+  filterGoals: FilterGoals;
+  setFilterGoals: (state: any) => void;
 }
 
 const useStore = create<Store>((set, get) => ({
   pools: [],
   setPools: (newPools: any) => set(() => ({ pools: newPools })),
+
+  filterGoals: null,
+  setFilterGoals: (newStatus: FilterGoals) =>
+    set(() => ({ filterGoals: newStatus })),
 }));
 
 export default useStore;

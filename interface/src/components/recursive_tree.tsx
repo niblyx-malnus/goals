@@ -11,6 +11,7 @@ import NewGoalInput from "./NewGoalInput";
 import IconMenu from "./IconMenu";
 import EditInput from "./EditInput";
 import AddIcon from "@mui/icons-material/Add";
+import useStore from "../store";
 
 interface TreeItemProps {
   readonly id: number;
@@ -123,10 +124,13 @@ const TreeItem = memo(
 );
 
 const RecursiveTree = ({ goalList, pin, onSelectCallback }: any) => {
+  const filterGoals = useStore((store) => store.filterGoals);
+
   const createTree = (goal: any) => {
     const currentGoal = goal.goal;
     const currentGoalId = goal.id.birth;
     const childGoals = goal.childNodes;
+    if (currentGoal.complete && filterGoals === "complete") return null;
     return (
       childGoals && (
         <TreeItem

@@ -10,9 +10,6 @@ import Container from "@mui/material/Container";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import InputBase from "@mui/material/InputBase";
-import DoneIcon from "@mui/icons-material/Done";
 import NewGoalInput from "./components/NewGoalInput";
 import EditInput from "./components/EditInput";
 import IconMenu from "./components/IconMenu";
@@ -22,6 +19,9 @@ import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import { PinId } from "./types/types";
 import { newGoalAction, newPoolAction } from "./store/actions";
+import { Stack } from "@mui/material";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 //TODO: hovering elements also bring a + icon button to nest structure
 //TODO: add the contect menu
@@ -113,7 +113,6 @@ function App() {
           quit: () => console.log("Kicked from subscription"),
         });
         setChannel(channelValue);
-        console.log("channelValue", channelValue);
       } catch (e) {
         log("subToUpdates error => ", e);
       }
@@ -256,6 +255,22 @@ function Project({
 function Header() {
   const [newProjectTitle, setNewProjectTitle] = useState<string>("");
   const [trying, setTrying] = useState<boolean>(false);
+
+  const setFilterGoals = useStore((store) => store.setFilterGoals);
+  const filterGoals = useStore((store) => store.filterGoals);
+  const [filterCompleteChecked, setFilterCompleteChecked] =
+    useState<boolean>(false);
+  const handleFilterCompleteChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const checked = event.target.checked;
+    setFilterCompleteChecked(event.target.checked);
+    if (checked) {
+      setFilterGoals("complete");
+    } else {
+      setFilterGoals(null);
+    }
+  };
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewProjectTitle(event.target.value);
   };
@@ -278,7 +293,12 @@ function Header() {
     }
   };
   return (
-    <Box sx={{ marginBottom: 3 }}>
+    <Stack
+      flexDirection="row"
+      alignItems="center"
+      // justifyContent="center"
+      sx={{ marginBottom: 3 }}
+    >
       <OutlinedInput
         id="add-new-pool"
         placeholder="Add Project"
@@ -295,7 +315,7 @@ function Header() {
               onClick={addNewPool}
               //onMouseDown={handleMouseDownPassword}
               edge="end"
-              disabled={trying}
+              disabled={trying || newProjectTitle?.length === 0}
             >
               {trying ? (
                 <CircularProgress size={24} style={{ padding: 1 }} />
@@ -306,7 +326,23 @@ function Header() {
           </InputAdornment>
         }
       />
-    </Box>
+      <Stack
+        sx={{ marginLeft: 3 }}
+        flexDirection="row"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <FormControlLabel
+          label="Filter Completed Goals"
+          control={
+            <Checkbox
+              checked={filterCompleteChecked}
+              onChange={handleFilterCompleteChange}
+            />
+          }
+        />
+      </Stack>
+    </Stack>
   );
 }
 

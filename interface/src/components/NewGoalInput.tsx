@@ -5,6 +5,7 @@ import InputBase from "@mui/material/InputBase";
 import { Box } from "@mui/material";
 //TODO: blur/ESCP button close this component
 //TODO: get this to grow like the pool title input
+//TODO: bring up this input (pressing the +) should uncollapse the structure associated
 function NewGoalInput({
   callback,
   id,
