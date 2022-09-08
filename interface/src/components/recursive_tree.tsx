@@ -12,6 +12,7 @@ import IconMenu from "./IconMenu";
 import EditInput from "./EditInput";
 import AddIcon from "@mui/icons-material/Add";
 import useStore from "../store";
+import CircularProgress from "@mui/material/CircularProgress";
 
 interface TreeItemProps {
   readonly id: number;
@@ -46,18 +47,30 @@ const TreeItem = memo(
     const [selected, setSelected] = useState(isSelected);
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState(false);
+    const [trying, setTrying] = useState<boolean>(false);
 
+    const handleAdd = () => {
+      toggleItemOpen(true);
+      setAddingGoal(true);
+    };
     return (
       <div>
         <StyledTreeItem>
-          <StyledMenuButtonContainer sx={{ position: "absolute", left: -30 }}>
-            <IconMenu
-              type="goal"
-              complete={goal.complete}
-              id={idObject}
-              pin={pin}
+          {trying ? (
+            <CircularProgress
+              size={24}
+              sx={{ position: "absolute", left: -30 }}
             />
-          </StyledMenuButtonContainer>
+          ) : (
+            <StyledMenuButtonContainer sx={{ position: "absolute", left: -30 }}>
+              <IconMenu
+                type="goal"
+                complete={goal.complete}
+                id={idObject}
+                pin={pin}
+              />
+            </StyledMenuButtonContainer>
+          )}
           {children && children.length > 0 && (
             <Box
               className="icon-container"
@@ -73,9 +86,7 @@ const TreeItem = memo(
                 setEditingTitle(true);
               }}
               style={{
-                marginLeft: `${
-                  children && children.length === 0 ? "24px" : ""
-                }`,
+                marginLeft: children && children.length === 0 ? "24px" : "",
                 background: `${selected ? "#d5d5d5" : ""}`,
                 textDecoration: goal.complete ? "line-through" : "auto",
               }}
@@ -83,25 +94,34 @@ const TreeItem = memo(
               {label}
             </Typography>
           ) : (
-            <EditInput
-              type="goal"
-              title={label}
-              onSubmit={() => {
-                setEditingTitle(false);
+            <div
+              style={{
+                marginLeft: children && children.length === 0 ? "24px" : "",
               }}
-              pin={pin}
-              id={idObject}
-            />
+            >
+              <EditInput
+                type="goal"
+                title={label}
+                onDone={() => {
+                  setEditingTitle(false);
+                }}
+                pin={pin}
+                id={idObject}
+                setParentTrying={setTrying}
+              />
+            </div>
           )}
-          <StyledMenuButton
-            className="add-goal-button"
-            // sx={{ position: "absolute", right: 35 }}
-            aria-label="add goal button"
-            size="small"
-            onClick={() => setAddingGoal(true)}
-          >
-            <AddIcon />
-          </StyledMenuButton>
+          {!trying && (
+            <StyledMenuButton
+              className="add-goal-button"
+              // sx={{ position: "absolute", right: 35 }}
+              aria-label="add goal button"
+              size="small"
+              onClick={handleAdd}
+            >
+              <AddIcon />
+            </StyledMenuButton>
+          )}
         </StyledTreeItem>
         {addingGoal && (
           <NewGoalInput

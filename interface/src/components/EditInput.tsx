@@ -8,15 +8,18 @@ import { log } from "../helpers";
 import Typography from "@mui/material/Typography";
 import { PinId, GoalId } from "../types/types";
 import { updatePoolTitleAction, updateGoalDescAction } from "../store/actions";
+//TODO: handle error states
 function EditInput({
   title,
-  onSubmit,
+  onDone,
+  setParentTrying,
   pin,
   id,
   type,
 }: {
   title: string;
-  onSubmit: Function;
+  onDone: Function;
+  setParentTrying: Function;
   pin?: PinId;
   id?: GoalId;
   type: "pool" | "goal";
@@ -38,6 +41,8 @@ function EditInput({
     ariaLabel: "update goal description",
     widthIncrement: 10,
   });
+  const [trying, setTrying] = useState<boolean>(false);
+
   const newTitleSpanRef: any = React.useRef(null);
 
   useEffect(() => {
@@ -53,30 +58,41 @@ function EditInput({
     setValue(event.target.value);
   };
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    //TODO: hitting ESCP to close this input
+    //call api
     if (event.key === "Enter") {
       //must call like this to use state values
+
       type === "pool" ? editPoolTitle() : editGoalDesc();
+    }
+    //close the input
+    if (event.key === "Escape") {
+      onDone();
     }
   };
   const editPoolTitle = async () => {
     //TODO: delete if no value?
     //TODO: make it so you can edit through icon menu
+    setParentTrying(true);
+    setTrying(true);
     try {
       const result = await api.editPoolTitle(pin, value);
       log("editPoolTitle result => ", result);
       if (result && pin && value) {
         updatePoolTitleAction(pin, value);
-        onSubmit();
       }
     } catch (e) {
       log("editPoolTitle error => ", e);
     }
+    setParentTrying(false);
+    setTrying(false);
+    onDone();
   };
   const editGoalDesc = async () => {
     //TODO: delete if no value?
     //TODO: make it so you can edit through icon menu
-    onSubmit();
+    //onDone();
+    setParentTrying(true);
+    setTrying(true);
     try {
       const result = await api.editGoalDesc(id, value);
       log("editGoalDesc result => ", result);
@@ -86,6 +102,9 @@ function EditInput({
     } catch (e) {
       log("editGoalDesc error => ", e);
     }
+    setParentTrying(false);
+    setTrying(false);
+    onDone();
   };
   useEffect(() => {
     //set meta variables according to type here
@@ -113,7 +132,7 @@ function EditInput({
         },
         typographySize: "h6",
         inputMinWidth: 50,
-        ariaLabel: "update goal description",
+        ariaLabel: "update goal title",
         widthIncrement: 10,
       });
     }
@@ -136,16 +155,16 @@ function EditInput({
           padding: 0,
         }}
         style={{
-          // marginLeft: 25,
           //intention here is to match the original typography (before double clicking)
+          //CONSIDERATION: can we do better on this?
           ...metaVars.inputTextStyle,
-          //for goal
         }}
         placeholder="title"
         inputProps={{ "aria-label": metaVars.ariaLabel }}
         autoFocus={true}
         // multiline
-        //disabled={trying}
+        disabled={trying}
+        onBlur={() => !trying && onDone()}
         value={value}
         onKeyDown={handleKeyDown}
         onChange={handleChange}

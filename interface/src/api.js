@@ -53,7 +53,6 @@ const api = {
       .poke({ app: "goal-store", mark: "goal-action", json: poolToEdit });
   },
   deletePool: async (pin) => {
-    //TODO: ask niblyx about order of stuff
     const poolToDelete = {
       "delete-pool": {
         pin,
@@ -84,7 +83,6 @@ const api = {
       .poke({ app: "goal-store", mark: "goal-action", json: newGoal });
   },
   deleteGoal: async (id) => {
-    //TODO: ask niblyx about order of stuff
     const goalToDelete = {
       "delete-goal": {
         id,

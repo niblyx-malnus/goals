@@ -23,10 +23,6 @@ import { Stack } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
-//TODO: hovering elements also bring a + icon button to nest structure
-//TODO: add the contect menu
-//TODO: make memo work for our structure
-
 function App() {
   const fetchedPools = useStore((store) => store.pools);
   const setFetchedPools = useStore((store) => store.setPools);
@@ -69,12 +65,11 @@ function App() {
   const getGoals = async () => {
     try {
       const result = await api.getData();
-
-      console.log("result", result);
+      log("getGoals result => ", result);
       const resultProjects = result.initial.store.pools;
       setFetchedPools(resultProjects);
     } catch (e) {
-      console.log("e", e);
+      log("getGoals error => ", e);
     }
   };
   const updateHandler = (update: any) => {
@@ -180,14 +175,25 @@ function Project({
 }) {
   const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
   const [addingGoal, setAddingGoal] = useState<boolean>(false);
-  const [editingTitle, setEditingTitle] = useState(false);
+  const [editingTitle, setEditingTitle] = useState<boolean>(false);
+  const [trying, setTrying] = useState<boolean>(false);
+  const handleAdd = () => {
+    toggleItemOpen(true);
+    setAddingGoal(true);
+  };
   return (
     <Box sx={{ marginBottom: 1 }}>
       <StyledTreeItem>
-        <StyledMenuButtonContainer sx={{ position: "absolute", left: -35 }}>
-          <IconMenu type="pool" pin={pin} />
-        </StyledMenuButtonContainer>
-
+        {trying ? (
+          <CircularProgress
+            size={24}
+            sx={{ position: "absolute", left: -35 }}
+          />
+        ) : (
+          <StyledMenuButtonContainer sx={{ position: "absolute", left: -35 }}>
+            <IconMenu type="pool" pin={pin} />
+          </StyledMenuButtonContainer>
+        )}
         {goalsLength > 0 && (
           <Box
             sx={{
@@ -215,23 +221,26 @@ function Project({
           <EditInput
             type="pool"
             title={title}
-            onSubmit={() => {
+            onDone={() => {
               setEditingTitle(false);
             }}
+            setParentTrying={setTrying}
             pin={pin}
           />
         )}
 
         {/*TODO: make this into it's own component(so we don't have to rerender the children)*/}
-        <StyledMenuButton
-          className="add-goal-button"
-          // sx={{ position: "absolute", right: 35 }}
-          aria-label="add goal button"
-          size="small"
-          onClick={() => setAddingGoal(true)}
-        >
-          <AddIcon />
-        </StyledMenuButton>
+        {!trying && (
+          <StyledMenuButton
+            className="add-goal-button"
+            // sx={{ position: "absolute", right: 35 }}
+            aria-label="add goal button"
+            size="small"
+            onClick={handleAdd}
+          >
+            <AddIcon />
+          </StyledMenuButton>
+        )}
       </StyledTreeItem>
       {addingGoal && (
         <NewGoalInput
