@@ -180,6 +180,7 @@ function Project({
   const [addingGoal, setAddingGoal] = useState<boolean>(false);
   const [editingTitle, setEditingTitle] = useState<boolean>(false);
   const [trying, setTrying] = useState<boolean>(false);
+
   const handleAdd = () => {
     toggleItemOpen(true);
     setAddingGoal(true);
@@ -190,16 +191,23 @@ function Project({
   }, [collapseAll.count]);
   return (
     <Box sx={{ marginBottom: 1 }}>
-      <StyledTreeItem>
+      <StyledTreeItem
+        sx={{
+          "&:hover": {
+            cursor: "pointer",
+            "& .show-on-hover": {
+              opacity: 1,
+            },
+          },
+        }}
+      >
         {trying ? (
           <CircularProgress
             size={24}
             sx={{ position: "absolute", left: -35 }}
           />
         ) : (
-          <StyledMenuButtonContainer sx={{ position: "absolute", left: -35 }}>
-            <IconMenu type="pool" pin={pin} />
-          </StyledMenuButtonContainer>
+          <IconMenu type="pool" pin={pin} setParentTrying={setTrying} />
         )}
         {goalsLength > 0 && (
           <Box
@@ -208,6 +216,7 @@ function Project({
               justifyContent: "center",
               alignItems: "center",
             }}
+            className="icon-container"
             onClick={() => toggleItemOpen(!isOpen)}
           >
             {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
@@ -215,11 +224,11 @@ function Project({
         )}
         {!editingTitle ? (
           <Typography
-            color="text.primary"
+            color={trying ? "text.disabled" : "text.primary"}
             variant="h5"
             fontWeight={"bold"}
             onDoubleClick={() => {
-              setEditingTitle(true);
+              !trying && setEditingTitle(true);
             }}
           >
             {title}
@@ -238,15 +247,16 @@ function Project({
 
         {/*TODO: make this into it's own component(so we don't have to rerender the children)*/}
         {!trying && (
-          <StyledMenuButton
-            className="add-goal-button"
+          <IconButton
+            sx={{ opacity: 0 }}
+            className="show-on-hover"
             // sx={{ position: "absolute", right: 35 }}
             aria-label="add goal button"
             size="small"
             onClick={handleAdd}
           >
             <AddIcon />
-          </StyledMenuButton>
+          </IconButton>
         )}
       </StyledTreeItem>
       {addingGoal && (
@@ -389,10 +399,10 @@ const StyledMenuButton = styled(IconButton)({
   },
 });
 const StyledMenuButtonContainer = styled(Box)({
-  opacity: 0,
+  /* opacity: 0,
   "&:hover": {
     opacity: 1,
-  },
+  },*/
 });
 const StyledTreeItem = styled(Box)({
   display: "flex",

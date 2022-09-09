@@ -47,10 +47,9 @@ const TreeItem = memo(
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
     const [selected, setSelected] = useState(isSelected);
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
-    const [editingTitle, setEditingTitle] = useState(false);
+    const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [trying, setTrying] = useState<boolean>(false);
     const collapseAll = useStore((store) => store.collapseAll);
-
     useEffect(() => {
       //everytime collapse all changes, we force isOpen value to comply
       toggleItemOpen(collapseAll.status);
@@ -61,24 +60,40 @@ const TreeItem = memo(
     };
     return (
       <div>
-        <StyledTreeItem>
+        <StyledTreeItem
+          sx={{
+            "&:hover": {
+              cursor: "pointer",
+              "& .show-on-hover": {
+                opacity: 1,
+              },
+            },
+          }}
+        >
           {trying ? (
             <CircularProgress
               size={24}
-              sx={{ position: "absolute", left: -30 }}
+              sx={{
+                position: "absolute",
+                left: -30,
+              }}
             />
           ) : (
-            <StyledMenuButtonContainer sx={{ position: "absolute", left: -30 }}>
-              <IconMenu
-                type="goal"
-                complete={goal.complete}
-                id={idObject}
-                pin={pin}
-              />
-            </StyledMenuButtonContainer>
+            <IconMenu
+              type="goal"
+              complete={goal.complete}
+              id={idObject}
+              pin={pin}
+              setParentTrying={setTrying}
+            />
           )}
           {children && children.length > 0 && (
             <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
               className="icon-container"
               onClick={() => toggleItemOpen(!isOpen)}
             >
@@ -88,8 +103,9 @@ const TreeItem = memo(
           {!editingTitle ? (
             <Typography
               variant="h6"
+              color={trying ? "text.disabled" : "text.primary"}
               onDoubleClick={() => {
-                setEditingTitle(true);
+                !trying && setEditingTitle(true);
               }}
               style={{
                 marginLeft: children && children.length === 0 ? "24px" : "",
@@ -118,15 +134,16 @@ const TreeItem = memo(
             </div>
           )}
           {!trying && (
-            <StyledMenuButton
-              className="add-goal-button"
+            <IconButton
+              sx={{ opacity: 0 }}
+              className="show-on-hover"
               // sx={{ position: "absolute", right: 35 }}
               aria-label="add goal button"
               size="small"
               onClick={handleAdd}
             >
               <AddIcon />
-            </StyledMenuButton>
+            </IconButton>
           )}
         </StyledTreeItem>
         {addingGoal && (
@@ -218,15 +235,6 @@ const StyledTreeItem = styled(Box)({
   flexDirection: "row",
   alignItems: "center",
   position: "relative",
-  "&:hover": {
-    cursor: "pointer",
-    [`${StyledMenuButton}`]: {
-      opacity: 1,
-    },
-    [`${StyledMenuButtonContainer}`]: {
-      opacity: 1,
-    },
-  },
 });
 const StyledTreeChildren = styled(Box)({
   paddingLeft: "10px",
