@@ -269,6 +269,7 @@ function Project({
   );
 }
 function Header() {
+  //TODO: header should be sticky
   const [newProjectTitle, setNewProjectTitle] = useState<string>("");
   const [trying, setTrying] = useState<boolean>(false);
 
@@ -367,7 +368,7 @@ function Header() {
         variant="outlined"
         onClick={() => setCollapseAll(!collapseAll)}
       >
-        {collapseAll ? "uncollapse all" : "collapse all"}
+        {collapseAll ? "collapse all" : "uncollapse all"}
       </Button>
     </Stack>
   );
