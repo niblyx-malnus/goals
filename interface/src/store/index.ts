@@ -13,8 +13,8 @@ interface Store {
 
   filterGoals: FilterGoals;
   setFilterGoals: (status: FilterGoals) => void;
-
-  collapseAll: boolean;
+  //number is included to allow for using the same function twice and having hooks react
+  collapseAll: { status: boolean; count: number };
   setCollapseAll: (status: boolean) => void;
 }
 
@@ -26,9 +26,11 @@ const useStore = create<Store>((set, get) => ({
   setFilterGoals: (newStatus: FilterGoals) =>
     set(() => ({ filterGoals: newStatus })),
 
-  collapseAll: false,
+  collapseAll: { status: false, count: 0 },
   setCollapseAll: (newStatus: boolean) =>
-    set(() => ({ collapseAll: newStatus })),
+    set(() => ({
+      collapseAll: { status: newStatus, count: get().collapseAll.count + 1 },
+    })),
 }));
 
 export default useStore;

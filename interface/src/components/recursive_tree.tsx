@@ -53,8 +53,8 @@ const TreeItem = memo(
 
     useEffect(() => {
       //everytime collapse all changes, we force isOpen value to comply
-      toggleItemOpen(collapseAll);
-    }, [collapseAll]);
+      toggleItemOpen(collapseAll.status);
+    }, [collapseAll.count]);
     const handleAdd = () => {
       toggleItemOpen(true);
       setAddingGoal(true);
