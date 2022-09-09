@@ -6,6 +6,8 @@ import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 //TODO: padding left  34 for add goal 44 for add under(me thinks), maybe a better way to do this
+//TODO: handle empty input
+
 function NewGoalInput({
   callback,
   id,

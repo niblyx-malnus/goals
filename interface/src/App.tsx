@@ -19,7 +19,8 @@ import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import { PinId } from "./types/types";
 import { newGoalAction, newPoolAction } from "./store/actions";
-import { Stack } from "@mui/material";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
@@ -173,6 +174,8 @@ function Project({
   children: any;
   goalsLength: number;
 }) {
+  const collapseAll = useStore((store) => store.collapseAll);
+
   const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
   const [addingGoal, setAddingGoal] = useState<boolean>(false);
   const [editingTitle, setEditingTitle] = useState<boolean>(false);
@@ -181,6 +184,10 @@ function Project({
     toggleItemOpen(true);
     setAddingGoal(true);
   };
+  useEffect(() => {
+    //everytime collapse all changes, we force isOpen value to comply
+    toggleItemOpen(collapseAll);
+  }, [collapseAll]);
   return (
     <Box sx={{ marginBottom: 1 }}>
       <StyledTreeItem>
@@ -267,6 +274,10 @@ function Header() {
 
   const setFilterGoals = useStore((store) => store.setFilterGoals);
   const filterGoals = useStore((store) => store.filterGoals);
+
+  const setCollapseAll = useStore((store) => store.setCollapseAll);
+  const collapseAll = useStore((store) => store.collapseAll);
+
   const [filterCompleteChecked, setFilterCompleteChecked] =
     useState<boolean>(false);
   const handleFilterCompleteChange = (
@@ -351,6 +362,13 @@ function Header() {
           }
         />
       </Stack>
+      <Button
+        sx={{ fontWeight: "bold" }}
+        variant="outlined"
+        onClick={() => setCollapseAll(!collapseAll)}
+      >
+        {collapseAll ? "uncollapse all" : "collapse all"}
+      </Button>
     </Stack>
   );
 }

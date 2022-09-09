@@ -1,4 +1,4 @@
-import React, { Fragment, useState, memo } from "react";
+import React, { Fragment, useState, memo, useEffect } from "react";
 import styled from "@emotion/styled/macro";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -22,6 +22,7 @@ interface TreeItemProps {
   readonly children: ReadonlyArray<JSX.Element>;
   readonly idObject: any;
   readonly goal: any;
+
   pin: PinId;
 }
 
@@ -48,7 +49,12 @@ const TreeItem = memo(
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState(false);
     const [trying, setTrying] = useState<boolean>(false);
+    const collapseAll = useStore((store) => store.collapseAll);
 
+    useEffect(() => {
+      //everytime collapse all changes, we force isOpen value to comply
+      toggleItemOpen(collapseAll);
+    }, [collapseAll]);
     const handleAdd = () => {
       toggleItemOpen(true);
       setAddingGoal(true);
@@ -144,12 +150,14 @@ const TreeItem = memo(
 );
 
 const RecursiveTree = ({ goalList, pin, onSelectCallback }: any) => {
+  //TODO: move these up to before mapping over projects (App.tsx currently)
   const filterGoals = useStore((store) => store.filterGoals);
 
   const createTree = (goal: any) => {
     const currentGoal = goal.goal;
     const currentGoalId = goal.id.birth;
     const childGoals = goal.childNodes;
+    //filter out complete if store says so
     if (currentGoal.complete && filterGoals === "complete") return null;
     return (
       childGoals && (

@@ -12,7 +12,10 @@ interface Store {
   setPools: (state: any) => void;
 
   filterGoals: FilterGoals;
-  setFilterGoals: (state: any) => void;
+  setFilterGoals: (status: FilterGoals) => void;
+
+  collapseAll: boolean;
+  setCollapseAll: (status: boolean) => void;
 }
 
 const useStore = create<Store>((set, get) => ({
@@ -22,6 +25,10 @@ const useStore = create<Store>((set, get) => ({
   filterGoals: null,
   setFilterGoals: (newStatus: FilterGoals) =>
     set(() => ({ filterGoals: newStatus })),
+
+  collapseAll: false,
+  setCollapseAll: (newStatus: boolean) =>
+    set(() => ({ collapseAll: newStatus })),
 }));
 
 export default useStore;

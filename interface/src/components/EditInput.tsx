@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import { PinId, GoalId } from "../types/types";
 import { updatePoolTitleAction, updateGoalDescAction } from "../store/actions";
 //TODO: handle error states
+//TODO: handle empty input
 function EditInput({
   title,
   onDone,
