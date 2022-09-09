@@ -23,6 +23,7 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import Divider from "@mui/material/Divider";
 
 function App() {
   const fetchedPools = useStore((store) => store.pools);
@@ -137,7 +138,7 @@ function App() {
   }, []);
 
   return (
-    <Container sx={{ marginTop: 2 }}>
+    <Container>
       <Header />
       {pools.map((pool: any, index: any) => {
         const poolTitle = pool.pool.title;
@@ -174,7 +175,8 @@ function Project({
   children: any;
   goalsLength: number;
 }) {
-  const collapseAll = useStore((store) => store.collapseAll);
+  //TODO: add the store type
+  const collapseAll = useStore((store: any) => store.collapseAll);
 
   const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
   const [addingGoal, setAddingGoal] = useState<boolean>(false);
@@ -279,7 +281,6 @@ function Project({
   );
 }
 function Header() {
-  //TODO: header should be sticky
   const [newProjectTitle, setNewProjectTitle] = useState<string>("");
   const [trying, setTrying] = useState<boolean>(false);
 
@@ -324,70 +325,75 @@ function Header() {
     }
   };
   return (
-    <Stack
-      flexDirection="row"
-      alignItems="center"
-      // justifyContent="center"
-      sx={{ marginBottom: 3 }}
+    <Box
+      sx={{
+        position: "sticky",
+        top: 0,
+        paddingTop: 2,
+        backgroundColor: "#eedfc9",
+      }}
+      zIndex={1}
     >
-      <OutlinedInput
-        id="add-new-pool"
-        placeholder="Add Project"
-        value={newProjectTitle}
-        onChange={handleChange}
-        size={"small"}
-        type={"text"}
-        disabled={trying}
-        onKeyDown={handleKeyDown}
-        endAdornment={
-          <InputAdornment position="end">
-            <IconButton
-              aria-label="toggle password visibility"
-              onClick={addNewPool}
-              //onMouseDown={handleMouseDownPassword}
-              edge="end"
-              disabled={trying || newProjectTitle?.length === 0}
-            >
-              {trying ? (
-                <CircularProgress size={24} style={{ padding: 1 }} />
-              ) : (
-                <AddIcon />
-              )}
-            </IconButton>
-          </InputAdornment>
-        }
-      />
-      <Stack
-        sx={{ marginLeft: 3 }}
-        flexDirection="row"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <FormControlLabel
-          label="Filter Completed Goals"
-          control={
-            <Checkbox
-              checked={filterCompleteChecked}
-              onChange={handleFilterCompleteChange}
-            />
+      <Stack flexDirection="row" alignItems="center">
+        <OutlinedInput
+          id="add-new-pool"
+          placeholder="Add Project"
+          value={newProjectTitle}
+          onChange={handleChange}
+          size={"small"}
+          type={"text"}
+          disabled={trying}
+          onKeyDown={handleKeyDown}
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={addNewPool}
+                edge="end"
+                disabled={trying || newProjectTitle?.length === 0}
+              >
+                {trying ? (
+                  <CircularProgress size={24} style={{ padding: 1 }} />
+                ) : (
+                  <AddIcon />
+                )}
+              </IconButton>
+            </InputAdornment>
           }
         />
+        <Stack
+          sx={{ marginLeft: 3 }}
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <FormControlLabel
+            label="Filter Completed Goals"
+            control={
+              <Checkbox
+                checked={filterCompleteChecked}
+                onChange={handleFilterCompleteChange}
+              />
+            }
+          />
+        </Stack>
+        <Button
+          sx={{ fontWeight: "bold", marginRight: 1 }}
+          variant="outlined"
+          onClick={() => setCollapseAll(true)}
+        >
+          uncollapse all
+        </Button>
+        <Button
+          sx={{ fontWeight: "bold" }}
+          variant="outlined"
+          onClick={() => setCollapseAll(false)}
+        >
+          collapse all
+        </Button>
       </Stack>
-      <Button
-        sx={{ fontWeight: "bold" }}
-        variant="outlined"
-        onClick={() => setCollapseAll(true)}
-      >
-        uncollapse all
-      </Button>
-      <Button
-        sx={{ fontWeight: "bold" }}
-        variant="outlined"
-        onClick={() => setCollapseAll(false)}
-      >
-        collapse all
-      </Button>
-    </Stack>
+      <Divider sx={{ paddingTop: 2 }} />
+    </Box>
   );
 }
 
