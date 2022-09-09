@@ -25,7 +25,10 @@ function NewGoalInput({
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     //call api
     if (event.key === "Enter") {
-      onSubmit();
+      if (value.length > 0) {
+        //must have a value to call the api
+        onSubmit();
+      }
     }
     //close input
     if (event.key === "Escape") {

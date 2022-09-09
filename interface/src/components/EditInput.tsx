@@ -9,7 +9,6 @@ import Typography from "@mui/material/Typography";
 import { PinId, GoalId } from "../types/types";
 import { updatePoolTitleAction, updateGoalDescAction } from "../store/actions";
 //TODO: handle error states
-//TODO: handle empty input
 function EditInput({
   title,
   onDone,
@@ -50,6 +49,7 @@ function EditInput({
     setValue(title);
   }, [title]);
   useEffect(() => {
+    //dynamicall changes the width on the input depending on a hidden text element
     if (newTitleSpanRef.current) {
       const width = newTitleSpanRef.current.getBoundingClientRect().width;
       setNewTitleInputWidth(width + metaVars.widthIncrement);
@@ -61,9 +61,11 @@ function EditInput({
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     //call api
     if (event.key === "Enter") {
-      //must call like this to use state values
-
-      type === "pool" ? editPoolTitle() : editGoalDesc();
+      if (value.length > 0) {
+        //must have a value to call the api
+        //must call like this to use state values, see meta vars
+        type === "pool" ? editPoolTitle() : editGoalDesc();
+      }
     }
     //close the input
     if (event.key === "Escape") {
