@@ -43,7 +43,7 @@
   ==
 ::
 +$  pool-nexus-update
-  $%  [%yoke nex=(map id goal-nexus)]
+  $%  [%yoke nex=(map id goal-nexus)] :: TODO: throw yok=yoke-update back in
   ==
 ::
 +$  goal-perms-update

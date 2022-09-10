@@ -172,8 +172,7 @@
             %yoke
           %+  frond  +<.upd
           %-  pairs
-          :~  [%yok (enjs-yoke yok.upd)]
-              [%nex (enjs-nex nex.upd)]
+          :~  [%nex (enjs-nex nex.upd)]
           ==
         ==
           ?(%goal-perms %goal-hitch %goal-nexus %goal-togls)
