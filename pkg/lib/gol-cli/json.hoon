@@ -47,7 +47,7 @@
       [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
       [%delete-pool (ot ~[pin+dejs-pin])]
       [%delete-goal (ot ~[id+dejs-id])]
-      [%yoke-sequence (ot ~[pin+dejs-pin yoke-sequence+dejs-yoke-seq])]
+      [%yoke (ot ~[pin+dejs-pin yok+dejs-yoke])]
       [%set-deadline (ot ~[id+dejs-id deadline+dejs-unit-date])]
       [%mark-actionable (ot ~[id+dejs-id])]
       [%unmark-actionable (ot ~[id+dejs-id])]
@@ -140,68 +140,79 @@
     ==
   --
 ::
-++  enjs-update
+++  enjs-home-update
   =,  enjs:format
-  |=  upd=update
+  |=  hom=home-update
   ^-  json
-  ?+    -.upd  !!
-      %initial
-    %+  frond
-      %initial
-    %-  pairs
-    :~  [%store (enjs-store store.upd)]
-    ==
-    ::
-      %new-goal
-    %+  frond
-      %new-goal
-    %-  pairs
-    :~  [%pin (enjs-pin pin.upd)]
-        [%mod (ship mod.upd)]
-        [%id (enjs-id id.upd)]
-        [%goal (enjs-goal goal.upd)]
-    ==
-    ::
-      %add-under
-    %+  frond
-      %add-under
-    %-  pairs
-    :~  [%pin (enjs-pin pin.upd)]
-        [%mod (ship mod.upd)]
-        [%pid (enjs-id pid.upd)]
-        [%cid (enjs-id cid.upd)]
-        [%goal (enjs-goal goal.upd)]
-    ==
-    ::
-      %new-pool
-    %+  frond
-      %new-pool
-    %-  pairs
-    :~  [%pin (enjs-pin pin.upd)]
-        [%pool (enjs-pool pool.upd)]
-    ==
-    ::
-    %delete-pool  (frond %delete-pool (pairs [%pin (enjs-pin pin.upd)]~))
-    ::
-      %delete-goal
-    %+  frond
-      %delete-goal
-    %-  pairs
-    :~  [%pin (enjs-pin pin.upd)]
-        [%mod (ship mod.upd)]
-        [%id (enjs-id id.upd)]
-    ==
-    ::
-    %error  (frond %error s+msg.upd)
-    ::
-      %yoke-sequence
-    %+  frond
-      %yoke-sequence
-    %-  pairs
-    :~  [%pin (enjs-pin pin.upd)]
-        [%mod (ship mod.upd)]
-        [%nex (enjs-nex nex.upd)]
-    ==
+  =/  upd=away-update  +.hom
+  %-  pairs
+  :~  :-  %hed
+      %-  pairs
+      :~  [%pin (enjs-pin pin.hom)]
+          [%mod (ship mod.hom)]
+      ==
+      :-  -.upd
+      ?-    -.upd
+          %spawn-goal
+        %-  pairs
+        :~  [%nex (enjs-nex nex.upd)]
+            [%id (enjs-id id.upd)]
+            [%goal (enjs-goal goal.upd)]
+        ==
+        ::
+        %spawn-pool  (frond %pool (enjs-pool pool.upd))
+        ::
+        %trash-goal  (frond %id (enjs-id id.upd))
+        ::
+        %trash-pool  ~
+        ::
+          %pool-perms
+        ?-  +<.upd
+          ?(%viewer %chef %peon)  (frond +<.upd (ship ship.upd))
+        ==
+        ::
+          %pool-hitch
+        ?-  +<.upd
+          %title  (frond +<.upd s+title.upd)
+        ==
+        ::
+          %pool-nexus
+        ?-    +<.upd
+            %yoke
+          %+  frond  +<.upd
+          %-  pairs
+          :~  [%yok (enjs-yoke yok.upd)]
+              [%nex (enjs-nex nex.upd)]
+          ==
+        ==
+          ?(%goal-perms %goal-hitch %goal-nexus %goal-togls)
+        %-  pairs
+        :~  [%id (enjs-id id.upd)]
+            :-  +>-.upd
+            ?-    -.upd
+                %goal-perms
+              ?-  +>-.upd
+                ?(%chef %peon)  (ship ship.upd)
+              ==
+              ::
+                %goal-hitch
+              ?-  +>-.upd
+                %desc  s+desc.upd
+              ==
+              ::
+                %goal-nexus
+              ?-  +>-.upd
+                %deadline  ?~(moment.upd ~ s+(scot %da u.moment.upd))
+              ==
+              ::
+                %goal-togls
+              ?-  +>-.upd
+                %complete  b+complete.upd
+                %actionable  b+actionable.upd
+              ==
+            ==
+        ==
+      ==
   ==
 ::
 ++  enjs-peek
@@ -209,6 +220,12 @@
   |=  pyk=peek
   ^-  json
   ?-    -.pyk
+      %initial
+    %+  frond
+      %initial
+    %-  pairs
+    :~  [%store (enjs-store store.pyk)]
+    ==
       %pool-keys
     %+  frond
       %pool-keys
@@ -324,13 +341,39 @@
   =,  enjs:format
   |=  =pool
   %-  pairs
-  :~  [%title s+title.pool]
-      [%creator (ship creator.pool)]
-      [%goals (enjs-goals goals.pool)]
-      [%chefs a+(turn ~(tap in chefs.pool) ship)]
-      [%peons a+(turn ~(tap in peons.pool) ship)]
-      [%viewers a+(turn ~(tap in viewers.pool) ship)]
-      [%archived b+archived.pool]
+  :~  :-  %froze
+      %-  pairs
+      :~  [%owner (ship owner.pool)]
+          [%birth s+(scot %da birth.pool)]
+          [%creator (ship creator.pool)]
+      ==
+      :-  %perms
+      %-  pairs
+      :~  [%chefs a+(turn ~(tap in chefs.pool) ship)]
+          [%peons a+(turn ~(tap in peons.pool) ship)]
+          [%viewers a+(turn ~(tap in viewers.pool) ship)]
+      ==
+      :-  %nexus
+      %-  pairs
+      :~  [%goals (enjs-goals goals.pool)]
+      ==
+      :-  %togls
+      %-  pairs
+      :~  [%archived b+archived.pool]
+      ==
+      :-  %hitch
+      %-  pairs
+      :~  [%title s+title.pool]
+      ==
+  ==
+::
+++  enjs-yoke
+  =,  enjs:format
+  |=  yok=exposed-yoke
+  %-  pairs
+  :~  [%yoke s+-.yok]
+      [%lid (enjs-id lid.yok)]
+      [%rid (enjs-id rid.yok)]
   ==
 ::
 ++  enjs-goals
@@ -347,15 +390,15 @@
   =,  enjs:format
   |=  =nex
   :-  %a  %+  turn  ~(tap by nex) 
-  |=  [=id =nexus] 
+  |=  [=id nexus=goal-nexus] 
   %-  pairs
   :~  [%id (enjs-id id)]
-      [%goal (enjs-nexus nexus)]
+      [%goal (enjs-goal-nexus nexus)]
   ==
 ::
-++  enjs-nexus
+++  enjs-goal-nexus
   =,  enjs:format
-  |=  =nexus
+  |=  nexus=goal-nexus
   ^-  json
   %-  pairs
   :~  [%par ?~(par.nexus ~ (enjs-id u.par.nexus))]
@@ -369,17 +412,34 @@
   |=  =goal
   ^-  json
   %-  pairs
-  :~  [%desc s+desc.goal]
-      [%author (ship author.goal)]
-      [%chefs a+(turn ~(tap in chefs.goal) ship)]
-      [%peons a+(turn ~(tap in peons.goal) ship)]
-      [%par ?~(par.goal ~ (enjs-id u.par.goal))]
-      [%kids a+(turn ~(tap in kids.goal) enjs-id)]
-      [%kickoff (enjs-edge kickoff.goal)]
-      [%deadline (enjs-edge deadline.goal)]
-      [%complete b+complete.goal]
-      [%actionable b+actionable.goal]
-      [%archived b+archived.goal]
+  :~  :-  %froze
+      %-  pairs
+      :~  [%owner (ship owner.goal)]
+          [%birth s+(scot %da birth.goal)]
+          [%author (ship author.goal)]
+      ==
+      :-  %perms
+      %-  pairs
+      :~  [%chefs a+(turn ~(tap in chefs.goal) ship)]
+          [%peons a+(turn ~(tap in peons.goal) ship)]
+      ==
+      :-  %nexus
+      %-  pairs
+      :~  [%par ?~(par.goal ~ (enjs-id u.par.goal))]
+          [%kids a+(turn ~(tap in kids.goal) enjs-id)]
+          [%kickoff (enjs-edge kickoff.goal)]
+          [%deadline (enjs-edge deadline.goal)]
+      ==
+      :-  %togls
+      %-  pairs
+      :~  [%complete b+complete.goal]
+          [%actionable b+actionable.goal]
+          [%archived b+archived.goal]
+      ==
+      :-  %hitch
+      %-  pairs
+      :~  [%desc s+desc.goal]
+      ==
   ==
 ::
 ++  enjs-edge

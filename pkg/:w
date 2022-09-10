@@ -1,5 +1,5 @@
 /-  gol=goal, goal-store
-/+  *gol-cli-goal, gol-cli-goals, pl=gol-cli-pool
+/+  *gol-cli-goal, gol-cli-goals, pr=gol-cli-pool
 |_  =store:gol
 +*  gols   ~(. gol-cli-goals +<)  
 ::
@@ -12,16 +12,17 @@
 :: create a new empty pool with title, initial viewers, chefs, and peons
 :: chefs and peons immediately added as viewers
 ++  new-pool
-  |=  $:  title=@t          chefs=(set ship)
-          peons=(set ship)  viewers=(set ship)
-          own=ship          mod=ship
-          now=@da
-      ==
-  ^-  home-cud:goal-store
-  =+  [pin pool]=(new-pool:gols title chefs peons viewers own now)
-  :+  pin
-    [[pin mod] %spawn-pool pool]
-  store(pools (~(put by pools.store) pin pool))
+  |=  [title=@t chefs=(set ship) peons=(set ship) viewers=(set ship) own=ship now=@da]
+  ^-  away-cud:goal-store
+  =/  check  (new-pool:check +<)
+  ?-    -.check
+    %|  ~|(+.check !!)
+      %&
+    =+  [pin pool]=(new-pool:gols title chefs peons viewers own now)
+    %+  pin
+      [%spawn-pool pool]
+    store(pools (~(put by pools.store) pin pool))
+  ==
 ::
 ++  delete-pool
   |=  [=pin:gol mod=ship]
@@ -34,16 +35,17 @@
 ++  archive-pool  !!
 ::
 ++  copy-pool
-  |=  $:  =old=pin:gol        title=@t
-          chefs=(set ship)    peons=(set ship)
-          viewers=(set ship)  own=ship
-          mod=ship            now=@da
-      ==
+  |=  [=old=pin:gol title=@t chefs=(set ship) peons=(set ship) viewers=(set ship) own=ship now=@da]
   ^-  home-cud:goal-store
-  =+  [pin pool]=(copy-pool:gols old-pin title chefs peons viewers own now)
-  :+  pin
-    [[pin mod] %spawn-pool pool]
-  (update-store pin pool)
+  =/  check  (copy-pool:check +<)
+  ?-    -.check  
+    %|  ~|(+.check !!)
+      %&
+    =+  [pin pool]=(copy-pool:gols old-pin title chefs peons viewers own now)
+    :+  pin
+      [[pin mod] %spawn-pool pool]
+    (update-store pin pool)
+  == 
 ::
 ++  new-goal-temp
   |=  $:  our=ship
@@ -55,7 +57,6 @@
     ^-  [id:gol goal:gol]
     =/  id  (unique-id:gols [our now])
     =|  =goal:gol
-    =.  owner.goal       owner.id      =.  birth.goal            birth.id
     =.  desc.goal        desc          =.  chefs.goal            chefs
     =.  peons.goal       peons         =.  moment.deadline.goal  deadline
     =.  actionable.goal  actionable    =.  author.goal           our
@@ -121,15 +122,15 @@
       ==
     =.  store  (put-in-pool:gols pin cid goal)
     =/  pool  (~(got by pools.store) pin)
-    =/  out  (~(apply-sequence pl pool) mod [%held-yoke cid pid]~)
+    =/  out  (~(apply-sequence pr pin pool) mod [%held-yoke cid pid]~)
     ?-    -.out
       %|  ~|(+.out !!)
         %&
       =/  pool  pool.p.out
       =.  pools.store  (~(put by pools.store) pin pool)
       =.  goal  (~(got by goals.pool) cid)
-      =/  nexus  nexus:`ngoal:gol`(~(got by goals.pool) pid)
-      =/  nex  (~(put by *nex:gol) pid nexus)
+      =/  nex  (~(get-nex pr pin pool) set.p.out)
+      =.  nex  (~(del by nex) cid)
       :+  pin
         [%spawn-goal nex cid goal]
       store
@@ -146,7 +147,7 @@
     =/  goal  (got-goal:gols id)
     =+  [pin pool]=(put-goal:gols id goal(desc desc))
     :+  pin
-      [%goal-hitch id %desc desc]
+      [id %goal-hitch %desc desc]
     store(pools (~(put by pools.store) pin pool))
   ==
 :: 
@@ -169,12 +170,12 @@
   ^-  away-cud:goal-store
   =/  pin  (~(got by directory.store) id)
   =/  pool  (~(got by pools.store) pin)
-  =/  out  (~(mark-actionable pl pool) id mod)
+  =/  out  (~(mark-actionable pr pin pool) id mod)
   ?-    -.out
     %|  ~|(+.out !!)
       %&
     :+  pin
-      [%goal-togls id %actionable %.y]
+      [id %goal-togls %actionable %.y]
     store(pools (~(put by pools.store) pin p.out))
   ==
 ::
@@ -183,12 +184,12 @@
   ^-  away-cud:goal-store
   =/  pin  (~(got by directory.store) id)
   =/  pool  (~(got by pools.store) pin)
-  =/  out  (~(unmark-actionable pl pool) id mod)
+  =/  out  (~(unmark-actionable pr pin pool) id mod)
   ?-    -.out
     %|  ~|(+.out !!)
       %&
     :+  pin
-      [%goal-togls id %actionable %.n]
+      [id %goal-togls %actionable %.n]
     store(pools (~(put by pools.store) pin p.out))
   ==
 ::
@@ -197,12 +198,12 @@
   ^-  away-cud:goal-store
   =/  pin  (~(got by directory.store) id)
   =/  pool  (~(got by pools.store) pin)
-  =/  out  (~(mark-complete pl pool) id mod)
+  =/  out  (~(mark-complete pr pin pool) id mod)
   ?-    -.out
     %|  ~|(+.out !!)
       %&
     :+  pin
-      [%goal-togls id %complete %.y]
+      [id %goal-togls %complete %.y]
    store(pools (~(put by pools.store) pin p.out))
   ==
 ::
@@ -211,12 +212,12 @@
   ^-  away-cud:goal-store
   =/  pin  (~(got by directory.store) id)
   =/  pool  (~(got by pools.store) pin)
-  =/  out  (~(unmark-complete pl pool) id mod)
+  =/  out  (~(unmark-complete pr pin pool) id mod)
   ?-    -.out
     %|  ~|(+.out !!)
       %&
     :+  pin
-      [%goal-togls id %complete %.n]
+      [id %goal-togls %complete %.n]
     store(pools (~(put by pools.store) pin p.out))
   ==
 ::
@@ -225,12 +226,12 @@
   ^-  away-cud:goal-store
   =/  pin  (~(got by directory.store) id)
   =/  pool  (~(got by pools.store) pin)
-  =/  out  (~(set-deadline pl pool) id moment mod)
+  =/  out  (~(set-deadline pr pin pool) id moment mod)
   ?-    -.out
     %|  ~|(+.out !!)
       %&
     :+  pin
-      [%goal-nexus id %deadline moment]
+      [id %goal-nexus %deadline moment]
     store(pools (~(put by pools.store) pin p.out))
   ==
 ::
@@ -244,7 +245,7 @@
     =/  pool  (~(got by pools.store) pin)
     =.  pool  pool(viewers (~(put in viewers.pool) invitee))
     :+  pin
-      [%pool-perms %viewer invitee]
+      [%pool-perms %viewer ship]
     store(pools (~(put by pools.store) pin pool))
   ==
 ::
@@ -258,7 +259,7 @@
     =/  goal  (got-goal:gols id)
     =+  [pin pool]=(put-goal:gols id goal(chefs (~(put in chefs.goal) chef)))
     :+  pin
-      [%goal-perms id %chef chef] 
+      [=id %goal-perms %chef chef] 
     store(pools (~(put by pools.store) pin pool))
   ==
 ::
@@ -272,26 +273,23 @@
     =/  goal  (got-goal:gols id)
     =+  [pin pool]=(put-goal:gols id goal(peons (~(put in peons.goal) peon)))
     :+  pin
-      [%goal-perms id %peon peon] 
+      [=id %goal-perms %peon peon] 
     store(pools (~(put by pools.store) pin pool))
   ==
 ::
 ++  apply-sequence
-  |=  [=pin:gol mod=ship yok=exposed-yoke:gol]
+  |=  [=pin:gol mod=ship seq=yoke-sequence:gol]
   ^-  away-cud:goal-store
-  !!
-  :: =/  pool  (~(got by pools.store) pin)
-  :: =/  out  (~(apply-sequence pl pool) mod [yok]~)
-  :: ?-    -.out
-  ::   %|  ~|(+.out !!)
-  ::     %&
-  ::   =/  pool  pool.p.out
-  ::   =/  nex  (~(get-nex pl pool) set.p.out)
-  ::   :+  pin
-  ::     [%pool-nexus %yoke-sequence yok nex]
-  ::   store
-  ::   :: store(pools (~(put by pools.store) pin pool.p.out))
-  :: ==
+  =/  pool  (~(got by pools.store) pin)
+  =/  out  (~(apply-sequence pr pin pool) mod seq)
+  ?-    -.out
+    %|  ~|(+.out !!)
+      %&
+    =/  nex  (~(get-nex pr pin pool) set.p.out)
+    :+  pin
+      [%pool-nexus %yoke-sequence nex]
+    store(pools (~(put by pools.store) pin pool.p.out))
+  ==
 ::
 ++  check-goal-perm
   |=  [mod=ship =goal-perm:gol =id:gol]
@@ -333,6 +331,16 @@
 ::
 ++  check
   |%
+  ++  new-pool
+    |=  [title=@t chefs=(set ship) peons=(set ship) viewers=(set ship) own=ship now=@da]
+    ^-  (each ~ term)
+    [%& ~]
+  ::
+  ++  copy-pool
+    |=  [=old=pin:gol title=@t chefs=(set ship) peons=(set ship) viewers=(set ship) own=ship now=@da]
+    ^-  (each ~ term)
+    [%& ~]
+  ::
   ++  new-goal
     |=  $:  =pin:gol
             desc=@t

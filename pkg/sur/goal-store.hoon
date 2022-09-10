@@ -30,7 +30,7 @@
       [%edit-pool-title =pin title=@t]
       [%delete-pool =pin]
       [%delete-goal =id]
-      [%yoke-sequence =pin =yoke-sequence]
+      [%yoke =pin yok=exposed-yoke]
       [%set-deadline =id deadline=(unit @da)]
       [%mark-actionable =id]
       [%unmark-actionable =id]
@@ -42,42 +42,54 @@
       [%subscribe owner=ship =pin]
   ==
 ::
-:: Each update is associated with a single pool
-:: (1) Adding new pool
-:: (2) Adding new goal to a pool 
-:: (3) Updating existing goal in a pool
-:: (4) Deleting goal in a pool
-:: (5) Deleting a pool
-:: Each update has a datetime at which it occurred
-:: Each update has a src ship which initiated the update
-:: [pin time src ]
-::
-+$  update
-  $%  [%pool-update =pool]
-      [%initial-pool-update =pool]
-      [%store-update =store]
-      [%initial =store]
-      [%new-goal =pin mod=ship =id =goal]
-      [%add-under =pin mod=ship pid=id cid=id =goal]
-      [%yoke-sequence =pin mod=ship =nex]
-      [%new-pool =pin =pool]
-      [%delete-pool =pin]
-      [%delete-goal =pin mod=ship =id]
-      [%error msg=@tas]
-     ::  [%edit-goal-desc [mod=ship =pin] =id desc=@t]
-     ::  [%edit-pool-title [mod=ship =pin] title=@t]
-     ::  [%set-deadline [mod=ship =pin] =id deadline=(unit @da)]
-     ::  [%mark-actionable [mod=ship =pin] =id]
-     ::  [%unmark-actionable [mod=ship =pin] =id]
-     ::  [%mark-complete [mod=ship =pin] =id]
-     ::  [%unmark-complete [mod=ship =pin] =id]
-     ::  [%make-chef [mod=ship =pin] chef=ship =id]
-     ::  [%make-peon [mod=ship =pin] peon=ship =id]
-     ::  [%failed =action err=@tas]
++$  pool-perms-update
+  $%  [?(%viewer %chef %peon) =ship]
   ==
 ::
++$  pool-hitch-update
+  $%  [%title title=@t]
+  ==
+::
++$  pool-nexus-update
+  $%  [%yoke yok=exposed-yoke nex=(map id goal-nexus)]
+  ==
+::
++$  goal-perms-update
+  $%  [?(%chef %peon) =ship]
+  ==
+::
++$  goal-hitch-update
+  $%  [%desc desc=@t]
+  ==
+::
++$  goal-nexus-update
+  $%  [%deadline moment=(unit @da)]
+  ==
+::
++$  goal-togls-update
+  $%  [%complete complete=?(%.y %.n)]
+      [%actionable actionable=?(%.y %.n)]
+  ==
+::
++$  away-update
+  $%  [%spawn-goal =nex =id =goal]
+      [%spawn-pool =pool]
+      [%trash-goal =id]
+      [%trash-pool ~]
+      [%pool-perms pool-perms-update]
+      [%pool-hitch pool-hitch-update]
+      [%pool-nexus pool-nexus-update]
+      [%goal-perms =id goal-perms-update]
+      [%goal-hitch =id goal-hitch-update]
+      [%goal-nexus =id goal-nexus-update]
+      [%goal-togls =id goal-togls-update]
+  ==
+::
++$  home-update  [[=pin mod=ship] away-update]
+::
 +$  peek
-  $%  [%pool-keys keys=(set pin)]
+  $%  [%initial =store]
+      [%pool-keys keys=(set pin)]
       [%all-goal-keys keys=(set id)]
       [%harvest harvest=(list id)]
       [%get-goal ugoal=(unit goal)]
@@ -95,5 +107,6 @@
       [%roots-uncompleted roots-uc=(list id)]
   ==
 ::
-+$  store-update  [=pin =update =store]
++$  away-cud  [=pin =away-update =store]
++$  home-cud  [=pin =home-update =store]
 --

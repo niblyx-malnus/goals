@@ -1,14 +1,14 @@
 /-  *goal-store
 /+  *gol-cli-json
-|_  act=action
+|_  upd=away-update
 ++  grow
   |%
-  ++  noun  act
+  ++  noun  upd
+  ++  json  !!
   --
 ++  grab
   |%
-  ++  noun  action
-  ++  json  !!  ::dejs-action
+  ++  noun  away-update
   --
 ++  grad  %noun
 --

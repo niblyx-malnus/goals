@@ -37,8 +37,11 @@
 ::
 ++  on-init
   ^-  (quip card _this)
-  :_  this(views (~(put by views) [%all ~] *view:vyu))
-  [%pass /goals %agent [our.bowl %goal-store] %watch /goals]~
+  :-  [%pass /goals %agent [our.bowl %goal-store] %watch /goals]~
+  %=  this
+    handles  *handles:vyu :: initial:hdls
+    views  (~(put by *views:vyu) [%all ~] *view:vyu) :: initial:vyuz
+  ==
 ::
 ++  on-save  !>(state)
 ::
@@ -107,7 +110,7 @@
   ?+    wire  (on-agent:def wire sign)
     :: poke-ack/nack on a view-command wire prompts a print
       [%view-command *]
-    =*  poke-self  ~(poke-self pass:io /)
+    =*  poke-self  ~(poke-self pass:io /print-context)
     :_  this
     [(poke-self view-action+!>(print+~))]~
     ::
@@ -120,54 +123,49 @@
       [%pass wire %agent [src.bowl %goal-store] %watch wire]~
         %fact
       ?+    p.cage.sign  (on-agent:def wire sign)
-          %goal-update
-        =*  poke-self  ~(poke-self pass:io /)
-        =/  update  !<(update:goal-store q.cage.sign)
+          %goal-home-update
+        =*  poke-self  ~(poke-self pass:io /print-context)
+        =+  ^-  [[=pin:gol mod=ship] update=away-update:goal-store]
+          !<(home-update:goal-store q.cage.sign)
         ?+    -.update
-          :: should print only when =(mod.update our.bowl)
+          :: ?.  =(mod our.bowl)  `this
           :_  this
           [(poke-self view-action+!>(print+~))]~
           ::
-            %error
-          :_  this
-          (print-cards:prtr ~[(trip msg.update)])
-          ::
-            ?(%initial %store-update)
-          :-  [(poke-self view-action+!>(print+~))]~
-          %=  this
-            handles  initial:hdls
-            views  initial:vyuz
-          ==
-          ::
-            %new-goal
+            %spawn-goal
           :-  [(poke-self view-action+!>(print+~))]~
           %=  this
             handles  (new-goal:hdls id.update)
             views  (new-goal:vyuz id.update)
           ==
           ::
-            %add-under
+            %spawn-pool
           :-  [(poke-self view-action+!>(print+~))]~
           %=  this
-            handles  (new-goal:hdls cid.update)
-            views  (new-goal:vyuz cid.update)
+            handles  (new-pool:hdls pin pool.update)
+            views  (new-pool:vyuz pin pool.update)
           ==
           ::
-            %new-pool
+            %trash-goal
           :-  [(poke-self view-action+!>(print+~))]~
           %=  this
-            handles  (new-pool:hdls pin.update pool.update)
-            views  (new-pool:vyuz pin.update pool.update)
+            handles  (delete-goal:hdls id.update)
+            context
+              ?:  =(context [%goal id.update])
+                [%all ~]
+              context
           ==
           ::
-            %delete-goal
+            %trash-pool
           :-  [(poke-self view-action+!>(print+~))]~
-          this(handles (delete-goal:hdls id.update))
-          ::
-            %delete-pool
-          :-  [(poke-self view-action+!>(print+~))]~
+          =/  new-handles  initial:hdls
           %=  this
-            handles  (delete-pool:hdls pin.update)
+            handles  new-handles
+            views  initial:vyuz
+            context
+              ?.  (~(has by gh.new-handles) context)
+                [%all ~]
+              context
           ==
         ==
       ==
@@ -403,5 +401,7 @@
   =+  [msg l]=(invalid-goal-error:prtr l.command)  ?.  =(~ msg)  msg
   =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
   ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
-  [(poke [owner.id.l %goal-store] goal-action+!>([%yoke-sequence (got-pin:scry id.l) [yoke-tag id.l id.r]~]))]~
+  =/  pin  (got-pin:scry id.l)
+  =/  yok  [yoke-tag id.l id.r]
+  [(poke [owner.id.l %goal-store] goal-action+!>([%yoke pin yok]))]~
 --

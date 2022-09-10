@@ -2,18 +2,18 @@
 |_  =bowl:gall
 ++  initial
   ^-  store
-  =/  upd=update
-    .^  update
+  =/  pyk=peek
+    .^  peek
       %gx
       :~  (scot %p our.bowl)
           %goal-store
           (scot %da now.bowl)
           %initial
-          %goal-update
+          %goal-peek
       ==
     ==
-  ?+  -.upd  !!
-    %initial  store.upd
+  ?+  -.pyk  !!
+    %initial  store.pyk
   ==
 ::
 ++  pool-keys
