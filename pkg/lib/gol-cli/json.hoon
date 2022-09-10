@@ -64,7 +64,7 @@
     (cold %prec-yoke (jest 'prec-yoke'))
     (cold %nest-rend (jest 'nest-rend'))
     (cold %nest-yoke (jest 'nest-yoke'))
-    (cold %held-rend-strict (jest 'held-rend-strict'))
+    (cold %held-rend (jest 'held-rend'))
     (cold %held-yoke (jest 'held-yoke'))
   ==
 ++  dejs-yoke-tag  (su:dejs:format parse-yoke-tag)
