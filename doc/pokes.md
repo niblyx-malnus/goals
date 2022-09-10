@@ -11,7 +11,7 @@ Available pokes for `%goal-store` as nouns and as JSON.
 %edit-pool-title                                                             
 %delete-pool                                                                 
 %delete-goal                                                                    
-%yoke-sequence                                                                  
+%yoke                                                                  
 %set-deadline                                                                   
 %mark-actionable                                                                
 %unmark-actionable                                                              
@@ -307,52 +307,28 @@ There are 8 kinds of "yokes":
 
 ### Noun
 ```
-[%yoke-sequence =pin =yoke-sequence]                                               
+[%yoke =pin yok=exposed-yoke]                                               
 ```
 
 ### JSON
 ```
 {
-  "yoke-sequence": {
+  "yoke": {
     "pin": {
       "owner": "zod",
       "birth": "~2000.1.1"
     },
-    "yoke-sequence": [
-      {
-        "yoke": "nest-yoke",
-        "lid": {
-          "owner": "zod",
-          "birth": "~2000.1.1"
-        },
-        "rid": {
-          "owner": "zod",
-          "birth": "~2000.1.1"
-        }
+    "yok": {
+      "yoke": "nest-yoke",
+      "lid": {
+        "owner": "zod",
+        "birth": "~2000.1.1"
       },
-      {
-        "yoke": "prec-yoke",
-        "lid": {
-          "owner": "zod",
-          "birth": "~2000.1.1"
-        },
-        "rid": {
-          "owner": "zod",
-          "birth": "~2000.1.1"
-        }
-      },
-      {
-        "yoke": "prio-rend",
-        "lid": {
-          "owner": "zod",
-          "birth": "~2000.1.1"
-        },
-        "rid": {
-          "owner": "zod",
-          "birth": "~2000.1.1"
-        }
+      "rid": {
+        "owner": "zod",
+        "birth": "~2000.1.1"
       }
-    ]
+    }
   }
 }
 ```
