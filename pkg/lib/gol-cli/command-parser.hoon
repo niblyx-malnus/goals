@@ -5,7 +5,7 @@
   ;~  pose
     parse-invite                              :: %invite
     parse-held-yoke                           
-    parse-held-rend-strict
+    parse-held-rend
     parse-nest-yoke                           
     parse-nest-rend
     parse-prec-yoke
@@ -44,9 +44,9 @@
     (cook crip parse-handle)
   ==
 ::
-++  parse-held-rend-strict
+++  parse-held-rend
   ;~  (glue ace)
-    (cold %held-rend-strict (jest '^mv'))
+    (cold %held-rend (jest '^mv'))
     (cook crip parse-handle)
     (cook crip parse-handle)
   ==

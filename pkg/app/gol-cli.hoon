@@ -201,10 +201,20 @@
     ~[(poke-self view-action+!>([%unhide-completed ~]))]
       ::
       %held-yoke
-    (yoke-command:hc command %held-yoke)
+    =*  poke  ~(poke pass:io [%command %move-goal ~])
+    =+  [msg l]=(invalid-goal-error:prtr l.command)  ?.  =(~ msg)  msg
+    =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
+    ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
+    =/  pin  (got-pin:scry id.l)
+    [(poke [owner.id.l %goal-store] goal-action+!>([%move-goal pin id.l (some id.r)]))]~
       ::
-      %held-rend-strict
-    (yoke-command:hc command %held-rend-strict)
+      %held-rend
+    =*  poke  ~(poke pass:io [%command %unmove-goal ~])
+    =+  [msg l]=(invalid-goal-error:prtr l.command)  ?.  =(~ msg)  msg
+    =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
+    ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
+    =/  pin  (got-pin:scry id.l)
+    [(poke [owner.id.l %goal-store] goal-action+!>([%move-goal pin id.l ~]))]~
       ::
       %nest-yoke
     (yoke-command:hc command %nest-yoke)
@@ -272,11 +282,12 @@
       (print-cards:prtr ~["ERROR: Cannot add goal outside of a pool."])
         %pool
       :~  %+  poke  [owner.pin.context %goal-store]
-          goal-action+!>([%new-goal pin.context desc.command ~ ~ ~ %.n])
+          goal-action+!>([%spawn-goal pin.context ~ desc.command %| ~ ~])
       ==
         %goal
+      =/  pin  (got-pin:scry id.context)
       :~  %+  poke  [owner.id.context %goal-store]
-          goal-action+!>([%add-under id.context desc.command ~ ~ ~ %.n])
+          goal-action+!>([%spawn-goal pin (some id.context) desc.command %| ~ ~])
       ==
     ==
       ::

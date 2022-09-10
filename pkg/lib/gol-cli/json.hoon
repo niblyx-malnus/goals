@@ -24,24 +24,14 @@
           viewers+dejs-set-ships
       ==
       ::
-      :-  %new-goal
+      :-  %spawn-goal
       %-  ot
       :~  pin+dejs-pin
+          upid+dejs-unit-id
           desc+so
+          actionable+bo
           chefs+dejs-set-ships
           peons+dejs-set-ships
-          deadline+dejs-unit-date
-          actionable+bo
-      ==
-      ::
-      :-  %add-under
-      %-  ot
-      :~  id+dejs-id
-          desc+so
-          chefs+dejs-set-ships
-          peons+dejs-set-ships
-          deadline+dejs-unit-date
-          actionable+bo
       ==
       [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
       [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
@@ -59,6 +49,7 @@
 ::
 ++  dejs-unit-date  |=(jon=json ?~(jon ~ (some (dejs-date jon))))
 ++  dejs-pin  (pe:dejs:format %pin dejs-id)
+++  dejs-unit-id  |=(jon=json ?~(jon ~ (some (dejs-id jon))))
 ++  dejs-id  (ot:dejs:format ~[owner+dejs-ship birth+dejs-date])
 ++  dejs-set-ships  (as:dejs:format dejs-ship)
 ++  dejs-ship  (su:dejs:format fed:ag)

@@ -10,27 +10,19 @@
         peons=(set ship)
         viewers=(set ship)
       ==
-      $:  %new-goal  
+      $:  %spawn-goal
         =pin
+        upid=(unit id)
         desc=@t
-        chefs=(set ship)
-        peons=(set ship)
-        deadline=(unit @da)
         actionable=?
-      ==
-      $:  %add-under
-        =id
-        desc=@t
-        chefs=(set ship)
-        peons=(set ship)
-        deadline=(unit @da)
-        actionable=?
+        =goal-perms
       ==
       [%edit-goal-desc =id desc=@t]
       [%edit-pool-title =pin title=@t]
       [%delete-pool =pin]
       [%delete-goal =id]
       [%yoke =pin yok=exposed-yoke]
+      [%move-goal =pin cid=id upid=(unit id)]
       [%set-deadline =id deadline=(unit @da)]
       [%mark-actionable =id]
       [%unmark-actionable =id]
@@ -51,7 +43,7 @@
   ==
 ::
 +$  pool-nexus-update
-  $%  [%yoke yok=exposed-yoke nex=(map id goal-nexus)]
+  $%  [%yoke nex=(map id goal-nexus)]
   ==
 ::
 +$  goal-perms-update

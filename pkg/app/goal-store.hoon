@@ -92,36 +92,18 @@
           [%give %kick ~[/[`@`+<.pin.action]/[`@`+>.pin.action]] ~]~
         (delete-pool:gs pin.action our.bowl)
           ::
-          :: [%new-goal =pin desc=@t chefs=(set ship) peons=(set ship) deadline=(unit @da) actionable=?]
-          %new-goal
+          :: [%spawn-goal =pin upid=(unit id) desc=@t actionable=? =goal-perms]
+          %spawn-goal
         ?>  =(our.bowl owner.pin.action)
         %+  convert-away-cud:hc 
           ~
-        %:  new-goal:gs
-          pin.action
+        %:  spawn-goal:gs
+          [pin.action src.bowl]
+          [our now]:bowl
+          upid.action
           desc.action
-          chefs.action
-          peons.action
-          deadline.action
           actionable.action
-          src.bowl
-          now.bowl
-        ==
-          ::
-          :: [%add-under =id desc=@t chefs=(set ship) peons=(set ship) deadline=(unit @da) actionable=?]
-          %add-under
-        ?>  =(our.bowl owner.id.action)
-        %+  convert-away-cud:hc 
-          ~
-        %:  add-under:gs
-          id.action
-          desc.action
-          chefs.action
-          peons.action
-          deadline.action
-          actionable.action
-          src.bowl
-          now.bowl
+          goal-perms.action
         ==
           ::
           :: [%delete-goal =id]
@@ -158,7 +140,25 @@
             |=(=id:gol [id nexus:`ngoal:gol`(~(got by goals.pool.p.out) id)])
           %+  convert-away-cud:hc  ~
           :+  pin.action
-            [%pool-nexus %yoke yok.action nex]
+            [%pool-nexus %yoke nex]
+          store(pools (~(put by pools.store) pin.action pool.p.out))
+        ==
+          ::
+          :: [%move-goal =pin cid=id upid=(init id)]
+          %move-goal
+        ?>  =(our.bowl owner.pin.action)
+        =/  pool  (~(got by pools.store) pin.action)
+        =/  out  (~(move-goal pl pool) cid.action upid.action src.bowl)
+        ?-    -.out
+          %|  ~|(+.out !!)
+            %&
+          =/  nex
+            %-  ~(gas by *(map id:gol goal-nexus:gol))
+            %+  turn  ~(tap in set.p.out)
+            |=(=id:gol [id nexus:`ngoal:gol`(~(got by goals.pool.p.out) id)])
+          %+  convert-away-cud:hc  ~
+          :+  pin.action
+            [%pool-nexus %yoke nex]
           store(pools (~(put by pools.store) pin.action pool.p.out))
         ==
           ::

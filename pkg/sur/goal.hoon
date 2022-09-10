@@ -319,9 +319,7 @@
 +$  yoke  $-([id id] pools)
 ::
 +$  core-yoke
-  $%  [%own-yoke lid=id rid=id]
-      [%own-rend lid=id rid=id]
-      [%dag-yoke e1=eid e2=eid]
+  $%  [%dag-yoke e1=eid e2=eid]
       [%dag-rend e1=eid e2=eid]
   ==
 ::
@@ -332,8 +330,9 @@
       %prec-yoke
       %nest-rend
       %nest-yoke
-      %held-rend-strict
+      %held-rend
       %held-yoke
+      %move-goal
   ==
 ::
 +$  yoke-tag  (union-from-list yoke-tags)
