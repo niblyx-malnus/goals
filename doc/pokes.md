@@ -288,9 +288,9 @@ Delete a goal.
 }
 ```
 
-## %yoke-sequence
+## %yoke
 ### Description
-Apply a sequence of graph transformations on the DAG data structure (if all are successful; if any fail, none go through).
+Apply a graph transformation on the DAG data structure.
 
 There are 8 kinds of "yokes":
 
