@@ -4,7 +4,6 @@
 ++  grow
   |%
   ++  noun  upd
-  ++  json  !!
   --
 ++  grab
   |%
