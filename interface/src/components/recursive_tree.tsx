@@ -186,7 +186,7 @@ const RecursiveTree = ({ goalList, pin, onSelectCallback }: any) => {
             onSelectCallback(id);
           }}
           isSelected={currentGoal.selected}
-          label={currentGoal.desc}
+          label={currentGoal.hitch.desc}
           goal={currentGoal}
           pin={pin}
         >

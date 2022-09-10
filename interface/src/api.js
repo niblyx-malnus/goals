@@ -10,7 +10,10 @@ const api = {
     //ropnys-batwyd-nossyt-mapwet => nec
     //lidlut-tabwed-pillex-ridrup => zod
     const urb = isDev()
-      ? new Urbit(process.env.REACT_APP_SHIP_URL, process.env.REACT_APP_SHIP_CODE)
+      ? new Urbit(
+          process.env.REACT_APP_SHIP_URL,
+          process.env.REACT_APP_SHIP_CODE
+        )
       : new Urbit("");
     urb.ship = isDev() ? process.env.REACT_APP_SHIP_NAME : window.ship;
     // Just log errors if we get any
@@ -47,7 +50,7 @@ const api = {
         title: newTitle,
       },
     };
-    
+
     return api
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: poolToEdit });

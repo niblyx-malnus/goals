@@ -87,7 +87,6 @@ export default function IconMenu({
   const markComplete = async () => {
     handleClose();
     setParentTrying(true);
-
     try {
       const result = await api.markComplete(id);
       log("markComplete result => ", result);

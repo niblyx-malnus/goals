@@ -24,12 +24,13 @@ import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Divider from "@mui/material/Divider";
-
+//TODO: add loader for initial loading phase
 function App() {
   const fetchedPools = useStore((store) => store.pools);
   const setFetchedPools = useStore((store) => store.setPools);
   const [channel, setChannel] = useState<null | number>(null);
   const [pools, setPools] = useState([]);
+  console.log("pools", pools);
   const onSelect = (id: number) => {
     // You can put whatever here
     console.log("you clicked: " + id);
@@ -56,10 +57,10 @@ function App() {
   useEffect(() => {
     //convert flat goals into nested goals for each pool
     const newProjects = fetchedPools.map((pool: any, id: any) => {
-      const newNestedGoals = createDataTree(pool.pool.goals);
+      const newNestedGoals = createDataTree(pool.pool.nexus.goals);
       return {
         ...pool,
-        pool: { ...pool.pool, goals: newNestedGoals },
+        pool: { ...pool.pool, nexus: { goals: newNestedGoals } },
       };
     });
     setPools(newProjects);
@@ -103,7 +104,7 @@ function App() {
       try {
         const channelValue = await api.createApi().subscribe({
           app: "goal-store",
-          path: "/updates",
+          path: "/goals",
           event: updateHandler,
           //TODO: handle sub death/kick/err
           err: () => console.log("Subscription rejected"),
@@ -124,7 +125,7 @@ function App() {
 
     const dataTree: any = [];
     dataset.forEach((aData: any) => {
-      const parentID = aData.goal.par?.birth;
+      const parentID = aData.goal.nexus?.par?.birth;
       const ID = aData.id.birth;
       if (parentID) {
         hashTable[parentID].childNodes.push(hashTable[ID]);
@@ -141,9 +142,9 @@ function App() {
     <Container>
       <Header />
       {pools.map((pool: any, index: any) => {
-        const poolTitle = pool.pool.title;
+        const poolTitle = pool.pool.hitch.title;
         const poolId = pool.pin.birth;
-        const goalList = pool.pool.goals;
+        const goalList = pool.pool.nexus.goals;
 
         return (
           <Project
