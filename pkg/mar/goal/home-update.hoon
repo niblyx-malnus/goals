@@ -4,7 +4,7 @@
 ++  grow
   |%
   ++  noun  upd
-  ++  json  !!
+  ++  json  enjs-home-update
   --
 ++  grab
   |%
