@@ -81,7 +81,7 @@ const TreeItem = memo(
           ) : (
             <IconMenu
               type="goal"
-              complete={goal.complete}
+              complete={goal.togls.complete}
               id={idObject}
               pin={pin}
               setParentTrying={setTrying}
@@ -110,7 +110,7 @@ const TreeItem = memo(
               style={{
                 marginLeft: children && children.length === 0 ? "24px" : "",
                 background: `${selected ? "#d5d5d5" : ""}`,
-                textDecoration: goal.complete ? "line-through" : "auto",
+                textDecoration: goal.togls.complete ? "line-through" : "auto",
               }}
             >
               {label}
@@ -148,7 +148,8 @@ const TreeItem = memo(
         </StyledTreeItem>
         {addingGoal && (
           <NewGoalInput
-            id={idObject}
+            pin={pin}
+            parentId={idObject}
             under={true}
             callback={() => setAddingGoal(false)}
           />
@@ -175,7 +176,7 @@ const RecursiveTree = ({ goalList, pin, onSelectCallback }: any) => {
     const currentGoalId = goal.id.birth;
     const childGoals = goal.childNodes;
     //filter out complete if store says so
-    if (currentGoal.complete && filterGoals === "complete") return null;
+    if (currentGoal.togls.complete && filterGoals === "complete") return null;
     return (
       childGoals && (
         <TreeItem

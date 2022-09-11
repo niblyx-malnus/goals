@@ -5,16 +5,18 @@ import InputBase from "@mui/material/InputBase";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
+import { GoalId, PinId } from "../types/types";
 //TODO: padding left  34 for add goal 44 for add under(me thinks), maybe a better way to do this
-//TODO: handle empty input
 
 function NewGoalInput({
   callback,
-  id,
+  parentId,
+  pin,
   under = false,
 }: {
   callback: Function;
-  id: { owner: string; birth: string };
+  parentId?: GoalId;
+  pin: PinId;
   under: boolean;
 }) {
   const [value, setValue] = useState<string>("");
@@ -40,10 +42,7 @@ function NewGoalInput({
     setTrying(true);
 
     try {
-      //we switch between addGoal(add goal to pool) and addGoalUnderGoal (add goal under another goal)
-      const result = under
-        ? await api.addGoalUnderGoal(value, id)
-        : await api.addGoal(value, id);
+      const result = await api.addGoal(value, pin, parentId);
       log("result", result);
     } catch (e) {}
     callback();

@@ -25,6 +25,12 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Divider from "@mui/material/Divider";
 //TODO: add loader for initial loading phase
+//TODO: disable the actions until subscription is setup/have any pools
+//TODO: display a "to get started add a pool"
+//TODO: add sharing projects, add pals integration, add @p validation, display currently added @p
+//TODO: once you are using add input, hide the add button
+//TODO: UI cleanup
+//TODO: add filter incomplete goals
 function App() {
   const fetchedPools = useStore((store) => store.pools);
   const setFetchedPools = useStore((store) => store.setPools);
@@ -76,22 +82,22 @@ function App() {
     }
   };
   const updateHandler = (update: any) => {
-    const actionName: any = Object.keys(update)[0];
+    log("update", update);
+    const actionName: any = Object.keys(update)[1];
+    log("actionName", actionName);
     if (actionName) {
       switch (actionName) {
-        case "new-goal": {
-          const { goal, id, pin }: any = update[actionName];
-          newGoalAction(id, pin, goal);
+        case "spawn-goal": {
+          const { goal, id , nex}: any = update[actionName];
+          const hed: any = update.hed;
+          newGoalAction(id, hed.pin, goal, nex);
           break;
         }
-        case "add-under": {
-          const { goal, cid, pid, pin }: any = update[actionName];
-          newGoalAction(cid, pin, goal);
-          break;
-        }
-        case "new-pool": {
+        case "spawn-pool": {
           let { pool, pin }: any = update[actionName];
-          newPoolAction({ pool, pin });
+          const hed: any = update.hed;
+
+          newPoolAction({ pool, pin: hed.pin });
           break;
         }
       }
@@ -264,7 +270,7 @@ function Project({
       </StyledTreeItem>
       {addingGoal && (
         <NewGoalInput
-          id={pin}
+          pin={pin}
           under={false}
           callback={() => setAddingGoal(false)}
         />
@@ -338,7 +344,7 @@ function Header() {
       <Stack flexDirection="row" alignItems="center">
         <OutlinedInput
           id="add-new-pool"
-          placeholder="Add Project"
+          placeholder="Add Pool"
           value={newProjectTitle}
           onChange={handleChange}
           size={"small"}

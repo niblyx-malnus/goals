@@ -1,6 +1,6 @@
 import memoize from "lodash/memoize";
 import Urbit from "@urbit/http-api";
-import { isDev } from "./helpers";
+import { isDev, log } from "./helpers";
 const api = {
   createApi: memoize(() => {
     /*
@@ -65,15 +65,12 @@ const api = {
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: poolToDelete });
   },
-  addGoal: async (desc, pin) => {
-    //adds a goal directly under a pool
-    const { owner, birth } = pin;
+  addGoal: async (desc, pin, parentId) => {
+    //parent id => add under
     const newGoal = {
-      "new-goal": {
-        pin: {
-          owner,
-          birth,
-        },
+      "spawn-goal": {
+        pin,
+        upid: parentId ? parentId : null,
         desc,
         chefs: [],
         peons: [],
@@ -107,26 +104,7 @@ const api = {
       .poke({ app: "goal-store", mark: "goal-action", json: goalToEdit });
   },
 
-  addGoalUnderGoal: async (desc, id) => {
-    //adds a goal under another goal
-    const { owner, birth } = id;
-    const newNestedGoal = {
-      "add-under": {
-        id: {
-          owner,
-          birth,
-        },
-        desc,
-        chefs: [],
-        peons: [],
-        deadline: null,
-        actionable: false,
-      },
-    };
-    return api
-      .createApi()
-      .poke({ app: "goal-store", mark: "goal-action", json: newNestedGoal });
-  },
+
   markComplete: async (id) => {
     const goalToMark = {
       "mark-complete": {

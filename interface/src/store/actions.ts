@@ -19,16 +19,17 @@ function updatePoolTitleAction(toUpdatePin: PinId, newTitle: string) {
   const state = useStore.getState();
   const pools = state.pools;
   const setPools = state.setPools;
-  console.log("newTitle", newTitle);
   //go through our pools updating the title of the one matching the pin passed
   const newPools = pools.map((poolItem: any, index: number) => {
     const { pin, pool } = poolItem;
     if (pin.birth === toUpdatePin.birth) {
-      return { ...poolItem, pool: { ...pool, title: newTitle } };
+      return {
+        ...poolItem,
+        pool: { ...pool, hitch: { ...pool.hitch, title: newTitle } },
+      };
     }
     return poolItem;
   });
-  console.log("newPools", newPools);
   setPools(newPools);
 }
 function deleteGoalAction(toDeleteId: GoalId, pinId: PinId) {
@@ -39,12 +40,18 @@ function deleteGoalAction(toDeleteId: GoalId, pinId: PinId) {
   const newPools = pools.map((poolItem: any, poolIndex: number) => {
     const { pin } = poolItem;
     if (pin.birth === pinId.birth) {
-      const newGoals = poolItem.pool.goals.filter(
+      const newGoals = poolItem.pool.nexus.goals.filter(
         (goalItem: any, goalIndex: any) => {
           return goalItem.id.birth !== toDeleteId.birth;
         }
       );
-      return { ...poolItem, pool: { ...poolItem.pool, goals: newGoals } };
+      return {
+        ...poolItem,
+        pool: {
+          ...poolItem.pool,
+          nexus: { ...poolItem.pool.nexus, goals: newGoals },
+        },
+      };
     }
     return poolItem;
   });
@@ -63,13 +70,16 @@ function updateGoalDescAction(
   const newPools = pools.map((poolItem: any, poolIndex: number) => {
     const { pin } = poolItem;
     if (pin.birth === pinId.birth) {
-      const newGoals = poolItem.pool.goals.map(
+      const newGoals = poolItem.pool.nexus.goals.map(
         (goalItem: any, goalIndex: any) => {
           if (goalItem.id.birth === toUpdateId.birth) {
             return {
               goal: {
                 ...goalItem.goal,
-                desc: newDesc,
+                hitch: {
+                  ...goalItem.goal.hitch,
+                  desc: newDesc,
+                },
               },
               id: goalItem.id,
             };
@@ -77,7 +87,13 @@ function updateGoalDescAction(
           return goalItem;
         }
       );
-      return { ...poolItem, pool: { ...poolItem.pool, goals: newGoals } };
+      return {
+        ...poolItem,
+        pool: {
+          ...poolItem.pool,
+          nexus: { ...poolItem.pool.nexus, goals: newGoals },
+        },
+      };
     }
     return poolItem;
   });
@@ -92,13 +108,16 @@ function toggleCompleteAction(toMarkId: GoalId, pinId: PinId, status: boolean) {
   const newPools = pools.map((poolItem: any, poolIndex: number) => {
     const { pin } = poolItem;
     if (pin.birth === pinId.birth) {
-      const newGoals = poolItem.pool.goals.map(
+      const newGoals = poolItem.pool.nexus.goals.map(
         (goalItem: any, goalIndex: any) => {
           if (goalItem.id.birth === toMarkId.birth) {
             return {
               goal: {
                 ...goalItem.goal,
-                complete: status,
+                togls: {
+                  ...goalItem.goal.togls,
+                  complete: status,
+                },
               },
               id: goalItem.id,
             };
@@ -106,25 +125,58 @@ function toggleCompleteAction(toMarkId: GoalId, pinId: PinId, status: boolean) {
           return goalItem;
         }
       );
-      return { ...poolItem, pool: { ...poolItem.pool, goals: newGoals } };
+      return {
+        ...poolItem,
+        pool: {
+          ...poolItem.pool,
+          nexus: { ...poolItem.pool.nexus, goals: newGoals },
+        },
+      };
     }
     return poolItem;
   });
 
   setPools(newPools);
 }
-function newGoalAction(newGoalId: GoalId, pinId: PinId, newGoal: any) {
+//called form subscription events
+function newGoalAction(
+  newGoalId: GoalId,
+  pinId: PinId,
+  newGoal: any,
+  nexus: any = null
+) {
   const state = useStore.getState();
   const pools = state.pools;
   const setPools = state.setPools;
   //select project using pinId and then add the goal to the goal list
+  //if nexus(add-under(nesting)) is provided, we find the goal provided in the nexus and update it with the new data
+
   const newPools = pools.map((poolItem: any, poolIndex: number) => {
     const { pin } = poolItem;
     if (pin.birth === pinId.birth) {
-      const newGoals = poolItem.pool.goals;
+      const newGoals = poolItem.pool.nexus.goals.map((goalItem: any) => {
+        if (nexus?.length > 0 && nexus[0].id.birth === goalItem.id.birth) {
+          return {
+            ...goalItem,
+            goal: {
+              ...goalItem.goal,
+              ...nexus.goal,
+            },
+          };
+        }
+        return goalItem;
+      });
       newGoals.push({ goal: newGoal, id: newGoalId });
-      return { ...poolItem, pool: { ...poolItem.pool, goals: newGoals } };
+
+      return {
+        ...poolItem,
+        pool: {
+          ...poolItem.pool,
+          nexus: { ...poolItem.pool.nexus, goals: newGoals },
+        },
+      };
     }
+
     return poolItem;
   });
   setPools(newPools);
