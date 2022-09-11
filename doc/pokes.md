@@ -99,23 +99,6 @@ $:  %copy-pool
 }
 ```
 
-### JSON
-```
-{
-  "new-goal": {
-    "pin": {
-      "owner": "zod",
-      "birth": "~2000.1.1"
-    },
-    "desc": "description of new goal",
-    "chefs": ["zod", "nec", "bud"],
-    "peons": ["zod", "nec", "bud"],
-    "deadline": (null or "~2000.1.1")
-    "actionable": true
-  }
-}
-```
-
 ## %spawn-goal
 ### Description
 Create a goal under/owned-by/contained-by an existing goal.
