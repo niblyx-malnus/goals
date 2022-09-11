@@ -25,6 +25,11 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Divider from "@mui/material/Divider";
 import { ShareDialog } from "./components";
+declare const window: Window &
+   typeof globalThis & {
+     scry: any;
+     poke:any;
+   }
 
 //TODO: add loader for initial loading phase
 //TODO: disable the actions until subscription is setup/have any pools
@@ -146,6 +151,9 @@ function App() {
   useEffect(() => {
     getGoals();
     subToUpdates();
+    window['scry'] = api.scry;
+    window['poke'] = api.poke;
+
   }, []);
 
   return (

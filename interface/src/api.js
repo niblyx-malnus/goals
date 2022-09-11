@@ -1,6 +1,7 @@
 import memoize from "lodash/memoize";
 import Urbit from "@urbit/http-api";
 import { isDev, log } from "./helpers";
+
 const api = {
   createApi: memoize(() => {
     /*
@@ -22,10 +23,33 @@ const api = {
     urb.onRetry = () => console.log("urbit onRetry");
     //not sure this is needed in release build
     urb.connect();
-
+   
     return urb;
   }),
-
+  scry: async (app = "cell", path = "/pull") => {
+    try {
+      const response = await api.createApi().scry({ app, path });
+      console.log("scry response: ", response);
+    } catch (e) {
+      console.log("scry error: ", e);
+    }
+  },
+  poke: async (
+    app = "cell",
+    mark = "sheet",
+    json = JSON.stringify([["test"]])
+  ) => {
+    try {
+      const response = await api.createApi().poke({
+        app,
+        mark,
+        json,
+      });
+      console.log("poke response: ", response);
+    } catch (e) {
+      console.log("poke error: ", e);
+    }
+  },
   getData: async () => {
     //gets our main data we display (pools/goals)
     return api.createApi().scry({ app: "goal-store", path: "/initial" });
@@ -103,7 +127,6 @@ const api = {
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: goalToEdit });
   },
-
 
   markComplete: async (id) => {
     const goalToMark = {
