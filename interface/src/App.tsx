@@ -24,6 +24,8 @@ import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Divider from "@mui/material/Divider";
+import { ShareDialog } from "./components";
+
 //TODO: add loader for initial loading phase
 //TODO: disable the actions until subscription is setup/have any pools
 //TODO: display a "to get started add a pool"
@@ -31,6 +33,8 @@ import Divider from "@mui/material/Divider";
 //TODO: once you are using add input, hide the add button
 //TODO: UI cleanup
 //TODO: add filter incomplete goals
+//TODO: add delete confirmation model
+//TODO: handle error messages
 function App() {
   const fetchedPools = useStore((store) => store.pools);
   const setFetchedPools = useStore((store) => store.setPools);
@@ -88,7 +92,7 @@ function App() {
     if (actionName) {
       switch (actionName) {
         case "spawn-goal": {
-          const { goal, id , nex}: any = update[actionName];
+          const { goal, id, nex }: any = update[actionName];
           const hed: any = update.hed;
           newGoalAction(id, hed.pin, goal, nex);
           break;
@@ -146,6 +150,12 @@ function App() {
 
   return (
     <Container>
+      <ShareDialog
+        open={false}
+        onClose={() => log("cancel")}
+        onConfirm={() => log("confirm")}
+        pals={[]}
+      />
       <Header />
       {pools.map((pool: any, index: any) => {
         const poolTitle = pool.pool.hitch.title;

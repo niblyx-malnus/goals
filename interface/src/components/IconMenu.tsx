@@ -9,6 +9,8 @@ import IconButton from "@mui/material/IconButton";
 import CheckIcon from "@mui/icons-material/Check";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ClearIcon from "@mui/icons-material/Clear";
+import LogoutIcon from "@mui/icons-material/Logout";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import Box from "@mui/material/Box";
 import { GoalId, PinId } from "../types/types";
 import { log } from "../helpers";
@@ -184,7 +186,7 @@ export default function IconMenu({
         open={open}
         onClose={handleClose}
       >
-        {type === "goal" && (
+        {type === "goal" ? (
           <div>
             {complete ? (
               <MenuItem onClick={unmarkComplete} disableRipple>
@@ -197,6 +199,17 @@ export default function IconMenu({
                 complete
               </MenuItem>
             )}
+          </div>
+        ) : (
+          <div>
+            <MenuItem onClick={() => log("ho ho ho ")} disableRipple>
+              <PeopleAltIcon fontSize="small" />
+              manage participants
+            </MenuItem>
+            <MenuItem onClick={() => log("ho ho ho ")} disableRipple>
+              <LogoutIcon fontSize="small" />
+              leave project
+            </MenuItem>
           </div>
         )}
         <MenuItem
