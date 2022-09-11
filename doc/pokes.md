@@ -4,9 +4,8 @@ Available pokes for `%goal-store` as nouns and as JSON.
 ### Poke List
 ```
 %new-pool
-%copy-pool
-%new-goal                                                                       
-%add-under                                                                      
+%copy-pool                                                                     
+%spawn-goal                                                                     
 %edit-goal-desc                                                                 
 %edit-pool-title                                                             
 %delete-pool                                                                 
@@ -100,34 +99,6 @@ $:  %copy-pool
 }
 ```
 
-## %new-goal  
-### Description
-Create a new root goal in a given pool.
-
-`pin` is the "pin" or pool id of the pool you want to add a goal to.
-
-`desc` is the description of the new goal.
-
-`chefs` are essentially admins; they have full permissions to add/edit/delete this goal, or any of its descendents.
-
-`peons` can mark (and unmark) this goal and any of its descendents complete. This is the only kind of permissions they have.
-
-`deadline` is an optional datetime marking the deadline for the goal.
-
-`actionable` denotes whether a goal is allowed to contain further goals or not. An actionable goal cannot contain subgoals.
-
-### Noun
-```
-$:  %new-goal                                                                   
-  =pin                                                                             
-  desc=@t                                                                       
-  chefs=(set ship)                                                                 
-  peons=(set ship)                                                              
-  deadline=(unit @da)                                                           
-  actionable=?                                                                  
-==                                                                                 
-```
-
 ### JSON
 ```
 {
@@ -145,47 +116,47 @@ $:  %new-goal
 }
 ```
 
-## %add-under
+## %spawn-goal
 ### Description
 Create a goal under/owned-by/contained-by an existing goal.
 
-`id` is the goal id of the goal you want to add a goal under.
+`pin` is the pool id.
+
+`upid` is a unit of the parent id (can be null).
 
 `desc` is the description of the new goal.
+
+`actionable` denotes whether a goal is allowed to contain further goals or not. An actionable goal cannot contain subgoals.
 
 `chefs` are essentially admins; they have full permissions to add/edit/delete this goal, or any of its descendents.
 
 `peons` can mark (and unmark) this goal and any of its descendents complete. This is the only kind of permissions they have.
 
-`deadline` is an optional datetime marking the deadline for the goal.
-
-`actionable` denotes whether a goal is allowed to contain further goals or not. An actionable goal cannot contain subgoals.
-
 ### Noun
 ```
-$:  %add-under                                                                  
-  =id                                                                           
-  desc=@t                                                                       
+$:  %spawn-goal                                                                  
+  =pin                                                                           
+  upid=(unit id)    
+  desc=@t
+  actionable=?
   chefs=(set ship)                                                              
-  peons=(set ship)                                                              
-  deadline=(unit @da)                                                           
-  actionable=?                                                                  
+  peons=(set ship)                           
 ==                                                                              
 ```
 
 ### JSON
 ```
 {
-  "add-under": {
-    "id": {
+  "spawn-goal": {
+    "pin": {
       "owner": "zod",
       "birth": "~2000.1.1"
     },
+    "upid": (null or "id": { "owner": "zod", "birth": "~2000.1.1" },
     "desc": "description of new goal",
+    "actionable": true,
     "chefs": ["zod", "nec", "bud"],
-    "peons": ["zod", "nec", "bud"],
-    "deadline": (null or "~2000.1.1")
-    "actionable": true
+    "peons": ["zod", "nec", "bud"]
   }
 }
 ```
