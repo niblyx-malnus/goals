@@ -20,6 +20,7 @@ import {
   deleteGoalAction,
   toggleCompleteAction,
 } from "../store/actions";
+import useStore from "../store";
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -80,6 +81,8 @@ export default function IconMenu({
 }) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const toggleShareDialog = useStore((store: any) => store.toggleShareDialog);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -202,7 +205,13 @@ export default function IconMenu({
           </div>
         ) : (
           <div>
-            <MenuItem onClick={() => log("ho ho ho ")} disableRipple>
+            <MenuItem
+              onClick={() => {
+                handleClose()
+                toggleShareDialog(true);
+              }}
+              disableRipple
+            >
               <PeopleAltIcon fontSize="small" />
               manage participants
             </MenuItem>

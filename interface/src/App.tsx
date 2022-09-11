@@ -26,10 +26,10 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Divider from "@mui/material/Divider";
 import { ShareDialog } from "./components";
 declare const window: Window &
-   typeof globalThis & {
-     scry: any;
-     poke:any;
-   }
+  typeof globalThis & {
+    scry: any;
+    poke: any;
+  };
 
 //TODO: add loader for initial loading phase
 //TODO: disable the actions until subscription is setup/have any pools
@@ -40,6 +40,7 @@ declare const window: Window &
 //TODO: add filter incomplete goals
 //TODO: add delete confirmation model
 //TODO: handle error messages
+//TODO: hanlde share dialog data (pool name, current viewers/admins/caps....)
 function App() {
   const fetchedPools = useStore((store) => store.pools);
   const setFetchedPools = useStore((store) => store.setPools);
@@ -151,19 +152,12 @@ function App() {
   useEffect(() => {
     getGoals();
     subToUpdates();
-    window['scry'] = api.scry;
-    window['poke'] = api.poke;
-
+    window["scry"] = api.scry;
+    window["poke"] = api.poke;
   }, []);
 
   return (
     <Container>
-      <ShareDialog
-        open={false}
-        onClose={() => log("cancel")}
-        onConfirm={() => log("confirm")}
-        pals={[]}
-      />
       <Header />
       {pools.map((pool: any, index: any) => {
         const poolTitle = pool.pool.hitch.title;
@@ -315,6 +309,7 @@ function Header() {
   const setCollapseAll = useStore((store) => store.setCollapseAll);
   const collapseAll = useStore((store) => store.collapseAll);
 
+
   const [filterCompleteChecked, setFilterCompleteChecked] =
     useState<boolean>(false);
   const handleFilterCompleteChange = (
@@ -359,6 +354,9 @@ function Header() {
       }}
       zIndex={1}
     >
+      <ShareDialog
+        pals={[]}
+      />
       <Stack flexDirection="row" alignItems="center">
         <OutlinedInput
           id="add-new-pool"

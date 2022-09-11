@@ -15,28 +15,27 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import AddIcon from "@mui/icons-material/Add";
+
 import Select, { SelectChangeEvent } from "@mui/material/Select";
+import { chipClasses } from "@mui/material";
+import useStore from "../store";
 interface ChipData {
   key: number;
   label: string;
 }
 const ob = require("urbit-ob");
-export default function ShareDialog({
-  open,
-  onConfirm,
-  onClose,
-  pals,
-}: {
-  open: boolean;
-  onConfirm: Function;
-  onClose: Function;
-  pals: any;
-}) {
+export default function ShareDialog({ pals }: { pals: any }) {
   const [inputValue, setInputValue] = useState<string>("~");
-  const [role, setRole] = useState("Viewers");
-
+  const [role, setRole] = useState("Viewer");
+  const open = useStore((store: any) => store.shareDialogOpen);
+  const toggleShareDialog = useStore((store: any) => store.toggleShareDialog);
+  const onConfirm = () => null;
+  const onClose = () => {
+    toggleShareDialog(false);
+  };
   const handleRoleChange = (event: SelectChangeEvent) => {
-    console.log("event.target.value", event.target.value);
     setRole(event.target.value as string);
   };
   const [pathError, setPathError] = useState<boolean>(false);
@@ -45,34 +44,52 @@ export default function ShareDialog({
   const [viewerList, setViewerList] = useState<ChipData[]>([]);
   const [captainList, setCaptainList] = useState<ChipData[]>([]);
   const [adminList, setAdminList] = useState<ChipData[]>([]);
-  const handleDelete = (chipToDelete: ChipData) => {
-    setChipData((chips) =>
+  const handleDeleteViewer = (chipToDelete: ChipData) => {
+    setViewerList((chips) =>
       chips.filter((chip) => chip.key !== chipToDelete.key)
     );
   };
-  const handleTagsUpdate = () => {
-    //transform chipData (key/label array) into tags (array of strings)
-    const newTags = chipData.map((item) => item.label);
-
-    onConfirm(newTags);
+  const handleDeleteCaptain = (chipToDelete: ChipData) => {
+    setCaptainList((chips) =>
+      chips.filter((chip) => chip.key !== chipToDelete.key)
+    );
   };
+  const handleDeleteAdmin = (chipToDelete: ChipData) => {
+    setAdminList((chips) =>
+      chips.filter((chip) => chip.key !== chipToDelete.key)
+    );
+  };
+
   const handleAdd = () => {
+    //make sure the entered p is for real for real
+    try {
+      validateShipName();
+    } catch (e) {
+      log("e", e);
+      return;
+    }
     //we remove white space around the text
     const label = inputValue.trim();
     //if no text, we abort
     if (label.length === 0) return;
-    const newChipData = [
-      ...chipData,
-      { key: chipData.length + 1, label, role },
-    ];
-    log("newChipData", newChipData);
+
     if (role === "Viewer") {
+      const newChipData = [
+        ...viewerList,
+        { key: viewerList.length + 1, label },
+      ];
+      setViewerList(newChipData);
     } else if (role === "Captain") {
+      const newChipData = [
+        ...captainList,
+        { key: captainList.length + 1, label },
+      ];
+      setCaptainList(newChipData);
     } else {
+      const newChipData = [...adminList, { key: adminList.length + 1, label }];
+      setAdminList(newChipData);
     }
-    setChipData(newChipData);
-    setInputValue("");
-    setRole("Viewer");
+    setInputValue("~");
   };
   const keyHandler = (event: any) => {
     if (event.keyCode === 13) {
@@ -82,30 +99,38 @@ export default function ShareDialog({
   const handleClose = () => {
     onClose();
   };
-  const handleShare = () => {
+  const validateShipName = () => {
     try {
       const isValid = ob.isValidPatp(inputValue);
-      /*if (isValid) {
-        //TODO: eventually restrict moons?
-        const clan = ob.clan(inputValue);
-        console.log("clan", clan);
-      }*/
+      log("isValid", isValid);
       if (!isValid) {
         setPathErrorMessage("Make sure the ship you entered exists");
         setPathError(true);
-        return;
+        throw Error("ship name not valid");
       }
       setPathErrorMessage("");
       setPathError(false);
       //it's valid, go ahead and try to share this
     } catch (e) {
-      console.log("e", e);
+      throw Error("ship name not valid");
     }
-
-    onConfirm(inputValue);
   };
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
+  };
+  const chipsGroup = (title: string, data: ChipData[], onDelete: Function) => {
+    if (data.length === 0) return;
+    return (
+      <Stack
+        flexDirection={"column"}
+        marginTop={1}
+      >
+        <Typography variant="subtitle2" fontWeight={"bold"}>
+          {title}{" "}
+        </Typography>
+        <Chips chipData={data} canDelete={true} onDelete={onDelete} />
+      </Stack>
+    );
   };
   return (
     <Dialog
@@ -115,14 +140,14 @@ export default function ShareDialog({
       maxWidth={"sm"}
       fullWidth
     >
-      <DialogTitle>Share</DialogTitle>
+      <DialogTitle>Manage Participants (x pool)</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Enter the ship name you wish to send this sheet to
+          Enter the ship and assign it a role
         </DialogContentText>
         <Stack flexDirection="row" alignItems="center" justifyContent="center">
           <Autocomplete
-            sx={{ flex: 1 }}
+            sx={{ flex: 1, marginTop: 1, marginBottom: 1 }}
             freeSolo
             id="pals-autocomplete"
             disableClearable
@@ -135,10 +160,16 @@ export default function ShareDialog({
             renderInput={(params) => (
               <TextField
                 {...params}
+                sx={{
+                  "& .MuiFormHelperText-root": {
+                    position: "absolute",
+                    bottom: "-1.2rem",
+                  },
+                }}
                 spellCheck="false"
                 error={pathError}
                 helperText={pathErrorMessage}
-                margin="dense"
+                size="small"
                 id="name"
                 label="@p"
                 type="text"
@@ -150,9 +181,10 @@ export default function ShareDialog({
               />
             )}
           />
-          <FormControl sx={{ width: 100 }}>
+          <FormControl sx={{ width: 110 }}>
             <InputLabel id="demo-simple-select-label">Role</InputLabel>
             <Select
+              size="small"
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={role}
@@ -164,23 +196,28 @@ export default function ShareDialog({
               <MenuItem value={"Admin"}>Admin</MenuItem>
             </Select>
           </FormControl>
+          <IconButton
+            aria-label="add ship to pool"
+            size="small"
+            onClick={handleAdd}
+          >
+            <AddIcon />
+          </IconButton>
         </Stack>
-        <Stack flexDirection={"row"}>
-          <Typography>Viewers: </Typography>
-          <Chips
-            chipData={chipData}
-            canDelete={true}
-            onDelete={(data:any) => {
-              handleDelete(data);
-            }}
-          />
-        </Stack>
-      
+        {chipsGroup("Admins", adminList, handleDeleteAdmin)}
+        {chipsGroup("Captains", captainList, handleDeleteCaptain)}
+        {chipsGroup("Viewers", viewerList, handleDeleteViewer)}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button disabled={!inputValue} onClick={handleShare}>
-          Share
+        <Button sx={{ color: "text.primary" }} onClick={handleClose}>
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          //disabled={!inputValue}
+          onClick={handleClose}
+        >
+          Save
         </Button>
       </DialogActions>
     </Dialog>
