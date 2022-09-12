@@ -30,9 +30,9 @@ Anyone who is a viewer on a pool can see all goals in that pool.
 
 `title` is the title of the new pool.
 
-`chefs` are essentially admins; they have full permissions to add/edit/delete any goal in the pool.
+`admins` have full permissions to add/edit/delete any goal in the pool.
 
-`peons` can mark (and unmark) any goal in the pool complete. This is the only kind of permissions they have.
+`captains` can spawn a new goal in the root of the pool (without parents) but have no other pool-level permissions.
 
 `viewers` can view the pool and store a copy of the pool on their own ship.
 
@@ -40,8 +40,8 @@ Anyone who is a viewer on a pool can see all goals in that pool.
 ```
 $:  %new-pool
     title=@t
-    chefs=(set ship)
-    peons=(set ship)
+    admins=(set ship)
+    captains=(set ship)
     viewers=(set ship)
 ==
 ```
@@ -51,8 +51,8 @@ $:  %new-pool
 {
   "new-pool": {
     "title": "title of new pool",
-    "chefs": ["zod", "nec", "bud"],
-    "peons": ["zod", "nec", "bud"],
+    "admins": ["zod", "nec", "bud"],
+    "captains": ["zod", "nec", "bud"],
     "viewers": ["zod", "nec", "bud"]
   }
 }
@@ -66,9 +66,9 @@ Make a copy of an existing pool.
 
 `title` is the title of the new pool copy.
 
-`chefs` are essentially admins; they have full permissions to add/edit/delete any goal in the pool.
+`admins` have full permissions to add/edit/delete any goal in the pool.
 
-`peons` can mark (and unmark) any goal in the pool complete. This is the only kind of permissions they have.
+`captains` can spawn a new goal in the root of the pool (without parents) but have no other pool-level permissions.
 
 `viewers` can view the pool and store a copy of the pool on their own ship.
 
@@ -77,8 +77,8 @@ Make a copy of an existing pool.
 $:  %copy-pool
     =old=pin
     title=@t
-    chefs=(set ship)
-    peons=(set ship)
+    admins=(set ship)
+    captains=(set ship)
     viewers=(set ship)
 ==
 ```
@@ -92,8 +92,8 @@ $:  %copy-pool
       "birth": "~2000.1.1"
     },
     "title": "title of new pool",
-    "chefs": ["zod", "nec", "bud"],
-    "peons": ["zod", "nec", "bud"],
+    "admins": ["zod", "nec", "bud"],
+    "captains": ["zod", "nec", "bud"],
     "viewers": ["zod", "nec", "bud"]
   }
 }
@@ -111,7 +111,7 @@ Create a goal under/owned-by/contained-by an existing goal.
 
 `actionable` denotes whether a goal is allowed to contain further goals or not. An actionable goal cannot contain subgoals.
 
-`chefs` are essentially admins; they have full permissions to add/edit/delete this goal, or any of its descendents.
+`captains` are essentially admins; they have full permissions to add/edit/delete this goal, or any of its descendents.
 
 `peons` can mark (and unmark) this goal and any of its descendents complete. This is the only kind of permissions they have.
 
@@ -122,7 +122,7 @@ $:  %spawn-goal
   upid=(unit id)    
   desc=@t
   actionable=?
-  chefs=(set ship)                                                              
+  captains=(set ship)                                                              
   peons=(set ship)                           
 ==                                                                              
 ```
@@ -138,7 +138,7 @@ $:  %spawn-goal
     "upid": (null or "id": { "owner": "zod", "birth": "~2000.1.1" },
     "desc": "description of new goal",
     "actionable": true,
-    "chefs": ["zod", "nec", "bud"],
+    "captains": ["zod", "nec", "bud"],
     "peons": ["zod", "nec", "bud"]
   }
 }
@@ -405,13 +405,9 @@ Unmark a goal complete. No succeeding goals can already be marked complete.
 }
 ```
 
-## %make-chef
+## %invite
 ### Description
-Make a ship a "chef" on a given goal. A "chef" has broad permissions on a goal and all its descendents.
-
-`chef` is the ship you want to make a "chef".
-
-`id` is the goal id of the goal you want to make `chef` a "chef" of.
+Invite a set of ships to become viewers on a pool.
 
 ### Noun
 ```
@@ -421,8 +417,36 @@ Make a ship a "chef" on a given goal. A "chef" has broad permissions on a goal a
 ### JSON
 ```
 {
-  "make-chef": {
-    "chef": "zod",
+  "invite": {
+    "pin": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    },   
+    "admins": ["zod", "nec", "bud"],
+    "captains": ["zod", "nec", "bud"],
+    "viewers": ["zod", "nec", "bud"]
+  }
+}
+```
+
+## %make-goal-captain
+### Description
+Make a ship a "captain" on a given goal. A "captain" has broad permissions on a goal and all its descendents.
+
+`captain` is the ship you want to make a "captain".
+
+`id` is the goal id of the goal you want to make `captain` a "captain" of.
+
+### Noun
+```
+[%make-goal-captain chef=ship =id]
+```
+
+### JSON
+```
+{
+  "make-goal-captain": {
+    "captain": "zod",
     "id": {
       "owner": "zod",
       "birth": "~2000.1.1"
@@ -431,7 +455,7 @@ Make a ship a "chef" on a given goal. A "chef" has broad permissions on a goal a
 }
 ```
 
-## %make-peon
+## %make-goal-peon
 ### Description
 Make a ship a "peon" on a given goal. A "peon" can mark (and unmark) a goal and all its descendents complete.
 
@@ -441,13 +465,13 @@ Make a ship a "peon" on a given goal. A "peon" can mark (and unmark) a goal and 
 
 ### Noun
 ```
-[%make-peon peon=ship =id]                                                      
+[%make-goal-peon peon=ship =id]                                                      
 ```
 
 ### JSON
 ```
 {
-  "make-peon": {
+  "make-goal-peon": {
     "peon": "zod",
     "id": {
       "owner": "zod",
