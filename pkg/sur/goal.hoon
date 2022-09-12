@@ -1,38 +1,110 @@
 /+  *gol-cli-help
 |%
 ::
++$  state-3  [%3 =store:s3]
 +$  state-2  [%2 =store:s2]
 +$  state-1  [%1 =store:s1]
 +$  state-0  [%0 =store:s0]
 ::
-+$  id          id:s2
-+$  eid         eid:s2
-+$  pin         pin:s2
-+$  edge        edge:s2
++$  id          id:s3
++$  eid         eid:s3
++$  pin         pin:s3
++$  edge        edge:s3
 ::
-+$  goal-froze  goal-froze:s2
-+$  goal-perms  goal-perms:s2
-+$  goal-nexus  goal-nexus:s2
-+$  goal-togls  goal-togls:s2
-+$  goal-hitch  goal-hitch:s2
++$  goal-froze  goal-froze:s3
++$  goal-perms  goal-perms:s3
++$  goal-nexus  goal-nexus:s3
++$  goal-togls  goal-togls:s3
++$  goal-hitch  goal-hitch:s3
 ::
-+$  goal        goal:s2
-+$  ngoal       ngoal:s2
-+$  goals       goals:s2
++$  goal        goal:s3
++$  ngoal       ngoal:s3
++$  goals       goals:s3
 ::
-+$  pool-froze  pool-froze:s2
-+$  pool-perms  pool-perms:s2
-+$  pool-nexus  pool-nexus:s2
-+$  pool-togls  pool-togls:s2
-+$  pool-hitch  pool-hitch:s2
++$  pool-froze  pool-froze:s3
++$  pool-perms  pool-perms:s3
++$  pool-nexus  pool-nexus:s3
++$  pool-togls  pool-togls:s3
++$  pool-hitch  pool-hitch:s3
 ::
-+$  pool        pool:s2
-+$  npool       npool:s2
-+$  pools       pools:s2
++$  pool        pool:s3
++$  npool       npool:s3
++$  pools       pools:s3
 ::
-+$  directory   directory:s2
++$  directory   directory:s3
 ::
-+$  store       store:s2
++$  store       store:s3
+::
+++  s3
+  |%
+  +$  id  id:s2
+  +$  eid  eid:s2
+  +$  pin  pin:s2
+  +$  edge  edge:s2
+  +$  directory  directory:s2
+  +$  goal-froze  goal-froze:s2
+  +$  goal-nexus  goal-nexus:s2
+  +$  goal-togls  goal-togls:s2
+  +$  goal-hitch  goal-hitch:s2
+  +$  pool-froze  pool-froze:s2
+  +$  pool-togls  pool-togls:s2
+  +$  pool-hitch  pool-hitch:s2
+  ::
+  +$  goal-perms
+    $:  captains=(set ship)
+        peons=(set ship)
+    ==
+  ::
+  +$  goal
+    $:  goal-froze
+        goal-perms
+        goal-nexus
+        goal-togls
+        goal-hitch
+    ==
+  ::
+  :: named goal (modules are named)
+  +$  ngoal
+    $:  froze=goal-froze
+        perms=goal-perms
+        nexus=goal-nexus
+        togls=goal-togls
+        hitch=goal-hitch
+    ==
+  ::
+  +$  goals  (map id goal)
+  ::
+  +$  pool-perms
+    $:  admins=(set ship)
+        captains=(set ship)
+        viewers=(set ship)
+    ==
+  ::
+  +$  pool-nexus
+    $:  =goals
+    ==
+  ::
+  +$  pool
+    $:  pool-froze
+        pool-perms
+        pool-nexus
+        pool-togls
+        pool-hitch
+    ==
+  ::
+  :: named pool (modules are named)
+  +$  npool
+    $:  froze=pool-froze
+        perms=pool-perms
+        nexus=pool-nexus
+        togls=pool-togls
+        hitch=pool-hitch
+    ==
+  ::
+  +$  pools  (map pin pool)
+  ::
+  +$  store  [=directory =pools]
+  --
 ::
 ++  s2
   |%
@@ -235,6 +307,10 @@
   ::
   +$  store  [=directory =projects]
   --
+++  convert-2-to-3
+  |=  =state-2
+  ^-  state-3
+  `state-3`[%3 +.state-2]
 ::
 ++  goal-1-to-2
   |=  [=id:s1 =goal:s1]
@@ -340,26 +416,4 @@
 +$  exposed-yoke  $%([yoke-tag lid=id rid=id])
 ::
 +$  yoke-sequence  (list ?(core-yoke [%held-rend lid=id rid=id] exposed-yoke))
-::
-+$  goal-perm
-  $%  %mod-chefs
-      %mod-peons
-      %add-under
-      %remove
-      %edit-desc
-      %set-deadline
-      %mark-actionable
-      %mark-complete
-      %mark-active
-  ==
-::
-+$  pool-perm
-  $%  %mod-viewers
-      %edit-title
-      %new-goal
-  ==
-::
-+$  pair-perm
-  $%  %&
-  ==
 --

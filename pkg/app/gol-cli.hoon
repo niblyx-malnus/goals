@@ -234,23 +234,23 @@
       %prio-rend
     (yoke-command:hc command %prio-rend)
       ::
-      ::  [%invite invitee=@p =id]
+      ::  [%invite =pin admins=(set ship) captains=(set ship) viewers=(set ship)]
       %invite
     =*  poke  ~(poke pass:io /mod-command/invite)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    ~[(poke [owner.pin.res %goal-store] goal-action+!>([%invite invitee.command pin.res]))]
+    ~[(poke [owner.pin.res %goal-store] goal-action+!>([%invite pin.res ~ ~ (sy ~[invitee.command])]))]
       ::
-      ::  [%make-chef chef=@p =id]
-      %make-chef
-    =*  poke  ~(poke pass:io /mod-command/make-chef)
+      ::  [%make-goal-captain captain=@p =id]
+      %make-goal-captain
+    =*  poke  ~(poke pass:io /mod-command/make-goal-captain)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    ~[(poke [owner.id.res %goal-store] goal-action+!>([%make-chef chef.command id.res]))]
+    ~[(poke [owner.id.res %goal-store] goal-action+!>([%make-goal-captain captain.command id.res]))]
       ::
-      ::  [%make-peon peon=@p =id]
-      %make-peon
-    =*  poke  ~(poke pass:io /mod-command/make-peon)
+      ::  [%make-goal-peon peon=@p =id]
+      %make-goal-peon
+    =*  poke  ~(poke pass:io /mod-command/make-goal-peon)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    ~[(poke [owner.id.res %goal-store] goal-action+!>([%make-peon peon.command id.res]))]
+    ~[(poke [owner.id.res %goal-store] goal-action+!>([%make-goal-peon peon.command id.res]))]
       ::
       :: [%new-pool title=@t]
       %new-pool

@@ -13,7 +13,7 @@
   $(now (add now ~s0..0001))
 ::
 ++  new-pool
-  |=  [title=@t chefs=(set ship) peons=(set ship) viewers=(set ship) own=ship now=@da]
+  |=  [title=@t captains=(set ship) admins=(set ship) viewers=(set ship) own=ship now=@da]
   ^-  [pin:gol pool:gol]
   =/  pin  [%pin (unique-id own now)]
   =|  =pool:gol
@@ -21,9 +21,9 @@
   =.  birth.pool  birth.pin
   =.  title.pool  title
   =.  creator.pool  own
-  =.  chefs.pool  chefs
-  =.  peons.pool  peons
-  =.  viewers.pool  (~(uni in viewers) (~(uni in chefs) peons))
+  =.  captains.pool  captains
+  =.  admins.pool  admins
+  =.  viewers.pool  (~(uni in viewers) (~(uni in captains) admins))
   [pin pool]
 ::
 ++  new-ids
@@ -44,15 +44,15 @@
 ++  copy-pool
   |=  $:  =old=pin:gol
           title=@t
-          chefs=(set ship)
-          peons=(set ship)
+          captains=(set ship)
+          admins=(set ship)
           viewers=(set ship)
           own=ship
           now=@da
       ==
   ^-  [pin:gol pool:gol]
   =/  old-pool  (~(got by pools) old-pin)
-  =+  [pin pool]=(new-pool title chefs peons viewers own now)
+  =+  [pin pool]=(new-pool title captains admins viewers own now)
   =.  pools  (~(put by pools) pin pool(creator owner.old-pin))
   =/  id-map  (new-ids ~(tap in ~(key by goals.old-pool)) own now)
   :-  pin
@@ -99,7 +99,7 @@
       ==
   id
 ::
-:: find the oldest ancestor of this goal for which you are a chef
+:: find the oldest ancestor of this goal for which you are a captain
 ++  seniority
   |=  [mod=ship =id:gol senior=(unit id:gol) path=(list id:gol) cp=?(%c %p)]
   ^-  senior=(unit id:gol)
@@ -109,7 +109,7 @@
   =.  senior
     ?-    cp
         %c
-      ?:  (~(has in chefs:(got-goal id)) mod)
+      ?:  (~(has in captains:(got-goal id)) mod)
         (some id)
       senior
         %p
@@ -127,8 +127,8 @@
   =/  pin  (~(got by directory) lid)
   ?.  =(pin (~(got by directory) rid))  [%& %.n]
   =/  pool-owner  +<:pin
-  =/  pool-chefs  chefs:(~(got by pools) pin)
-  ?:  |(=(pool-owner mod) (~(has in pool-chefs) mod))  [%& %.y]
+  =/  pool-captains  captains:(~(got by pools) pin)
+  ?:  |(=(pool-owner mod) (~(has in pool-captains) mod))  [%& %.y]
   =/  l  (seniority mod lid ~ ~ %c)
   =/  r  (seniority mod rid ~ ~ %c)
   ?.  =(senior.l senior.r)  [%| %diff-sen-perm-fail]

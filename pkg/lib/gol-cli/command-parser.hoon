@@ -15,8 +15,8 @@
     parse-new-pool                            :: %np
     parse-delete-pool-goal
     parse-copy-pool                         
-    parse-make-chef                           :: %mc
-    parse-make-peon                           :: %mp
+    parse-make-goal-captain
+    parse-make-goal-peon
     parse-add-goal                            :: %ag
     parse-edit-goal-desc                      :: %eg
     parse-edit-pool-title                     :: %ep
@@ -100,16 +100,16 @@
     (cook crip parse-handle)  :: handle argument
   ==
 ::
-++  parse-make-chef
+++  parse-make-goal-captain
   ;~  (glue ace)
-    (cold %make-chef (jest 'mc'))
+    (cold %make-goal-captain (jest 'mc'))
     fed:ag
     (cook crip parse-handle)  :: handle argument
   ==
 ::
-++  parse-make-peon
+++  parse-make-goal-peon
   ;~  (glue ace)
-    (cold %make-peon (jest 'mp'))
+    (cold %make-goal-peon (jest 'mp'))
     fed:ag
     (cook crip parse-handle)  :: handle argument
   ==

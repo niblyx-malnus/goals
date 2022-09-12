@@ -10,8 +10,8 @@
   :~  :-  %new-pool
       %-  ot
       :~  title+so
-          chefs+dejs-set-ships
-          peons+dejs-set-ships
+          admins+dejs-set-ships
+          captains+dejs-set-ships
           viewers+dejs-set-ships
       ==
       ::
@@ -19,8 +19,8 @@
       %-  ot
       :~  old-pin+dejs-pin
           title+so
-          chefs+dejs-set-ships
-          peons+dejs-set-ships
+          admins+dejs-set-ships
+          captains+dejs-set-ships
           viewers+dejs-set-ships
       ==
       ::
@@ -30,7 +30,7 @@
           upid+dejs-unit-id
           desc+so
           actionable+bo
-          chefs+dejs-set-ships
+          captains+dejs-set-ships
           peons+dejs-set-ships
       ==
       [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
@@ -43,8 +43,15 @@
       [%unmark-actionable (ot ~[id+dejs-id])]
       [%mark-complete (ot ~[id+dejs-id])]
       [%unmark-complete (ot ~[id+dejs-id])]
-      [%make-chef (ot ~[chef+dejs-ship id+dejs-id])]
-      [%make-peon (ot ~[peon+dejs-ship id+dejs-id])]
+      [%make-goal-captain (ot ~[captain+dejs-ship id+dejs-id])]
+      [%make-goal-peon (ot ~[peon+dejs-ship id+dejs-id])]
+      :-  %invite
+      %-  ot
+      :~  pin+dejs-pin
+          admins+dejs-set-ships
+          captains+dejs-set-ships
+          viewers+dejs-set-ships
+      ==
   ==
 ::
 ++  dejs-unit-date  |=(jon=json ?~(jon ~ (some (dejs-date jon))))
@@ -79,9 +86,18 @@
       %new-pool
     %-  pairs
     :~  [%title s+'test']
-        [%chefs a+~[s+'zod' s+'nec' s+'bud']]
-        [%peons a+~[s+'zod' s+'nec' s+'bud']]
+        [%admins a+~[s+'zod' s+'nec' s+'bud']]
+        [%captains a+~[s+'zod' s+'nec' s+'bud']]
         [%viewers a+~[s+'zod' s+'nec' s+'bud']]
+    ==
+  ++  invite
+    =,  enjs:format
+    ^-  json
+    %+  frond
+      %invite
+    %-  pairs
+    :~  [%invitee s+'zod']
+        [%pin (pairs ~[[%owner s+'zod'] [%birth test-date]])]
     ==
   ++  copy-pool
     =,  enjs:format
@@ -91,8 +107,8 @@
     %-  pairs
     :~  [%old-pin (pairs ~[[%owner s+'zod'] [%birth test-date]])]
         [%title s+'test']
-        [%chefs a+~[s+'zod' s+'nec' s+'bud']]
-        [%peons a+~[s+'zod' s+'nec' s+'bud']]
+        [%admins a+~[s+'zod' s+'nec' s+'bud']]
+        [%captains a+~[s+'zod' s+'nec' s+'bud']]
         [%viewers a+~[s+'zod' s+'nec' s+'bud']]
     ==
   ++  new-goal
@@ -103,7 +119,7 @@
     %-  pairs
     :~  [%pin (pairs ~[[%owner s+'zod'] [%birth test-date]])]
         [%desc s+'test desc']
-        [%chefs a+~[s+'zod' s+'nec' s+'bud']]
+        [%captains a+~[s+'zod' s+'nec' s+'bud']]
         [%peons a+~[s+'zod' s+'nec' s+'bud']]
         [%deadline test-date]
         [%actionable b+%.n]
@@ -159,7 +175,12 @@
         ::
           %pool-perms
         ?-  +<.upd
-          ?(%viewer %chef %peon)  (frond +<.upd (ship ship.upd))
+          %add-pool-viewers  (frond +<.upd a+(turn ~(tap in viewers.upd) ship))
+          %rem-pool-viewers  (frond +<.upd a+(turn ~(tap in viewers.upd) ship))
+          %add-pool-admins  (frond +<.upd a+(turn ~(tap in admins.upd) ship))
+          %rem-pool-admins  (frond +<.upd a+(turn ~(tap in admins.upd) ship))
+          %add-pool-captains  (frond +<.upd a+(turn ~(tap in captains.upd) ship))
+          %rem-pool-captains  (frond +<.upd a+(turn ~(tap in captains.upd) ship))
         ==
         ::
           %pool-hitch
@@ -182,7 +203,10 @@
             ?-    -.upd
                 %goal-perms
               ?-  +>-.upd
-                ?(%chef %peon)  (ship ship.upd)
+                %add-goal-captains  (frond +>-.upd a+(turn ~(tap in captains.upd) ship))
+                %rem-goal-captains  (frond +>-.upd a+(turn ~(tap in captains.upd) ship))
+                %add-goal-peons  (frond +>-.upd a+(turn ~(tap in peons.upd) ship))
+                %rem-goal-peons  (frond +>-.upd a+(turn ~(tap in peons.upd) ship))
               ==
               ::
                 %goal-hitch
@@ -339,8 +363,8 @@
       ==
       :-  %perms
       %-  pairs
-      :~  [%chefs a+(turn ~(tap in chefs.pool) ship)]
-          [%peons a+(turn ~(tap in peons.pool) ship)]
+      :~  [%admins a+(turn ~(tap in admins.pool) ship)]
+          [%captains a+(turn ~(tap in captains.pool) ship)]
           [%viewers a+(turn ~(tap in viewers.pool) ship)]
       ==
       :-  %nexus
@@ -410,7 +434,7 @@
       ==
       :-  %perms
       %-  pairs
-      :~  [%chefs a+(turn ~(tap in chefs.goal) ship)]
+      :~  [%captains a+(turn ~(tap in captains.goal) ship)]
           [%peons a+(turn ~(tap in peons.goal) ship)]
       ==
       :-  %nexus

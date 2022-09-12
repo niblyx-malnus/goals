@@ -1,34 +1,21 @@
 /-  gol=goal
 /+  *gol-cli-goal, gol-cli-goals
-:: =|  floop=[%& ~]
+=|  ext=(each term term)
+=|  efx=(set id:gol)
 |_  p=pool:gol
-:: +*  this  .
-:: 
-:: if the head of floop is yes, act normal
-:: if the head of floop is no, return this
-:: 
-:: ?:  -.floop  `this
++*  this  .
+++  apex
+  |=  =pool:gol
+  this(p pool)
 ::
+++  abet
+  ^-  (each [=pool:gol =(set id:gol)] term)
+  ?-  -.ext
+    %|  ext
+    %&  [%& p efx]
+  ==
+:: 
 ++  init-goal
-  |=  $:  =id:gol
-          desc=@t
-          actionable=?(%.y %.n)  
-          =goal-perms:gol
-      ==
-    ^-  goal:gol
-    :: ?:  -.floop  `this
-    =|  =goal:gol
-    =.  owner.goal       owner.id            =.  birth.goal  birth.id
-    =.  desc.goal        desc          
-    =.  actionable.goal  actionable
-    =.  peons.goal       peons.goal-perms    =.  captains.goal  captains.goal-perms        
-    :: 
-    :: Initialize edges
-    =.  outflow.kickoff.goal  (~(put in *(set eid:gol)) [%d id])
-    =.  inflow.deadline.goal  (~(put in *(set eid:gol)) [%k id])
-    goal
-::
-++  init-goal-temp
   |=  =id:gol
   ^-  goal:gol
   =|  =goal:gol
@@ -42,29 +29,20 @@
 ::
 ++  spawn-goal
   |=  [=id:gol upid=(unit id:gol) mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
-  =/  goal  (init-goal-temp id)
+  ^-  _this
+  ?.  -.ext  this
+  =/  goal  (init-goal id)
   =.  goal  goal(captains (~(put in captains.goal) mod))
-  =/  perm
+  =/  pore
     ?~  upid
-      ?:  (check-root-spawn-perm mod)  [%& %&]
-      [%| %root-spawn-perm-fail]
+      ?:  (check-root-spawn-perm mod)  this
+      this(ext [%| %root-spawn-perm-fail])
     (check-goal-perm u.upid mod)
-  ?-    -.perm
-    %|  ~|(+.perm !!)
-      %&
-    =.  goals.p  (~(put by goals.p) id goal)
-    =/  out  (move-goal id upid owner.p) :: divine intervention
-    ?-    -.out
-      %|  ~|(+.out !!)
-        %&
-      =/  set
-        ?~  upid
-          ~
-        (sy ~[u.upid])
-      [%& p set]
-    ==
-  ==
+  =.  goals.p.pore  (~(put by goals.p.pore) id goal)
+  =.  pore  (move-goal:pore id upid owner.p.pore) :: divine intervention (owner)
+  ?~  upid
+    pore
+  pore(efx (~(put in efx) u.upid))
 ::
 ++  got-edge
   |=  =eid:gol
@@ -409,193 +387,190 @@
 ::
 ++  check-goal-perm
   |=  [=id:gol mod=ship]
-  ^-  (each ? term)
-  ?:  (check-pool-perm mod)  [%& %&]
+  ^-  _this
+  ?.  -.ext  this
+  ?:  (check-pool-perm mod)  this
   =/  s  (seniority mod id %c)
-  ?~  senior.s  [%| %null-sen-perm-fail]  [%& %&]
+  ?~  senior.s  this(ext [%| %null-sen-perm-fail])  this
 ::
 ++  check-peon-perm
   |=  [=id:gol mod=ship]
-  ^-  (each ? term)
-  =/  perm  (check-goal-perm id mod)
-  ?-    -.perm
-    %&  [%& %&]
-      %|
-    =/  s  (seniority mod id %p)
-    ?~  senior.s  [%| %peon-perm-fail]  [%& %&]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (check-goal-perm id mod)
+  ?:  -.ext.pore  pore
+  =/  s  (seniority mod id %p)
+  ?~  senior.s  pore(ext [%| %peon-perm-fail])  pore
 ::
 ++  check-pair-perm
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each ? term)
-  ?:  (check-pool-perm mod)  [%& %&]
+  ^-  _this
+  ?.  -.ext  this
+  ?:  (check-pool-perm mod)  this
   =/  l  (seniority mod lid %c)
   =/  r  (seniority mod rid %c)
-  ?.  =(senior.l senior.r)  [%| %diff-sen-perm-fail]
-  ?~  senior.l  [%| %null-sen-perm-fail]  [%& %&]
+  ?.  =(senior.l senior.r)  this(ext [%| %diff-sen-perm-fail])
+  ?~  senior.l  this(ext [%| %null-sen-perm-fail])  this
 ::
 ++  dag-yoke
   |=  [e1=eid:gol e2=eid:gol mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
+  ^-  _this
+  ?.  -.ext  this
   ::
   :: Check mod permissions
-  =/  perm  (check-pair-perm id.e1 id.e2 mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    ::
-    :: Cannot relate goal to itself
-    ?:  =(id.e1 id.e2)  [%| %same-goal]
-    =/  edge1  (got-edge e1)
-    =/  edge2  (got-edge e2)
-    ::
-    :: Cannot create relationship where a completed goal is to the right
-    :: and an uncompleted goal is to the left
-    ?:  ?&  complete:(~(got by goals.p) id.e2)
-            !complete:(~(got by goals.p) id.e1)
-        ==
-      [%| %incomplete-complete]
-    ::
-    :: Cannot create relationship with the deadline of the right id
-    :: if the right id is an actionable goal
-    ?:  ?&  =(-.e2 %d)
-            actionable:(~(got by goals.p) id.e2)
-        ==
-      [%| %right-actionable]
-    ::
-    :: e2 must not come before e1
-    ?:  (before e2 e1)  [%| %before-e2-e1]
-    ::
-    :: there must be no bound mismatch between e1 and e2
-    ?:  (unit-gth moment.edge1 -:(ryte-bound e2))  [%| %bound-mismatch]
-    ?:  (unit-lth moment.edge2 -:(left-bound e1))  [%| %bound-mismatch]
-    ::
-    :: dag-yoke
-    =.  outflow.edge1  (~(put in outflow.edge1) e2)
-    =.  inflow.edge2  (~(put in inflow.edge2) e1)
-    =.  goals.p  (~(put by goals.p) id.e1 (update-edge e1 edge1))
-    =.  goals.p  (~(put by goals.p) id.e2 (update-edge e2 edge2))
-    [%& p (~(gas in *(set id:gol)) ~[id.e1 id.e2])]
-  ==
+  =/  pore  (check-pair-perm id.e1 id.e2 mod)
+  ?.  -.ext.pore  pore
+  ::
+  :: Cannot relate goal to itself
+  ?:  =(id.e1 id.e2)  pore(ext [%| %same-goal])
+  =/  edge1  (got-edge e1)
+  =/  edge2  (got-edge e2)
+  ::
+  :: Cannot create relationship where a completed goal is to the right
+  :: and an uncompleted goal is to the left
+  ?:  ?&  complete:(~(got by goals.p.pore) id.e2)
+          !complete:(~(got by goals.p.pore) id.e1)
+      ==
+    pore(ext [%| %incomplete-complete])
+  ::
+  :: Cannot create relationship with the deadline of the right id
+  :: if the right id is an actionable goal
+  ?:  ?&  =(-.e2 %d)
+          actionable:(~(got by goals.p.pore) id.e2)
+      ==
+    pore(ext [%| %right-actionable])
+  ::
+  :: e2 must not come before e1
+  ?:  (before e2 e1)  pore(ext [%| %before-e2-e1])
+  ::
+  :: there must be no bound mismatch between e1 and e2
+  ?:  (unit-gth moment.edge1 -:(ryte-bound e2))  pore(ext [%| %bound-mismatch])
+  ?:  (unit-lth moment.edge2 -:(left-bound e1))  pore(ext [%| %bound-mismatch])
+  ::
+  :: dag-yoke
+  =.  outflow.edge1  (~(put in outflow.edge1) e2)
+  =.  inflow.edge2  (~(put in inflow.edge2) e1)
+  =.  goals.p.pore  (~(put by goals.p.pore) id.e1 (update-edge e1 edge1))
+  =.  goals.p.pore  (~(put by goals.p.pore) id.e2 (update-edge e2 edge2))
+  pore(efx (~(gas in efx) ~[id.e1 id.e2]))
 ::
 ++  dag-rend
   |=  [e1=eid:gol e2=eid:gol mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
+  ^-  _this
+  ?.  -.ext  this
   ::
   :: Check mod permissions
-  =/  perm  (check-pair-perm id.e1 id.e2 mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    ::
-    :: Cannot unrelate goal from itself
-    ?:  =(id.e1 id.e2)  [%| %same-goal]
-    ::
-    :: Cannot destroy containment of an owned goal
-    =/  l  (~(got by goals.p) id.e1)
-    =/  r  (~(got by goals.p) id.e2)
-    ?:  ?|  &(=(-.e1 %d) =(-.e2 %d) (~(has in kids.r) id.e1))
-            &(=(-.e1 %k) =(-.e2 %k) (~(has in kids.l) id.e2))
-        ==
-      [%| %owned-goal]
-    ::
-    :: dag-rend
-    =/  edge1  (got-edge e1)
-    =/  edge2  (got-edge e2)
-    =.  outflow.edge1  (~(del in outflow.edge1) e2)
-    =.  inflow.edge2  (~(del in inflow.edge2) e1)
-    =.  goals.p  (~(put by goals.p) id.e1 (update-edge e1 edge1))
-    =.  goals.p  (~(put by goals.p) id.e2 (update-edge e2 edge2))
-    [%& p (~(gas in *(set id:gol)) ~[id.e1 id.e2])]
-  ==
+  =/  pore  (check-pair-perm id.e1 id.e2 mod)
+  ?.  -.ext.pore  pore
+  ::
+  :: Cannot unrelate goal from itself
+  ?:  =(id.e1 id.e2)  pore(ext [%| %same-goal])
+  ::
+  :: Cannot destroy containment of an owned goal
+  =/  l  (~(got by goals.p.pore) id.e1)
+  =/  r  (~(got by goals.p.pore) id.e2)
+  ?:  ?|  &(=(-.e1 %d) =(-.e2 %d) (~(has in kids.r) id.e1))
+          &(=(-.e1 %k) =(-.e2 %k) (~(has in kids.l) id.e2))
+      ==
+    pore(ext [%| %owned-goal])
+  ::
+  :: dag-rend
+  =/  edge1  (got-edge e1)
+  =/  edge2  (got-edge e2)
+  =.  outflow.edge1  (~(del in outflow.edge1) e2)
+  =.  inflow.edge2  (~(del in inflow.edge2) e1)
+  =.  goals.p.pore  (~(put by goals.p.pore) id.e1 (update-edge e1 edge1))
+  =.  goals.p.pore  (~(put by goals.p.pore) id.e2 (update-edge e2 edge2))
+  pore(efx (~(gas in efx) ~[id.e1 id.e2]))
 ::
 ++  prio-yoke
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
+  ^-  _this
+  ?.  -.ext  this
   (dag-yoke [%k lid] [%k rid] mod)
 ::
 ++  prio-rend
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
+  ^-  _this
+  ?.  -.ext  this
   (dag-rend [%k lid] [%k rid] mod)
 ::
 ++  prec-yoke
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
+  ^-  _this
+  ?.  -.ext  this
   (dag-yoke [%d lid] [%k rid] mod)
 ::
 ++  prec-rend
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
+  ^-  _this
+  ?.  -.ext  this
   (dag-rend [%d lid] [%k rid] mod)
 ::
 ++  nest-yoke
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
+  ^-  _this
+  ?.  -.ext  this
   (dag-yoke [%d lid] [%d rid] mod)
 ::
 ++  nest-rend
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
+  ^-  _this
+  ?.  -.ext  this
   (dag-rend [%d lid] [%d rid] mod)
 ::
 ++  hook-yoke
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
+  ^-  _this
+  ?.  -.ext  this
   (dag-yoke [%k lid] [%d rid] mod)
 ::
 ++  hook-rend
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
+  ^-  _this
+  ?.  -.ext  this
   (dag-rend [%k lid] [%d rid] mod)
 ::
 ++  held-yoke
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
-  %+  apply-sequence  mod
-  :~  [%dag-yoke [%d lid] %d rid]
-      [%dag-yoke [%k rid] %k lid]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (dag-yoke [%d lid] [%d rid] mod)
+  (dag-yoke:pore [%k rid] [%k lid] mod)
 ::
 ++  held-rend
   |=  [lid=id:gol rid=id:gol mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
-  %+  apply-sequence  mod
-  :~  [%dag-rend [%d lid] %d rid]
-      [%dag-rend [%k rid] %k lid]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (dag-rend [%d lid] [%d rid] mod)
+  (dag-rend:pore [%k rid] [%k lid] mod)
 ::
 ++  move-goal
   |=  [lid=id:gol urid=(unit id:gol) mod=ship]
-  ^-  (each [=pool:gol =(set id:gol)] term)
-  =/  perm  (check-goal-perm lid mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    =/  l  (~(got by goals.p) lid)
-    ::
-    :: If par.l is non-null, end this relationship
-    =/  out=(each [=pool:gol =(set id:gol)] term)
-      ?~  par.l  [%& p ~]
-      =/  q  (~(got by goals.p) u.par.l)
-      =.  goals.p  (~(put by goals.p) u.par.l q(kids (~(del in kids.q) lid)))
-      (held-rend lid u.par.l mod)
-    ?-    -.out
-      %|  out
-        %&
-      =.  p  pool.p.out
-      =.  l  (~(got by goals.p) lid) :: l has changed
-      =.  goals.p  (~(put by goals.p) lid l(par urid))
-      ::
-      :: If urid is non-null, create this relationship
-      ?~  urid  
-        ?.  (check-pool-perm mod)  [%| %pool-perm-fail]
-        [%& p set.p.out]
-      =/  r  (~(got by goals.p) u.urid)
-      =.  goals.p  (~(put by goals.p) u.urid r(kids (~(put in kids.r) lid)))
-      (held-yoke lid u.urid mod)
-    ==
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (check-goal-perm lid mod)
+  ?.  -.ext.pore  pore
+  =/  l  (~(got by goals.p.pore) lid)
+  ::
+  :: If par.l is non-null, end this relationship
+  =.  pore
+    ?~  par.l  pore
+    =/  q  (~(got by goals.p.pore) u.par.l)
+    =.  goals.p.pore  (~(put by goals.p.pore) u.par.l q(kids (~(del in kids.q) lid)))
+    (held-rend:pore lid u.par.l mod)
+  ::
+  :: Put parent (null or unit of id) in child's par
+  =.  l  (~(got by goals.p.pore) lid) :: l has changed
+  =.  goals.p.pore  (~(put by goals.p.pore) lid l(par urid))
+  ::
+  :: If urid is non-null, create this relationship
+  ?~  urid  
+    ?:  (check-pool-perm mod)  pore
+    pore(ext [%| %pool-perm-fail])
+  =/  r  (~(got by goals.p.pore) u.urid)
+  =.  goals.p.pore  (~(put by goals.p.pore) u.urid r(kids (~(put in kids.r) lid)))
+  (held-yoke:pore lid u.urid mod)
 ::
 :: How to make it easy to compose transformations?
 :: =|  floop=[%& ~]
@@ -618,237 +593,181 @@
 :: 
 :: type of abet is ^-  (each [effects new-state] error-message)
 ::
-++  apply-sequence
-  |=  [mod=ship seq=yoke-sequence:gol]
-  ^-  (each [=pool:gol =(set id:gol)] term)
-  =/  id-set  *(set id:gol)
-  |-
-  ?~  seq
-    [%& p id-set]
-  =/  yoke-output=(each [=pool:gol =(set id:gol)] term)
-    ?-  -.i.seq
-      %dag-yoke   (dag-yoke e1.i.seq e2.i.seq mod)
-      %dag-rend   (dag-rend e1.i.seq e2.i.seq mod)
-      %prio-rend  (prio-rend lid.i.seq rid.i.seq mod)
-      %prio-yoke  (prio-yoke lid.i.seq rid.i.seq mod)
-      %prec-rend  (prec-rend lid.i.seq rid.i.seq mod)
-      %prec-yoke  (prec-yoke lid.i.seq rid.i.seq mod) 
-      %nest-rend  (nest-rend lid.i.seq rid.i.seq mod) 
-      %nest-yoke  (nest-yoke lid.i.seq rid.i.seq mod) 
-      %held-rend  (held-rend lid.i.seq rid.i.seq mod) 
-      %held-yoke  (held-yoke lid.i.seq rid.i.seq mod) 
-      %move-goal  !!
-    ==
-  ?-    -.yoke-output
-    %|  yoke-output
-      %&
-      %=  $
-        seq  t.seq
-        p  pool.p.yoke-output
-        id-set  (~(uni in id-set) set.p.yoke-output)
-      ==
-  ==
 ::
 ++  mark-actionable
   |=  [=id:gol mod=ship]
-  ^-  (each pool:gol term)
-  =/  perm  (check-goal-perm id mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    =/  goal  (~(got by goals.p) id)
-    ?.  .=  0
-        %+  murn
-        ~(tap in inflow.deadline.goal) 
-        |=(=eid:gol ?:(=(id id.eid) ~ (some eid)))
-      [%| %has-nested]
-    =.  goals.p  (~(put by goals.p) id goal(actionable %&))
-    [%& p]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (check-goal-perm id mod)
+  ?.  -.ext.pore  pore
+  =/  goal  (~(got by goals.p.pore) id)
+  ?.  .=  0
+      %+  murn
+      ~(tap in inflow.deadline.goal) 
+      |=(=eid:gol ?:(=(id id.eid) ~ (some eid)))
+    pore(ext [%| %has-nested])
+  pore(goals.p (~(put by goals.p.pore) id goal(actionable %&)))
 ::
 ++  mark-complete
   |=  [=id:gol mod=ship]
-  ^-  (each pool:gol term)
-  =/  perm  (check-peon-perm id mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    =/  goal  (~(got by goals.p) id)
-    ?:  (left-uncompleted id)  [%| %left-uncompleted]
-    =.  goals.p  (~(put by goals.p) id goal(complete %&))
-    [%& p]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (check-peon-perm id mod)
+  ?.  -.ext.pore  pore
+  =/  goal  (~(got by goals.p.pore) id)
+  ?:  (left-uncompleted id)  pore(ext [%| %left-uncompleted])
+  pore(goals.p (~(put by goals.p.pore) id goal(complete %&)))
 ::
 ++  unmark-actionable
   |=  [=id:gol mod=ship]
-  ^-  (each pool:gol term)
-  =/  perm  (check-goal-perm id mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    =/  goal  (~(got by goals.p) id)
-    =.  goals.p  (~(put by goals.p) id goal(actionable %|))
-    [%& p]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (check-goal-perm id mod)
+  ?.  -.ext.pore  pore
+  =/  goal  (~(got by goals.p.pore) id)
+  pore(goals.p (~(put by goals.p.pore) id goal(actionable %|)))
 ::
 ++  unmark-complete
   |=  [=id:gol mod=ship]
-  ^-  (each pool:gol term)
-  =/  perm  (check-peon-perm id mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    =/  goal  (~(got by goals.p) id)
-    ?:  (ryte-completed id)  [%| %ryte-completed]
-    =.  goals.p  (~(put by goals.p) id goal(complete %|))
-    [%& p]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (check-peon-perm id mod)
+  ?.  -.ext.pore  pore
+  =/  goal  (~(got by goals.p.pore) id)
+  ?:  (ryte-completed id)  pore(ext [%| %ryte-completed])
+  pore(goals.p (~(put by goals.p.pore) id goal(complete %|)))
 ::
 ++  set-deadline
   |=  [=id:gol moment=(unit @da) mod=ship]
-  ^-  (each pool:gol term)
-  =/  perm  (check-goal-perm id mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    =/  rb  (ryte-bound [%d id])
-    =/  lb  (left-bound [%d id])
-    ?:  &(!=(+.lb [%d id]) (unit-lth moment -:lb))  [%| %bound-left]
-    ?:  &(!=(+.rb [%d id]) (unit-gth moment -:rb))  [%| %bound-ryte]
-    =/  goal  (~(got by goals.p) id)
-    =.  goals.p  (~(put by goals.p) id goal(moment.deadline moment))
-    [%& p]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (check-goal-perm id mod)
+  ?.  -.ext.pore  pore
+  =/  rb  (ryte-bound [%d id])
+  =/  lb  (left-bound [%d id])
+  ?:  &(!=(+.lb [%d id]) (unit-lth moment -:lb))  pore(ext [%| %bound-left])
+  ?:  &(!=(+.rb [%d id]) (unit-gth moment -:rb))  pore(ext [%| %bound-ryte])
+  =/  goal  (~(got by goals.p.pore) id)
+  pore(goals.p (~(put by goals.p.pore) id goal(moment.deadline moment)))
 ::
 ++  set-kickoff
   |=  [=id:gol moment=(unit @da) mod=ship]
-  ^-  (each pool:gol term)
-  =/  perm  (check-goal-perm id mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    =/  rb  (ryte-bound [%k id])
-    =/  lb  (left-bound [%k id])
-    ?:  &(!=(+.lb [%k id]) (unit-lth moment -:lb))  [%| %bound-left]
-    ?:  &(!=(+.rb [%k id]) (unit-gth moment -:rb))  [%| %bound-ryte]
-    =/  goal  (~(got by goals.p) id)
-    =.  goals.p  (~(put by goals.p) id goal(moment.kickoff moment))
-    [%& p]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (check-goal-perm id mod)
+  ?.  -.ext.pore  pore
+  =/  rb  (ryte-bound [%k id])
+  =/  lb  (left-bound [%k id])
+  ?:  &(!=(+.lb [%k id]) (unit-lth moment -:lb))  pore(ext [%| %bound-left])
+  ?:  &(!=(+.rb [%k id]) (unit-gth moment -:rb))  pore(ext [%| %bound-ryte])
+  =/  goal  (~(got by goals.p.pore) id)
+  pore(goals.p (~(put by goals.p.pore) id goal(moment.kickoff moment)))
 ::
 ++  add-pool-viewers
   |=  [viewers=(set ship) mod=ship]
-  ^-  (each pool:gol term)
-  ?.  (check-pool-perm mod)  [%| %pool-perm-fail]
-  =.  viewers.p  (~(uni in viewers.p) viewers)
-  [%& p]
+  ^-  _this
+  ?.  -.ext  this
+  ?.  (check-pool-perm mod)  this(ext [%| %pool-perm-fail])
+  this(viewers.p (~(uni in viewers.p) viewers))
 ::
 ++  rem-pool-viewers
   |=  [viewers=(set ship) mod=ship]
-  ^-  (each pool:gol term)
-  ?.  (check-pool-perm mod)  [%| %pool-perm-fail]
-  =.  viewers.p  (~(dif in viewers.p) viewers)
-  [%& p]
+  ^-  _this
+  ?.  -.ext  this
+  ?.  (check-pool-perm mod)  this(ext [%| %pool-perm-fail])
+  this(viewers.p (~(dif in viewers.p) viewers))
 ::
 ++  add-pool-admins
   |=  [admins=(set ship) mod=ship]
-  ^-  (each pool:gol term)
-  ?.  (check-pool-perm mod)  [%| %pool-perm-fail]
-  =.  viewers.p  (~(uni in viewers.p) admins)
-  =.  admins.p  (~(uni in admins.p) admins)
-  [%& p]
+  ^-  _this
+  ?.  -.ext  this
+  ?.  (check-pool-perm mod)  this(ext [%| %pool-perm-fail])
+  %=  this
+    viewers.p  (~(uni in viewers.p) admins)
+    admins.p  (~(uni in admins.p) admins)
+  ==
 ::
 ++  rem-pool-admins
   |=  [admins=(set ship) mod=ship]
-  ^-  (each pool:gol term)
-  ?.  =(owner.p mod)  [%| %pool-owner-fail] :: only owner can remove admin
-  =.  admins.p  (~(dif in admins.p) admins)
-  [%& p]
+  ^-  _this
+  ?.  -.ext  this
+  ?.  =(owner.p mod)  this(ext [%| %pool-owner-fail]) :: only owner can remove admin
+  this(admins.p (~(dif in admins.p) admins))
 ::
 ++  add-pool-captains
   |=  [captains=(set ship) mod=ship]
-  ^-  (each pool:gol term)
-  ?.  (check-pool-perm mod)  [%| %pool-perm-fail]
-  =.  viewers.p  (~(uni in viewers.p) captains)
-  =.  captains.p  (~(uni in captains.p) captains)
-  [%& p]
+  ^-  _this
+  ?.  -.ext  this
+  ?.  (check-pool-perm mod)  this(ext [%| %pool-perm-fail])
+  %=  this
+    viewers.p  (~(uni in viewers.p) captains)
+    captains.p  (~(uni in captains.p) captains)
+  ==
 ::
 ++  rem-pool-captains
   |=  [captains=(set ship) mod=ship]
-  ^-  (each pool:gol term)
-  ?.  (check-pool-perm mod)  [%| %pool-perm-fail]
-  =.  captains.p  (~(dif in captains.p) captains)
-  [%& p]
+  ^-  _this
+  ?.  -.ext  this
+  ?.  (check-pool-perm mod)  this(ext [%| %pool-perm-fail])
+  this(captains.p (~(dif in captains.p) captains))
 ::
 ++  add-goal-captains
   |=  [=id:gol captains=(set ship) mod=ship]
-  ^-  (each pool:gol term)
-  =/  perm  (check-goal-perm id mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    ?.  =(0 ~(wyt in (~(dif in captains) viewers.p)))  [%| %goal-captain-non-viewer]
-    =/  goal  (~(got by goals.p) id)
-    =.  captains.goal  (~(uni in captains.goal) captains)
-    =.  goals.p  (~(put by goals.p) id goal)
-    [%& p]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (check-goal-perm id mod)
+  ?.  -.ext.pore  pore
+  ?.  =(0 ~(wyt in (~(dif in captains) viewers.p)))
+    pore(ext [%| %goal-captain-non-viewer])
+  =/  goal  (~(got by goals.p.pore) id)
+  =.  captains.goal  (~(uni in captains.goal) captains)
+  pore(goals.p (~(put by goals.p.pore) id goal))
 ::
 ++  rem-goal-captains
   |=  [=id:gol captains=(set ship) mod=ship]
-  ^-  (each pool:gol term)
-  =/  perm  (check-goal-perm id mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    =/  goal  (~(got by goals.p) id)
-    =.  captains.goal  (~(dif in captains.goal) captains)
-    =.  goals.p  (~(put by goals.p) id goal)
-    [%& p]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (check-goal-perm id mod)
+  ?.  -.ext.pore  pore
+  =/  goal  (~(got by goals.p.pore) id)
+  =.  captains.goal  (~(dif in captains.goal) captains)
+  pore(goals.p (~(put by goals.p.pore) id goal))
 ::
 ++  add-goal-peons
   |=  [=id:gol peons=(set ship) mod=ship]
-  ^-  (each pool:gol term)
-  =/  perm  (check-goal-perm id mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    ?.  =(0 ~(wyt in (~(dif in peons) viewers.p)))  [%| %goal-peon-non-viewer]
-    =/  goal  (~(got by goals.p) id)
-    =.  peons.goal  (~(uni in peons.goal) peons)
-    =.  goals.p  (~(put by goals.p) id goal)
-    [%& p]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (check-goal-perm id mod)
+  ?.  -.ext.pore  pore
+  ?.  =(0 ~(wyt in (~(dif in peons) viewers.p)))
+    pore(ext [%| %goal-peon-non-viewer])
+  =/  goal  (~(got by goals.p.pore) id)
+  =.  peons.goal  (~(uni in peons.goal) peons)
+  pore(goals.p (~(put by goals.p.pore) id goal))
 ::
 ++  rem-goal-peons
   |=  [=id:gol peons=(set ship) mod=ship]
-  ^-  (each pool:gol term)
-  =/  perm  (check-goal-perm id mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    =/  goal  (~(got by goals.p) id)
-    =.  peons.goal  (~(dif in peons.goal) peons)
-    =.  goals.p  (~(put by goals.p) id goal)
-    [%& p]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (check-goal-perm id mod)
+  ?.  -.ext.pore  pore
+  =/  goal  (~(got by goals.p.pore) id)
+  =.  peons.goal  (~(dif in peons.goal) peons)
+  pore(goals.p (~(put by goals.p.pore) id goal))
 ::
 ++  edit-goal-desc
   |=  [=id:gol desc=@t mod=ship]
-  ^-  (each pool:gol term)
-  =/  perm  (check-goal-perm id mod)
-  ?-    -.perm
-    %|  perm
-      %&
-    =/  goal  (~(got by goals.p) id)
-    =.  goals.p  (~(put by goals.p) id goal(desc desc))
-    [%& p]
-  ==
+  ^-  _this
+  ?.  -.ext  this
+  =/  pore  (check-goal-perm id mod)
+  ?.  -.ext.pore  pore
+  =/  goal  (~(got by goals.p.pore) id)
+  pore(goals.p (~(put by goals.p.pore) id goal(desc desc)))
 :: 
 ++  edit-pool-title
   |=  [title=@t mod=ship]
-  ^-  (each pool:gol term)
-  ?.  (check-pool-perm mod)  [%| %pool-perm-fail]
-  [%& p(title title)]
+  ^-  _this
+  ?.  -.ext  this
+  ?.  (check-pool-perm mod)  this(ext [%| %pool-perm-fail])
+  this(p p(title title))
 --

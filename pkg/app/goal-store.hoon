@@ -7,13 +7,15 @@
   $%  state-0
       state-1
       state-2
+      state-3
   ==
 +$  state-0  state-0:gol
 +$  state-1  state-1:gol
 +$  state-2  state-2:gol
++$  state-3  state-3:gol
 +$  card  card:agent:gall
 --
-=|  state-2
+=|  state-3
 =*  state  -
 ::
 %+  verb  |
@@ -37,8 +39,10 @@
   =/  old  !<(versioned-state old-vase)
   |-
   ?-    -.old
-      %2
+      %3
     `this(state old)
+      %2
+    $(old (convert-2-to-3:gol old))
       %1
     $(old (convert-1-to-2:gol old))
       %0
@@ -53,22 +57,23 @@
       =/  action  !<(action:goal-store vase)
       ?-    -.action
           ::
-          :: [%new-pool title=@t chefs=(set ship) peons=(set ship) viewers=(set ship)]
+          :: [%new-pool title=@t admins=(set ship) captains=(set ship) viewers=(set ship)]
           %new-pool
+        ~&  wex.bowl
         ?>  =(src.bowl our.bowl)
         %+  convert-home-cud:hc
           ~
         %:  new-pool:gs
           title.action
-          chefs.action
-          peons.action
+          admins.action
+          captains.action
           viewers.action
           src.bowl
           our.bowl
           now.bowl
         ==
           ::
-          :: [%copy-pool =old=pin title=@t chefs=(set ship) peons=(set ship) viewers=(set ship)]
+          :: [%copy-pool =old=pin title=@t admins=(set ship) captains=(set ship) viewers=(set ship)]
           %copy-pool
         ?>  =(src.bowl our.bowl)
         %+  convert-home-cud:hc
@@ -76,8 +81,8 @@
         %:  copy-pool:gs
           old-pin.action
           title.action
-          chefs.action
-          peons.action
+          admins.action
+          captains.action
           viewers.action
           src.bowl
           our.bowl
@@ -103,7 +108,8 @@
           upid.action
           desc.action
           actionable.action
-          goal-perms.action
+          captains.action
+          peons.action
         ==
           ::
           :: [%delete-goal =id]
@@ -140,7 +146,7 @@
             |=(=id:gol [id nexus:`ngoal:gol`(~(got by goals.pool.p.out) id)])
           %+  convert-away-cud:hc  ~
           :+  pin.action
-            [%pool-nexus %yoke nex]
+            [%pool-nexus %yoke nex]~
           store(pools (~(put by pools.store) pin.action pool.p.out))
         ==
           ::
@@ -158,7 +164,7 @@
             |=(=id:gol [id nexus:`ngoal:gol`(~(got by goals.pool.p.out) id)])
           %+  convert-away-cud:hc  ~
           :+  pin.action
-            [%pool-nexus %yoke nex]
+            [%pool-nexus %yoke nex]~
           store(pools (~(put by pools.store) pin.action pool.p.out))
         ==
           ::
@@ -192,29 +198,40 @@
         %+  convert-away-cud:hc  ~
         (unmark-complete:gs id.action src.bowl)
           ::
-          :: [%make-chef chef=ship =id]
-          %make-chef
+          :: [%make-goal-captain captain=ship =id]
+          %make-goal-captain
         ?>  =(our.bowl owner.id.action)
         %+  convert-away-cud:hc  ~
-        (make-chef:gs id.action chef.action src.bowl)
+        (add-goal-captains:gs id.action (sy ~[captain.action]) src.bowl)
           ::
-          :: [%make-peon peon=ship =id]
-          %make-peon
+          :: [%make-goal-peon peon=ship =id]
+          %make-goal-peon
         ?>  =(our.bowl owner.id.action)
         %+  convert-away-cud:hc  ~
-        (make-peon:gs id.action peon.action src.bowl)
+        (add-goal-peons:gs id.action (sy ~[peon.action]) src.bowl)
           ::
           :: [%invite invitee=ship =pin]
           %invite
         =*  poke-other  ~(poke-other pass:hc /)
-        ?<  =(invitee.action our.bowl)
         %+  convert-away-cud:hc
-          [(poke-other invitee.action goal-action+!>([%subscribe our.bowl pin.action]))]~
-        (put-viewer:gs pin.action invitee.action src.bowl)
+          %+  turn  
+            %~  tap  in
+            (~(uni in (~(uni in viewers.action) admins.action)) captains.action)
+          |=  =ship
+          (poke-other ship goal-action+!>([%subscribe our.bowl pin.action]))
+        %:  add-pool-invitees:gs
+          pin.action
+          viewers.action
+          admins.action
+          captains.action
+          src.bowl
+        ==
           ::
           :: [%subscribe owner=ship =pin]
           %subscribe
         =/  pite  /[`@`+<.pin.action]/[`@`+>.pin.action]
+        ?<  =(owner.action our.bowl)
+        ?:  (~(has by pools.store) pin.action)  ~|(%already-subscribed !!)
         =*  watch-other  ~(watch-other pass:hc pite)
         :_  state
         :~  (watch-other owner.action pite)
@@ -353,31 +370,46 @@
         :: --------------------------------------------------------------------
         :: spawn/trash
         ::
-        :: THIS WORKS
           [%spawn-pool *]
         :_  this(store (spawn-pool:spawn-trash:etch pin pool.update))
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
         ::
-        :: THIS WORKS
           [%spawn-goal *]
         :_  this(store (spawn-goal:spawn-trash:etch pin [nex id goal]:update))
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
         ::
-        :: THIS WORKS
           [%trash-goal *]
         :_  this(store (trash-goal:spawn-trash:etch pin id.update))
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
         :: --------------------------------------------------------------------
         :: pool-perms
         ::
-        :: THIS WORKS
-          [%pool-perms %viewer *]
-        :_  this(store (viewer:pool-perms:etch pin ship.update))
+          [%pool-perms %add-pool-viewers *]
+        :_  this(store (add-pool-viewers:pool-perms:etch pin viewers.update))
+        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
+        ::
+          [%pool-perms %rem-pool-viewers *]
+        :_  this(store (rem-pool-viewers:pool-perms:etch pin viewers.update))
+        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
+        ::
+          [%pool-perms %add-pool-captains *]
+        :_  this(store (add-pool-captains:pool-perms:etch pin captains.update))
+        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
+        ::
+          [%pool-perms %rem-pool-captains *]
+        :_  this(store (rem-pool-captains:pool-perms:etch pin captains.update))
+        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
+        ::
+          [%pool-perms %add-pool-admins *]
+        :_  this(store (add-pool-admins:pool-perms:etch pin admins.update))
+        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
+        ::
+          [%pool-perms %rem-pool-admins *]
+        :_  this(store (rem-pool-admins:pool-perms:etch pin admins.update))
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
         :: --------------------------------------------------------------------
         :: pool-hitch
         ::
-        :: THIS WORKS
           [%pool-hitch %title *]
         :_  this(store (title:pool-hitch:etch pin title.update))
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
@@ -390,38 +422,40 @@
         :: --------------------------------------------------------------------
         :: goal-perms
         ::
-        :: THIS WORKS
-          [%goal-perms id:gol %chef *]
-        :_  this(store (chef:goal-perms:etch [id ship]:update))
+          [%goal-perms id:gol %add-goal-captains *]
+        :_  this(store (add-goal-captains:goal-perms:etch [id captains]:update))
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
         ::
-        :: THIS WORKS
-          [%goal-perms id:gol %peon *]
-        :_  this(store (peon:goal-perms:etch [id ship]:update))
+          [%goal-perms id:gol %rem-goal-captains *]
+        :_  this(store (rem-goal-captains:goal-perms:etch [id captains]:update))
+        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
+        ::
+          [%goal-perms id:gol %add-goal-peons *]
+        :_  this(store (add-goal-peons:goal-perms:etch [id peons]:update))
+        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
+        ::
+          [%goal-perms id:gol %rem-goal-peons *]
+        :_  this(store (rem-goal-peons:goal-perms:etch [id peons]:update))
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
         :: --------------------------------------------------------------------
         :: goal-hitch
         ::
-        :: THIS WORKS
           [%goal-hitch id:gol %desc *]
         :_  this(store (desc:goal-hitch:etch pin [id desc]:update))
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
         :: --------------------------------------------------------------------
         :: goal-nexus
         ::
-        :: THIS WORKS
           [%goal-nexus id:gol %deadline *]
         :_  this(store (deadline:goal-nexus:etch pin [id moment]:update))
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
         :: --------------------------------------------------------------------
         :: goal-togls
         ::
-        :: THIS WORKS
           [%goal-togls id:gol %complete *]
         :_  this(store (complete:goal-togls:etch pin [id complete]:update))
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
         ::
-        :: THIS WORKS
           [%goal-togls id:gol %actionable *]
         :_  this(store (actionable:goal-togls:etch pin [id actionable]:update))
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
@@ -448,15 +482,19 @@
     (~(watch pass:io wire) [other dap.bowl] path)
   --
 ::
-++  send-away-update
-  |=  [=pin:gol =away-update:goal-store]
-  ^-  card
+++  send-away-updates
+  |=  [=pin:gol upd=(list away-update:goal-store)]
+  ^-  (list card)
   ?>  =(our.bowl +<.pin)
+  %+  turn  upd
+  |=  =away-update:goal-store
   (fact:io goal-away-update+!>(away-update) ~[/[`@`+<.pin]/[`@`+>.pin]])
 ::
-++  send-home-update
+++  send-home-updates
+  |=  upd=(list home-update:goal-store)
+  ^-  (list card)
+  %+  turn  upd
   |=  =home-update:goal-store
-  ^-  card
   (fact:io goal-home-update+!>(home-update) ~[/goals])
 ::
 ++  convert-home-cud
@@ -464,16 +502,18 @@
   ^-  (quip card _state)
   :_  state(store store.home-cud)
   %+  weld  cards
-  :~  (send-home-update home-update.home-cud)
-  ==
+  (send-home-updates upd.home-cud)
 ::
 ++  convert-away-cud
   |=  [cards=(list card) =away-cud:goal-store]
   ^-  (quip card _state)
   :_  state(store store.away-cud)
-  %+  weld  cards
-  :~  (send-away-update [pin away-update]:away-cud)
-      %-  send-home-update 
-      [[pin src.bowl] away-update]:[away-cud .]
+  ;:  weld
+    cards
+    (send-away-updates [pin upd]:away-cud)
+    %-  send-home-updates 
+    %+  turn  upd.away-cud
+    |=  =away-update:goal-store
+    [[pin.away-cud src.bowl] away-update]
   ==
 --

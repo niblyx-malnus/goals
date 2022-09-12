@@ -2,12 +2,17 @@
 |%
 ::
 +$  action
-  $%  [%new-pool title=@t chefs=(set ship) peons=(set ship) viewers=(set ship)]
+  $%  $:  %new-pool
+          title=@t
+          admins=(set ship)
+          captains=(set ship)
+          viewers=(set ship)
+      ==
       $:  %copy-pool 
         =old=pin
         title=@t
-        chefs=(set ship)
-        peons=(set ship)
+        admins=(set ship)
+        captains=(set ship)
         viewers=(set ship)
       ==
       $:  %spawn-goal
@@ -15,7 +20,8 @@
         upid=(unit id)
         desc=@t
         actionable=?
-        =goal-perms
+        captains=(set ship)
+        peons=(set ship)
       ==
       [%edit-goal-desc =id desc=@t]
       [%edit-pool-title =pin title=@t]
@@ -28,14 +34,24 @@
       [%unmark-actionable =id]
       [%mark-complete =id]
       [%unmark-complete =id]
-      [%make-chef chef=ship =id]
-      [%make-peon peon=ship =id]
-      [%invite invitee=ship =pin]
+      [%make-goal-captain captain=ship =id]
+      [%make-goal-peon peon=ship =id]
+      $:  %invite
+        =pin
+        admins=(set ship)
+        captains=(set ship)
+        viewers=(set ship)
+      ==
       [%subscribe owner=ship =pin]
   ==
 ::
 +$  pool-perms-update
-  $%  [?(%viewer %chef %peon) =ship]
+  $%  [%add-pool-viewers viewers=(set ship)]
+      [%rem-pool-viewers viewers=(set ship)]  
+      [%add-pool-admins admins=(set ship)]
+      [%rem-pool-admins admins=(set ship)]
+      [%add-pool-captains captains=(set ship)]
+      [%rem-pool-captains captains=(set ship)]
   ==
 ::
 +$  pool-hitch-update
@@ -47,7 +63,10 @@
   ==
 ::
 +$  goal-perms-update
-  $%  [?(%chef %peon) =ship]
+  $%  [%add-goal-captains captains=(set ship)]
+      [%rem-goal-captains captains=(set ship)]
+      [%add-goal-peons peons=(set ship)]
+      [%rem-goal-peons peons=(set ship)]
   ==
 ::
 +$  goal-hitch-update
@@ -99,6 +118,6 @@
       [%roots-uncompleted roots-uc=(list id)]
   ==
 ::
-+$  away-cud  [=pin =away-update =store]
-+$  home-cud  [=pin =home-update =store]
++$  away-cud  [=pin upd=(list away-update) =store]
++$  home-cud  [=pin upd=(list home-update) =store]
 --

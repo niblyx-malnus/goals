@@ -52,13 +52,13 @@
   ?-    -.grip
     %all  "~"
       %pool
-    =/  chefs  (~(put in chefs:(got-pool:scry pin.grip)) owner.pin.grip)
-    ?:  (~(has in chefs) our.bowl)
+    =/  captains  (~(put in captains:(got-pool:scry pin.grip)) owner.pin.grip)
+    ?:  (~(has in captains) our.bowl)
       "c"
     "~"
       %goal
-    =/  chefs  (~(put in chefs:(got-pool:scry (got-pin:scry id.grip))) owner.id.grip)
-    ?:  (~(has in chefs) our.bowl)
+    =/  captains  (~(put in captains:(got-pool:scry (got-pin:scry id.grip))) owner.id.grip)
+    ?:  (~(has in captains) our.bowl)
       "c"
     =/  c-sen  (seniority:scry our.bowl id.grip %c)
     =/  p-sen  (seniority:scry our.bowl id.grip %p)
@@ -73,17 +73,17 @@
   ?-    -.grip
     %all  "c~ p~"
       %pool
-    =/  chefs  (~(put in chefs:(got-pool:scry pin.grip)) owner.pin.grip)
-    ?:  =(1 ~(wyt in chefs))  :(weld "c" (trip (scot %p owner.pin.grip)) " p~")
+    =/  captains  (~(put in captains:(got-pool:scry pin.grip)) owner.pin.grip)
+    ?:  =(1 ~(wyt in captains))  :(weld "c" (trip (scot %p owner.pin.grip)) " p~")
     "c+ p~"
       %goal
-    =/  chefs  chefs:(got-goal:scry id.grip)
-    =/  chef
-      ?:  =(0 ~(wyt in chefs))
+    =/  captains  captains:(got-goal:scry id.grip)
+    =/  captain
+      ?:  =(0 ~(wyt in captains))
         "c~"
-      ?.  =(1 ~(wyt in chefs))
+      ?.  =(1 ~(wyt in captains))
         "c+"
-      (weld "c" (trip (scot %p (snag 0 ~(tap in chefs)))))
+      (weld "c" (trip (scot %p (snag 0 ~(tap in captains)))))
     =/  peons  peons:(got-goal:scry id.grip)
     =/  peon
       ?:  =(0 ~(wyt in peons))
@@ -91,7 +91,7 @@
       ?.  =(1 ~(wyt in peons))
         "p+"
       (weld "p" (trip (scot %p (snag 0 ~(tap in peons)))))
-    :(weld chef " " peon)
+    :(weld captain " " peon)
   ==
 ::
 :: get cards to print goal substructure

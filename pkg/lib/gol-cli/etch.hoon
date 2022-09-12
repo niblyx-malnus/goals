@@ -27,6 +27,7 @@
   ++  spawn-pool
     |=  [=pin:gol =pool:gol]
     ^-  store:gol
+    ?:  (~(has by pools.store) pin)  store :: necessary?
     %=  store
       directory
         %-  ~(gas by directory.store)
@@ -55,12 +56,49 @@
 ::
 ++  pool-perms
   |%
-  ++  viewer
-    |=  [=pin:gol invitee=ship]
+  ++  add-pool-viewers
+    |=  [=pin:gol viewers=(set ship)]
     ^-  store:gol
     =/  pool  (~(got by pools.store) pin)
-    =/  viewers  (~(put in viewers.pool) invitee)
-    store(pools (~(put by pools.store) pin pool(viewers viewers)))
+    =.  viewers.pool  (~(uni in viewers.pool) viewers)
+    store(pools (~(put by pools.store) pin pool))
+  ::
+  ++  rem-pool-viewers
+    |=  [=pin:gol viewers=(set ship)]
+    ^-  store:gol
+    =/  pool  (~(got by pools.store) pin)
+    =.  viewers.pool  (~(dif in viewers.pool) viewers)
+    store(pools (~(put by pools.store) pin pool))
+  ::
+  ++  add-pool-captains
+    |=  [=pin:gol captains=(set ship)]
+    ^-  store:gol
+    =/  pool  (~(got by pools.store) pin)
+    =.  viewers.pool  (~(uni in viewers.pool) captains)
+    =.  captains.pool  (~(uni in captains.pool) captains)
+    store(pools (~(put by pools.store) pin pool))
+  ::
+  ++  rem-pool-captains
+    |=  [=pin:gol captains=(set ship)]
+    ^-  store:gol
+    =/  pool  (~(got by pools.store) pin)
+    =.  captains.pool  (~(dif in captains.pool) captains)
+    store(pools (~(put by pools.store) pin pool))
+  ::
+  ++  add-pool-admins
+    |=  [=pin:gol admins=(set ship)]
+    ^-  store:gol
+    =/  pool  (~(got by pools.store) pin)
+    =.  viewers.pool  (~(uni in viewers.pool) admins)
+    =.  admins.pool  (~(uni in admins.pool) admins)
+    store(pools (~(put by pools.store) pin pool))
+  ::
+  ++  rem-pool-admins
+    |=  [=pin:gol admins=(set ship)]
+    ^-  store:gol
+    =/  pool  (~(got by pools.store) pin)
+    =.  admins.pool  (~(dif in admins.pool) admins)
+    store(pools (~(put by pools.store) pin pool))
   --
 ::
 ++  pool-hitch
@@ -90,18 +128,32 @@
 ::
 ++  goal-perms
   |%
-  ++  chef
-    |=  [=id:gol chef=ship]
+  ++  add-goal-captains
+    |=  [=id:gol captains=(set ship)]
     ^-  store:gol
     =/  goal  (got-goal:gols id)
-    =+  [pin pool]=(put-goal:gols id goal(chefs (~(put in chefs.goal) chef)))
+    =+  [pin pool]=(put-goal:gols id goal(captains (~(uni in captains.goal) captains)))
     store(pools (~(put by pools.store) pin pool))
   ::
-  ++  peon
-    |=  [=id:gol peon=ship]
+  ++  rem-goal-captains
+    |=  [=id:gol captains=(set ship)]
     ^-  store:gol
     =/  goal  (got-goal:gols id)
-    =+  [pin pool]=(put-goal:gols id goal(peons (~(put in peons.goal) peon)))
+    =+  [pin pool]=(put-goal:gols id goal(captains (~(dif in captains.goal) captains)))
+    store(pools (~(put by pools.store) pin pool))
+  ::
+  ++  add-goal-peons
+    |=  [=id:gol peons=(set ship)]
+    ^-  store:gol
+    =/  goal  (got-goal:gols id)
+    =+  [pin pool]=(put-goal:gols id goal(peons (~(uni in peons.goal) peons)))
+    store(pools (~(put by pools.store) pin pool))
+  ::
+  ++  rem-goal-peons
+    |=  [=id:gol peons=(set ship)]
+    ^-  store:gol
+    =/  goal  (got-goal:gols id)
+    =+  [pin pool]=(put-goal:gols id goal(peons (~(dif in peons.goal) peons)))
     store(pools (~(put by pools.store) pin pool))
   --
 ::
