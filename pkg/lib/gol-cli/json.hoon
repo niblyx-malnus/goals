@@ -169,7 +169,11 @@
         ::
         %spawn-pool  (frond %pool (enjs-pool pool.upd))
         ::
-        %trash-goal  (frond %id (enjs-id id.upd))
+          %trash-goal  
+        %-  pairs
+        :~  [%nex (enjs-nex nex.upd)]
+            [%del a+(turn ~(tap in del.upd) enjs-id)]
+        ==
         ::
         %trash-pool  ~
         ::

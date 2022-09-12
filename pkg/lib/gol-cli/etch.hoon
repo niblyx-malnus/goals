@@ -36,11 +36,32 @@
     ==
   ::
   ++  trash-goal
-    |=  [=pin:gol =id:gol]
+    |=  [=pin:gol =nex:gol del=(set id:gol)]
     ^-  store:gol
     =/  pool  (~(got by pools.store) pin)
-    :-  (~(del by directory.store) id)
-    (~(put by pools.store) pin pool(goals (purge-goals:gols goals.pool id)))
+    =.  directory.store
+      =/  del  ~(tap in del)
+      =/  idx  0
+      |-  
+      ?:  =(idx (lent del))
+        directory.store
+      $(idx +(idx), directory.store (~(del by directory.store) (snag idx del)))
+    =.  goals.pool
+      =/  del  ~(tap in del)
+      =/  idx  0
+      |-  
+      ?:  =(idx (lent del))
+        goals.pool
+      $(idx +(idx), goals.pool (~(del by goals.pool) (snag idx del)))
+    =.  goals.pool
+      %-  ~(gas by goals.pool)
+      %+  turn  ~(tap in nex)
+      |=  [=id:gol =goal-nexus:gol]
+      ^-  [id:gol goal:gol]
+      =/  =ngoal:gol  (~(got by goals.pool) id)
+      [id ngoal(nexus goal-nexus)]
+    :-  directory.store
+    (~(put by pools.store) pin pool)
   ::
   ++  trash-pool
     |=  =pin:gol

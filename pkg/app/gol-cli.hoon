@@ -149,11 +149,20 @@
             %trash-goal
           :-  [(poke-self view-action+!>(print+~))]~
           %=  this
-            handles  (delete-goal:hdls id.update)
+            handles  
+              =/  del  ~(tap in del.update)
+              =/  idx  0
+              |-
+              ?:  =(idx (lent del))
+                handles
+              $(idx +(idx), handles (delete-goal:hdls (snag idx del)))
             context
-              ?:  =(context [%goal id.update])
-                [%all ~]
-              context
+              ?+    -.context  context
+                  %goal
+                ?:  (~(has in del.update) id.context)
+                  [%all ~]
+                context
+              ==
           ==
           ::
             %trash-pool

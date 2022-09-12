@@ -90,10 +90,24 @@
   ^-  away-cud:goal-store
   =/  pin  (~(got by directory.store) id)
   =/  pool  (~(got by pools.store) pin)
-  :+  pin
-    [%trash-goal id]~
-  :-  (~(del by directory.store) id)
-  (~(put by pools.store) pin pool(goals (purge-goals:gols goals.pool id)))
+  =/  prog  ~(tap in (~(progeny pl pool) id))
+  =/  ovlp  *(set id:gol)
+  =/  idx  0
+  |-
+  ?:  =(idx (lent prog))
+    =/  nex
+      %-  ~(gas by *(map id:gol goal-nexus:gol))
+      %+  turn  ~(tap in (~(dif in ovlp) (sy prog)))
+      |=(=id:gol [id nexus:`ngoal:gol`(~(got by goals.pool) id)])
+    :+  pin
+      [%trash-goal nex (sy prog)]~
+    :-  (~(del by directory.store) id)
+    (~(put by pools.store) pin pool)
+  %=  $
+    idx  +(idx)
+    ovlp  (~(uni in ovlp) (get-overlaps:gols goals.pool (snag idx prog)))
+    pool  pool(goals (purge-goals:gols goals.pool (snag idx prog)))
+  ==
 ::
 ++  edit-goal-desc
   |=  [=id:gol desc=@t mod=ship]

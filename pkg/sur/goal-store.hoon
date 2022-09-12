@@ -85,7 +85,7 @@
 +$  away-update
   $%  [%spawn-goal =nex =id =goal]
       [%spawn-pool =pool]
-      [%trash-goal =id]
+      [%trash-goal =nex del=(set id)]
       [%trash-pool ~]
       [%pool-perms pool-perms-update]
       [%pool-hitch pool-hitch-update]

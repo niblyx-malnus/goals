@@ -28,6 +28,18 @@
     =.  inflow.deadline.goal  (~(put in *(set eid:gol)) [%k id])
     goal
 ::
+++  progeny
+  |=  =id:gol
+  ^-  (set id:gol)
+  =/  output  (~(put in *(set id:gol)) id)
+  =/  goal  (~(got by goals.p) id)
+  =/  kids  ~(tap in kids.goal)
+  =/  idx  0
+  |-
+  ?:  =(idx (lent kids))
+    output
+  $(idx +(idx), output (~(uni in output) (progeny (snag idx kids))))
+::
 ++  init-goal-temp
   |=  =id:gol
   ^-  goal:gol

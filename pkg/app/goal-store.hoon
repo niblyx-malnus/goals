@@ -92,7 +92,7 @@
           :: [%delete-pool =pin]
           %delete-pool
         ?>  =(src.bowl our.bowl)
-        ?>  =(our.bowl owner.pin.action)
+        ?.  =(our.bowl owner.pin.action)  ~|(%not-owner !!)
         %+  convert-home-cud:hc
           [%give %kick ~[/[`@`+<.pin.action]/[`@`+>.pin.action]] ~]~
         (delete-pool:gs pin.action our.bowl)
@@ -116,7 +116,7 @@
           %delete-goal
         :: for now, only owner can delete goals
         ?>  =(src.bowl our.bowl)
-        ?>  =(our.bowl owner.id.action)
+        ?.  =(our.bowl owner.id.action)  ~|(%not-owner !!)
         %+  convert-away-cud:hc  ~
         (delete-goal:gs id.action our.bowl)
           ::
@@ -212,6 +212,7 @@
           ::
           :: [%invite invitee=ship =pin]
           %invite
+        ?.  =(our.bowl owner.pin.action)  ~|(%not-owner !!)
         =*  poke-other  ~(poke-other pass:hc /)
         %+  convert-away-cud:hc
           %+  turn  
@@ -379,7 +380,7 @@
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
         ::
           [%trash-goal *]
-        :_  this(store (trash-goal:spawn-trash:etch pin id.update))
+        :_  this(store (trash-goal:spawn-trash:etch pin nex.update del.update))
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
         :: --------------------------------------------------------------------
         :: pool-perms

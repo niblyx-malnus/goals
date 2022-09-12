@@ -77,6 +77,28 @@
       ==
   ==
 ::
+++  get-overlaps
+  |=  [=goals:gol =id:gol]
+  ^-  (set id:gol)
+  =/  goal  (~(got by goals) id)
+  =/  output  *(set id:gol)
+  =.  output  
+    ?~  par.goal  
+      output
+    (~(put in output) u.par.goal)
+  =.  output  (~(uni in output) kids.goal)
+  =.  output  %-  ~(uni in output)
+              ^-  (set id:gol)
+              (~(run in inflow.kickoff.goal) |=(=eid:gol id.eid))
+  =.  output  %-  ~(uni in output)
+              ^-  (set id:gol)
+              (~(run in outflow.kickoff.goal) |=(=eid:gol id.eid))
+  =.  output  %-  ~(uni in output)
+              ^-  (set id:gol)
+              (~(run in inflow.deadline.goal) |=(=eid:gol id.eid))
+  %-  ~(uni in output)
+  `(set id:gol)`(~(run in outflow.deadline.goal) |=(=eid:gol id.eid))
+::
 :: purge goal from goals
 ++  purge-goals
   |=  [=goals:gol =id:gol]
