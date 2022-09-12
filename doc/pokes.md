@@ -15,9 +15,10 @@ Available pokes for `%goal-store` as nouns and as JSON.
 %mark-actionable                                                                
 %unmark-actionable                                                              
 %mark-complete                                                                  
-%unmark-complete                                                                
-%make-chef
-%make-peon
+%unmark-complete  
+%invite
+%make-goal-captain
+%make-goal-peon
 ```
 
 ## %new-pool
