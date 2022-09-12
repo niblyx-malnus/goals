@@ -41,6 +41,8 @@ declare const window: Window &
 //TODO: add delete confirmation model
 //TODO: handle error messages
 //TODO: hanlde share dialog data (pool name, current viewers/admins/caps....)
+//TODO: migrate the actions to the subscription
+//TODO: add success/error alert (bottom left) for the manage perms dialog
 function App() {
   const fetchedPools = useStore((store) => store.pools);
   const setFetchedPools = useStore((store) => store.setPools);

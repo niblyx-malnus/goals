@@ -17,14 +17,15 @@ import FormControl from "@mui/material/FormControl";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
+import LoadingButton from '@mui/lab/LoadingButton';
 
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { chipClasses } from "@mui/material";
 import useStore from "../store";
 import api from "../api";
 interface ChipData {
   key: number;
   label: string;
+  canDelete: boolean;
 }
 const ob = require("urbit-ob");
 export default function ShareDialog({ pals }: { pals: any }) {
@@ -33,7 +34,7 @@ export default function ShareDialog({ pals }: { pals: any }) {
   const open = useStore((store: any) => store.shareDialogOpen);
   const toggleShareDialog = useStore((store: any) => store.toggleShareDialog);
   const shareDialogData = useStore((store: any) => store.shareDialogData);
-  const onConfirm = () => null;
+
   const onClose = () => {
     toggleShareDialog(false, null);
   };
@@ -42,27 +43,38 @@ export default function ShareDialog({ pals }: { pals: any }) {
   };
   const [pathError, setPathError] = useState<boolean>(false);
   const [pathErrorMessage, setPathErrorMessage] = useState<string>("");
-  const [chipData, setChipData] = useState<readonly ChipData[]>([]);
   const [viewerList, setViewerList] = useState<ChipData[]>([]);
   const [captainList, setCaptainList] = useState<ChipData[]>([]);
   const [adminList, setAdminList] = useState<ChipData[]>([]);
+  const [trying, setTrying] = useState<boolean>(false);
   const handleDeleteViewer = (chipToDelete: ChipData) => {
+    if (trying) return;
+
     setViewerList((chips) =>
-      chips.filter((chip) => chip.key !== chipToDelete.key)
+      chips.filter((chip) => chip.label !== chipToDelete.label)
     );
   };
   const handleDeleteCaptain = (chipToDelete: ChipData) => {
+    if (trying) return;
+
     setCaptainList((chips) =>
-      chips.filter((chip) => chip.key !== chipToDelete.key)
+      chips.filter((chip) => chip.label !== chipToDelete.label)
     );
+    //delete corrospoding ship in viewerList
+    handleDeleteViewer(chipToDelete);
   };
   const handleDeleteAdmin = (chipToDelete: ChipData) => {
+    if (trying) return;
+
     setAdminList((chips) =>
-      chips.filter((chip) => chip.key !== chipToDelete.key)
+      chips.filter((chip) => chip.label !== chipToDelete.label)
     );
+    //delete corrospoding ship in viewerList
+    handleDeleteViewer(chipToDelete);
   };
 
   const handleAdd = () => {
+    if (trying) return;
     //make sure the entered p is for real for real
     try {
       validateShipName();
@@ -76,22 +88,93 @@ export default function ShareDialog({ pals }: { pals: any }) {
     label = label.substring(1);
     //if no text, we abort
     if (label.length === 0) return;
+    const checkForShip = (obj: any) => obj.label === label;
 
     if (role === "Viewer") {
-      const newChipData = [
+      const viewerExists = viewerList.some(checkForShip);
+
+      if (viewerExists) {
+        setPathErrorMessage("This viewer already exists");
+        setPathError(true);
+        return;
+      }
+      const newViewerList = [
         ...viewerList,
-        { key: viewerList.length + 1, label },
+        { key: viewerList.length + 1, label, canDelete: true },
       ];
-      setViewerList(newChipData);
+      setViewerList(newViewerList);
     } else if (role === "Captain") {
-      const newChipData = [
+      const capExists = captainList.some(checkForShip);
+      const adminExists = adminList.some(checkForShip);
+
+      if (capExists) {
+        setPathErrorMessage("This captain already exists");
+        setPathError(true);
+        return;
+      }
+      if (adminExists) {
+        setPathErrorMessage("This ship is an admin");
+        setPathError(true);
+        return;
+      }
+      const newCaptainList = [
         ...captainList,
-        { key: captainList.length + 1, label },
+        { key: captainList.length + 1, label, canDelete: true },
       ];
-      setCaptainList(newChipData);
+      setCaptainList(newCaptainList);
+      //if a cap  is added, we'll also add it the viewerList list
+      const viewerExists = viewerList.some(checkForShip);
+      let newViewerList;
+      if (viewerExists) {
+        newViewerList = viewerList.map((item: any) => {
+          if (item.label === label) {
+            return { ...item, canDelete: false };
+          }
+          return item;
+        });
+      } else {
+        newViewerList = [
+          ...viewerList,
+          { key: viewerList.length + 1, label, canDelete: false },
+        ];
+      }
+      setViewerList(newViewerList);
     } else {
-      const newChipData = [...adminList, { key: adminList.length + 1, label }];
-      setAdminList(newChipData);
+      const capExists = captainList.some(checkForShip);
+      const adminExists = adminList.some(checkForShip);
+
+      if (capExists) {
+        setPathErrorMessage("This captain already exists");
+        setPathError(true);
+        return;
+      }
+      if (adminExists) {
+        setPathErrorMessage("This ship is an admin");
+        setPathError(true);
+        return;
+      }
+      const newAdminList = [
+        ...adminList,
+        { key: adminList.length + 1, label, canDelete: true },
+      ];
+      setAdminList(newAdminList);
+
+      const viewerExists = viewerList.some(checkForShip);
+      let newViewerList;
+      if (viewerExists) {
+        newViewerList = viewerList.map((item: any) => {
+          if (item.label === label) {
+            return { ...item, canDelete: false };
+          }
+          return item;
+        });
+      } else {
+        newViewerList = [
+          ...viewerList,
+          { key: viewerList.length + 1, label, canDelete: false },
+        ];
+      }
+      setViewerList(newViewerList);
     }
     setInputValue("~");
   };
@@ -106,7 +189,7 @@ export default function ShareDialog({ pals }: { pals: any }) {
   const validateShipName = () => {
     try {
       const isValid = ob.isValidPatp(inputValue);
-      log("isValid", isValid);
+
       if (!isValid) {
         setPathErrorMessage("Make sure the ship you entered exists");
         setPathError(true);
@@ -127,36 +210,53 @@ export default function ShareDialog({ pals }: { pals: any }) {
     return (
       <Stack flexDirection={"column"} marginTop={1}>
         <Typography variant="subtitle2" fontWeight={"bold"}>
-          {title}{" "}
+          {title}
         </Typography>
         <Chips chipData={data} canDelete={true} onDelete={onDelete} />
       </Stack>
     );
   };
   const updatePoolPerms = async () => {
+    setTrying(true);
     try {
       //convert chips to a data list
       const viewers = viewerList.map((item) => item.label);
       const captains = captainList.map((item) => item.label);
       const admins = adminList.map((item) => item.label);
-      const result = await api.invite(shareDialogData.pin, viewers, captains, admins);
-      log(" updatePoolPerms result =>", result);
+      const result = await api.invite(
+        shareDialogData.pin,
+        viewers,
+        captains,
+        admins
+      );
+      log("updatePoolPerms result =>", result);
     } catch (e) {
-      log(" updatePoolPerms error =>", e);
+      log("updatePoolPerms error =>", e);
     }
+    setTrying(false);
   };
   useEffect(() => {
     if (!shareDialogData) return;
     //construct our chips from the permlist, everytime we display this
     const permList = shareDialogData.permList; //TODO: handle not having this?
-    const viewerChips = permList.viewers.map((item: any, index: any) => {
-      return { key: index, label: item };
+    let viewerChips = permList.viewers.map((item: any, index: any) => {
+      return { key: index, label: item, canDelete: true };
     });
     const captainChips = permList.captains.map((item: any, index: any) => {
-      return { key: index, label: item };
+      return { key: index, label: item, canDelete: true };
     });
     const adminChips = permList.admins.map((item: any, index: any) => {
-      return { key: index, label: item };
+      return { key: index, label: item, canDelete: true };
+    });
+    //create links beetween caps/admins and viewers
+    viewerChips = viewerChips.map((item: any) => {
+      if (
+        permList.captains.includes(item.label) ||
+        permList.admins.includes(item.label)
+      ) {
+        return { ...item, canDelete: false };
+      }
+      return item;
     });
     setViewerList(viewerChips);
     setCaptainList(captainChips);
@@ -164,6 +264,7 @@ export default function ShareDialog({ pals }: { pals: any }) {
   }, [open, shareDialogData]);
   //if we dont have data we dont render
   if (!shareDialogData) return null;
+
   return (
     <Dialog
       open={open}
@@ -172,7 +273,9 @@ export default function ShareDialog({ pals }: { pals: any }) {
       maxWidth={"sm"}
       fullWidth
     >
-      <DialogTitle>Manage Participants ({shareDialogData.title})</DialogTitle>
+      <DialogTitle fontWeight={"bold"}>
+        Manage Participants ({shareDialogData.title})
+      </DialogTitle>
       <DialogContent>
         <DialogContentText>
           Enter the ship and assign it a role
@@ -232,6 +335,7 @@ export default function ShareDialog({ pals }: { pals: any }) {
             aria-label="add ship to pool"
             size="small"
             onClick={handleAdd}
+            disabled={trying}
           >
             <AddIcon />
           </IconButton>
@@ -241,16 +345,16 @@ export default function ShareDialog({ pals }: { pals: any }) {
         {chipsGroup("Viewers", viewerList, handleDeleteViewer)}
       </DialogContent>
       <DialogActions>
-        <Button sx={{ color: "text.primary" }} onClick={handleClose}>
+        <Button
+          disabled={trying}
+          sx={{ color: "text.primary" }}
+          onClick={handleClose}
+        >
           Cancel
         </Button>
-        <Button
-          variant="contained"
-          //disabled={!inputValue}
-          onClick={updatePoolPerms}
-        >
+        <LoadingButton variant="contained" loading={trying} onClick={updatePoolPerms}>
           Save
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

@@ -150,7 +150,7 @@ const api = {
   },
   invite: async (pin, viewers, captains, admins) => {
     const newPoolPerms = {
-      invite: {
+      'invite': {
         pin,
         admins,
         captains,

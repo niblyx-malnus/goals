@@ -11,17 +11,13 @@ const ListItem = styled("li")(({ theme }) => ({
   margin: theme.spacing(0.5),
 }));
 
-export default function Chips({
-  chipData,
-  canDelete = false,
-  onDelete = null,
-}: any) {
+export default function Chips({ chipData, onDelete = null }: any) {
   return (
     <Stack flexDirection="row" flexWrap="wrap" sx={{ listStyle: "none" }}>
       {chipData.map((data: any, index: any) => {
         return (
           <ListItem key={index}>
-            {canDelete ? (
+            {data.canDelete ? (
               <Chip
                 variant="outlined"
                 sx={{ cursor: "pointer" }}
@@ -31,7 +27,12 @@ export default function Chips({
                 onDelete={() => onDelete(data)}
               />
             ) : (
-              <Chip sx={{ cursor: "pointer" }} label={data.label} />
+              <Chip
+                sx={{ cursor: "pointer" }}
+                label={
+                  <Typography variant="subtitle2">{data.label}</Typography>
+                }
+              />
             )}
           </ListItem>
         );
