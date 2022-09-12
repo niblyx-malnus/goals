@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -21,6 +21,7 @@ import AddIcon from "@mui/icons-material/Add";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { chipClasses } from "@mui/material";
 import useStore from "../store";
+import api from "../api";
 interface ChipData {
   key: number;
   label: string;
@@ -31,9 +32,10 @@ export default function ShareDialog({ pals }: { pals: any }) {
   const [role, setRole] = useState("Viewer");
   const open = useStore((store: any) => store.shareDialogOpen);
   const toggleShareDialog = useStore((store: any) => store.toggleShareDialog);
+  const shareDialogData = useStore((store: any) => store.shareDialogData);
   const onConfirm = () => null;
   const onClose = () => {
-    toggleShareDialog(false);
+    toggleShareDialog(false, null);
   };
   const handleRoleChange = (event: SelectChangeEvent) => {
     setRole(event.target.value as string);
@@ -69,7 +71,9 @@ export default function ShareDialog({ pals }: { pals: any }) {
       return;
     }
     //we remove white space around the text
-    const label = inputValue.trim();
+    let label = inputValue.trim();
+    //we remove the ~
+    label = label.substring(1);
     //if no text, we abort
     if (label.length === 0) return;
 
@@ -121,10 +125,7 @@ export default function ShareDialog({ pals }: { pals: any }) {
   const chipsGroup = (title: string, data: ChipData[], onDelete: Function) => {
     if (data.length === 0) return;
     return (
-      <Stack
-        flexDirection={"column"}
-        marginTop={1}
-      >
+      <Stack flexDirection={"column"} marginTop={1}>
         <Typography variant="subtitle2" fontWeight={"bold"}>
           {title}{" "}
         </Typography>
@@ -132,6 +133,37 @@ export default function ShareDialog({ pals }: { pals: any }) {
       </Stack>
     );
   };
+  const updatePoolPerms = async () => {
+    try {
+      //convert chips to a data list
+      const viewers = viewerList.map((item) => item.label);
+      const captains = captainList.map((item) => item.label);
+      const admins = adminList.map((item) => item.label);
+      const result = await api.invite(shareDialogData.pin, viewers, captains, admins);
+      log(" updatePoolPerms result =>", result);
+    } catch (e) {
+      log(" updatePoolPerms error =>", e);
+    }
+  };
+  useEffect(() => {
+    if (!shareDialogData) return;
+    //construct our chips from the permlist, everytime we display this
+    const permList = shareDialogData.permList; //TODO: handle not having this?
+    const viewerChips = permList.viewers.map((item: any, index: any) => {
+      return { key: index, label: item };
+    });
+    const captainChips = permList.captains.map((item: any, index: any) => {
+      return { key: index, label: item };
+    });
+    const adminChips = permList.admins.map((item: any, index: any) => {
+      return { key: index, label: item };
+    });
+    setViewerList(viewerChips);
+    setCaptainList(captainChips);
+    setAdminList(adminChips);
+  }, [open, shareDialogData]);
+  //if we dont have data we dont render
+  if (!shareDialogData) return null;
   return (
     <Dialog
       open={open}
@@ -140,7 +172,7 @@ export default function ShareDialog({ pals }: { pals: any }) {
       maxWidth={"sm"}
       fullWidth
     >
-      <DialogTitle>Manage Participants (x pool)</DialogTitle>
+      <DialogTitle>Manage Participants ({shareDialogData.title})</DialogTitle>
       <DialogContent>
         <DialogContentText>
           Enter the ship and assign it a role
@@ -215,7 +247,7 @@ export default function ShareDialog({ pals }: { pals: any }) {
         <Button
           variant="contained"
           //disabled={!inputValue}
-          onClick={handleClose}
+          onClick={updatePoolPerms}
         >
           Save
         </Button>

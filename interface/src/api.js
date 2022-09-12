@@ -23,7 +23,7 @@ const api = {
     urb.onRetry = () => console.log("urbit onRetry");
     //not sure this is needed in release build
     urb.connect();
-   
+
     return urb;
   }),
   scry: async (app = "cell", path = "/pull") => {
@@ -147,6 +147,19 @@ const api = {
     return api
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: goalToMark });
+  },
+  invite: async (pin, viewers, captains, admins) => {
+    const newPoolPerms = {
+      invite: {
+        pin,
+        admins,
+        captains,
+        viewers,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: newPoolPerms });
   },
 };
 export default api;

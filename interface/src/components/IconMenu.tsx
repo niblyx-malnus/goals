@@ -72,12 +72,14 @@ export default function IconMenu({
   pin,
   type,
   setParentTrying,
+  poolData,
 }: {
   complete?: boolean;
   id?: GoalId;
   pin?: PinId;
   type: "pool" | "goal";
   setParentTrying: Function;
+  poolData?: any;
 }) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -207,8 +209,8 @@ export default function IconMenu({
           <div>
             <MenuItem
               onClick={() => {
-                handleClose()
-                toggleShareDialog(true);
+                handleClose();
+                toggleShareDialog(true, poolData);
               }}
               disableRipple
             >

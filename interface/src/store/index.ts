@@ -18,7 +18,9 @@ interface Store {
   setCollapseAll: (status: boolean) => void;
 
   shareDialogOpen: boolean;
-  toggleShareDialog: (status: boolean) => void;
+  toggleShareDialog: (status: boolean, poolData: any) => void;
+  //data we get passed by the pool to the share dialog
+  shareDialogData: any;
 }
 
 const useStore = create<Store>((set, get) => ({
@@ -36,9 +38,11 @@ const useStore = create<Store>((set, get) => ({
     })),
 
   shareDialogOpen: false,
-  toggleShareDialog: (newStatus: boolean) =>
+  shareDialogData: null,
+  toggleShareDialog: (newStatus: boolean, poolData: any) =>
     set(() => ({
       shareDialogOpen: newStatus,
+      shareDialogData: poolData,
     })),
 }));
 

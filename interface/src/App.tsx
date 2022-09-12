@@ -163,13 +163,14 @@ function App() {
         const poolTitle = pool.pool.hitch.title;
         const poolId = pool.pin.birth;
         const goalList = pool.pool.nexus.goals;
-
+        const permList = pool.pool.perms;
         return (
           <Project
             title={poolTitle}
             key={poolId}
             pin={pool.pin}
             goalsLength={goalList?.length}
+            permList={permList}
           >
             <RecursiveTree
               goalList={goalList}
@@ -188,11 +189,13 @@ function Project({
   children,
   pin,
   goalsLength,
+  permList,
 }: {
   title: string;
   pin: PinId;
   children: any;
   goalsLength: number;
+  permList: any;
 }) {
   //TODO: add the store type
   const collapseAll = useStore((store: any) => store.collapseAll);
@@ -228,7 +231,12 @@ function Project({
             sx={{ position: "absolute", left: -35 }}
           />
         ) : (
-          <IconMenu type="pool" pin={pin} setParentTrying={setTrying} />
+          <IconMenu
+            poolData={{ title, permList, pin }}
+            type="pool"
+            pin={pin}
+            setParentTrying={setTrying}
+          />
         )}
         {goalsLength > 0 && (
           <Box
@@ -309,7 +317,6 @@ function Header() {
   const setCollapseAll = useStore((store) => store.setCollapseAll);
   const collapseAll = useStore((store) => store.collapseAll);
 
-
   const [filterCompleteChecked, setFilterCompleteChecked] =
     useState<boolean>(false);
   const handleFilterCompleteChange = (
@@ -354,9 +361,7 @@ function Header() {
       }}
       zIndex={1}
     >
-      <ShareDialog
-        pals={[]}
-      />
+      <ShareDialog pals={[]} />
       <Stack flexDirection="row" alignItems="center">
         <OutlinedInput
           id="add-new-pool"
