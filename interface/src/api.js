@@ -58,8 +58,8 @@ const api = {
     const newPool = {
       "new-pool": {
         title,
-        chefs: [],
-        peons: [],
+        captains: [],
+        admins: [],
         viewers: [],
       },
     };
@@ -96,7 +96,7 @@ const api = {
         pin,
         upid: parentId ? parentId : null,
         desc,
-        chefs: [],
+        captains: [],
         peons: [],
         deadline: null,
         actionable: false,

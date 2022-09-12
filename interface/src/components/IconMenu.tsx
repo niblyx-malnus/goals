@@ -128,10 +128,6 @@ export default function IconMenu({
     try {
       const result = await api.deletePool(pin);
       log("deletePool result => ", result);
-      if (result && pin) {
-        //if success, go ahead an update the state via actions
-        deletePoolAction(pin);
-      }
     } catch (e) {
       log("deletePool error => ", e);
     }
@@ -144,10 +140,6 @@ export default function IconMenu({
     try {
       const result = await api.deleteGoal(id);
       log("deleteGoal result => ", result);
-      if (result && id && pin) {
-        //if success, go ahead an update the state via actions
-        deleteGoalAction(id, pin);
-      }
     } catch (e) {
       log("deleteGoal error => ", e);
     }

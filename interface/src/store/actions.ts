@@ -32,17 +32,19 @@ function updatePoolTitleAction(toUpdatePin: PinId, newTitle: string) {
   });
   setPools(newPools);
 }
-function deleteGoalAction(toDeleteId: GoalId, pinId: PinId) {
+function deleteGoalAction(toDeleteList: GoalId[], pinId: PinId) {
   const state = useStore.getState();
   const pools = state.pools;
   const setPools = state.setPools;
+
+  const toDeleteIdList = toDeleteList.map((item: GoalId) => item.birth);
   //select the project using pin, and then filter out goals using toDeleteId
   const newPools = pools.map((poolItem: any, poolIndex: number) => {
     const { pin } = poolItem;
     if (pin.birth === pinId.birth) {
       const newGoals = poolItem.pool.nexus.goals.filter(
         (goalItem: any, goalIndex: any) => {
-          return goalItem.id.birth !== toDeleteId.birth;
+          return !toDeleteIdList.includes(goalItem.id.birth);
         }
       );
       return {
@@ -55,7 +57,6 @@ function deleteGoalAction(toDeleteId: GoalId, pinId: PinId) {
     }
     return poolItem;
   });
-
   setPools(newPools);
 }
 function updateGoalDescAction(

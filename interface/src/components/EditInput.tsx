@@ -80,9 +80,7 @@ function EditInput({
     try {
       const result = await api.editPoolTitle(pin, value);
       log("editPoolTitle result => ", result);
-      if (result && pin && value) {
-        updatePoolTitleAction(pin, value);
-      }
+    
     } catch (e) {
       log("editPoolTitle error => ", e);
     }

@@ -18,7 +18,13 @@ import { log } from "./helpers";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import { PinId } from "./types/types";
-import { newGoalAction, newPoolAction } from "./store/actions";
+import {
+  deleteGoalAction,
+  deletePoolAction,
+  newGoalAction,
+  newPoolAction,
+  updatePoolTitleAction
+} from "./store/actions";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
@@ -110,6 +116,26 @@ function App() {
           const hed: any = update.hed;
 
           newPoolAction({ pool, pin: hed.pin });
+          break;
+        }
+        case "trash-goal": {
+          let { del }: any = update[actionName];
+          const hed: any = update.hed;
+
+          deleteGoalAction(del, hed.pin);
+          break;
+        }
+        case "trash-pool": {
+          const hed: any = update.hed;
+
+          deletePoolAction(hed.pin);
+          break;
+        }
+        case "pool-hitch": {
+          const hed: any = update.hed;
+          let { title }: any = update[actionName];
+
+          updatePoolTitleAction(hed.pin, title);
           break;
         }
       }
