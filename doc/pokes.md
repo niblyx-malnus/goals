@@ -412,7 +412,7 @@ Invite a set of ships to become viewers on a pool.
 
 ### Noun
 ```
-[%make-chef chef=ship =id]
+[%invite =pin admins=(set ship) captains=(set ship) viewers=(set ship)]
 ```
 
 ### JSON
