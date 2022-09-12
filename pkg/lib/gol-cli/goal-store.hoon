@@ -205,11 +205,11 @@
   ?-    -.v
     %|  ~|(+.v !!)
       %&
-    =/  a  (~(add-pool-admins pl p.v) viewers mod)
+    =/  a  (~(add-pool-admins pl p.v) admins mod)
     ?-    -.a
       %|  ~|(+.a !!)
         %&
-      =/  c  (~(add-pool-captains pl p.a) viewers mod)
+      =/  c  (~(add-pool-captains pl p.a) captains mod)
       ?-    -.c
         %|  ~|(+.c !!)
           %&
