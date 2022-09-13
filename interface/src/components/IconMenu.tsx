@@ -84,6 +84,7 @@ export default function IconMenu({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const toggleShareDialog = useStore((store: any) => store.toggleShareDialog);
+  const toggleDeleteDialog = useStore((store: any) => store.toggleDeleteDialog);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -196,6 +197,10 @@ export default function IconMenu({
                 complete
               </MenuItem>
             )}
+            <MenuItem onClick={deleteGoal} disableRipple>
+              <DeleteIcon fontSize="small" />
+              delete
+            </MenuItem>
           </div>
         ) : (
           <div>
@@ -213,15 +218,20 @@ export default function IconMenu({
               <LogoutIcon fontSize="small" />
               leave project
             </MenuItem>
+            <MenuItem
+              onClick={() => {
+                toggleDeleteDialog(true, {
+                  title: poolData.title,
+                  callback: deletePool,
+                });
+              }}
+              disableRipple
+            >
+              <DeleteIcon fontSize="small" />
+              delete
+            </MenuItem>
           </div>
         )}
-        <MenuItem
-          onClick={type === "pool" ? deletePool : deleteGoal}
-          disableRipple
-        >
-          <DeleteIcon fontSize="small" />
-          delete
-        </MenuItem>
       </StyledMenu>
     </Box>
   );

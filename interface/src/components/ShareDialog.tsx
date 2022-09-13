@@ -17,7 +17,7 @@ import FormControl from "@mui/material/FormControl";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
-import LoadingButton from '@mui/lab/LoadingButton';
+import LoadingButton from "@mui/lab/LoadingButton";
 
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import useStore from "../store";
@@ -277,7 +277,7 @@ export default function ShareDialog({ pals }: { pals: any }) {
         Manage Participants ({shareDialogData.title})
       </DialogTitle>
       <DialogContent>
-        <DialogContentText>
+        <DialogContentText sx={{ color: "text.primary" }}>
           Enter the ship and assign it a role
         </DialogContentText>
         <Stack flexDirection="row" alignItems="center" justifyContent="center">
@@ -352,7 +352,11 @@ export default function ShareDialog({ pals }: { pals: any }) {
         >
           Cancel
         </Button>
-        <LoadingButton variant="contained" loading={trying} onClick={updatePoolPerms}>
+        <LoadingButton
+          variant="contained"
+          loading={trying}
+          onClick={updatePoolPerms}
+        >
           Save
         </LoadingButton>
       </DialogActions>

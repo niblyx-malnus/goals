@@ -32,7 +32,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
 
 import Divider from "@mui/material/Divider";
-import { ShareDialog } from "./components";
+import { ShareDialog, DeletionDialog } from "./components";
 declare const window: Window &
   typeof globalThis & {
     scry: any;
@@ -45,9 +45,7 @@ declare const window: Window &
 //TODO: once you are using add input, hide the add button
 //TODO: UI cleanup
 //TODO: add filter incomplete goals
-//TODO: add delete confirmation model
 //TODO: handle error messages
-//TODO: hanlde share dialog data (pool name, current viewers/admins/caps....)
 //TODO: migrate the actions to the subscription
 //TODO: add success/error alert (bottom left) for the manage perms dialog
 interface Loading {
@@ -438,6 +436,7 @@ function Header() {
       zIndex={1}
     >
       <ShareDialog pals={[]} />
+      <DeletionDialog />
       <Stack flexDirection="row" alignItems="center">
         <OutlinedInput
           id="add-new-pool"
