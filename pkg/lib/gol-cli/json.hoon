@@ -434,7 +434,7 @@
   :~  :-  %froze
       %-  pairs
       :~  [%owner (ship owner.goal)]
-          [%birth s+(scot %da birth.goal)]
+          [%birth (numb (unm:chrono:userlib birth.goal))]
           [%author (ship author.goal)]
       ==
       :-  %perms
