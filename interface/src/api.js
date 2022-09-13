@@ -148,9 +148,9 @@ const api = {
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: goalToMark });
   },
-  invite: async (pin, viewers, captains, admins) => {
+  updatePoolPermissions: async (pin, viewers, captains, admins) => {
     const newPoolPerms = {
-      'invite': {
+      invite: {
         pin,
         admins,
         captains,
@@ -160,6 +160,16 @@ const api = {
     return api
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: newPoolPerms });
+  },
+  leavePool: async (pin) => {
+    const poolToLeave = {
+      unsubscribe: {
+        pin,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: poolToLeave });
   },
 };
 export default api;

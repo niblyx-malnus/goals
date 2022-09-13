@@ -36,7 +36,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
 
 import Divider from "@mui/material/Divider";
-import { ShareDialog, DeletionDialog } from "./components";
+import { ShareDialog, DeletionDialog, LeaveDialog } from "./components";
 declare const window: Window &
   typeof globalThis & {
     scry: any;
@@ -53,7 +53,7 @@ declare const window: Window &
 //TODO: migrate the actions to the subscription
 //TODO: add success/error alert (bottom left) for the manage perms dialog
 //TODO: edit inputs should hide the action buttons and take up the full width of the screen
-
+//TODO: add an event log to the app
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -471,6 +471,7 @@ function Header() {
     >
       <ShareDialog pals={[]} />
       <DeletionDialog />
+      <LeaveDialog  />
       <Stack flexDirection="row" alignItems="center">
         <OutlinedInput
           id="add-new-pool"

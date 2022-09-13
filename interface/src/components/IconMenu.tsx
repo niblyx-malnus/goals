@@ -85,6 +85,7 @@ export default function IconMenu({
   const open = Boolean(anchorEl);
   const toggleShareDialog = useStore((store: any) => store.toggleShareDialog);
   const toggleDeleteDialog = useStore((store: any) => store.toggleDeleteDialog);
+  const toggleLeaveDialog = useStore((store: any) => store.toggleLeaveDialog);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -98,7 +99,6 @@ export default function IconMenu({
     try {
       const result = await api.markComplete(id);
       log("markComplete result => ", result);
-   
     } catch (e) {
       log("markComplete error => ", e);
     }
@@ -110,7 +110,6 @@ export default function IconMenu({
     try {
       const result = await api.unmarkComplete(id);
       log("unmarkComplete result => ", result);
-     
     } catch (e) {
       log("unmarkComplete error => ", e);
     }
@@ -125,6 +124,18 @@ export default function IconMenu({
       log("deletePool result => ", result);
     } catch (e) {
       log("deletePool error => ", e);
+    }
+    setParentTrying(false);
+  };
+  const leavePool = async () => {
+    handleClose();
+    setParentTrying(true);
+
+    try {
+      const result = await api.leavePool(pin);
+      log("leavePool result => ", result);
+    } catch (e) {
+      log("leavePool error => ", e);
     }
     setParentTrying(false);
   };
@@ -197,7 +208,6 @@ export default function IconMenu({
           <div>
             <MenuItem
               onClick={() => {
-                handleClose();
                 toggleShareDialog(true, poolData);
               }}
               disableRipple
@@ -205,7 +215,15 @@ export default function IconMenu({
               <PeopleAltIcon fontSize="small" />
               manage participants
             </MenuItem>
-            <MenuItem onClick={() => log("ho ho ho ")} disableRipple>
+            <MenuItem
+              onClick={() => {
+                toggleLeaveDialog(true, {
+                  title: poolData.title,
+                  callback: leavePool,
+                });
+              }}
+              disableRipple
+            >
               <LogoutIcon fontSize="small" />
               leave project
             </MenuItem>

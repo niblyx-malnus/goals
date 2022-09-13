@@ -26,6 +26,10 @@ interface Store {
   deleteDialogOpen: boolean;
   toggleDeleteDialog: (status: boolean, deleteDialogData: any) => void;
 
+  leaveDialogData: any;
+  leaveDialogOpen: boolean;
+  toggleLeaveDialog: (status: boolean, leaveDialogData: any) => void;
+
   order: Order;
   setOrder: (newOrder: Order) => void;
 }
@@ -58,6 +62,14 @@ const useStore = create<Store>((set, get) => ({
     set(() => ({
       deleteDialogOpen: newStatus,
       deleteDialogData: newDeleteDialogData,
+    })),
+
+  leaveDialogData: null,
+  leaveDialogOpen: false,
+  toggleLeaveDialog: (newStatus: boolean, newLeaveDialogData: any) =>
+    set(() => ({
+      leaveDialogOpen: newStatus,
+      leaveDialogData: newLeaveDialogData,
     })),
 
   order: "asc",

@@ -223,7 +223,7 @@ export default function ShareDialog({ pals }: { pals: any }) {
       const viewers = viewerList.map((item) => item.label);
       const captains = captainList.map((item) => item.label);
       const admins = adminList.map((item) => item.label);
-      const result = await api.invite(
+      const result = await api.updatePoolPermissions(
         shareDialogData.pin,
         viewers,
         captains,
