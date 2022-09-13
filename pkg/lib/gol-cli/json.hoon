@@ -52,6 +52,7 @@
           captains+dejs-set-ships
           viewers+dejs-set-ships
       ==
+      [%unsubscribe (ot ~[pin+dejs-pin])]
   ==
 ::
 ++  dejs-unit-date  |=(jon=json ?~(jon ~ (some (dejs-date jon))))

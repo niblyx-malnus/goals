@@ -54,7 +54,6 @@
       %2
     :-  ~
     %=  this
-      state    old
       handles  initial:hdls
       views    initial:vyuz
     ==

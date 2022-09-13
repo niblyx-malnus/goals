@@ -215,7 +215,7 @@
             %~  tap  in
             (~(uni in (~(uni in viewers.action) admins.action)) captains.action)
           |=  =ship
-          (poke-other ship goal-action+!>([%subscribe our.bowl pin.action]))
+          (poke-other ship goal-action+!>([%subscribe pin.action]))
         %:  add-pool-invitees:gs
           pin.action
           viewers.action
@@ -224,14 +224,23 @@
           src.bowl
         ==
           ::
-          :: [%subscribe owner=ship =pin]
+          :: [%subscribe =pin]
           %subscribe
         =/  pite  /[`@`+<.pin.action]/[`@`+>.pin.action]
-        ?<  =(owner.action our.bowl)
+        ?<  =(owner.pin.action our.bowl)
         ?:  (~(has by pools.store) pin.action)  ~|(%already-subscribed !!)
         =*  watch-other  ~(watch-other pass:hc pite)
         :_  state
-        :~  (watch-other owner.action pite)
+        :~  (watch-other owner.pin.action pite)
+        ==
+          ::
+          :: [%unsubscribe =pin]
+          %unsubscribe
+        =/  wire  /[`@`+<.pin.action]/[`@`+>.pin.action]
+        =*  leave-other  ~(leave-other pass:hc wire)
+        :_  state(store (trash-pool:spawn-trash:etch pin.action))
+        :~  (leave-other owner.pin.action)
+            (fact:io goal-home-update+!>([[pin.action src.bowl] %trash-pool ~]) ~[/goals])
         ==
       ==
     ==
@@ -477,6 +486,11 @@
     |=  [other=@p =path]
     ^-  card
     (~(watch pass:io wire) [other dap.bowl] path)
+  ::
+  ++  leave-other
+    |=  other=@p
+    ^-  card
+    (~(leave pass:io wire) other dap.bowl)
   --
 ::
 ++  send-away-updates

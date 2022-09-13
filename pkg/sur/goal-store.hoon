@@ -42,7 +42,8 @@
         captains=(set ship)
         viewers=(set ship)
       ==
-      [%subscribe owner=ship =pin]
+      [%subscribe =pin]
+      [%unsubscribe =pin]
   ==
 ::
 +$  pool-perms-update
