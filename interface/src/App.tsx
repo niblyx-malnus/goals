@@ -23,12 +23,14 @@ import {
   deletePoolAction,
   newGoalAction,
   newPoolAction,
-  updatePoolTitleAction
+  updatePoolTitleAction,
 } from "./store/actions";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import Alert from "@mui/material/Alert";
+
 import Divider from "@mui/material/Divider";
 import { ShareDialog } from "./components";
 declare const window: Window &
@@ -37,7 +39,6 @@ declare const window: Window &
     poke: any;
   };
 
-//TODO: add loader for initial loading phase
 //TODO: disable the actions until subscription is setup/have any pools
 //TODO: display a "to get started add a pool"
 //TODO: add sharing projects, add pals integration, add @p validation, display currently added @p
@@ -49,11 +50,21 @@ declare const window: Window &
 //TODO: hanlde share dialog data (pool name, current viewers/admins/caps....)
 //TODO: migrate the actions to the subscription
 //TODO: add success/error alert (bottom left) for the manage perms dialog
+interface Loading {
+  trying: boolean;
+  success: boolean;
+  error: boolean;
+}
 function App() {
   const fetchedPools = useStore((store) => store.pools);
   const setFetchedPools = useStore((store) => store.setPools);
   const [channel, setChannel] = useState<null | number>(null);
   const [pools, setPools] = useState([]);
+  const [loading, setLoading] = useState<Loading>({
+    trying: true,
+    success: false,
+    error: false,
+  });
   console.log("pools", pools);
   const onSelect = (id: number) => {
     // You can put whatever here
@@ -89,14 +100,21 @@ function App() {
     });
     setPools(newProjects);
   }, [fetchedPools]);
-  const getGoals = async () => {
+  const fetchInitial = async () => {
+    setLoading({ trying: true, success: false, error: false });
     try {
       const result = await api.getData();
-      log("getGoals result => ", result);
+      log("fetchInitial result => ", result);
       const resultProjects = result.initial.store.pools;
       setFetchedPools(resultProjects);
+      if (result) {
+        setLoading({ trying: false, success: true, error: false });
+      } else {
+        setLoading({ trying: false, success: false, error: true });
+      }
     } catch (e) {
-      log("getGoals error => ", e);
+      log("fetchInitial error => ", e);
+      setLoading({ trying: false, success: false, error: true });
     }
   };
   const updateHandler = (update: any) => {
@@ -178,7 +196,7 @@ function App() {
     return dataTree;
   };
   useEffect(() => {
-    getGoals();
+    fetchInitial();
     subToUpdates();
     window["scry"] = api.scry;
     window["poke"] = api.poke;
@@ -187,31 +205,60 @@ function App() {
   return (
     <Container>
       <Header />
-      {pools.map((pool: any, index: any) => {
-        const poolTitle = pool.pool.hitch.title;
-        const poolId = pool.pin.birth;
-        const goalList = pool.pool.nexus.goals;
-        const permList = pool.pool.perms;
-        return (
-          <Project
-            title={poolTitle}
-            key={poolId}
-            pin={pool.pin}
-            goalsLength={goalList?.length}
-            permList={permList}
-          >
-            <RecursiveTree
-              goalList={goalList}
-              onSelectCallback={onSelect}
+      {loading.trying && (
+        <Stack flexDirection="row" alignItems="center">
+          <CircularProgress size={28} />
+          <Typography sx={{ marginLeft: 2 }} variant="h6" fontWeight={"bold"}>
+            Loading pools...
+          </Typography>
+        </Stack>
+      )}
+      {loading.success && pools.length === 0 ? (
+        <Typography variant="h6" fontWeight={"bold"}>
+          Add a pool to get started
+        </Typography>
+      ) : (
+        pools.map((pool: any, index: any) => {
+          const poolTitle = pool.pool.hitch.title;
+          const poolId = pool.pin.birth;
+          const goalList = pool.pool.nexus.goals;
+          const permList = pool.pool.perms;
+          return (
+            <Project
+              title={poolTitle}
+              key={poolId}
               pin={pool.pin}
-            />
-          </Project>
-        );
-      })}
+              goalsLength={goalList?.length}
+              permList={permList}
+            >
+              <RecursiveTree
+                goalList={goalList}
+                onSelectCallback={onSelect}
+                pin={pool.pin}
+              />
+            </Project>
+          );
+        })
+      )}
+      {loading.error && <ErrorAlert onRetry={fetchInitial} />}
     </Container>
   );
 }
-
+function ErrorAlert({ onRetry }: { onRetry: Function }) {
+  return (
+    <Alert
+      variant="filled"
+      severity="error"
+      action={
+        <Button onClick={() => onRetry()} color="inherit" size="small">
+          try again
+        </Button>
+      }
+    >
+      We couldn't get you the pools, sorry
+    </Alert>
+  );
+}
 function Project({
   title,
   children,
@@ -386,6 +433,7 @@ function Header() {
         top: 0,
         paddingTop: 2,
         backgroundColor: "#eedfc9",
+        marginBottom: 2,
       }}
       zIndex={1}
     >
