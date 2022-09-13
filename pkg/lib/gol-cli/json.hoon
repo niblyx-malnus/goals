@@ -363,7 +363,7 @@
   :~  :-  %froze
       %-  pairs
       :~  [%owner (ship owner.pool)]
-          [%birth s+(scot %da birth.pool)]
+          [%birth (numb (unm:chrono:userlib birth.pool))]
           [%creator (ship creator.pool)]
       ==
       :-  %perms
