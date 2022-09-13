@@ -98,10 +98,7 @@ export default function IconMenu({
     try {
       const result = await api.markComplete(id);
       log("markComplete result => ", result);
-      if (result && id && pin) {
-        //if success, go ahead an update the state via actions
-        toggleCompleteAction(id, pin, true);
-      }
+   
     } catch (e) {
       log("markComplete error => ", e);
     }
@@ -113,10 +110,7 @@ export default function IconMenu({
     try {
       const result = await api.unmarkComplete(id);
       log("unmarkComplete result => ", result);
-      if (result && id && pin) {
-        //if success, go ahead an update the state via actions
-        toggleCompleteAction(id, pin, false);
-      }
+     
     } catch (e) {
       log("unmarkComplete error => ", e);
     }
@@ -146,9 +140,6 @@ export default function IconMenu({
     }
     setParentTrying(false);
   };
-  //TODO: in open state it should still display the icon button
-  //TODO: in trying mode it should disable the button and goal/project and show a loading element (spinner)
-  //TODO: add a callback to control trying/succes/error state in parent component of this one
   return (
     <Box
       className="show-on-hover"

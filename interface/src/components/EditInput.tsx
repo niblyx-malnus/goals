@@ -97,9 +97,7 @@ function EditInput({
     try {
       const result = await api.editGoalDesc(id, value);
       log("editGoalDesc result => ", result);
-      if (result && id && pin && value) {
-        updateGoalDescAction(id, pin, value);
-      }
+   
     } catch (e) {
       log("editGoalDesc error => ", e);
     }

@@ -24,6 +24,8 @@ import {
   newGoalAction,
   newPoolAction,
   updatePoolTitleAction,
+  updateGoalDescAction,
+  toggleCompleteAction
 } from "./store/actions";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
@@ -48,6 +50,8 @@ declare const window: Window &
 //TODO: handle error messages
 //TODO: migrate the actions to the subscription
 //TODO: add success/error alert (bottom left) for the manage perms dialog
+//TODO: edit inputs should hide the action buttons and take up the full width of the screen
+
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -117,25 +121,25 @@ function App() {
   };
   const updateHandler = (update: any) => {
     log("update", update);
-    const actionName: any = Object.keys(update)[1];
+    const actionName: any = Object.keys(update.tel)[0];
     log("actionName", actionName);
     if (actionName) {
       switch (actionName) {
         case "spawn-goal": {
-          const { goal, id, nex }: any = update[actionName];
+          const { goal, id, nex }: any = update.tel[actionName];
           const hed: any = update.hed;
           newGoalAction(id, hed.pin, goal, nex);
           break;
         }
         case "spawn-pool": {
-          let { pool, pin }: any = update[actionName];
+          let { pool, pin }: any = update.tel[actionName];
           const hed: any = update.hed;
 
           newPoolAction({ pool, pin: hed.pin });
           break;
         }
         case "trash-goal": {
-          let { del }: any = update[actionName];
+          let { del }: any = update.tel[actionName];
           const hed: any = update.hed;
 
           deleteGoalAction(del, hed.pin);
@@ -149,9 +153,24 @@ function App() {
         }
         case "pool-hitch": {
           const hed: any = update.hed;
-          let { title }: any = update[actionName];
+          let { title }: any = update.tel[actionName];
 
           updatePoolTitleAction(hed.pin, title);
+          break;
+        }
+        case "goal-hitch": {
+          const hed: any = update.hed;
+          let { desc, id }: any = update.tel[actionName];
+
+          updateGoalDescAction(id, hed.pin, desc);
+          break;
+        }
+        case "goal-togls": {
+          const hed: any = update.hed;
+          let { complete, id }: any = update.tel[actionName];
+
+          toggleCompleteAction(id, hed.pin, complete);
+
           break;
         }
       }

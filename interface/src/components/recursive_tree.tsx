@@ -168,7 +168,6 @@ const TreeItem = memo(
 );
 
 const RecursiveTree = ({ goalList, pin, onSelectCallback }: any) => {
-  //TODO: move these up to before mapping over projects (App.tsx currently)
   const filterGoals = useStore((store) => store.filterGoals);
 
   const createTree = (goal: any) => {
