@@ -279,7 +279,9 @@
       ?.  =(~ msg)
         (print-cards:prtr ~["Invalid handle."])
       [(poke-our %goal-store goal-action+!>([%delete-goal id.g]))]~
-    [(poke-our %goal-store goal-action+!>([%delete-pool pin.p]))]~
+    ?:  =(our.bowl owner.pin.p)
+      [(poke-our %goal-store goal-action+!>([%delete-pool pin.p]))]~
+    [(poke-our %goal-store goal-action+!>([%unsubscribe pin.p]))]~
       ::
       :: [%copy-pool h=@t title=@t]
       %copy-pool

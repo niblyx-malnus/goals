@@ -96,7 +96,20 @@
           ::
           :: [%spawn-goal =pin upid=(unit id) desc=@t actionable=? =goal-perms]
           %spawn-goal
-        ?>  =(our.bowl owner.pin.action)
+        ?.  =(our.bowl owner.pin.action)
+          =*  poke-other  ~(poke-other pass:hc /foreign-spawn-goal)
+          :_  state
+          :~  %+  poke-other  owner.pin.action
+              :-  %goal-action
+              !>  :*  %spawn-goal
+                      pin.action
+                      upid.action
+                      desc.action
+                      actionable.action
+                      captains.action
+                      peons.action
+                  ==
+          ==
         %+  convert-away-cud:hc  ~
         %:  spawn-goal:gs
           [pin.action src.bowl]
@@ -209,7 +222,7 @@
           :: [%invite invitee=ship =pin]
           %invite
         ?.  =(our.bowl owner.pin.action)  ~|(%not-owner !!)
-        =*  poke-other  ~(poke-other pass:hc /)
+        =*  poke-other  ~(poke-other pass:hc /invite)
         %+  convert-away-cud:hc
           %+  turn  
             %~  tap  in
@@ -237,6 +250,7 @@
           :: [%unsubscribe =pin]
           %unsubscribe
         =/  wire  /[`@`+<.pin.action]/[`@`+>.pin.action]
+        ?<  =(owner.pin.action our.bowl)
         =*  leave-other  ~(leave-other pass:hc wire)
         :_  state(store (trash-pool:spawn-trash:etch pin.action))
         :~  (leave-other owner.pin.action)

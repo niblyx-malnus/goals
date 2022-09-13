@@ -1,10 +1,9 @@
-:~
-  title+'Goals'
-  info+'Urbit task manager.'
-  color+0xd9.b06d
-  version+[0 0 0]
-  website+'https://github.com/niblyx-malnus/nested-goals'
-  license+'MIT'
-  base+'goals'
-  glob-ames+[~podbyt-walwyl-niblyx-malnus 0v6.qrtae.1c96g.ejdpf.1vjv9.flfc4]
+:~  title+'Goals'
+    info+'Urbit task manager.'
+    color+0xd9.b06d
+    version+[0 0 0]
+    website+'https://github.com/niblyx-malnus/nested-goals'
+    license+'MIT'
+    base+'goals'
+    glob-ames+[~zod 0v0]
 ==
