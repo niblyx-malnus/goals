@@ -12,6 +12,8 @@ export interface PinId {
   birth: string;
   owner: string;
 }
+
 export type FilterGoals = null | "complete" | "incomplete";
+export type Order =  "asc" | "dsc";
 
 export type Tree = ReadonlyArray<TreeBranch>;

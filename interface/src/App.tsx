@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import RecursiveTree from "./components/recursive_tree";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -17,7 +17,7 @@ import useStore from "./store";
 import { log } from "./helpers";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
-import { PinId } from "./types/types";
+import { Order, PinId } from "./types/types";
 import {
   deleteGoalAction,
   deletePoolAction,
@@ -25,7 +25,9 @@ import {
   newPoolAction,
   updatePoolTitleAction,
   updateGoalDescAction,
-  toggleCompleteAction
+  toggleCompleteAction,
+  orderPools,
+  orderPoolsAction,
 } from "./store/actions";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
@@ -58,6 +60,8 @@ interface Loading {
   error: boolean;
 }
 function App() {
+  const order = useStore((store) => store.order);
+
   const fetchedPools = useStore((store) => store.pools);
   const setFetchedPools = useStore((store) => store.setPools);
   const [channel, setChannel] = useState<null | number>(null);
@@ -67,7 +71,6 @@ function App() {
     success: false,
     error: false,
   });
-  console.log("pools", pools);
   const onSelect = (id: number) => {
     // You can put whatever here
     console.log("you clicked: " + id);
@@ -102,13 +105,20 @@ function App() {
     });
     setPools(newProjects);
   }, [fetchedPools]);
+
   const fetchInitial = async () => {
     setLoading({ trying: true, success: false, error: false });
     try {
       const result = await api.getData();
       log("fetchInitial result => ", result);
       const resultProjects = result.initial.store.pools;
-      setFetchedPools(resultProjects);
+      //here we enforce asc order for pool to not confuse the users
+      const preOrderedPools = resultProjects.sort((aey: any, bee: any) => {
+        return aey.pool.froze.birth - bee.pool.froze.birth;
+      });
+      const orderedPools = orderPools(preOrderedPools, order);
+      log("orderedPools", orderedPools);
+      setFetchedPools(orderedPools);
       if (result) {
         setLoading({ trying: false, success: true, error: false });
       } else {
@@ -276,129 +286,131 @@ function ErrorAlert({ onRetry }: { onRetry: Function }) {
     </Alert>
   );
 }
-function Project({
-  title,
-  children,
-  pin,
-  goalsLength,
-  permList,
-}: {
-  title: string;
-  pin: PinId;
-  children: any;
-  goalsLength: number;
-  permList: any;
-}) {
-  //TODO: add the store type
-  const collapseAll = useStore((store: any) => store.collapseAll);
+const Project = memo(
+  ({
+    title,
+    children,
+    pin,
+    goalsLength,
+    permList,
+  }: {
+    title: string;
+    pin: PinId;
+    children: any;
+    goalsLength: number;
+    permList: any;
+  }) => {
+    //TODO: add the store type
+    const collapseAll = useStore((store: any) => store.collapseAll);
 
-  const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
-  const [addingGoal, setAddingGoal] = useState<boolean>(false);
-  const [editingTitle, setEditingTitle] = useState<boolean>(false);
-  const [trying, setTrying] = useState<boolean>(false);
+    const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
+    const [addingGoal, setAddingGoal] = useState<boolean>(false);
+    const [editingTitle, setEditingTitle] = useState<boolean>(false);
+    const [trying, setTrying] = useState<boolean>(false);
 
-  const handleAdd = () => {
-    toggleItemOpen(true);
-    setAddingGoal(true);
-  };
-  useEffect(() => {
-    //everytime collapse all changes, we force isOpen value to comply
-    toggleItemOpen(collapseAll.status);
-  }, [collapseAll.count]);
-  return (
-    <Box sx={{ marginBottom: 1 }}>
-      <StyledTreeItem
-        sx={{
-          "&:hover": {
-            cursor: "pointer",
-            "& .show-on-hover": {
-              opacity: 1,
+    const handleAdd = () => {
+      toggleItemOpen(true);
+      setAddingGoal(true);
+    };
+    useEffect(() => {
+      //everytime collapse all changes, we force isOpen value to comply
+      toggleItemOpen(collapseAll.status);
+    }, [collapseAll.count]);
+    return (
+      <Box sx={{ marginBottom: 1 }}>
+        <StyledTreeItem
+          sx={{
+            "&:hover": {
+              cursor: "pointer",
+              "& .show-on-hover": {
+                opacity: 1,
+              },
             },
-          },
-        }}
-      >
-        {trying ? (
-          <CircularProgress
-            size={24}
-            sx={{ position: "absolute", left: -35 }}
-          />
-        ) : (
-          <IconMenu
-            poolData={{ title, permList, pin }}
-            type="pool"
-            pin={pin}
-            setParentTrying={setTrying}
-          />
-        )}
-        {goalsLength > 0 && (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            className="icon-container"
-            onClick={() => toggleItemOpen(!isOpen)}
-          >
-            {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
-          </Box>
-        )}
-        {!editingTitle ? (
-          <Typography
-            color={trying ? "text.disabled" : "text.primary"}
-            variant="h5"
-            fontWeight={"bold"}
-            onDoubleClick={() => {
-              !trying && setEditingTitle(true);
-            }}
-          >
-            {title}
-          </Typography>
-        ) : (
-          <EditInput
-            type="pool"
-            title={title}
-            onDone={() => {
-              setEditingTitle(false);
-            }}
-            setParentTrying={setTrying}
-            pin={pin}
-          />
-        )}
+          }}
+        >
+          {trying ? (
+            <CircularProgress
+              size={24}
+              sx={{ position: "absolute", left: -35 }}
+            />
+          ) : (
+            <IconMenu
+              poolData={{ title, permList, pin }}
+              type="pool"
+              pin={pin}
+              setParentTrying={setTrying}
+            />
+          )}
+          {goalsLength > 0 && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              className="icon-container"
+              onClick={() => toggleItemOpen(!isOpen)}
+            >
+              {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
+            </Box>
+          )}
+          {!editingTitle ? (
+            <Typography
+              color={trying ? "text.disabled" : "text.primary"}
+              variant="h5"
+              fontWeight={"bold"}
+              onDoubleClick={() => {
+                !trying && setEditingTitle(true);
+              }}
+            >
+              {title}
+            </Typography>
+          ) : (
+            <EditInput
+              type="pool"
+              title={title}
+              onDone={() => {
+                setEditingTitle(false);
+              }}
+              setParentTrying={setTrying}
+              pin={pin}
+            />
+          )}
 
-        {/*TODO: make this into it's own component(so we don't have to rerender the children)*/}
-        {!trying && (
-          <IconButton
-            sx={{ opacity: 0 }}
-            className="show-on-hover"
-            // sx={{ position: "absolute", right: 35 }}
-            aria-label="add goal button"
-            size="small"
-            onClick={handleAdd}
-          >
-            <AddIcon />
-          </IconButton>
+          {/*TODO: make this into it's own component(so we don't have to rerender the children)*/}
+          {!trying && (
+            <IconButton
+              sx={{ opacity: 0 }}
+              className="show-on-hover"
+              // sx={{ position: "absolute", right: 35 }}
+              aria-label="add goal button"
+              size="small"
+              onClick={handleAdd}
+            >
+              <AddIcon />
+            </IconButton>
+          )}
+        </StyledTreeItem>
+        {addingGoal && (
+          <NewGoalInput
+            pin={pin}
+            under={false}
+            callback={() => setAddingGoal(false)}
+          />
         )}
-      </StyledTreeItem>
-      {addingGoal && (
-        <NewGoalInput
-          pin={pin}
-          under={false}
-          callback={() => setAddingGoal(false)}
-        />
-      )}
-      <StyledTreeChildren
-        style={{
-          // backgroundColor:"orange",
-          height: !isOpen ? "0px" : "auto",
-          overflow: !isOpen ? "hidden" : "visible",
-        }}
-      >
-        {children}
-      </StyledTreeChildren>
-    </Box>
-  );
-}
+        <StyledTreeChildren
+          style={{
+            // backgroundColor:"orange",
+            height: !isOpen ? "0px" : "auto",
+            overflow: !isOpen ? "hidden" : "visible",
+          }}
+        >
+          {children}
+        </StyledTreeChildren>
+      </Box>
+    );
+  }
+);
 function Header() {
   const [newProjectTitle, setNewProjectTitle] = useState<string>("");
   const [trying, setTrying] = useState<boolean>(false);
@@ -408,6 +420,9 @@ function Header() {
 
   const setCollapseAll = useStore((store) => store.setCollapseAll);
   const collapseAll = useStore((store) => store.collapseAll);
+
+  const order = useStore((store) => store.order);
+  const setOrder = useStore((store) => store.setOrder);
 
   const [filterCompleteChecked, setFilterCompleteChecked] =
     useState<boolean>(false);
@@ -512,6 +527,24 @@ function Header() {
           onClick={() => setCollapseAll(false)}
         >
           collapse all
+        </Button>
+        <Button
+          sx={{ fontWeight: "bold", marginRight: 1 }}
+          variant="outlined"
+          onClick={() => {
+            return orderPoolsAction("asc");
+          }}
+        >
+          set asc order
+        </Button>
+        <Button
+          sx={{ fontWeight: "bold", marginRight: 1 }}
+          variant="outlined"
+          onClick={() => {
+            return orderPoolsAction("dsc");
+          }}
+        >
+          set dsc order
         </Button>
       </Stack>
       <Divider sx={{ paddingTop: 2 }} />

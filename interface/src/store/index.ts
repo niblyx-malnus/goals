@@ -1,5 +1,5 @@
 import create from "zustand";
-import { FilterGoals } from "../types/types";
+import { FilterGoals, Order } from "../types/types";
 
 interface Store {
   /*
@@ -25,6 +25,9 @@ interface Store {
   deleteDialogData: any;
   deleteDialogOpen: boolean;
   toggleDeleteDialog: (status: boolean, deleteDialogData: any) => void;
+
+  order: Order;
+  setOrder: (newOrder: Order) => void;
 }
 
 const useStore = create<Store>((set, get) => ({
@@ -48,13 +51,19 @@ const useStore = create<Store>((set, get) => ({
       shareDialogOpen: newStatus,
       shareDialogData: poolData,
     })),
-     
+
   deleteDialogData: null,
   deleteDialogOpen: false,
   toggleDeleteDialog: (newStatus: boolean, newDeleteDialogData: any) =>
     set(() => ({
       deleteDialogOpen: newStatus,
       deleteDialogData: newDeleteDialogData,
+    })),
+
+  order: "asc",
+  setOrder: (newOrder: Order) =>
+    set(() => ({
+      order: newOrder,
     })),
 }));
 

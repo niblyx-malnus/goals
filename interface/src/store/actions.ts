@@ -1,8 +1,9 @@
 /*Functions we use to generate data to enter to the store*/
 
 import useStore from ".";
-import { GoalId, PinId } from "../types/types";
+import { GoalId, Order, PinId } from "../types/types";
 import cloneDeep from "lodash/cloneDeep";
+import { log } from "../helpers";
 function deletePoolAction(toDeletePin: PinId) {
   const state = useStore.getState();
   const pools = state.pools;
@@ -148,6 +149,7 @@ function newGoalAction(
 ) {
   const state = useStore.getState();
   const pools = state.pools;
+  const order = state.order;
   const setPools = state.setPools;
   //select project using pinId and then add the goal to the goal list
   //if nexus(add-under(nesting)) is provided, we find the goal provided in the nexus and update it with the new data
@@ -167,8 +169,11 @@ function newGoalAction(
         }
         return goalItem;
       });
-      newGoals.push({ goal: newGoal, id: newGoalId });
-
+      if (order === "asc") {
+        newGoals.push({ goal: newGoal, id: newGoalId });
+      } else {
+        newGoals.unshift({ goal: newGoal, id: newGoalId });
+      }
       return {
         ...poolItem,
         pool: {
@@ -191,6 +196,38 @@ function newPoolAction(newPool: any) {
   newPools.push(newPool);
   setPools(newPools);
 }
+function orderPoolsAction(newOrder: Order) {
+  const state = useStore.getState();
+  const pools = state.pools;
+  const setPools = state.setPools;
+  const setOrder = state.setOrder;
+  //reorder the goals using the helper
+  const newPools = orderPools(pools, newOrder);
+
+  setPools(newPools);
+  setOrder(newOrder);
+}
+
+//this is actually just a helper
+const orderPools = (pools: any, order: Order) => {
+  //reorder the pools and then the goals, returns ordered pools
+  const orderedPoolsAndGoals = pools.map((poolItem: any) => {
+    const reorderedGoal = poolItem.pool.nexus.goals.sort(
+      (aey: any, bee: any) => {
+        if (order === "asc") return aey.goal.froze.birth - bee.goal.froze.birth;
+        return bee.goal.froze.birth - aey.goal.froze.birth;
+      }
+    );
+    return {
+      ...poolItem,
+      pool: {
+        ...poolItem.pool,
+        nexus: { ...poolItem.pool.nexus, goals: reorderedGoal },
+      },
+    };
+  });
+  return orderedPoolsAndGoals;
+};
 export {
   deletePoolAction,
   deleteGoalAction,
@@ -199,4 +236,6 @@ export {
   updateGoalDescAction,
   newGoalAction,
   newPoolAction,
+  orderPoolsAction,
+  orderPools,
 };

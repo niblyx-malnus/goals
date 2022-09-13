@@ -177,39 +177,38 @@ const RecursiveTree = ({ goalList, pin, onSelectCallback }: any) => {
     //filter out complete if store says so
     if (currentGoal.togls.complete && filterGoals === "complete") return null;
     return (
-      childGoals && (
-        <TreeItem
-          idObject={goal.id}
-          id={currentGoalId}
-          key={currentGoalId}
-          onSelectCallback={(id: number) => {
-            onSelectCallback(id);
-          }}
-          isSelected={currentGoal.selected}
-          label={currentGoal.hitch.desc}
-          goal={currentGoal}
-          pin={pin}
-        >
-          {childGoals.map((goal: any) => {
-            const currentChildGoalId = goal.id.birth;
-            return (
-              <Fragment key={currentChildGoalId}>{createTree(goal)}</Fragment>
-            );
-          })}
-        </TreeItem>
-      )
+      <TreeItem
+        idObject={goal.id}
+        id={currentGoalId}
+        key={currentGoalId}
+        onSelectCallback={(id: number) => {
+          onSelectCallback(id);
+        }}
+        isSelected={currentGoal.selected}
+        label={currentGoal.hitch.desc}
+        goal={currentGoal}
+        pin={pin}
+      >
+        {childGoals.map((goal: any) => {
+          const currentChildGoalId = goal.id.birth;
+          return (
+            <Fragment key={currentChildGoalId}>{createTree(goal)}</Fragment>
+          );
+        })}
+      </TreeItem>
     );
   };
   return (
     <Box>
-      {goalList.map((goal: any, i: any) => (
-        <Box key={i}>{createTree(goal)}</Box>
-      ))}
+      {goalList.map((goal: any, index: number) => {
+        console.log("pin.birth", pin.birth);
+        return createTree(goal);
+      })}
     </Box>
   );
 };
 
-export default RecursiveTree;
+export default memo(RecursiveTree);
 
 // styles
 const StyledMenuButton = styled(IconButton)({
