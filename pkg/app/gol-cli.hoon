@@ -39,8 +39,8 @@
   ^-  (quip card _this)
   :-  [%pass /goals %agent [our.bowl %goal-store] %watch /goals]~
   %=  this
-    handles  *handles:vyu :: initial:hdls
-    views  (~(put by *views:vyu) [%all ~] *view:vyu) :: initial:vyuz
+    handles  initial:hdls
+    views  initial:vyuz
   ==
 ::
 ++  on-save  !>(state)
@@ -52,7 +52,12 @@
   |-
   ?-    -.old
       %2
-    `this(state old)
+    :-  ~
+    %=  this
+      state    old
+      handles  initial:hdls
+      views    initial:vyuz
+    ==
       %1
     $(old (convert-1-to-2:vyu old))
       %0

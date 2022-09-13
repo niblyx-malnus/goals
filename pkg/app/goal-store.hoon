@@ -59,10 +59,8 @@
           ::
           :: [%new-pool title=@t admins=(set ship) captains=(set ship) viewers=(set ship)]
           %new-pool
-        ~&  wex.bowl
         ?>  =(src.bowl our.bowl)
-        %+  convert-home-cud:hc
-          ~
+        %+  convert-home-cud:hc  ~
         %:  new-pool:gs
           title.action
           admins.action
@@ -76,8 +74,7 @@
           :: [%copy-pool =old=pin title=@t admins=(set ship) captains=(set ship) viewers=(set ship)]
           %copy-pool
         ?>  =(src.bowl our.bowl)
-        %+  convert-home-cud:hc
-          ~
+        %+  convert-home-cud:hc  ~
         %:  copy-pool:gs
           old-pin.action
           title.action
@@ -100,8 +97,7 @@
           :: [%spawn-goal =pin upid=(unit id) desc=@t actionable=? =goal-perms]
           %spawn-goal
         ?>  =(our.bowl owner.pin.action)
-        %+  convert-away-cud:hc 
-          ~
+        %+  convert-away-cud:hc  ~
         %:  spawn-goal:gs
           [pin.action src.bowl]
           [our now]:bowl
@@ -512,7 +508,7 @@
   ;:  weld
     cards
     (send-away-updates [pin upd]:away-cud)
-    %-  send-home-updates 
+    %-  send-home-updates
     %+  turn  upd.away-cud
     |=  =away-update:goal-store
     [[pin.away-cud src.bowl] away-update]

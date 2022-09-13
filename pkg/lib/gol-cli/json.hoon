@@ -158,7 +158,8 @@
       :~  [%pin (enjs-pin pin.hom)]
           [%mod (ship mod.hom)]
       ==
-      :-  -.upd
+      :-  %tel
+      %+  frond  -.upd
       ?-    -.upd
           %spawn-goal
         %-  pairs
