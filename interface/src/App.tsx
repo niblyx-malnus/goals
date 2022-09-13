@@ -471,7 +471,7 @@ function Header() {
     >
       <ShareDialog pals={[]} />
       <DeletionDialog />
-      <LeaveDialog  />
+      <LeaveDialog />
       <Stack flexDirection="row" alignItems="center">
         <OutlinedInput
           id="add-new-pool"
