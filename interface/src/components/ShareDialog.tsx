@@ -34,6 +34,7 @@ export default function ShareDialog({ pals }: { pals: any }) {
   const open = useStore((store: any) => store.shareDialogOpen);
   const toggleShareDialog = useStore((store: any) => store.toggleShareDialog);
   const shareDialogData = useStore((store: any) => store.shareDialogData);
+  const roleMap = useStore((store: any) => store.roleMap);
 
   const onClose = () => {
     toggleShareDialog(false, null);
@@ -47,6 +48,8 @@ export default function ShareDialog({ pals }: { pals: any }) {
   const [captainList, setCaptainList] = useState<ChipData[]>([]);
   const [adminList, setAdminList] = useState<ChipData[]>([]);
   const [trying, setTrying] = useState<boolean>(false);
+  const [canEditAdmins, setCanEditAdmins] = useState<boolean>(true);
+
   const handleDeleteViewer = (chipToDelete: ChipData) => {
     if (trying) return;
 
@@ -184,6 +187,8 @@ export default function ShareDialog({ pals }: { pals: any }) {
     }
   };
   const handleClose = () => {
+    //reset select to have viewer
+    setRole("Viewer");
     onClose();
   };
   const validateShipName = () => {
@@ -238,6 +243,9 @@ export default function ShareDialog({ pals }: { pals: any }) {
   useEffect(() => {
     if (!shareDialogData) return;
     //construct our chips from the permlist, everytime we display this
+    //get the current role related to this ship
+    const myRole = roleMap.get(shareDialogData.pin.birth);
+    const canEditAdmins = myRole !== "admin";
     const permList = shareDialogData.permList; //TODO: handle not having this?
     let viewerChips = permList.viewers.map((item: any, index: any) => {
       return { key: index, label: item, canDelete: true };
@@ -246,7 +254,7 @@ export default function ShareDialog({ pals }: { pals: any }) {
       return { key: index, label: item, canDelete: true };
     });
     const adminChips = permList.admins.map((item: any, index: any) => {
-      return { key: index, label: item, canDelete: true };
+      return { key: index, label: item, canDelete: canEditAdmins };
     });
     //create links beetween caps/admins and viewers
     viewerChips = viewerChips.map((item: any) => {
@@ -261,10 +269,10 @@ export default function ShareDialog({ pals }: { pals: any }) {
     setViewerList(viewerChips);
     setCaptainList(captainChips);
     setAdminList(adminChips);
+    setCanEditAdmins(canEditAdmins);
   }, [open, shareDialogData]);
   //if we dont have data we dont render
   if (!shareDialogData) return null;
-
   return (
     <Dialog
       open={open}
@@ -328,7 +336,7 @@ export default function ShareDialog({ pals }: { pals: any }) {
             >
               <MenuItem value={"Viewer"}>Viewer</MenuItem>
               <MenuItem value={"Captain"}>Captain</MenuItem>
-              <MenuItem value={"Admin"}>Admin</MenuItem>
+              {canEditAdmins && <MenuItem value={"Admin"}>Admin</MenuItem>}
             </Select>
           </FormControl>
           <IconButton

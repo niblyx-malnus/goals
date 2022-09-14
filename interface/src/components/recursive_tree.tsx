@@ -13,7 +13,9 @@ import EditInput from "./EditInput";
 import AddIcon from "@mui/icons-material/Add";
 import useStore from "../store";
 import CircularProgress from "@mui/material/CircularProgress";
-import { shipName } from "../helpers";
+import Chip from "@mui/material/Chip";
+import Avatar from "@mui/material/Avatar";
+import { log, shipName } from "../helpers";
 
 interface TreeItemProps {
   readonly id: number;
@@ -23,7 +25,7 @@ interface TreeItemProps {
   readonly children: ReadonlyArray<JSX.Element>;
   readonly idObject: any;
   readonly goal: any;
-  role: string;
+  poolRole: string;
   pin: PinId;
   isCaptain: boolean;
 }
@@ -45,7 +47,7 @@ const TreeItem = memo(
     idObject,
     goal,
     pin,
-    role,
+    poolRole,
     isCaptain,
   }: TreeItemProps) => {
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
@@ -54,6 +56,7 @@ const TreeItem = memo(
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [trying, setTrying] = useState<boolean>(false);
     const collapseAll = useStore((store) => store.collapseAll);
+
     useEffect(() => {
       //everytime collapse all changes, we force isOpen value to comply
       toggleItemOpen(collapseAll.status);
@@ -63,8 +66,8 @@ const TreeItem = memo(
       setAddingGoal(true);
     };
     const renderIconMenu = () => {
-      if (role === "viewer") return;
-      if (role === "captain" && !isCaptain) return;
+      if (poolRole === "viewer") return;
+      if (poolRole === "captain" && !isCaptain) return;
       return trying ? (
         <CircularProgress
           size={24}
@@ -97,8 +100,8 @@ const TreeItem = memo(
           {label}
         </Typography>
       );
-      if (role === "viewer") return noEditPermTitle;
-      if (role === "captain" && !isCaptain) return noEditPermTitle;
+      if (poolRole === "viewer") return noEditPermTitle;
+      if (poolRole === "captain" && !isCaptain) return noEditPermTitle;
       return !editingTitle ? (
         <Typography
           variant="h6"
@@ -134,8 +137,8 @@ const TreeItem = memo(
       );
     };
     const renderAddButton = () => {
-      if (role === "viewer") return;
-      if (role === "captain" && !isCaptain) return;
+      if (poolRole === "viewer") return;
+      if (poolRole === "captain" && !isCaptain) return;
       return (
         !trying && (
           <IconButton
@@ -183,6 +186,20 @@ const TreeItem = memo(
 
             {renderAddButton()}
           </>
+          {goal.perms.captains.map((item: any, index: number) => {
+            return (
+              <Chip
+                key={item}
+                sx={{ opacity: 0, marginLeft: 1 }}
+                avatar={<Avatar>C</Avatar>}
+                className="show-on-hover"
+                size="small"
+                label={<Typography fontWeight={"bold"}>{item}</Typography>}
+                color="primary"
+                variant="outlined"
+              />
+            );
+          })}
         </StyledTreeItem>
         {addingGoal && (
           <NewGoalInput
@@ -205,7 +222,7 @@ const TreeItem = memo(
   }
 );
 
-const RecursiveTree = ({ goalList, pin, onSelectCallback, role }: any) => {
+const RecursiveTree = ({ goalList, pin, onSelectCallback, poolRole }: any) => {
   const filterGoals = useStore((store) => store.filterGoals);
   const ship = shipName();
   const createTree = (goal: any) => {
@@ -214,8 +231,9 @@ const RecursiveTree = ({ goalList, pin, onSelectCallback, role }: any) => {
     const childGoals = goal.childNodes;
     //filter out complete if store says so
     if (currentGoal.togls.complete && filterGoals === "complete") return null;
-    //am I cap, no cap 100p on a stack
+    //we need to know if the current ship is a captain on this goal
     const isCaptain = currentGoal.perms.captains.includes(ship);
+
     return (
       <TreeItem
         idObject={goal.id}
@@ -228,7 +246,7 @@ const RecursiveTree = ({ goalList, pin, onSelectCallback, role }: any) => {
         label={currentGoal.hitch.desc}
         goal={currentGoal}
         pin={pin}
-        role={role}
+        poolRole={poolRole}
         isCaptain={isCaptain}
       >
         {childGoals.map((goal: any) => {

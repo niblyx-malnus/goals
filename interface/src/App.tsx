@@ -59,11 +59,8 @@ declare const window: Window &
 //TODO: edit inputs should hide the action buttons and take up the full width of the screen
 //TODO: add an event log to the app
 //TODO: actions log / displaying ownership tomorrow and
-//TODO: display pool owner
 //TODO: handle sub kick/error IMPORTANT
-//TODO: dont allow admins to delete other admins
-//TODO: display own role in a pool
-//TODO: manage roles, reset role to viewer after doing stuff
+
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -450,12 +447,20 @@ const Project = memo(
           {/*TODO: make this into it's own component(so we don't have to rerender the children)*/}
           {renderAddButton()}
           <Chip
-            sx={{ opacity: 0 }}
+            sx={{ opacity: 0, marginLeft: 1 }}
             className="show-on-hover"
             avatar={<Avatar>O</Avatar>}
             size="small"
-            label={poolOwner}
+            label={<Typography fontWeight={"bold"}>{poolOwner}</Typography>}
             color="primary"
+            variant="outlined"
+          />
+          <Chip
+            sx={{ opacity: 0, marginLeft: 1 }}
+            className="show-on-hover"
+            size="small"
+            label={<Typography fontWeight={"bold"}>{role}</Typography>}
+            color="secondary"
             variant="outlined"
           />
         </StyledTreeItem>
