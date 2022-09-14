@@ -13,7 +13,8 @@ export interface PinId {
   owner: string;
 }
 
+export type SnackBarData = { message: string; severity: string } | null;
 export type FilterGoals = null | "complete" | "incomplete";
-export type Order =  "asc" | "dsc";
+export type Order = "asc" | "dsc";
 
 export type Tree = ReadonlyArray<TreeBranch>;

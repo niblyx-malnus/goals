@@ -7,7 +7,7 @@ import InputBase from "@mui/material/InputBase";
 import { log } from "../helpers";
 import Typography from "@mui/material/Typography";
 import { PinId, GoalId } from "../types/types";
-import { updatePoolTitleAction, updateGoalDescAction } from "../store/actions";
+import useStore from "../store";
 //TODO: handle error states
 function EditInput({
   title,
@@ -44,6 +44,7 @@ function EditInput({
   const [trying, setTrying] = useState<boolean>(false);
 
   const newTitleSpanRef: any = React.useRef(null);
+  const toggleSnackBar = useStore((store) => store.toggleSnackBar);
 
   useEffect(() => {
     setValue(title);
@@ -80,8 +81,11 @@ function EditInput({
     try {
       const result = await api.editPoolTitle(pin, value);
       log("editPoolTitle result => ", result);
-    
     } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to edit pool title",
+        severity: "error",
+      });
       log("editPoolTitle error => ", e);
     }
     setParentTrying(false);
@@ -97,8 +101,11 @@ function EditInput({
     try {
       const result = await api.editGoalDesc(id, value);
       log("editGoalDesc result => ", result);
-   
     } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to edit goal description",
+        severity: "error",
+      });
       log("editGoalDesc error => ", e);
     }
     setParentTrying(false);

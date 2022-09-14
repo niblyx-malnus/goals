@@ -1,5 +1,5 @@
 import create from "zustand";
-import { FilterGoals, Order } from "../types/types";
+import { FilterGoals, Order, SnackBarData } from "../types/types";
 
 interface Store {
   /*
@@ -35,6 +35,10 @@ interface Store {
 
   roleMap: any;
   setRoleMap: (newRoleMap: any) => void;
+
+  snackBarOpen: boolean;
+  snackBarData: SnackBarData;
+  toggleSnackBar: (newStatus: boolean, newSnackBarData:SnackBarData) => void;
 }
 
 const useStore = create<Store>((set, get) => ({
@@ -85,6 +89,14 @@ const useStore = create<Store>((set, get) => ({
   setRoleMap: (newRoleMap: any) =>
     set(() => ({
       roleMap: newRoleMap,
+    })),
+
+  snackBarOpen: false,
+  snackBarData: null,
+  toggleSnackBar: (newStatus, newSnackBarData) =>
+    set(() => ({
+      snackBarOpen: newStatus,
+      snackBarData: newSnackBarData,
     })),
 }));
 

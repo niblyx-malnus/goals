@@ -34,6 +34,8 @@ export default function ShareDialog({ pals }: { pals: any }) {
   const open = useStore((store: any) => store.shareDialogOpen);
   const toggleShareDialog = useStore((store: any) => store.toggleShareDialog);
   const shareDialogData = useStore((store: any) => store.shareDialogData);
+  const toggleSnackBar = useStore((store) => store.toggleSnackBar);
+
   const roleMap = useStore((store: any) => store.roleMap);
 
   const onClose = () => {
@@ -234,8 +236,17 @@ export default function ShareDialog({ pals }: { pals: any }) {
         captains,
         admins
       );
+      toggleSnackBar(true, {
+        message: "successfully updated pool permissions",
+        severity: "success",
+      });
+      handleClose();
       log("updatePoolPerms result =>", result);
     } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to update pool permissions",
+        severity: "error",
+      });
       log("updatePoolPerms error =>", e);
     }
     setTrying(false);

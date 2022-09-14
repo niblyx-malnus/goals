@@ -86,6 +86,7 @@ export default function IconMenu({
   const toggleShareDialog = useStore((store: any) => store.toggleShareDialog);
   const toggleDeleteDialog = useStore((store: any) => store.toggleDeleteDialog);
   const toggleLeaveDialog = useStore((store: any) => store.toggleLeaveDialog);
+  const toggleSnackBar = useStore((store) => store.toggleSnackBar);
 
   const roleMap = useStore((store: any) => store.roleMap);
   const role = roleMap.get(pin?.birth);
@@ -103,6 +104,10 @@ export default function IconMenu({
       const result = await api.markComplete(id);
       log("markComplete result => ", result);
     } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to mark goal complete",
+        severity: "error",
+      });
       log("markComplete error => ", e);
     }
     setParentTrying(false);
@@ -114,6 +119,10 @@ export default function IconMenu({
       const result = await api.unmarkComplete(id);
       log("unmarkComplete result => ", result);
     } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to mark goal incomplete",
+        severity: "error",
+      });
       log("unmarkComplete error => ", e);
     }
     setParentTrying(false);
@@ -125,7 +134,15 @@ export default function IconMenu({
     try {
       const result = await api.deletePool(pin);
       log("deletePool result => ", result);
+      toggleSnackBar(true, {
+        message: "successfully deleted pool",
+        severity: "success",
+      });
     } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to delete pool",
+        severity: "error",
+      });
       log("deletePool error => ", e);
     }
     setParentTrying(false);
@@ -137,7 +154,15 @@ export default function IconMenu({
     try {
       const result = await api.leavePool(pin);
       log("leavePool result => ", result);
+      toggleSnackBar(true, {
+        message: "successfully left pool",
+        severity: "success",
+      });
     } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to leave pool",
+        severity: "error",
+      });
       log("leavePool error => ", e);
     }
     setParentTrying(false);
@@ -150,6 +175,10 @@ export default function IconMenu({
       const result = await api.deleteGoal(id);
       log("deleteGoal result => ", result);
     } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to delete goal",
+        severity: "error",
+      });
       log("deleteGoal error => ", e);
     }
     setParentTrying(false);

@@ -6,6 +6,7 @@ import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import { GoalId, PinId } from "../types/types";
+import useStore from "../store";
 //TODO: padding left  34 for add goal 44 for add under(me thinks), maybe a better way to do this
 
 function NewGoalInput({
@@ -21,6 +22,9 @@ function NewGoalInput({
 }) {
   const [value, setValue] = useState<string>("");
   const [trying, setTrying] = useState<boolean>(false);
+
+  const toggleSnackBar = useStore((store) => store.toggleSnackBar);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
   };
@@ -43,8 +47,14 @@ function NewGoalInput({
 
     try {
       const result = await api.addGoal(value, pin, parentId);
-      log("result", result);
-    } catch (e) {}
+      log("addGoal result =>", result);
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to add goal",
+        severity: "error",
+      });
+      log("addGoal error =>", e);
+    }
     callback();
     setTrying(false);
   };

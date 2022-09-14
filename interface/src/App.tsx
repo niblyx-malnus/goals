@@ -39,7 +39,12 @@ import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
 
-import { ShareDialog, DeletionDialog, LeaveDialog } from "./components";
+import {
+  ShareDialog,
+  DeletionDialog,
+  LeaveDialog,
+  Snackie,
+} from "./components";
 declare const window: Window &
   typeof globalThis & {
     scry: any;
@@ -49,16 +54,13 @@ declare const window: Window &
 
 //TODO: disable the actions until subscription is setup/have any pools
 //TODO: display a "to get started add a pool"
-//TODO: add sharing projects, add pals integration
+//TODO: add pals integration
 //TODO: once you are using add input, hide the add button
 //TODO: UI cleanup
 //TODO: add filter incomplete goals
-//TODO: handle error messages
 //TODO: migrate the actions to the subscription
-//TODO: add success/error alert (bottom left) for the manage perms dialog
 //TODO: edit inputs should hide the action buttons and take up the full width of the screen
 //TODO: add an event log to the app
-//TODO: actions log / displaying ownership tomorrow and
 //TODO: handle sub kick/error IMPORTANT
 
 interface Loading {
@@ -489,13 +491,10 @@ function Header() {
   const [trying, setTrying] = useState<boolean>(false);
 
   const setFilterGoals = useStore((store) => store.setFilterGoals);
-  const filterGoals = useStore((store) => store.filterGoals);
 
   const setCollapseAll = useStore((store) => store.setCollapseAll);
-  const collapseAll = useStore((store) => store.collapseAll);
 
-  const order = useStore((store) => store.order);
-  const setOrder = useStore((store) => store.setOrder);
+  const toggleSnackBar = useStore((store) => store.toggleSnackBar);
 
   const [filterCompleteChecked, setFilterCompleteChecked] =
     useState<boolean>(false);
@@ -524,7 +523,15 @@ function Header() {
       try {
         const result = await api.addPool(newProjectTitle);
         log("addNewPool result => ", result);
+        toggleSnackBar(true, {
+          message: "successfully added pool",
+          severity: "success",
+        });
       } catch (e) {
+        toggleSnackBar(true, {
+          message: "failed to add pool",
+          severity: "error",
+        });
         log("addNewPool error =>", e);
       }
       setNewProjectTitle("");
@@ -545,6 +552,7 @@ function Header() {
       <ShareDialog pals={[]} />
       <DeletionDialog />
       <LeaveDialog />
+      <Snackie />
       <Stack flexDirection="row" alignItems="center">
         <OutlinedInput
           id="add-new-pool"
