@@ -32,6 +32,9 @@ interface Store {
 
   order: Order;
   setOrder: (newOrder: Order) => void;
+
+  roleMap: any;
+  setRoleMap: (newRoleMap: any) => void;
 }
 
 const useStore = create<Store>((set, get) => ({
@@ -76,6 +79,12 @@ const useStore = create<Store>((set, get) => ({
   setOrder: (newOrder: Order) =>
     set(() => ({
       order: newOrder,
+    })),
+
+  roleMap: null,
+  setRoleMap: (newRoleMap: any) =>
+    set(() => ({
+      roleMap: newRoleMap,
     })),
 }));
 

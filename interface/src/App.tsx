@@ -14,10 +14,12 @@ import NewGoalInput from "./components/NewGoalInput";
 import EditInput from "./components/EditInput";
 import IconMenu from "./components/IconMenu";
 import useStore from "./store";
-import { log } from "./helpers";
+import { log, shipName } from "./helpers";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import { Order, PinId } from "./types/types";
+import Avatar from "@mui/material/Avatar";
+
 import {
   deleteGoalAction,
   deletePoolAction,
@@ -34,18 +36,20 @@ import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
-
+import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
+
 import { ShareDialog, DeletionDialog, LeaveDialog } from "./components";
 declare const window: Window &
   typeof globalThis & {
     scry: any;
     poke: any;
+    ship: any;
   };
 
 //TODO: disable the actions until subscription is setup/have any pools
 //TODO: display a "to get started add a pool"
-//TODO: add sharing projects, add pals integration, add @p validation, display currently added @p
+//TODO: add sharing projects, add pals integration
 //TODO: once you are using add input, hide the add button
 //TODO: UI cleanup
 //TODO: add filter incomplete goals
@@ -54,6 +58,11 @@ declare const window: Window &
 //TODO: add success/error alert (bottom left) for the manage perms dialog
 //TODO: edit inputs should hide the action buttons and take up the full width of the screen
 //TODO: add an event log to the app
+//TODO: actions log / displaying ownership tomorrow and
+//TODO: display pool owner
+//TODO: display own role in a pool
+//TODO: handle sub kick/error IMPORTANT
+
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -61,7 +70,7 @@ interface Loading {
 }
 function App() {
   const order = useStore((store) => store.order);
-
+  const setRoleMap = useStore((store) => store.setRoleMap);
   const fetchedPools = useStore((store) => store.pools);
   const setFetchedPools = useStore((store) => store.setPools);
   const [channel, setChannel] = useState<null | number>(null);
@@ -117,7 +126,29 @@ function App() {
         return aey.pool.froze.birth - bee.pool.froze.birth;
       });
       const orderedPools = orderPools(preOrderedPools, order);
-      log("orderedPools", orderedPools);
+      //make our role map
+      const roleMap = new Map();
+      const currShip = shipName();
+      orderedPools.forEach((poolItem: any) => {
+        //TODO: I want to return out
+        const { pin, pool } = poolItem;
+        if (pin.owner === currShip) {
+          //check if this ship is the owner
+          roleMap.set(pin.birth, "owner");
+        }
+        //check the perms lists for the current ship
+        if (pool.perms.viewers.includes(shipName)) {
+          roleMap.set(pin.birth, "viewer");
+        }
+        if (pool.perms.captains.includes(shipName)) {
+          roleMap.set(pin.birth, "captain");
+        }
+        if (pool.perms.admins.includes(shipName)) {
+          roleMap.set(pin.birth, "admin");
+        }
+      });
+      console.log("roleMap", roleMap);
+      setRoleMap(roleMap);
       setFetchedPools(orderedPools);
       if (result) {
         setLoading({ trying: false, success: true, error: false });
@@ -228,6 +259,7 @@ function App() {
     window["scry"] = api.scry;
     window["poke"] = api.poke;
   }, []);
+  const roleMap = useStore((store: any) => store.roleMap);
 
   return (
     <Container>
@@ -248,20 +280,25 @@ function App() {
         pools.map((pool: any, index: any) => {
           const poolTitle = pool.pool.hitch.title;
           const poolId = pool.pin.birth;
+          const poolOwner = pool.pin.owner;
           const goalList = pool.pool.nexus.goals;
           const permList = pool.pool.perms;
+          const role = roleMap.get(poolId);
           return (
             <Project
               title={poolTitle}
+              poolOwner={poolOwner}
               key={poolId}
               pin={pool.pin}
               goalsLength={goalList?.length}
               permList={permList}
+              role={role}
             >
               <RecursiveTree
                 goalList={goalList}
                 onSelectCallback={onSelect}
                 pin={pool.pin}
+                poolRole={role}
               />
             </Project>
           );
@@ -293,12 +330,16 @@ const Project = memo(
     pin,
     goalsLength,
     permList,
+    poolOwner,
+    role,
   }: {
     title: string;
     pin: PinId;
     children: any;
     goalsLength: number;
     permList: any;
+    poolOwner: string;
+    role: string;
   }) => {
     //TODO: add the store type
     const collapseAll = useStore((store: any) => store.collapseAll);
@@ -316,6 +357,67 @@ const Project = memo(
       //everytime collapse all changes, we force isOpen value to comply
       toggleItemOpen(collapseAll.status);
     }, [collapseAll.count]);
+    const renderIconMenu = () => {
+      if (role === "viewer" || role === "captain") return;
+      return trying ? (
+        <CircularProgress size={24} sx={{ position: "absolute", left: -35 }} />
+      ) : (
+        <IconMenu
+          poolData={{ title, permList, pin }}
+          type="pool"
+          pin={pin}
+          setParentTrying={setTrying}
+        />
+      );
+    };
+    const renderTitle = () => {
+      if (role === "viewer" || role === "captain") {
+        return (
+          <Typography color={"text.primary"} variant="h5" fontWeight={"bold"}>
+            {title}
+          </Typography>
+        );
+      }
+      return !editingTitle ? (
+        <Typography
+          color={trying ? "text.disabled" : "text.primary"}
+          variant="h5"
+          fontWeight={"bold"}
+          onDoubleClick={() => {
+            !trying && setEditingTitle(true);
+          }}
+        >
+          {title}
+        </Typography>
+      ) : (
+        <EditInput
+          type="pool"
+          title={title}
+          onDone={() => {
+            setEditingTitle(false);
+          }}
+          setParentTrying={setTrying}
+          pin={pin}
+        />
+      );
+    };
+    const renderAddButton = () => {
+      if (role === "viewer") return;
+      return (
+        !trying && (
+          <IconButton
+            sx={{ opacity: 0 }}
+            className="show-on-hover"
+            // sx={{ position: "absolute", right: 35 }}
+            aria-label="add goal button"
+            size="small"
+            onClick={handleAdd}
+          >
+            <AddIcon />
+          </IconButton>
+        )
+      );
+    };
     return (
       <Box sx={{ marginBottom: 1 }}>
         <StyledTreeItem
@@ -328,19 +430,7 @@ const Project = memo(
             },
           }}
         >
-          {trying ? (
-            <CircularProgress
-              size={24}
-              sx={{ position: "absolute", left: -35 }}
-            />
-          ) : (
-            <IconMenu
-              poolData={{ title, permList, pin }}
-              type="pool"
-              pin={pin}
-              setParentTrying={setTrying}
-            />
-          )}
+          {renderIconMenu()}
           {goalsLength > 0 && (
             <Box
               sx={{
@@ -354,42 +444,19 @@ const Project = memo(
               {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
             </Box>
           )}
-          {!editingTitle ? (
-            <Typography
-              color={trying ? "text.disabled" : "text.primary"}
-              variant="h5"
-              fontWeight={"bold"}
-              onDoubleClick={() => {
-                !trying && setEditingTitle(true);
-              }}
-            >
-              {title}
-            </Typography>
-          ) : (
-            <EditInput
-              type="pool"
-              title={title}
-              onDone={() => {
-                setEditingTitle(false);
-              }}
-              setParentTrying={setTrying}
-              pin={pin}
-            />
-          )}
+          {renderTitle()}
 
           {/*TODO: make this into it's own component(so we don't have to rerender the children)*/}
-          {!trying && (
-            <IconButton
-              sx={{ opacity: 0 }}
-              className="show-on-hover"
-              // sx={{ position: "absolute", right: 35 }}
-              aria-label="add goal button"
-              size="small"
-              onClick={handleAdd}
-            >
-              <AddIcon />
-            </IconButton>
-          )}
+          {renderAddButton()}
+          <Chip
+            sx={{ opacity: 0 }}
+            className="show-on-hover"
+            avatar={<Avatar>O</Avatar>}
+            size="small"
+            label={poolOwner}
+            color="primary"
+            variant="outlined"
+          />
         </StyledTreeItem>
         {addingGoal && (
           <NewGoalInput

@@ -13,6 +13,7 @@ import EditInput from "./EditInput";
 import AddIcon from "@mui/icons-material/Add";
 import useStore from "../store";
 import CircularProgress from "@mui/material/CircularProgress";
+import { shipName } from "../helpers";
 
 interface TreeItemProps {
   readonly id: number;
@@ -22,8 +23,9 @@ interface TreeItemProps {
   readonly children: ReadonlyArray<JSX.Element>;
   readonly idObject: any;
   readonly goal: any;
-
+  role: string;
   pin: PinId;
+  isCaptain: boolean;
 }
 
 export interface RecursiveTreeProps {
@@ -43,6 +45,8 @@ const TreeItem = memo(
     idObject,
     goal,
     pin,
+    role,
+    isCaptain,
   }: TreeItemProps) => {
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
     const [selected, setSelected] = useState(isSelected);
@@ -58,6 +62,95 @@ const TreeItem = memo(
       toggleItemOpen(true);
       setAddingGoal(true);
     };
+    const renderIconMenu = () => {
+      if (role === "viewer") return;
+      if (role === "captain" && !isCaptain) return;
+      return trying ? (
+        <CircularProgress
+          size={24}
+          sx={{
+            position: "absolute",
+            left: -30,
+          }}
+        />
+      ) : (
+        <IconMenu
+          type="goal"
+          complete={goal.togls.complete}
+          id={idObject}
+          pin={pin}
+          setParentTrying={setTrying}
+        />
+      );
+    };
+    const renderTitle = () => {
+      const noEditPermTitle = (
+        <Typography
+          variant="h6"
+          color={"text.primary"}
+          style={{
+            marginLeft: children && children.length === 0 ? "24px" : "",
+            background: `${selected ? "#d5d5d5" : ""}`,
+            textDecoration: goal.togls.complete ? "line-through" : "auto",
+          }}
+        >
+          {label}
+        </Typography>
+      );
+      if (role === "viewer") return noEditPermTitle;
+      if (role === "captain" && !isCaptain) return noEditPermTitle;
+      return !editingTitle ? (
+        <Typography
+          variant="h6"
+          color={trying ? "text.disabled" : "text.primary"}
+          onDoubleClick={() => {
+            !trying && setEditingTitle(true);
+          }}
+          style={{
+            marginLeft: children && children.length === 0 ? "24px" : "",
+            background: `${selected ? "#d5d5d5" : ""}`,
+            textDecoration: goal.togls.complete ? "line-through" : "auto",
+          }}
+        >
+          {label}
+        </Typography>
+      ) : (
+        <div
+          style={{
+            marginLeft: children && children.length === 0 ? "24px" : "",
+          }}
+        >
+          <EditInput
+            type="goal"
+            title={label}
+            onDone={() => {
+              setEditingTitle(false);
+            }}
+            pin={pin}
+            id={idObject}
+            setParentTrying={setTrying}
+          />
+        </div>
+      );
+    };
+    const renderAddButton = () => {
+      if (role === "viewer") return;
+      if (role === "captain" && !isCaptain) return;
+      return (
+        !trying && (
+          <IconButton
+            sx={{ opacity: 0 }}
+            className="show-on-hover"
+            // sx={{ position: "absolute", right: 35 }}
+            aria-label="add goal button"
+            size="small"
+            onClick={handleAdd}
+          >
+            <AddIcon />
+          </IconButton>
+        )
+      );
+    };
     return (
       <div>
         <StyledTreeItem
@@ -70,81 +163,26 @@ const TreeItem = memo(
             },
           }}
         >
-          {trying ? (
-            <CircularProgress
-              size={24}
-              sx={{
-                position: "absolute",
-                left: -30,
-              }}
-            />
-          ) : (
-            <IconMenu
-              type="goal"
-              complete={goal.togls.complete}
-              id={idObject}
-              pin={pin}
-              setParentTrying={setTrying}
-            />
-          )}
-          {children && children.length > 0 && (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              className="icon-container"
-              onClick={() => toggleItemOpen(!isOpen)}
-            >
-              {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
-            </Box>
-          )}
-          {!editingTitle ? (
-            <Typography
-              variant="h6"
-              color={trying ? "text.disabled" : "text.primary"}
-              onDoubleClick={() => {
-                !trying && setEditingTitle(true);
-              }}
-              style={{
-                marginLeft: children && children.length === 0 ? "24px" : "",
-                background: `${selected ? "#d5d5d5" : ""}`,
-                textDecoration: goal.togls.complete ? "line-through" : "auto",
-              }}
-            >
-              {label}
-            </Typography>
-          ) : (
-            <div
-              style={{
-                marginLeft: children && children.length === 0 ? "24px" : "",
-              }}
-            >
-              <EditInput
-                type="goal"
-                title={label}
-                onDone={() => {
-                  setEditingTitle(false);
+          <>
+            {renderIconMenu()}
+
+            {children && children.length > 0 && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
-                pin={pin}
-                id={idObject}
-                setParentTrying={setTrying}
-              />
-            </div>
-          )}
-          {!trying && (
-            <IconButton
-              sx={{ opacity: 0 }}
-              className="show-on-hover"
-              // sx={{ position: "absolute", right: 35 }}
-              aria-label="add goal button"
-              size="small"
-              onClick={handleAdd}
-            >
-              <AddIcon />
-            </IconButton>
-          )}
+                className="icon-container"
+                onClick={() => toggleItemOpen(!isOpen)}
+              >
+                {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
+              </Box>
+            )}
+            {renderTitle()}
+
+            {renderAddButton()}
+          </>
         </StyledTreeItem>
         {addingGoal && (
           <NewGoalInput
@@ -161,21 +199,23 @@ const TreeItem = memo(
           }}
         >
           {children}
-        </StyledTreeChildren>{" "}
+        </StyledTreeChildren>
       </div>
     );
   }
 );
 
-const RecursiveTree = ({ goalList, pin, onSelectCallback }: any) => {
+const RecursiveTree = ({ goalList, pin, onSelectCallback, role }: any) => {
   const filterGoals = useStore((store) => store.filterGoals);
-
+  const ship = shipName();
   const createTree = (goal: any) => {
     const currentGoal = goal.goal;
     const currentGoalId = goal.id.birth;
     const childGoals = goal.childNodes;
     //filter out complete if store says so
     if (currentGoal.togls.complete && filterGoals === "complete") return null;
+    //am I cap, no cap 100p on a stack
+    const isCaptain = currentGoal.perms.captains.includes(ship);
     return (
       <TreeItem
         idObject={goal.id}
@@ -188,6 +228,8 @@ const RecursiveTree = ({ goalList, pin, onSelectCallback }: any) => {
         label={currentGoal.hitch.desc}
         goal={currentGoal}
         pin={pin}
+        role={role}
+        isCaptain={isCaptain}
       >
         {childGoals.map((goal: any) => {
           const currentChildGoalId = goal.id.birth;
@@ -201,7 +243,6 @@ const RecursiveTree = ({ goalList, pin, onSelectCallback }: any) => {
   return (
     <Box>
       {goalList.map((goal: any, index: number) => {
-        console.log("pin.birth", pin.birth);
         return createTree(goal);
       })}
     </Box>

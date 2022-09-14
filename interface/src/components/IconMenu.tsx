@@ -87,6 +87,9 @@ export default function IconMenu({
   const toggleDeleteDialog = useStore((store: any) => store.toggleDeleteDialog);
   const toggleLeaveDialog = useStore((store: any) => store.toggleLeaveDialog);
 
+  const roleMap = useStore((store: any) => store.roleMap);
+  const role = roleMap.get(pin?.birth);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -215,30 +218,34 @@ export default function IconMenu({
               <PeopleAltIcon fontSize="small" />
               manage participants
             </MenuItem>
-            <MenuItem
-              onClick={() => {
-                toggleLeaveDialog(true, {
-                  title: poolData.title,
-                  callback: leavePool,
-                });
-              }}
-              disableRipple
-            >
-              <LogoutIcon fontSize="small" />
-              leave project
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                toggleDeleteDialog(true, {
-                  title: poolData.title,
-                  callback: deletePool,
-                });
-              }}
-              disableRipple
-            >
-              <DeleteIcon fontSize="small" />
-              delete
-            </MenuItem>
+            {role !== "owner" && (
+              <MenuItem
+                onClick={() => {
+                  toggleLeaveDialog(true, {
+                    title: poolData.title,
+                    callback: leavePool,
+                  });
+                }}
+                disableRipple
+              >
+                <LogoutIcon fontSize="small" />
+                leave project
+              </MenuItem>
+            )}
+            {role === "owner" && (
+              <MenuItem
+                onClick={() => {
+                  toggleDeleteDialog(true, {
+                    title: poolData.title,
+                    callback: deletePool,
+                  });
+                }}
+                disableRipple
+              >
+                <DeleteIcon fontSize="small" />
+                delete
+              </MenuItem>
+            )}
           </div>
         )}
       </StyledMenu>
