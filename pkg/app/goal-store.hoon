@@ -404,6 +404,10 @@
         :: --------------------------------------------------------------------
         :: pool-perms
         ::
+          [%pool-perms %add-perms *]
+        :_  this(store (add-perms:pool-perms:etch pin [viewers admins captains]:update))
+        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
+        ::
           [%pool-perms %add-pool-viewers *]
         :_  this(store (add-pool-viewers:pool-perms:etch pin viewers.update))
         ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]

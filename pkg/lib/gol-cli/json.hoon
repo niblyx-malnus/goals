@@ -187,6 +187,13 @@
           %rem-pool-admins  (frond +<.upd a+(turn ~(tap in admins.upd) ship))
           %add-pool-captains  (frond +<.upd a+(turn ~(tap in captains.upd) ship))
           %rem-pool-captains  (frond +<.upd a+(turn ~(tap in captains.upd) ship))
+          %add-perms
+          %+  frond  +<.upd
+          %-  pairs
+          :~  [%admins a+(turn ~(tap in admins.upd) ship)]
+              [%captains a+(turn ~(tap in captains.upd) ship)]
+              [%viewers a+(turn ~(tap in viewers.upd) ship)]
+          ==
         ==
         ::
           %pool-hitch

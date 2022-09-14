@@ -5,5 +5,5 @@
     website+'https://github.com/niblyx-malnus/nested-goals'
     license+'MIT'
     base+'goals'
-    glob-ames+[~podbyt-walwyl-niblyx-malnus 0v0]
+    glob-ames+[~zod 0v0]
 ==

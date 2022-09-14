@@ -53,6 +53,7 @@
       [%rem-pool-admins admins=(set ship)]
       [%add-pool-captains captains=(set ship)]
       [%rem-pool-captains captains=(set ship)]
+      [%add-perms admins=(set ship) captains=(set ship) viewers=(set ship)]
   ==
 ::
 +$  pool-hitch-update
@@ -60,7 +61,7 @@
   ==
 ::
 +$  pool-nexus-update
-  $%  [%yoke nex=(map id goal-nexus)] :: TODO: throw yok=yoke-update back in
+  $%  [%yoke =nex]
   ==
 ::
 +$  goal-perms-update

@@ -37,10 +37,10 @@
 ::
 ++  on-init
   ^-  (quip card _this)
-  :-  [%pass /goals %agent [our.bowl %goal-store] %watch /goals]~
+  :-  [(~(watch-our pass:io /goals) %goal-store /goals)]~
   %=  this
-    handles  initial:hdls
-    views  initial:vyuz
+    handles  *handles:vyu
+    views  (~(put by *views:vyu) [%all ~] *view:vyu)
   ==
 ::
 ++  on-save  !>(state)
@@ -121,6 +121,17 @@
       [%goals ~]
     ?>  =(src.bowl our.bowl)
     ?+    -.sign  (on-agent:def wire sign)
+        %watch-ack
+      ?~  p.sign
+        %-  (slog '%gol-cli: Watch /goals succeeded.' ~)
+        :-  ~
+        %=  this
+          handles  initial:hdls
+          views    initial:vyuz
+        ==
+      %-  (slog '%gol-cli: Watch /goals failed.' ~)
+      `this
+      ::
         %kick
       %-  (slog '%gol-cli: Got kick from %goal-store, resubscribing...' ~)
       :_  this
@@ -416,6 +427,11 @@
     |=  [other=@p =path]
     ^-  card
     (~(watch pass:io wire) [other dap.bowl] path)
+  ::
+  ++  leave-other
+    |=  other=@p
+    ^-  card
+    (~(leave pass:io wire) other dap.bowl)
   --
 ::
 ++  def-cols  ~[%handle %level %deadline %priority]

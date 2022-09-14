@@ -120,6 +120,15 @@
     =/  pool  (~(got by pools.store) pin)
     =.  admins.pool  (~(dif in admins.pool) admins)
     store(pools (~(put by pools.store) pin pool))
+  ::
+  ++  add-perms
+    |=  [=pin:gol viewers=(set ship) admins=(set ship) captains=(set ship)]
+    ^-  store:gol
+    =/  pool  (~(got by pools.store) pin)
+    =.  viewers.pool  (~(uni in viewers.pool) viewers)
+    =.  admins.pool  (~(uni in admins.pool) admins)
+    =.  captains.pool  (~(uni in captains.pool) admins)
+    store(pools (~(put by pools.store) pin pool))
   --
 ::
 ++  pool-hitch
