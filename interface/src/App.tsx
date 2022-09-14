@@ -60,9 +60,10 @@ declare const window: Window &
 //TODO: add an event log to the app
 //TODO: actions log / displaying ownership tomorrow and
 //TODO: display pool owner
-//TODO: display own role in a pool
 //TODO: handle sub kick/error IMPORTANT
-
+//TODO: dont allow admins to delete other admins
+//TODO: display own role in a pool
+//TODO: manage roles, reset role to viewer after doing stuff
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -137,13 +138,13 @@ function App() {
           roleMap.set(pin.birth, "owner");
         }
         //check the perms lists for the current ship
-        if (pool.perms.viewers.includes(shipName)) {
+        if (pool.perms.viewers.includes(currShip)) {
           roleMap.set(pin.birth, "viewer");
         }
-        if (pool.perms.captains.includes(shipName)) {
+        if (pool.perms.captains.includes(currShip)) {
           roleMap.set(pin.birth, "captain");
         }
-        if (pool.perms.admins.includes(shipName)) {
+        if (pool.perms.admins.includes(currShip)) {
           roleMap.set(pin.birth, "admin");
         }
       });
