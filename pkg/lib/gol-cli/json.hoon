@@ -152,7 +152,7 @@
   =,  enjs:format
   |=  hom=home-update
   ^-  json
-  =/  upd=away-update  +.hom
+  =/  upd=update  +.hom
   %-  pairs
   :~  :-  %hed
       %-  pairs

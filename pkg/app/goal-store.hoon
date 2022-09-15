@@ -273,7 +273,7 @@
     =/  pin  `pin:gol`[%pin owner birth]
     =/  pool  (~(got by pools) pin)
     :_  this
-    [%give %fact ~ %goal-away-update !>(spawn-pool+pool)]~
+    [%give %fact ~ %goal-away-update !>([our.bowl spawn-pool+pool])]~
   ==
 ::
 ++  on-leave  on-leave:def
@@ -384,8 +384,6 @@
     =/  owner  `@p`i.wire
     =/  birth  `@da`i.t.wire
     =/  pin  `pin:gol`[%pin owner birth]
-    =/  pool  (~(got by pools.store) pin)
-    =/  pore  (apex:pl pool)
     ?>  =(src.bowl owner)
     ?+    -.sign  (on-agent:def wire sign)
         %watch-ack
@@ -405,12 +403,14 @@
       ?+    +<.update  (on-agent:def wire sign)
           %spawn-pool
         :_  this(store (spawn-pool:spawn-trash:etch pin pool.update))
-        ~[(fact:io goal-home-update+!>([[pin src.bowl] update]) ~[/goals])]
+        ~[(fact:io goal-home-update+!>([[pin src.bowl] +.update]) ~[/goals])]
         ::
           $?  %spawn-goal  %trash-goal
               %pool-perms  %pool-hitch  %pool-nexus
               %goal-perms  %goal-hitch  %goal-nexus  %goal-togls
           ==
+        =/  pool  (~(got by pools.store) pin)
+        =/  pore  (apex:pl pool)
         :_  this(store (update-store:gs pin pool:abet:(etch:pore +.update)))
         ~[(fact:io goal-home-update+!>([[pin mod.update] +.update]) ~[/goals])]
       ==
