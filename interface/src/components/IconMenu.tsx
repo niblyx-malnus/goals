@@ -238,15 +238,17 @@ export default function IconMenu({
           </div>
         ) : (
           <div>
-            <MenuItem
-              onClick={() => {
-                toggleShareDialog(true, poolData);
-              }}
-              disableRipple
-            >
-              <PeopleAltIcon fontSize="small" />
-              manage participants
-            </MenuItem>
+            {(role === "owner" || role === "admin") && (
+              <MenuItem
+                onClick={() => {
+                  toggleShareDialog(true, poolData);
+                }}
+                disableRipple
+              >
+                <PeopleAltIcon fontSize="small" />
+                manage participants
+              </MenuItem>
+            )}
             {role !== "owner" && (
               <MenuItem
                 onClick={() => {

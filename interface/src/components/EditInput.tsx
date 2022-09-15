@@ -5,10 +5,8 @@ import api from "../api";
 import InputBase from "@mui/material/InputBase";
 
 import { log } from "../helpers";
-import Typography from "@mui/material/Typography";
 import { PinId, GoalId } from "../types/types";
 import useStore from "../store";
-//TODO: handle error states
 function EditInput({
   title,
   onDone,
@@ -24,11 +22,7 @@ function EditInput({
   id?: GoalId;
   type: "pool" | "goal";
 }) {
-  //TODO: fix flickering issue
-  //TODO: add edit to menu also
-  //TODO: press ESCP while focusing on the input to close it
   const [value, setValue] = useState<string>("");
-  const [newTitleInputWidth, setNewTitleInputWidth] = useState<number>(0);
   const [metaVars, setMetaVars] = useState<any>({
     inputTextStyle: {
       fontWeight: 500,
@@ -43,19 +37,12 @@ function EditInput({
   });
   const [trying, setTrying] = useState<boolean>(false);
 
-  const newTitleSpanRef: any = React.useRef(null);
   const toggleSnackBar = useStore((store) => store.toggleSnackBar);
 
   useEffect(() => {
     setValue(title);
   }, [title]);
-  useEffect(() => {
-    //dynamicall changes the width on the input depending on a hidden text element
-    if (newTitleSpanRef.current) {
-      const width = newTitleSpanRef.current.getBoundingClientRect().width;
-      setNewTitleInputWidth(width + metaVars.widthIncrement);
-    }
-  }, [value]);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
   };
@@ -144,38 +131,29 @@ function EditInput({
     }
   }, [type]);
   return (
-    <>
-      <Typography
-        variant={metaVars.typographySize}
-        fontWeight="bold"
-        ref={newTitleSpanRef}
-        sx={{ visibility: "hidden", position: "absolute", left: -9999 }}
-      >
-        {value}
-      </Typography>
-      <InputBase
-        sx={{
-          minWidth: metaVars.inputMinWidth,
-          width: newTitleInputWidth,
-          display: "inline-block",
-          padding: 0,
-        }}
-        style={{
-          //intention here is to match the original typography (before double clicking)
-          //CONSIDERATION: can we do better on this?
-          ...metaVars.inputTextStyle,
-        }}
-        placeholder="title"
-        inputProps={{ "aria-label": metaVars.ariaLabel }}
-        autoFocus={true}
-        // multiline
-        disabled={trying}
-        onBlur={() => !trying && onDone()}
-        value={value}
-        onKeyDown={handleKeyDown}
-        onChange={handleChange}
-      />
-    </>
+    <InputBase
+      sx={{
+        flex: 1,
+        display: "inline-block",
+        minWidth: metaVars.inputMinWidth,
+        padding: 0,
+        width: "100%",
+      }}
+      style={{
+        //intention here is to match the original typography (before double clicking)
+        //CONSIDERATION: can we do better on this?
+        ...metaVars.inputTextStyle,
+      }}
+      placeholder="title"
+      inputProps={{ "aria-label": metaVars.ariaLabel }}
+      autoFocus={true}
+      // multiline
+      disabled={trying}
+      onBlur={() => !trying && onDone()}
+      value={value}
+      onKeyDown={handleKeyDown}
+      onChange={handleChange}
+    />
   );
 }
 export default EditInput;

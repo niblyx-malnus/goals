@@ -56,6 +56,7 @@ const TreeItem = memo(
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [trying, setTrying] = useState<boolean>(false);
     const collapseAll = useStore((store) => store.collapseAll);
+    const disableActions = trying || editingTitle || addingGoal;
 
     useEffect(() => {
       //everytime collapse all changes, we force isOpen value to comply
@@ -68,23 +69,28 @@ const TreeItem = memo(
     const renderIconMenu = () => {
       if (poolRole === "viewer") return;
       if (poolRole === "captain" && !isCaptain) return;
-      return trying ? (
-        <CircularProgress
-          size={24}
-          sx={{
-            position: "absolute",
-            left: -30,
-          }}
-        />
-      ) : (
-        <IconMenu
-          type="goal"
-          complete={goal.togls.complete}
-          id={idObject}
-          pin={pin}
-          setParentTrying={setTrying}
-        />
-      );
+      if (trying) {
+        return (
+          <CircularProgress
+            size={24}
+            sx={{
+              position: "absolute",
+              left: -30,
+            }}
+          />
+        );
+      }
+      if (!disableActions) {
+        return (
+          <IconMenu
+            type="goal"
+            complete={goal.togls.complete}
+            id={idObject}
+            pin={pin}
+            setParentTrying={setTrying}
+          />
+        );
+      }
     };
     const renderTitle = () => {
       const noEditPermTitle = (
@@ -107,7 +113,7 @@ const TreeItem = memo(
           variant="h6"
           color={trying ? "text.disabled" : "text.primary"}
           onDoubleClick={() => {
-            !trying && setEditingTitle(true);
+            !disableActions && setEditingTitle(true);
           }}
           style={{
             marginLeft: children && children.length === 0 ? "24px" : "",
@@ -121,6 +127,7 @@ const TreeItem = memo(
         <div
           style={{
             marginLeft: children && children.length === 0 ? "24px" : "",
+            flex: 1,
           }}
         >
           <EditInput
@@ -140,7 +147,7 @@ const TreeItem = memo(
       if (poolRole === "viewer") return;
       if (poolRole === "captain" && !isCaptain) return;
       return (
-        !trying && (
+        !disableActions && (
           <IconButton
             sx={{ opacity: 0 }}
             className="show-on-hover"
@@ -229,8 +236,13 @@ const RecursiveTree = ({ goalList, pin, onSelectCallback, poolRole }: any) => {
     const currentGoal = goal.goal;
     const currentGoalId = goal.id.birth;
     const childGoals = goal.childNodes;
-    //filter out complete if store says so
-    if (currentGoal.togls.complete && filterGoals === "complete") return null;
+    //filter out complete or incomplete goals if store says so
+    if (
+      (currentGoal.togls.complete && filterGoals === "complete") ||
+      (!currentGoal.togls.complete && filterGoals === "incomplete")
+    )
+      return null;
+
     //we need to know if the current ship is a captain on this goal
     const isCaptain = currentGoal.perms.captains.includes(ship);
 

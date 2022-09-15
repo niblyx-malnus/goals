@@ -19,7 +19,8 @@ import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import { Order, PinId } from "./types/types";
 import Avatar from "@mui/material/Avatar";
-
+import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
+import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import {
   deleteGoalAction,
   deletePoolAction,
@@ -38,7 +39,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
-
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import {
   ShareDialog,
   DeletionDialog,
@@ -62,7 +64,7 @@ declare const window: Window &
 //TODO: edit inputs should hide the action buttons and take up the full width of the screen
 //TODO: add an event log to the app
 //TODO: handle sub kick/error IMPORTANT
-
+//TODO: viewers should still be able to view the menu and leave the project
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -262,7 +264,7 @@ function App() {
   const roleMap = useStore((store: any) => store.roleMap);
 
   return (
-    <Container>
+    <Container sx={{ paddingBottom: 10 }}>
       <Header />
       {loading.trying && (
         <Stack flexDirection="row" alignItems="center">
@@ -348,7 +350,7 @@ const Project = memo(
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [trying, setTrying] = useState<boolean>(false);
-
+    const disableActions = trying || editingTitle || addingGoal;
     const handleAdd = () => {
       toggleItemOpen(true);
       setAddingGoal(true);
@@ -358,17 +360,24 @@ const Project = memo(
       toggleItemOpen(collapseAll.status);
     }, [collapseAll.count]);
     const renderIconMenu = () => {
-      if (role === "viewer" || role === "captain") return;
-      return trying ? (
-        <CircularProgress size={24} sx={{ position: "absolute", left: -35 }} />
-      ) : (
-        <IconMenu
-          poolData={{ title, permList, pin }}
-          type="pool"
-          pin={pin}
-          setParentTrying={setTrying}
-        />
-      );
+      if (trying) {
+        return (
+          <CircularProgress
+            size={24}
+            sx={{ position: "absolute", left: -35 }}
+          />
+        );
+      }
+      if (!disableActions) {
+        return (
+          <IconMenu
+            poolData={{ title, permList, pin }}
+            type="pool"
+            pin={pin}
+            setParentTrying={setTrying}
+          />
+        );
+      }
     };
     const renderTitle = () => {
       if (role === "viewer" || role === "captain") {
@@ -384,7 +393,7 @@ const Project = memo(
           variant="h5"
           fontWeight={"bold"}
           onDoubleClick={() => {
-            !trying && setEditingTitle(true);
+            !disableActions && setEditingTitle(true);
           }}
         >
           {title}
@@ -404,7 +413,7 @@ const Project = memo(
     const renderAddButton = () => {
       if (role === "viewer") return;
       return (
-        !trying && (
+        !disableActions && (
           <IconButton
             sx={{ opacity: 0 }}
             className="show-on-hover"
@@ -489,6 +498,7 @@ const Project = memo(
 function Header() {
   const [newProjectTitle, setNewProjectTitle] = useState<string>("");
   const [trying, setTrying] = useState<boolean>(false);
+  const order = useStore((store) => store.order);
 
   const setFilterGoals = useStore((store) => store.setFilterGoals);
 
@@ -498,13 +508,29 @@ function Header() {
 
   const [filterCompleteChecked, setFilterCompleteChecked] =
     useState<boolean>(false);
+  const [filterIncompleteChecked, setFilterIncompleteChecked] =
+    useState<boolean>(false);
   const handleFilterCompleteChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const checked = event.target.checked;
     setFilterCompleteChecked(event.target.checked);
+    if (filterIncompleteChecked) setFilterIncompleteChecked(false);
     if (checked) {
       setFilterGoals("complete");
+    } else {
+      setFilterGoals(null);
+    }
+  };
+  const handleFilterIncompleteChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const checked = event.target.checked;
+    setFilterIncompleteChecked(event.target.checked);
+    if (filterCompleteChecked) setFilterCompleteChecked(false);
+
+    if (checked) {
+      setFilterGoals("incomplete");
     } else {
       setFilterGoals(null);
     }
@@ -582,11 +608,12 @@ function Header() {
         />
         <Stack
           sx={{ marginLeft: 3 }}
-          flexDirection="row"
+          flexDirection="column"
           alignItems="center"
           justifyContent="center"
         >
           <FormControlLabel
+            sx={{ height: 36.5 }}
             label="Filter Completed Goals"
             control={
               <Checkbox
@@ -595,39 +622,63 @@ function Header() {
               />
             }
           />
+          <FormControlLabel
+            sx={{ height: 36.5 }}
+            label="Filter Incomplete Goals"
+            control={
+              <Checkbox
+                checked={filterIncompleteChecked}
+                onChange={handleFilterIncompleteChange}
+              />
+            }
+          />
         </Stack>
-        <Button
-          sx={{ fontWeight: "bold", marginRight: 1 }}
-          variant="outlined"
-          onClick={() => setCollapseAll(true)}
+        <Stack
+          flexDirection="column"
+          //alignItems="center"
+          justifyContent="flex-start"
         >
-          uncollapse all
-        </Button>
-        <Button
-          sx={{ fontWeight: "bold" }}
-          variant="outlined"
-          onClick={() => setCollapseAll(false)}
-        >
-          collapse all
-        </Button>
-        <Button
-          sx={{ fontWeight: "bold", marginRight: 1 }}
-          variant="outlined"
-          onClick={() => {
-            return orderPoolsAction("asc");
-          }}
-        >
-          set asc order
-        </Button>
-        <Button
-          sx={{ fontWeight: "bold", marginRight: 1 }}
-          variant="outlined"
-          onClick={() => {
-            return orderPoolsAction("dsc");
-          }}
-        >
-          set dsc order
-        </Button>
+          <Button
+            sx={{ fontWeight: "bold", justifyContent: " flex-start" }}
+            variant="text"
+            startIcon={<KeyboardDoubleArrowDownIcon />}
+            onClick={() => setCollapseAll(true)}
+          >
+            uncollapse all
+          </Button>
+          <Button
+            sx={{ fontWeight: "bold", justifyContent: " flex-start" }}
+            variant="text"
+            startIcon={<KeyboardDoubleArrowUpIcon />}
+            onClick={() => setCollapseAll(false)}
+          >
+            collapse all
+          </Button>
+        </Stack>
+
+        {order === "asc" ? (
+          <Button
+            sx={{ fontWeight: "bold", justifyContent: " flex-start" }}
+            variant="text"
+            startIcon={<ArrowDropDownIcon />}
+            onClick={() => {
+              return orderPoolsAction("dsc");
+            }}
+          >
+            dsc order
+          </Button>
+        ) : (
+          <Button
+            sx={{ fontWeight: "bold", justifyContent: " flex-start" }}
+            variant="text"
+            startIcon={<ArrowDropUpIcon />}
+            onClick={() => {
+              return orderPoolsAction("asc");
+            }}
+          >
+            asc order
+          </Button>
+        )}
       </Stack>
       <Divider sx={{ paddingTop: 2 }} />
     </Box>
