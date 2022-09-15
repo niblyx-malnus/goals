@@ -1,6 +1,6 @@
 /-  gol=goal, goal-store
 /+  dbug, default-agent, verb, agentio,
-    gol-cli-goals, gol-cli-goal-store, pl=gol-cli-pool, px=gol-cli-poolx,
+    gol-cli-goals, gol-cli-goal-store, pl=gol-cli-pool,
     gol-cli-etch
 |%
 +$  versioned-state
@@ -277,6 +277,19 @@
   ==
 ::
 ++  on-leave  on-leave:def
+  :: |=  =path
+  :: ^-  (quip card _this)
+  :: ?+    path  (on-watch:def path)
+  ::     [@ @ ~]
+  ::   =/  owner  `@p`i.path
+  ::   =/  birth  `@da`i.t.path
+  ::   =/  pin  `pin:gol`[%pin owner birth]
+  ::   =/  pool  (~(got by pools) pin)
+  ::   =/  pore  (apex:pl pool)
+  ::   =.  pore  (rem-pool-viewers:pore (sy ~[src.bowl]))
+  ::   
+  :: ==
+::
 ++  on-peek
   |=  =path
   ^-  (unit (unit cage))
@@ -371,8 +384,9 @@
     =/  owner  `@p`i.wire
     =/  birth  `@da`i.t.wire
     =/  pin  `pin:gol`[%pin owner birth]
-    =/  mod  src.bowl
-    ?>  =(mod owner)
+    =/  pool  (~(got by pools.store) pin)
+    =/  pore  (apex:pl pool)
+    ?>  =(src.bowl owner)
     ?+    -.sign  (on-agent:def wire sign)
         %watch-ack
       ?~  p.sign
@@ -388,103 +402,17 @@
         %fact
       ?>  =(p.cage.sign %goal-away-update)
       =/  update  !<(away-update:goal-store q.cage.sign)
-      ?+    update  (on-agent:def wire sign)
-        :: --------------------------------------------------------------------
-        :: spawn/trash
-        ::
-          [%spawn-pool *]
+      ?+    +<.update  (on-agent:def wire sign)
+          %spawn-pool
         :_  this(store (spawn-pool:spawn-trash:etch pin pool.update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
+        ~[(fact:io goal-home-update+!>([[pin src.bowl] update]) ~[/goals])]
         ::
-          [%spawn-goal *]
-        :_  this(store (spawn-goal:spawn-trash:etch pin [nex id goal]:update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        ::
-          [%trash-goal *]
-        :_  this(store (trash-goal:spawn-trash:etch pin nex.update del.update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        :: --------------------------------------------------------------------
-        :: pool-perms
-        ::
-          [%pool-perms %add-perms *]
-        :_  this(store (add-perms:pool-perms:etch pin [viewers admins captains]:update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        ::
-          [%pool-perms %add-pool-viewers *]
-        :_  this(store (add-pool-viewers:pool-perms:etch pin viewers.update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        ::
-          [%pool-perms %rem-pool-viewers *]
-        :_  this(store (rem-pool-viewers:pool-perms:etch pin viewers.update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        ::
-          [%pool-perms %add-pool-captains *]
-        :_  this(store (add-pool-captains:pool-perms:etch pin captains.update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        ::
-          [%pool-perms %rem-pool-captains *]
-        :_  this(store (rem-pool-captains:pool-perms:etch pin captains.update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        ::
-          [%pool-perms %add-pool-admins *]
-        :_  this(store (add-pool-admins:pool-perms:etch pin admins.update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        ::
-          [%pool-perms %rem-pool-admins *]
-        :_  this(store (rem-pool-admins:pool-perms:etch pin admins.update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        :: --------------------------------------------------------------------
-        :: pool-hitch
-        ::
-          [%pool-hitch %title *]
-        :_  this(store (title:pool-hitch:etch pin title.update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        :: --------------------------------------------------------------------
-        :: pool-nexus
-        ::
-          [%pool-nexus %yoke *]
-        :_  this(store (yoke:pool-nexus:etch pin nex.update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        :: --------------------------------------------------------------------
-        :: goal-perms
-        ::
-          [%goal-perms id:gol %add-goal-captains *]
-        :_  this(store (add-goal-captains:goal-perms:etch [id captains]:update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        ::
-          [%goal-perms id:gol %rem-goal-captains *]
-        :_  this(store (rem-goal-captains:goal-perms:etch [id captains]:update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        ::
-          [%goal-perms id:gol %add-goal-peons *]
-        :_  this(store (add-goal-peons:goal-perms:etch [id peons]:update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        ::
-          [%goal-perms id:gol %rem-goal-peons *]
-        :_  this(store (rem-goal-peons:goal-perms:etch [id peons]:update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        :: --------------------------------------------------------------------
-        :: goal-hitch
-        ::
-          [%goal-hitch id:gol %desc *]
-        :_  this(store (desc:goal-hitch:etch pin [id desc]:update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        :: --------------------------------------------------------------------
-        :: goal-nexus
-        ::
-          [%goal-nexus id:gol %deadline *]
-        :_  this(store (deadline:goal-nexus:etch pin [id moment]:update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        :: --------------------------------------------------------------------
-        :: goal-togls
-        ::
-          [%goal-togls id:gol %complete *]
-        :_  this(store (complete:goal-togls:etch pin [id complete]:update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
-        ::
-          [%goal-togls id:gol %actionable *]
-        :_  this(store (actionable:goal-togls:etch pin [id actionable]:update))
-        ~[(fact:io goal-home-update+!>([[pin mod] update]) ~[/goals])]
+          $?  %spawn-goal  %trash-goal
+              %pool-perms  %pool-hitch  %pool-nexus
+              %goal-perms  %goal-hitch  %goal-nexus  %goal-togls
+          ==
+        :_  this(store (update-store:gs pin pool:abet:(etch:pore +.update)))
+        ~[(fact:io goal-home-update+!>([[pin mod.update] +.update]) ~[/goals])]
       ==
     ==
   ==
@@ -545,6 +473,6 @@
     %-  send-home-updates
     %+  turn  upd.away-cud
     |=  =away-update:goal-store
-    [[pin.away-cud src.bowl] away-update]
+    [[pin.away-cud mod.away-update] +.away-update]
   ==
 --

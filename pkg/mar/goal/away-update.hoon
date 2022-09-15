@@ -1,5 +1,4 @@
 /-  *goal-store
-/+  *gol-cli-json
 |_  upd=away-update
 ++  grow
   |%

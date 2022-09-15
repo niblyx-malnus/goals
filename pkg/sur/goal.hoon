@@ -406,9 +406,10 @@
       %prec-yoke
       %nest-rend
       %nest-yoke
+      %hook-rend
+      %hook-yoke
       %held-rend
       %held-yoke
-      %move-goal
   ==
 ::
 +$  yoke-tag  (union-from-list yoke-tags)

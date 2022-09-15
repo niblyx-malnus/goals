@@ -84,11 +84,11 @@
       [%actionable actionable=?(%.y %.n)]
   ==
 ::
-+$  away-update
-  $%  [%spawn-goal =nex =id =goal]
-      [%spawn-pool =pool]
-      [%trash-goal =nex del=(set id)]
++$  update
+  $%  [%spawn-pool =pool]
       [%trash-pool ~]
+      [%spawn-goal =nex =id =goal]
+      [%trash-goal =nex del=(set id)]
       [%pool-perms pool-perms-update]
       [%pool-hitch pool-hitch-update]
       [%pool-nexus pool-nexus-update]
@@ -97,8 +97,9 @@
       [%goal-nexus =id goal-nexus-update]
       [%goal-togls =id goal-togls-update]
   ==
++$  away-update  [mod=ship update]
 ::
-+$  home-update  [[=pin mod=ship] away-update]
++$  home-update  [[=pin mod=ship] update]
 ::
 +$  peek
   $%  [%initial =store]
