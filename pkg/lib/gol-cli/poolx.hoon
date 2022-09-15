@@ -146,6 +146,7 @@
 ++  delete-goal
   |=  [=id:gol mod=ship]
   ^-  _this
+  ?>  (check-pool-perm mod)
   =/  prog  ~(tap in (progeny id))
   =/  ovlp  *(set id:gol)
   =/  pore  this

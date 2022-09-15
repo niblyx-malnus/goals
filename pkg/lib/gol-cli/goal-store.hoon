@@ -27,6 +27,35 @@
     directory  (~(put by directory.store) id pin)
   ==
 ::
+++  move-goal
+  |=  [=pin:gol cid=id:gol upid=(unit id:gol) mod=ship]
+  =/  pool  (~(got by pools.store) pin)
+  =/  pore  (apex:px pool)
+  =.  pore  (move-goal:pore cid upid mod)
+  :+  pin
+    efx:abet:pore
+  store(pools (~(put by pools.store) pin pool:abet:pore))
+::
+++  yoke
+  |=  [=pin:gol yok=exposed-yoke:gol mod=ship]
+  =/  pool  (~(got by pools.store) pin)
+  =/  pore  (apex:px pool)
+  =.  pore
+    ?+  -.yok  !!
+      %prio-rend  (prio-rend:pore lid.yok rid.yok mod)
+      %prio-yoke  (prio-yoke:pore lid.yok rid.yok mod)
+      %prec-rend  (prec-rend:pore lid.yok rid.yok mod)
+      %prec-yoke  (prec-yoke:pore lid.yok rid.yok mod)
+      %nest-rend  (nest-rend:pore lid.yok rid.yok mod)
+      %nest-yoke  (nest-yoke:pore lid.yok rid.yok mod)
+      %held-rend  (held-rend:pore lid.yok rid.yok mod)
+      %held-yoke  (held-yoke:pore lid.yok rid.yok mod)
+    ==
+  :+  pin
+    efx:abet:pore
+  store(pools (~(put by pools.store) pin pool:abet:pore))
+
+::
 ++  update-store
   |=  [=pin:gol =pool:gol]
   ^-  store:gol

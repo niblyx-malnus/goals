@@ -1,6 +1,6 @@
 /-  gol=goal, goal-store
 /+  dbug, default-agent, verb, agentio,
-    gol-cli-goals, gol-cli-goal-store, pl=gol-cli-pool,
+    gol-cli-goals, gol-cli-goal-store, pl=gol-cli-pool, px=gol-cli-poolx,
     gol-cli-etch
 |%
 +$  versioned-state
@@ -97,19 +97,9 @@
           :: [%spawn-goal =pin upid=(unit id) desc=@t actionable=? =goal-perms]
           %spawn-goal
         ?.  =(our.bowl owner.pin.action)
-          =*  poke-other  ~(poke-other pass:hc /foreign-spawn-goal)
+          =*  poke-other  ~(poke-other pass:hc /away/spawn-goal)
           :_  state
-          :~  %+  poke-other  owner.pin.action
-              :-  %goal-action
-              !>  :*  %spawn-goal
-                      pin.action
-                      upid.action
-                      desc.action
-                      actionable.action
-                      captains.action
-                      peons.action
-                  ==
-          ==
+          [(poke-other owner.pin.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
         %:  spawn-goal:gs
           [pin.action src.bowl]
@@ -124,98 +114,110 @@
           :: [%delete-goal =id]
           %delete-goal
         :: for now, only owner can delete goals
-        ?>  =(src.bowl our.bowl)
-        ?.  =(our.bowl owner.id.action)  ~|(%not-owner !!)
+        ?.  =(our.bowl owner.id.action)
+          =*  poke-other  ~(poke-other pass:hc /away/spawn-goal)
+          :_  state
+          [(poke-other owner.id.action goal-action+!>(action))]~
+        =/  pool  (~(got by pools.store) (~(got by directory) id.action))
         %+  convert-away-cud:hc  ~
         (delete-goal:gs id.action our.bowl)
           ::
           :: [%edit-goal-desc =id desc=@t]
           %edit-goal-desc
-        ?>  =(our.bowl owner.id.action)
+        ?.  =(our.bowl owner.id.action)
+          =*  poke-other  ~(poke-other pass:hc /away/edit-goal-desc)
+          :_  state
+          [(poke-other owner.id.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
         (edit-goal-desc:gs id.action desc.action src.bowl)
           ::
           :: [%edit-pool-title =pin title=@t]
           %edit-pool-title
-        ?>  =(our.bowl owner.pin.action)
+        ?.  =(our.bowl owner.pin.action)
+          =*  poke-other  ~(poke-other pass:hc /away/edit-pool-title)
+          :_  state
+          [(poke-other owner.pin.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
         (edit-pool-title:gs pin.action title.action src.bowl)
           ::
           :: [%yoke =pin yok=exposed-yoke]
           %yoke
-        ?>  =(our.bowl owner.pin.action)
-        =/  pool  (~(got by pools.store) pin.action)
-        =/  out  (~(apply-sequence pl pool) src.bowl [yok.action]~)
-        ?-    -.out
-          %|  ~|(+.out !!)
-            %&
-          =/  nex
-            %-  ~(gas by *(map id:gol goal-nexus:gol))
-            %+  turn  ~(tap in set.p.out)
-            |=(=id:gol [id nexus:`ngoal:gol`(~(got by goals.pool.p.out) id)])
-          %+  convert-away-cud:hc  ~
-          :+  pin.action
-            [%pool-nexus %yoke nex]~
-          store(pools (~(put by pools.store) pin.action pool.p.out))
-        ==
+        ?.  =(our.bowl owner.pin.action)
+          =*  poke-other  ~(poke-other pass:hc /away/yoke)
+          :_  state
+          [(poke-other owner.pin.action goal-action+!>(action))]~
+        %+  convert-away-cud:hc  ~
+        (yoke:gs pin.action yok.action src.bowl)
           ::
-          :: [%move-goal =pin cid=id upid=(init id)]
+          :: [%move-goal =pin cid=id upid=(unit id)]
           %move-goal
-        ?>  =(our.bowl owner.pin.action)
-        =/  pool  (~(got by pools.store) pin.action)
-        =/  out  (~(move-goal pl pool) cid.action upid.action src.bowl)
-        ?-    -.out
-          %|  ~|(+.out !!)
-            %&
-          =/  nex
-            %-  ~(gas by *(map id:gol goal-nexus:gol))
-            %+  turn  ~(tap in set.p.out)
-            |=(=id:gol [id nexus:`ngoal:gol`(~(got by goals.pool.p.out) id)])
-          %+  convert-away-cud:hc  ~
-          :+  pin.action
-            [%pool-nexus %yoke nex]~
-          store(pools (~(put by pools.store) pin.action pool.p.out))
-        ==
+        ?.  =(our.bowl owner.pin.action)
+          =*  poke-other  ~(poke-other pass:hc /away/move-goal)
+          :_  state
+          [(poke-other owner.pin.action goal-action+!>(action))]~
+        %+  convert-away-cud:hc  ~
+        (move-goal:gs pin.action cid.action upid.action src.bowl)
           ::
           :: [%set-deadline =id deadline=(unit @da)]
           %set-deadline
-        ?>  =(our.bowl owner.id.action)
+        ?.  =(our.bowl owner.id.action)
+          =*  poke-other  ~(poke-other pass:hc /away/set-deadline)
+          :_  state
+          [(poke-other owner.id.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
         (set-deadline:gs id.action deadline.action src.bowl)
           ::
           :: [%mark-actionable =id]
           %mark-actionable
-        ?>  =(our.bowl owner.id.action)
+        ?.  =(our.bowl owner.id.action)
+          =*  poke-other  ~(poke-other pass:hc /away/mark-actionable)
+          :_  state
+          [(poke-other owner.id.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
         (mark-actionable:gs id.action src.bowl)
           ::
           :: [%unmark-actionable =id]
           %unmark-actionable
-        ?>  =(our.bowl owner.id.action)
+        ?.  =(our.bowl owner.id.action)
+          =*  poke-other  ~(poke-other pass:hc /away/unmark-actionable)
+          :_  state
+          [(poke-other owner.id.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
         (unmark-actionable:gs id.action src.bowl)
           ::
           :: [%mark-complete =id]
           %mark-complete
-        ?>  =(our.bowl owner.id.action)
+        ?.  =(our.bowl owner.id.action)
+          =*  poke-other  ~(poke-other pass:hc /away/mark-complete)
+          :_  state
+          [(poke-other owner.id.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
         (mark-complete:gs id.action our.bowl)
           ::
           :: [%unmark-complete =id]
           %unmark-complete
-        ?>  =(our.bowl owner.id.action)
+        ?.  =(our.bowl owner.id.action)
+          =*  poke-other  ~(poke-other pass:hc /away/unmark-complete)
+          :_  state
+          [(poke-other owner.id.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
         (unmark-complete:gs id.action src.bowl)
           ::
           :: [%make-goal-captain captain=ship =id]
           %make-goal-captain
-        ?>  =(our.bowl owner.id.action)
+        ?.  =(our.bowl owner.id.action)
+          =*  poke-other  ~(poke-other pass:hc /away/make-goal-captain)
+          :_  state
+          [(poke-other owner.id.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
         (add-goal-captains:gs id.action (sy ~[captain.action]) src.bowl)
           ::
           :: [%make-goal-peon peon=ship =id]
           %make-goal-peon
-        ?>  =(our.bowl owner.id.action)
+        ?.  =(our.bowl owner.id.action)
+          =*  poke-other  ~(poke-other pass:hc /away-make-goal-peon)
+          :_  state
+          [(poke-other owner.id.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
         (add-goal-peons:gs id.action (sy ~[peon.action]) src.bowl)
           ::
