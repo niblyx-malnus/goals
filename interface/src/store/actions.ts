@@ -207,7 +207,24 @@ function orderPoolsAction(newOrder: Order) {
   setPools(newPools);
   setOrder(newOrder);
 }
+function updatePoolPermsAction(toUpdatePin: PinId, newPerms: any) {
+  const state = useStore.getState();
+  const pools = state.pools;
+  const setPools = state.setPools;
 
+  //go through our poool, find the one with the toUpdatePin id and update it's perms with the new ones
+  const newPools = pools.map((poolItem: any, index: number) => {
+    const { pin, pool } = poolItem;
+    if (pin.birth === toUpdatePin.birth) {
+      return {
+        ...poolItem,
+        pool: { ...pool, perms: newPerms },
+      };
+    }
+    return poolItem;
+  });
+  setPools(newPools);
+}
 //this is actually just a helper
 const orderPools = (pools: any, order: Order) => {
   //reorder the pools and then the goals, returns ordered pools
@@ -238,4 +255,5 @@ export {
   newPoolAction,
   orderPoolsAction,
   orderPools,
+  updatePoolPermsAction,
 };

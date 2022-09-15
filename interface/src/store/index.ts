@@ -32,13 +32,16 @@ interface Store {
 
   order: Order;
   setOrder: (newOrder: Order) => void;
-
+  //roll map for the pools
   roleMap: any;
   setRoleMap: (newRoleMap: any) => void;
 
   snackBarOpen: boolean;
   snackBarData: SnackBarData;
-  toggleSnackBar: (newStatus: boolean, newSnackBarData:SnackBarData) => void;
+  toggleSnackBar: (newStatus: boolean, newSnackBarData: SnackBarData) => void;
+
+  logList: any;
+  setLogList: (newLogList: any) => void;
 }
 
 const useStore = create<Store>((set, get) => ({
@@ -98,6 +101,25 @@ const useStore = create<Store>((set, get) => ({
       snackBarOpen: newStatus,
       snackBarData: newSnackBarData,
     })),
+
+  logList: [],
+  setLogList: (newItem) => {
+    //append new log item to the log list, adding a timestamp
+    const newLogList = get().logList;
+    const newerItem = {
+      ...newItem,
+      date: new Date().toLocaleTimeString("default", {
+        hour: "numeric",
+        minute: "numeric",
+      }),
+    };
+
+    newLogList.push(newerItem);
+
+    set(() => ({
+      logList: newLogList,
+    }));
+  },
 }));
 
 export default useStore;

@@ -241,6 +241,7 @@ export default function IconMenu({
             {(role === "owner" || role === "admin") && (
               <MenuItem
                 onClick={() => {
+                  handleClose();
                   toggleShareDialog(true, poolData);
                 }}
                 disableRipple
@@ -252,6 +253,7 @@ export default function IconMenu({
             {role !== "owner" && (
               <MenuItem
                 onClick={() => {
+                  handleClose();
                   toggleLeaveDialog(true, {
                     title: poolData.title,
                     callback: leavePool,
@@ -266,6 +268,7 @@ export default function IconMenu({
             {role === "owner" && (
               <MenuItem
                 onClick={() => {
+                  handleClose();
                   toggleDeleteDialog(true, {
                     title: poolData.title,
                     callback: deletePool,

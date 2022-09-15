@@ -14,6 +14,7 @@ import AddIcon from "@mui/icons-material/Add";
 import useStore from "../store";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
 import Avatar from "@mui/material/Avatar";
 import { log, shipName } from "../helpers";
 
@@ -193,20 +194,28 @@ const TreeItem = memo(
 
             {renderAddButton()}
           </>
-          {goal.perms.captains.map((item: any, index: number) => {
-            return (
-              <Chip
-                key={item}
-                sx={{ opacity: 0, marginLeft: 1 }}
-                avatar={<Avatar>C</Avatar>}
-                className="show-on-hover"
-                size="small"
-                label={<Typography fontWeight={"bold"}>{item}</Typography>}
-                color="primary"
-                variant="outlined"
-              />
-            );
-          })}
+          {!editingTitle && (
+            <Stack
+              flexDirection={"row"}
+              alignItems="center"
+              className="show-on-hover"
+              sx={{ opacity: 0 }}
+            >
+              {goal.perms.captains.map((item: any, index: number) => {
+                return (
+                  <Chip
+                    key={item}
+                    sx={{ marginLeft: 1 }}
+                    avatar={<Avatar>C</Avatar>}
+                    size="small"
+                    label={<Typography fontWeight={"bold"}>{item}</Typography>}
+                    color="primary"
+                    variant="outlined"
+                  />
+                );
+              })}
+            </Stack>
+          )}
         </StyledTreeItem>
         {addingGoal && (
           <NewGoalInput

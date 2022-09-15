@@ -21,6 +21,7 @@ import { Order, PinId } from "./types/types";
 import Avatar from "@mui/material/Avatar";
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
+
 import {
   deleteGoalAction,
   deletePoolAction,
@@ -31,6 +32,7 @@ import {
   toggleCompleteAction,
   orderPools,
   orderPoolsAction,
+  updatePoolPermsAction,
 } from "./store/actions";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
@@ -46,7 +48,9 @@ import {
   DeletionDialog,
   LeaveDialog,
   Snackie,
+  Log,
 } from "./components";
+
 declare const window: Window &
   typeof globalThis & {
     scry: any;
@@ -55,16 +59,11 @@ declare const window: Window &
   };
 
 //TODO: disable the actions until subscription is setup/have any pools
-//TODO: display a "to get started add a pool"
 //TODO: add pals integration
-//TODO: once you are using add input, hide the add button
 //TODO: UI cleanup
-//TODO: add filter incomplete goals
-//TODO: migrate the actions to the subscription
-//TODO: edit inputs should hide the action buttons and take up the full width of the screen
-//TODO: add an event log to the app
 //TODO: handle sub kick/error IMPORTANT
-//TODO: viewers should still be able to view the menu and leave the project
+//TO TEST: viewers should still be able to view the menu and leave the project
+//TODO:  polish the chatbox UI and logic
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -82,39 +81,46 @@ function App() {
     success: false,
     error: false,
   });
+  const currShip = shipName();
+
+  const setLogList = useStore((store) => store.setLogList);
+
   const onSelect = (id: number) => {
     // You can put whatever here
     console.log("you clicked: " + id);
-    //look for goal with given id and change it's desc to "hello world"
-    const newfetchedPools = fetchedPools.map((pool: any, index: any) => {
-      //look through each pools goals to find the one we seek, the one who rules them all, the one ring of power!
-      const newGoals = pool.pool.goals.map((goalItem: any, goalIndex: any) => {
-        const goalId = goalItem.id.birth;
-        if (goalId === id) {
-          return {
-            goal: {
-              ...goalItem.goal,
-              desc: "hello world, I just changed you",
-            },
-            id: goalItem.id,
-          };
-        }
-        return goalItem;
-      });
-      return { ...pool, pool: { ...pool.pool, goals: newGoals } };
-    });
-    setFetchedPools(newfetchedPools);
   };
   useEffect(() => {
     //convert flat goals into nested goals for each pool
-    const newProjects = fetchedPools.map((pool: any, id: any) => {
-      const newNestedGoals = createDataTree(pool.pool.nexus.goals);
+    //make our role map
+    const roleMap = new Map();
+
+    const newProjects = fetchedPools.map((poolItem: any, id: any) => {
+      //update the perms here, in case they do change
+      const { pin, pool } = poolItem;
+
+      if (pin.owner === currShip) {
+        //check if this ship is the owner
+        roleMap.set(pin.birth, "owner");
+      }
+      //check the perms lists for the current ship
+      if (pool.perms.viewers.includes(currShip)) {
+        roleMap.set(pin.birth, "viewer");
+      }
+      if (pool.perms.captains.includes(currShip)) {
+        roleMap.set(pin.birth, "captain");
+      }
+      if (pool.perms.admins.includes(currShip)) {
+        roleMap.set(pin.birth, "admin");
+      }
+      //create our nested data structure we use for rendering
+      const newNestedGoals = createDataTree(pool.nexus.goals);
       return {
-        ...pool,
-        pool: { ...pool.pool, nexus: { goals: newNestedGoals } },
+        ...poolItem,
+        pool: { ...pool, nexus: { goals: newNestedGoals } },
       };
     });
     setPools(newProjects);
+    setRoleMap(roleMap);
   }, [fetchedPools]);
 
   const fetchInitial = async () => {
@@ -128,29 +134,7 @@ function App() {
         return aey.pool.froze.birth - bee.pool.froze.birth;
       });
       const orderedPools = orderPools(preOrderedPools, order);
-      //make our role map
-      const roleMap = new Map();
-      const currShip = shipName();
-      orderedPools.forEach((poolItem: any) => {
-        //TODO: I want to return out
-        const { pin, pool } = poolItem;
-        if (pin.owner === currShip) {
-          //check if this ship is the owner
-          roleMap.set(pin.birth, "owner");
-        }
-        //check the perms lists for the current ship
-        if (pool.perms.viewers.includes(currShip)) {
-          roleMap.set(pin.birth, "viewer");
-        }
-        if (pool.perms.captains.includes(currShip)) {
-          roleMap.set(pin.birth, "captain");
-        }
-        if (pool.perms.admins.includes(currShip)) {
-          roleMap.set(pin.birth, "admin");
-        }
-      });
-      console.log("roleMap", roleMap);
-      setRoleMap(roleMap);
+
       setFetchedPools(orderedPools);
       if (result) {
         setLoading({ trying: false, success: true, error: false });
@@ -165,7 +149,13 @@ function App() {
   const updateHandler = (update: any) => {
     log("update", update);
     const actionName: any = Object.keys(update.tel)[0];
-    log("actionName", actionName);
+
+    //add this update to our logList
+    setLogList({
+      actionName,
+      ship: update.hed?.mod,
+    });
+
     if (actionName) {
       switch (actionName) {
         case "spawn-goal": {
@@ -213,6 +203,13 @@ function App() {
           let { complete, id }: any = update.tel[actionName];
 
           toggleCompleteAction(id, hed.pin, complete);
+
+          break;
+        }
+        case "pool-perms": {
+          const hed: any = update.hed;
+
+          updatePoolPermsAction(hed.pin, update.tel[actionName]);
 
           break;
         }
@@ -285,7 +282,7 @@ function App() {
           const poolOwner = pool.pin.owner;
           const goalList = pool.pool.nexus.goals;
           const permList = pool.pool.perms;
-          const role = roleMap.get(poolId);
+          const role = roleMap?.get(poolId);
           return (
             <Project
               title={poolTitle}
@@ -310,6 +307,7 @@ function App() {
     </Container>
   );
 }
+
 function ErrorAlert({ onRetry }: { onRetry: Function }) {
   return (
     <Alert
@@ -457,23 +455,30 @@ const Project = memo(
 
           {/*TODO: make this into it's own component(so we don't have to rerender the children)*/}
           {renderAddButton()}
-          <Chip
-            sx={{ opacity: 0, marginLeft: 1 }}
-            className="show-on-hover"
-            avatar={<Avatar>O</Avatar>}
-            size="small"
-            label={<Typography fontWeight={"bold"}>{poolOwner}</Typography>}
-            color="primary"
-            variant="outlined"
-          />
-          <Chip
-            sx={{ opacity: 0, marginLeft: 1 }}
-            className="show-on-hover"
-            size="small"
-            label={<Typography fontWeight={"bold"}>{role}</Typography>}
-            color="secondary"
-            variant="outlined"
-          />
+          {!editingTitle && (
+            <Stack
+              flexDirection={"row"}
+              alignItems="center"
+              className="show-on-hover"
+              sx={{ opacity: 0 }}
+            >
+              <Chip
+                sx={{ marginLeft: 1 }}
+                avatar={<Avatar>O</Avatar>}
+                size="small"
+                label={<Typography fontWeight={"bold"}>{poolOwner}</Typography>}
+                color="primary"
+                variant="outlined"
+              />
+              <Chip
+                sx={{ marginLeft: 1 }}
+                size="small"
+                label={<Typography fontWeight={"bold"}>{role}</Typography>}
+                color="secondary"
+                variant="outlined"
+              />
+            </Stack>
+          )}
         </StyledTreeItem>
         {addingGoal && (
           <NewGoalInput
@@ -575,6 +580,7 @@ function Header() {
       }}
       zIndex={1}
     >
+      <Log />
       <ShareDialog pals={[]} />
       <DeletionDialog />
       <LeaveDialog />
