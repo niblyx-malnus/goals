@@ -73,6 +73,7 @@ export default function IconMenu({
   type,
   setParentTrying,
   poolData,
+  positionLeft,
 }: {
   complete?: boolean;
   id?: GoalId;
@@ -80,6 +81,7 @@ export default function IconMenu({
   type: "pool" | "goal";
   setParentTrying: Function;
   poolData?: any;
+  positionLeft: number;
 }) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -186,11 +188,10 @@ export default function IconMenu({
   return (
     <Box
       className="show-on-hover"
-      sx={{ opacity: open ? 1 : 0, position: "absolute", left: -30 }}
+      sx={{ opacity: open ? 1 : 0, position: "absolute", left: positionLeft }}
     >
       <IconButton
         className="menu-button"
-        //sx={{ position: "absolute", left: -35 }}
         aria-label="menu button"
         size="small"
         aria-controls={open ? "icon-menu-id" : undefined}

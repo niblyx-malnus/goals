@@ -89,6 +89,7 @@ const TreeItem = memo(
             id={idObject}
             pin={pin}
             setParentTrying={setTrying}
+            positionLeft={children && children.length === 0 ? -35 : -30}
           />
         );
       }
@@ -99,7 +100,6 @@ const TreeItem = memo(
           variant="h6"
           color={"text.primary"}
           style={{
-            marginLeft: children && children.length === 0 ? "24px" : "",
             background: `${selected ? "#d5d5d5" : ""}`,
             textDecoration: goal.togls.complete ? "line-through" : "auto",
           }}
@@ -117,7 +117,6 @@ const TreeItem = memo(
             !disableActions && setEditingTitle(true);
           }}
           style={{
-            marginLeft: children && children.length === 0 ? "24px" : "",
             background: `${selected ? "#d5d5d5" : ""}`,
             textDecoration: goal.togls.complete ? "line-through" : "auto",
           }}
@@ -127,7 +126,6 @@ const TreeItem = memo(
       ) : (
         <div
           style={{
-            marginLeft: children && children.length === 0 ? "24px" : "",
             flex: 1,
           }}
         >
@@ -217,22 +215,24 @@ const TreeItem = memo(
             </Stack>
           )}
         </StyledTreeItem>
-        {addingGoal && (
-          <NewGoalInput
-            pin={pin}
-            parentId={idObject}
-            under={true}
-            callback={() => setAddingGoal(false)}
-          />
-        )}
-        <StyledTreeChildren
+
+        <Box
+          sx={{ paddingLeft: 5 }}
           style={{
             height: !isOpen ? "0px" : "auto",
             overflow: !isOpen ? "hidden" : "visible",
           }}
         >
+          {addingGoal && (
+            <NewGoalInput
+              pin={pin}
+              parentId={idObject}
+              under={true}
+              callback={() => setAddingGoal(false)}
+            />
+          )}
           {children}
-        </StyledTreeChildren>
+        </Box>
       </div>
     );
   }

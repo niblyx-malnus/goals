@@ -61,8 +61,6 @@ function EditInput({
     }
   };
   const editPoolTitle = async () => {
-    //TODO: delete if no value?
-    //TODO: make it so you can edit through icon menu
     setParentTrying(true);
     setTrying(true);
     try {
@@ -80,9 +78,6 @@ function EditInput({
     onDone();
   };
   const editGoalDesc = async () => {
-    //TODO: delete if no value?
-    //TODO: make it so you can edit through icon menu
-    //onDone();
     setParentTrying(true);
     setTrying(true);
     try {

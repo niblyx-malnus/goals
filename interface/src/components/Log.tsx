@@ -38,20 +38,30 @@ export default function Log({}) {
             {logList.map((log: any, index: number) => {
               return (
                 <Stack
+                  flex={1}
                   flexDirection={"row"}
                   alignItems="center"
                   justifyContent="flex-start"
                   key={"log-item-" + index}
+                  flexWrap="nowrap"
                 >
-                  <Typography variant="subtitle1">[{log.date}]</Typography>
+                  <Typography variant="subtitle1" sx={{ whiteSpace: "nowrap" }}>
+                    [{log.date}]
+                  </Typography>
                   <Typography
                     variant="subtitle1"
                     fontWeight="bold"
                     color={"primary"}
+                    sx={{ whiteSpace: "nowrap" }}
                   >
                     [~{log.ship}]
                   </Typography>
-                  <Typography variant="subtitle1" marginLeft={1}>
+                  <Typography
+                    variant="subtitle1"
+                    marginLeft={1}
+                    paddingRight={2}
+                    sx={{ whiteSpace: "nowrap" }}
+                  >
                     {log.actionName}
                   </Typography>
                 </Stack>

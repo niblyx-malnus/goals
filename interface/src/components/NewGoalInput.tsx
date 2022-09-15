@@ -7,7 +7,6 @@ import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import { GoalId, PinId } from "../types/types";
 import useStore from "../store";
-//TODO: padding left  34 for add goal 44 for add under(me thinks), maybe a better way to do this
 
 function NewGoalInput({
   callback,
@@ -59,7 +58,7 @@ function NewGoalInput({
     setTrying(false);
   };
   return (
-    <Box style={{ paddingLeft: 44 }}>
+    <Box>
       <Stack
         flexDirection="row"
         justifyContent="center"
@@ -69,7 +68,6 @@ function NewGoalInput({
         {trying && (
           <CircularProgress
             size={22}
-            //style={{ padding: 1 }}
             sx={{ position: "absolute", left: -30 }}
           />
         )}

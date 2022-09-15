@@ -18,9 +18,9 @@ const api = {
       : new Urbit("");
     urb.ship = isDev() ? process.env.REACT_APP_SHIP_NAME : window.ship;
     // Just log errors if we get any
-    urb.onError = (message) => console.log("onError: ", message);
-    urb.onOpen = () => console.log("urbit onOpen");
-    urb.onRetry = () => console.log("urbit onRetry");
+    urb.onError = (message) => log("onError: ", message);
+    urb.onOpen = () => log("urbit onOpen");
+    urb.onRetry = () => log("urbit onRetry");
     //not sure this is needed in release build
     urb.connect();
 
@@ -29,9 +29,9 @@ const api = {
   scry: async (app = "cell", path = "/pull") => {
     try {
       const response = await api.createApi().scry({ app, path });
-      console.log("scry response: ", response);
+      log("scry response: ", response);
     } catch (e) {
-      console.log("scry error: ", e);
+      log("scry error: ", e);
     }
   },
   poke: async (
@@ -45,9 +45,9 @@ const api = {
         mark,
         json,
       });
-      console.log("poke response: ", response);
+      log("poke response: ", response);
     } catch (e) {
-      console.log("poke error: ", e);
+      log("poke error: ", e);
     }
   },
   getData: async () => {

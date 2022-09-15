@@ -60,10 +60,7 @@ declare const window: Window &
 
 //TODO: disable the actions until subscription is setup/have any pools
 //TODO: add pals integration
-//TODO: UI cleanup
-//TODO: handle sub kick/error IMPORTANT
-//TO TEST: viewers should still be able to view the menu and leave the project
-//TODO:  polish the chatbox UI and logic
+//TODO: handle sub kick/error
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -87,7 +84,7 @@ function App() {
 
   const onSelect = (id: number) => {
     // You can put whatever here
-    console.log("you clicked: " + id);
+    log("you clicked: " + id);
   };
   useEffect(() => {
     //convert flat goals into nested goals for each pool
@@ -226,8 +223,8 @@ function App() {
           path: "/goals",
           event: updateHandler,
           //TODO: handle sub death/kick/err
-          err: () => console.log("Subscription rejected"),
-          quit: () => console.log("Kicked from subscription"),
+          err: () => log("Subscription rejected"),
+          quit: () => log("Kicked from subscription"),
         });
         setChannel(channelValue);
       } catch (e) {
@@ -373,6 +370,7 @@ const Project = memo(
             type="pool"
             pin={pin}
             setParentTrying={setTrying}
+            positionLeft={goalsLength === 0 ? -35 : -30}
           />
         );
       }
@@ -480,22 +478,23 @@ const Project = memo(
             </Stack>
           )}
         </StyledTreeItem>
-        {addingGoal && (
-          <NewGoalInput
-            pin={pin}
-            under={false}
-            callback={() => setAddingGoal(false)}
-          />
-        )}
-        <StyledTreeChildren
+
+        <Box
+          sx={{ paddingLeft: 5 }}
           style={{
-            // backgroundColor:"orange",
             height: !isOpen ? "0px" : "auto",
             overflow: !isOpen ? "hidden" : "visible",
           }}
         >
+          {addingGoal && (
+            <NewGoalInput
+              pin={pin}
+              under={false}
+              callback={() => setAddingGoal(false)}
+            />
+          )}
           {children}
-        </StyledTreeChildren>
+        </Box>
       </Box>
     );
   }
@@ -718,9 +717,6 @@ const StyledTreeItem = styled(Box)({
       opacity: 1,
     },
   },
-});
-const StyledTreeChildren = styled(Box)({
-  paddingLeft: "20px",
 });
 
 const StyledLabel = styled(Box)({
