@@ -3,11 +3,51 @@
 |_  =store:gol
 +*  gols   ~(. gol-cli-goals +<)  
 ::
+:: update directory to reflect new goals in a pool
+++  update-dir
+  |=  [=pin:gol efx=(list update:goal-store)]
+  ^-  directory:gol
+  |^
+  =/  idx  0
+  |-
+  ?:  =(idx (lent efx))
+    directory.store
+  =/  upd  (snag idx efx)
+  %=  $
+    idx  +(idx)
+    directory.store
+      ?+    upd  directory.store
+          [%spawn-pool *]
+        %-  ~(gas by directory.store) 
+        %+  turn
+          ~(tap in ~(key by goals.pool.upd))
+        |=  =id:gol
+        [id pin]
+        ::
+          [%trash-pool *]
+        (gus-by-directory ~(tap in ~(key by goals:(~(got by pools.store) pin))))
+        ::
+          [%spawn-goal *]
+        (~(put by directory.store) id.upd pin)
+        ::
+          [%trash-goal *]
+        (gus-by-directory ~(tap in del.upd))
+      ==
+  ==
+  ++  gus-by-directory
+    |=  ids=(list id:gol)
+    =/  idx  0
+    |-
+    ?:  =(idx (lent ids))
+      directory.store
+    $(idx +(idx), directory.store (~(del in directory.store) (snag idx ids)))
+  --
+::
 ++  update-store
-  |=  [=pin:gol =pool:gol]
+  |=  [=pin:gol efx=(list update:goal-store) =pool:gol]
   ^-  store:gol
   :_  (~(put by pools.store) pin pool)
-  (update-dir:gols pin ~(key by goals.pool))
+  (update-dir pin efx)
 ::
 ++  get-away-cud
   |=  [=pin:gol mod=ship pore=_pl]
@@ -18,7 +58,7 @@
     |=  upd=update:goal-store
     ^-  away-update:goal-store
     [mod upd]
-  (update-store pin pool:abet:pore)
+  (update-store pin abet:pore)
 ::
 ++  spawn-goal
   |=  $:  [=pin:gol mod=ship]
@@ -72,7 +112,7 @@
   ^-  home-cud:goal-store
   :+  pin
     [[pin mod] %trash-pool ~]~
-  :-  (update-dir:gols pin ~)
+  :-  (update-dir pin [%trash-pool ~]~)
   (~(del by pools.store) pin)
 ::
 ++  archive-pool  !!
@@ -87,7 +127,7 @@
   =+  [pin pool]=(copy-pool:gols old-pin title captains admins viewers own now)
   :+  pin
     [[pin mod] %spawn-pool pool]~
-  (update-store pin pool)
+  (update-store pin [%spawn-pool pool]~ pool)
 ::
 ++  delete-goal
   |=  [=id:gol mod=ship]

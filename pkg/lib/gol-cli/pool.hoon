@@ -599,6 +599,7 @@
   ^-  _this
   ::
   :: Check mod permissions
+  :: TODO: dag-rend should only require permissions on one of the goals
   ?>  (check-pair-perm id.e1 id.e2 mod)
   ::
   :: Cannot unrelate goal from itself
