@@ -193,16 +193,4 @@
   =.  goals.pool  (~(put by goals.pool) id goal)
   :_  (~(put by pools) pin pool)
   (~(put by directory) id pin)
-::
-:: update directory to reflect new goals in a pool
-++  update-dir
-  |=  [target=pin:gol sources=(set id:gol)]
-  ^-  directory:gol
-  =/  dir
-    %-  ~(gas by *directory:gol)
-    %+  murn  ~(tap by directory)
-    |=  [a=id:gol b=pin:gol]
-    ?:(=(b target) ~ (some [a b]))
-  =/  pairs  (turn ~(tap in sources) |=(=id:gol [id target]))
-  (~(gas by dir) pairs)
 --

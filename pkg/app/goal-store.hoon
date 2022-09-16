@@ -411,7 +411,7 @@
           ==
         =/  pool  (~(got by pools.store) pin)
         =/  pore  (apex:pl pool)
-        :_  this(store (update-store:gs pin pool:abet:(etch:pore +.update)))
+        :_  this(store (update-store:gs pin [+.update]~ pool:abet:(etch:pore +.update)))
         ~[(fact:io goal-home-update+!>([[pin mod.update] +.update]) ~[/goals])]
       ==
     ==
