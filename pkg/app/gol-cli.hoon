@@ -117,6 +117,9 @@
     =*  poke-self  ~(poke-self pass:io /print-context)
     :_  this
     [(poke-self view-action+!>(print+~))]~
+      [%mod-command *]
+    :_  this
+    (print-cards:prtr ~["Hit ENTER for updates."])
     ::
       [%goals ~]
     ?>  =(src.bowl our.bowl)
@@ -142,27 +145,24 @@
         =*  poke-self  ~(poke-self pass:io /print-context)
         =+  ^-  [[=pin:gol mod=ship] =update:goal-store]
           !<(home-update:goal-store q.cage.sign)
-        ?+    -.update
-          :: ?.  =(mod our.bowl)  `this
-          :_  this
-          [(poke-self view-action+!>(print+~))]~
+        ?+    -.update  `this
           ::
             %spawn-goal
-          :-  [(poke-self view-action+!>(print+~))]~
+          :-  ~
           %=  this
             handles  (new-goal:hdls id.update)
             views  (new-goal:vyuz id.update)
           ==
           ::
             %spawn-pool
-          :-  [(poke-self view-action+!>(print+~))]~
+          :-  ~
           %=  this
             handles  (new-pool:hdls pin pool.update)
             views  (new-pool:vyuz pin pool.update)
           ==
           ::
             %trash-goal
-          :-  [(poke-self view-action+!>(print+~))]~
+          :-  ~
           %=  this
             handles  
               =/  del  ~(tap in del.update)
@@ -181,7 +181,7 @@
           ==
           ::
             %trash-pool
-          :-  [(poke-self view-action+!>(print+~))]~
+          :-  ~
           =/  new-handles  initial:hdls
           %=  this
             handles  new-handles
