@@ -35,6 +35,82 @@
 ::
 +$  store       store:s3
 ::
+++  s4
+  |%
+  +$  id  id:s3
+  +$  eid  eid:s3
+  +$  pin  pin:s3
+  +$  edge  edge:s3
+  +$  directory  directory:s3
+  +$  goal-froze  goal-froze:s3
+  +$  goal-nexus  goal-nexus:s3
+  +$  goal-togls  goal-togls:s3
+      :: +$  togl
+      ::   $:  mod=ship
+      ::       timestamp=@da
+      ::   ==
+  +$  goal-hitch  goal-hitch:s3
+      :: meta=(map @tas (unit @tas))
+      :: tags=(set @tas)
+      ::
+  +$  pool-froze  pool-froze:s3
+  +$  pool-togls  pool-togls:s3
+  +$  pool-hitch  pool-hitch:s3
+  ::
+  +$  goal-role  ?(%captain %peon)
+  ::
+  +$  goal-perms  
+    $:  point=(unit ship)
+        perms=(map ship [role=goal-role font=id])
+    ==
+  ::
+  +$  goal
+    $:  goal-froze
+        goal-perms
+        goal-nexus
+        goal-togls
+        goal-hitch
+    ==
+  ::
+  :: named goal (modules are named)
+  +$  ngoal
+    $:  froze=goal-froze
+        perms=goal-perms
+        nexus=goal-nexus
+        togls=goal-togls
+        hitch=goal-hitch
+    ==
+  ::
+  +$  goals  (map id goal)
+  ::
+  +$  pool-role  ?(%owner %admin %captain)
+  ::
+  +$  pool-perms  (map ship (unit pool-role))
+  ::
+  +$  pool-nexus  =goals
+  ::
+  +$  pool
+    $:  pool-froze
+        pool-perms
+        pool-nexus
+        pool-togls
+        pool-hitch
+    ==
+  ::
+  :: named pool (modules are named)
+  +$  npool
+    $:  froze=pool-froze
+        perms=pool-perms
+        nexus=pool-nexus
+        togls=pool-togls
+        hitch=pool-hitch
+    ==
+  ::
+  +$  pools  (map pin pool)
+  ::
+  +$  store  [=directory =pools]
+  --
+::
 ++  s3
   |%
   +$  id  id:s2
@@ -80,9 +156,7 @@
         viewers=(set ship)
     ==
   ::
-  +$  pool-nexus
-    $:  =goals
-    ==
+  +$  pool-nexus  =goals
   ::
   +$  pool
     $:  pool-froze
@@ -131,11 +205,6 @@
         kickoff=edge
         deadline=edge
     ==
-  :: ::  
-  :: +$  togl
-  ::   $:  mod=ship
-  ::       timestamp=@da
-  ::   ==
   ::
   +$  goal-togls
     $:  complete=?(%.y %.n)
@@ -143,11 +212,7 @@
         archived=?(%.y %.n)
     ==
   ::
-  +$  goal-hitch
-    $:  desc=@t
-        :: meta=(map @tas (unit @tas))
-        :: tags=(set @tas)
-    ==
+  +$  goal-hitch  desc=@t
   ::
   +$  goal
     $:  goal-froze
@@ -180,18 +245,11 @@
         viewers=(set ship)
     ==
   ::
-  +$  pool-nexus
-    $:  =goals
-    ==
+  +$  pool-nexus  =goals
   ::
-  +$  pool-togls
-    $:  archived=?(%.y %.n)
-    ==
+  +$  pool-togls  archived=?(%.y %.n)
   ::
-  +$  pool-hitch
-    $:  title=@t
-        :: fields=(map @tas (list @tas))
-    ==
+  +$  pool-hitch  title=@t
   ::
   +$  pool
     $:  pool-froze
@@ -406,9 +464,10 @@
       %prec-yoke
       %nest-rend
       %nest-yoke
+      %hook-rend
+      %hook-yoke
       %held-rend
       %held-yoke
-      %move-goal
   ==
 ::
 +$  yoke-tag  (union-from-list yoke-tags)

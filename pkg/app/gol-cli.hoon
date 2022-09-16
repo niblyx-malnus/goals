@@ -140,7 +140,7 @@
       ?+    p.cage.sign  (on-agent:def wire sign)
           %goal-home-update
         =*  poke-self  ~(poke-self pass:io /print-context)
-        =+  ^-  [[=pin:gol mod=ship] update=away-update:goal-store]
+        =+  ^-  [[=pin:gol mod=ship] =update:goal-store]
           !<(home-update:goal-store q.cage.sign)
         ?+    -.update
           :: ?.  =(mod our.bowl)  `this
