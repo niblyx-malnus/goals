@@ -171,5 +171,25 @@ const api = {
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: poolToLeave });
   },
+  markActionable: async (id) => {
+    const goalToMark = {
+      "mark-actionable": {
+        id,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: goalToMark });
+  },
+  unmarkActionable: async (id) => {
+    const goalToMark = {
+      "unmark-actionable": {
+        id,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: goalToMark });
+  },
 };
 export default api;

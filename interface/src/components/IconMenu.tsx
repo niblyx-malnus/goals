@@ -11,6 +11,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ClearIcon from "@mui/icons-material/Clear";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import PlayForWorkIcon from "@mui/icons-material/PlayForWork";
 import Box from "@mui/material/Box";
 import { GoalId, PinId } from "../types/types";
 import { log } from "../helpers";
@@ -74,8 +75,11 @@ export default function IconMenu({
   setParentTrying,
   poolData,
   positionLeft,
+  actionable,
 }: {
+  actionable?: any;
   complete?: boolean;
+
   id?: GoalId;
   pin?: PinId;
   type: "pool" | "goal";
@@ -185,11 +189,38 @@ export default function IconMenu({
     }
     setParentTrying(false);
   };
+  const markActionable = async () => {
+    handleClose();
+    setParentTrying(true);
+    try {
+      const result = await api.markActionable(id);
+      log("markActionable result => ", result);
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to make goal actionable",
+        severity: "error",
+      });
+      log("markActionable error => ", e);
+    }
+    setParentTrying(false);
+  };
+  const unmarkActionable = async () => {
+    handleClose();
+    setParentTrying(true);
+    try {
+      const result = await api.unmarkActionable(id);
+      log("unmarkActionable result => ", result);
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to remove goal actionable",
+        severity: "error",
+      });
+      log("unmarkActionable error => ", e);
+    }
+    setParentTrying(false);
+  };
   return (
-    <Box
-      className="show-on-hover"
-      sx={{ opacity: open ? 1 : 0, position: "absolute", left: positionLeft }}
-    >
+    <Box className="show-on-hover" sx={{ opacity: open ? 1 : 0 }}>
       <IconButton
         className="menu-button"
         aria-label="menu button"
@@ -230,6 +261,17 @@ export default function IconMenu({
               <MenuItem onClick={markComplete} disableRipple>
                 <CheckIcon fontSize="small" />
                 complete
+              </MenuItem>
+            )}
+            {actionable ? (
+              <MenuItem onClick={markActionable} disableRipple>
+                <PlayForWorkIcon fontSize="small" />
+                remove actionable
+              </MenuItem>
+            ) : (
+              <MenuItem onClick={unmarkActionable} disableRipple>
+                <PlayForWorkIcon fontSize="small" />
+                make actionable
               </MenuItem>
             )}
             <MenuItem onClick={deleteGoal} disableRipple>

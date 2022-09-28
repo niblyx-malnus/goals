@@ -16,8 +16,9 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Avatar from "@mui/material/Avatar";
-import { log, shipName } from "../helpers";
 
+import { log, shipName } from "../helpers";
+import { blue, orange, yellow } from "@mui/material/colors";
 interface TreeItemProps {
   readonly id: number;
   readonly onSelectCallback: (id: number) => void;
@@ -85,11 +86,13 @@ const TreeItem = memo(
         return (
           <IconMenu
             type="goal"
+            //TODO: just pass togls entirely to this
+            actionable={goal.togls.actionable}
             complete={goal.togls.complete}
             id={idObject}
             pin={pin}
             setParentTrying={setTrying}
-            positionLeft={children && children.length === 0 ? -35 : -30}
+            positionLeft={0}
           />
         );
       }
@@ -161,7 +164,15 @@ const TreeItem = memo(
       );
     };
     return (
-      <div>
+      <Box
+        sx={{
+          "&:hover": {
+            "& > div > .helper-bar ": {
+              backgroundColor: blue[400],
+            },
+          },
+        }}
+      >
         <StyledTreeItem
           sx={{
             "&:hover": {
@@ -173,23 +184,40 @@ const TreeItem = memo(
           }}
         >
           <>
+            <Box
+              sx={{
+                position: "absolute",
+                left: -24,
+                display: "flex",
+                flexDirection: "row",
+              }}
+            >
+              {children && children.length > 0 && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  className="icon-container"
+                  onClick={() => toggleItemOpen(!isOpen)}
+                >
+                  {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
+                </Box>
+              )}
+            </Box>
+            <Box
+              sx={{
+                backgroundColor: goal.togls.actionable ? orange[50] : "auto",
+                padding: 0.2,
+                paddingLeft: 1,
+                paddingRight: 1,
+                borderRadius: 1,
+              }}
+            >
+              {renderTitle()}
+            </Box>
             {renderIconMenu()}
-
-            {children && children.length > 0 && (
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                className="icon-container"
-                onClick={() => toggleItemOpen(!isOpen)}
-              >
-                {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
-              </Box>
-            )}
-            {renderTitle()}
-
             {renderAddButton()}
           </>
           {!editingTitle && (
@@ -217,12 +245,26 @@ const TreeItem = memo(
         </StyledTreeItem>
 
         <Box
-          sx={{ paddingLeft: 5 }}
+          sx={{ paddingLeft: "24px" }}
           style={{
+            position: "relative",
             height: !isOpen ? "0px" : "auto",
             overflow: !isOpen ? "hidden" : "visible",
           }}
         >
+          <Box
+            className="helper-bar"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              position: "absolute",
+              left: -13,
+              top: 0,
+              width: "1.5px",
+              backgroundColor: "text.secondary",
+              height: "100%",
+            }}
+          />
           {addingGoal && (
             <NewGoalInput
               pin={pin}
@@ -233,7 +275,7 @@ const TreeItem = memo(
           )}
           {children}
         </Box>
-      </div>
+      </Box>
     );
   }
 );
