@@ -129,10 +129,13 @@ function EditInput({
     <InputBase
       sx={{
         flex: 1,
-        display: "inline-block",
+       display: "inline-block",
         minWidth: metaVars.inputMinWidth,
-        padding: 0,
         width: "100%",
+        padding: 0.2,
+        paddingLeft: 1,
+        paddingRight: 1,
+        borderRadius: 1,
       }}
       style={{
         //intention here is to match the original typography (before double clicking)

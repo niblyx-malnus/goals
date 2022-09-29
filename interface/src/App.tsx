@@ -359,7 +359,7 @@ const Project = memo(
         return (
           <CircularProgress
             size={24}
-            sx={{ position: "absolute", left: -35 }}
+            sx={{ position: "absolute", left: -24 }}
           />
         );
       }
@@ -378,22 +378,40 @@ const Project = memo(
     const renderTitle = () => {
       if (role === "viewer" || role === "captain") {
         return (
-          <Typography color={"text.primary"} variant="h5" fontWeight={"bold"}>
-            {title}
-          </Typography>
+          <Box
+            sx={{
+              padding: 0.2,
+              paddingLeft: 1,
+              paddingRight: 1,
+              borderRadius: 1,
+            }}
+          >
+            <Typography color={"text.primary"} variant="h5" fontWeight={"bold"}>
+              {title}
+            </Typography>
+          </Box>
         );
       }
       return !editingTitle ? (
-        <Typography
-          color={trying ? "text.disabled" : "text.primary"}
-          variant="h5"
-          fontWeight={"bold"}
-          onDoubleClick={() => {
-            !disableActions && setEditingTitle(true);
+        <Box
+          sx={{
+            padding: 0.2,
+            paddingLeft: 1,
+            paddingRight: 1,
+            borderRadius: 1,
           }}
         >
-          {title}
-        </Typography>
+          <Typography
+            color={trying ? "text.disabled" : "text.primary"}
+            variant="h5"
+            fontWeight={"bold"}
+            onDoubleClick={() => {
+              !disableActions && setEditingTitle(true);
+            }}
+          >
+            {title}
+          </Typography>
+        </Box>
       ) : (
         <EditInput
           type="pool"
@@ -435,23 +453,34 @@ const Project = memo(
             },
           }}
         >
-          {renderIconMenu()}
-          {goalsLength > 0 && (
+          {!trying && (
             <Box
               sx={{
+                position: "absolute",
+                left: -24,
                 display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+                flexDirection: "row",
               }}
-              className="icon-container"
-              onClick={() => toggleItemOpen(!isOpen)}
             >
-              {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
+              {goalsLength > 0 && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  className="icon-container"
+                  onClick={() => toggleItemOpen(!isOpen)}
+                >
+                  {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
+                </Box>
+              )}
             </Box>
           )}
           {renderTitle()}
 
           {/*TODO: make this into it's own component(so we don't have to rerender the children)*/}
+          {renderIconMenu()}
           {renderAddButton()}
           {!editingTitle && (
             <Stack
@@ -480,7 +509,7 @@ const Project = memo(
         </StyledTreeItem>
 
         <Box
-          sx={{ paddingLeft: 5 }}
+          sx={{ paddingLeft: 4 }}
           style={{
             height: !isOpen ? "0px" : "auto",
             overflow: !isOpen ? "hidden" : "visible",

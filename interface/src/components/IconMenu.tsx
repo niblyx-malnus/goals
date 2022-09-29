@@ -236,11 +236,11 @@ export default function IconMenu({
       <StyledMenu
         anchorOrigin={{
           vertical: "top",
-          horizontal: "left",
+          horizontal: "right",
         }}
         transformOrigin={{
           vertical: "top",
-          horizontal: "right",
+          horizontal: "left",
         }}
         id="icon-menu-id"
         MenuListProps={{
@@ -263,17 +263,17 @@ export default function IconMenu({
                 complete
               </MenuItem>
             )}
-            {actionable ? (
-              <MenuItem onClick={markActionable} disableRipple>
+            {/*actionable ? (
+              <MenuItem onClick={unmarkActionable} disableRipple>
                 <PlayForWorkIcon fontSize="small" />
                 remove actionable
               </MenuItem>
             ) : (
-              <MenuItem onClick={unmarkActionable} disableRipple>
+              <MenuItem onClick={markActionable} disableRipple>
                 <PlayForWorkIcon fontSize="small" />
                 make actionable
               </MenuItem>
-            )}
+            )*/}
             <MenuItem onClick={deleteGoal} disableRipple>
               <DeleteIcon fontSize="small" />
               delete

@@ -211,7 +211,6 @@ function updatePoolPermsAction(toUpdatePin: PinId, newPerms: any) {
   const state = useStore.getState();
   const pools = state.pools;
   const setPools = state.setPools;
-
   //go through our poool, find the one with the toUpdatePin id and update it's perms with the new ones
   const newPools = pools.map((poolItem: any, index: number) => {
     const { pin, pool } = poolItem;

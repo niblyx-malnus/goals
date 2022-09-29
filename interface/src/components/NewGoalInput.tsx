@@ -63,7 +63,12 @@ function NewGoalInput({
         flexDirection="row"
         justifyContent="center"
         alignItems="center"
-        sx={{ position: "relative" }}
+        sx={{
+          position: "relative",
+          padding: 0.2,
+          paddingLeft: 1,
+          paddingRight: 1,
+        }}
       >
         {trying && (
           <CircularProgress

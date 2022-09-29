@@ -77,7 +77,7 @@ const TreeItem = memo(
             size={24}
             sx={{
               position: "absolute",
-              left: -30,
+              left: -24,
             }}
           />
         );
@@ -99,33 +99,52 @@ const TreeItem = memo(
     };
     const renderTitle = () => {
       const noEditPermTitle = (
-        <Typography
-          variant="h6"
-          color={"text.primary"}
-          style={{
-            background: `${selected ? "#d5d5d5" : ""}`,
-            textDecoration: goal.togls.complete ? "line-through" : "auto",
+        <Box
+          sx={{
+            backgroundColor: goal.togls.actionable ? orange[50] : "auto",
+
+            padding: 0.2,
+            paddingLeft: 1,
+            paddingRight: 1,
+            borderRadius: 1,
           }}
         >
-          {label}
-        </Typography>
+          <Typography
+            variant="h6"
+            color={"text.primary"}
+            style={{
+              textDecoration: goal.togls.complete ? "line-through" : "auto",
+            }}
+          >
+            {label}
+          </Typography>
+        </Box>
       );
       if (poolRole === "viewer") return noEditPermTitle;
       if (poolRole === "captain" && !isCaptain) return noEditPermTitle;
       return !editingTitle ? (
-        <Typography
-          variant="h6"
-          color={trying ? "text.disabled" : "text.primary"}
-          onDoubleClick={() => {
-            !disableActions && setEditingTitle(true);
-          }}
-          style={{
-            background: `${selected ? "#d5d5d5" : ""}`,
-            textDecoration: goal.togls.complete ? "line-through" : "auto",
+        <Box
+          sx={{
+            backgroundColor: goal.togls.actionable ? orange[50] : "auto",
+            padding: 0.2,
+            paddingLeft: 1,
+            paddingRight: 1,
+            borderRadius: 1,
           }}
         >
-          {label}
-        </Typography>
+          <Typography
+            variant="h6"
+            color={trying ? "text.disabled" : "text.primary"}
+            onDoubleClick={() => {
+              !disableActions && setEditingTitle(true);
+            }}
+            style={{
+              textDecoration: goal.togls.complete ? "line-through" : "auto",
+            }}
+          >
+            {label}
+          </Typography>
+        </Box>
       ) : (
         <div
           style={{
@@ -184,39 +203,31 @@ const TreeItem = memo(
           }}
         >
           <>
-            <Box
-              sx={{
-                position: "absolute",
-                left: -24,
-                display: "flex",
-                flexDirection: "row",
-              }}
-            >
-              {children && children.length > 0 && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                  className="icon-container"
-                  onClick={() => toggleItemOpen(!isOpen)}
-                >
-                  {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
-                </Box>
-              )}
-            </Box>
-            <Box
-              sx={{
-                backgroundColor: goal.togls.actionable ? orange[50] : "auto",
-                padding: 0.2,
-                paddingLeft: 1,
-                paddingRight: 1,
-                borderRadius: 1,
-              }}
-            >
-              {renderTitle()}
-            </Box>
+            {!trying && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  left: -24,
+                  display: "flex",
+                  flexDirection: "row",
+                }}
+              >
+                {children && children.length > 0 && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                    className="icon-container"
+                    onClick={() => toggleItemOpen(!isOpen)}
+                  >
+                    {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
+                  </Box>
+                )}
+              </Box>
+            )}
+            {renderTitle()}
             {renderIconMenu()}
             {renderAddButton()}
           </>
