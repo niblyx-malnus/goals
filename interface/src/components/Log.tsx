@@ -10,7 +10,7 @@ import Stack from "@mui/material/Stack";
 
 import Paper from "@mui/material/Paper";
 import Fab from "@mui/material/Fab";
-
+//TODO: update log icon to something more fititng
 export default function Log({}) {
   const [open, setOpen] = useState<boolean>(false);
   const logList = useStore((store: any) => store.logList);

@@ -191,5 +191,27 @@ const api = {
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: goalToMark });
   },
+  setKickoff: async (id, date) => {
+    const newKickoff = {
+      "set-deadline": {
+        id,
+        deadline: date, //null or date
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: newKickoff });
+  },
+  setDeadline: async (id, date) => {
+    const newDeadline = {
+      "set-deadline": {
+        id,
+        deadline: date, //null or date
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: newDeadline });
+  },
 };
 export default api;

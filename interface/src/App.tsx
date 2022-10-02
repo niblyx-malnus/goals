@@ -49,6 +49,7 @@ import {
   LeaveDialog,
   Snackie,
   Log,
+  TimelineDialog,
 } from "./components";
 
 declare const window: Window &
@@ -612,6 +613,7 @@ function Header() {
       <ShareDialog pals={[]} />
       <DeletionDialog />
       <LeaveDialog />
+      <TimelineDialog />
       <Snackie />
       <Stack flexDirection="row" alignItems="center">
         <OutlinedInput

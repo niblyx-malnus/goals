@@ -42,6 +42,9 @@ interface Store {
 
   logList: any;
   setLogList: (newLogList: any) => void;
+
+  timelineDialogOpen: boolean;
+  toggleTimelineDialog: (newStatus: boolean) => void;
 }
 
 const useStore = create<Store>((set, get) => ({
@@ -73,7 +76,6 @@ const useStore = create<Store>((set, get) => ({
       deleteDialogOpen: newStatus,
       deleteDialogData: newDeleteDialogData,
     })),
-
   leaveDialogData: null,
   leaveDialogOpen: false,
   toggleLeaveDialog: (newStatus: boolean, newLeaveDialogData: any) =>
@@ -120,6 +122,11 @@ const useStore = create<Store>((set, get) => ({
       logList: newLogList,
     }));
   },
+  timelineDialogOpen: false,
+  toggleTimelineDialog: (newStatus: boolean) =>
+    set(() => ({
+      timelineDialogOpen: newStatus,
+    })),
 }));
 
 export default useStore;

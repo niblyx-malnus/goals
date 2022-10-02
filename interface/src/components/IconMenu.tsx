@@ -16,13 +16,9 @@ import Box from "@mui/material/Box";
 import { GoalId, PinId } from "../types/types";
 import { log } from "../helpers";
 import api from "../api";
-import {
-  deletePoolAction,
-  deleteGoalAction,
-  toggleCompleteAction,
-} from "../store/actions";
-import useStore from "../store";
 
+import useStore from "../store";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
     elevation={1}
@@ -93,7 +89,9 @@ export default function IconMenu({
   const toggleDeleteDialog = useStore((store: any) => store.toggleDeleteDialog);
   const toggleLeaveDialog = useStore((store: any) => store.toggleLeaveDialog);
   const toggleSnackBar = useStore((store) => store.toggleSnackBar);
-
+  const toggleTimelineDialog = useStore(
+    (store: any) => store.toggleTimelineDialog
+  );
   const roleMap = useStore((store: any) => store.roleMap);
   const role = roleMap.get(pin?.birth);
 
@@ -219,6 +217,11 @@ export default function IconMenu({
     }
     setParentTrying(false);
   };
+  const handleTimeline = () => {
+    handleClose();
+    toggleTimelineDialog(true);
+  };
+
   return (
     <Box className="show-on-hover" sx={{ opacity: open ? 1 : 0 }}>
       <IconButton
@@ -274,6 +277,10 @@ export default function IconMenu({
                 make actionable
               </MenuItem>
             )*/}
+            <MenuItem onClick={handleTimeline} disableRipple>
+              <CalendarMonthIcon fontSize="small" />
+              timeline
+            </MenuItem>
             <MenuItem onClick={deleteGoal} disableRipple>
               <DeleteIcon fontSize="small" />
               delete

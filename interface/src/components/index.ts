@@ -6,6 +6,7 @@ import DeletionDialog from "./DeletionDialog";
 import LeaveDialog from "./LeaveDialog";
 import Snackie from "./Snackie";
 import Log from "./Log";
+import TimelineDialog from "./TimelineDialog";
 
 export {
   EditInput,
@@ -16,4 +17,5 @@ export {
   LeaveDialog,
   Snackie,
   Log,
+  TimelineDialog
 };
