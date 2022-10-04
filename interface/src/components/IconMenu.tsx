@@ -12,13 +12,15 @@ import ClearIcon from "@mui/icons-material/Clear";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import PlayForWorkIcon from "@mui/icons-material/PlayForWork";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import FolderCopyIcon from "@mui/icons-material/FolderCopy";
 import Box from "@mui/material/Box";
 import { GoalId, PinId } from "../types/types";
 import { log } from "../helpers";
 import api from "../api";
 
 import useStore from "../store";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+//TODO: hook up enter button to dialog confirm button everywhere
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
     elevation={1}
@@ -91,6 +93,9 @@ export default function IconMenu({
   const toggleSnackBar = useStore((store) => store.toggleSnackBar);
   const toggleTimelineDialog = useStore(
     (store: any) => store.toggleTimelineDialog
+  );
+  const toggleCopyPoolDialog = useStore(
+    (store: any) => store.toggleCopyPoolDialog
   );
   const roleMap = useStore((store: any) => store.roleMap);
   const role = roleMap.get(pin?.birth);
@@ -315,6 +320,19 @@ export default function IconMenu({
                 leave project
               </MenuItem>
             )}
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                toggleCopyPoolDialog(true, {
+                  title: poolData.title,
+                  pin,
+                });
+              }}
+              disableRipple
+            >
+              <FolderCopyIcon fontSize="small" />
+              make a copy
+            </MenuItem>
             {role === "owner" && (
               <MenuItem
                 onClick={() => {

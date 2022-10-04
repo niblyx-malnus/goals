@@ -1,3 +1,4 @@
+import { CreateCssVarsProviderResult } from "@mui/system";
 import create from "zustand";
 import { FilterGoals, Order, SnackBarData } from "../types/types";
 
@@ -45,6 +46,10 @@ interface Store {
 
   timelineDialogOpen: boolean;
   toggleTimelineDialog: (newStatus: boolean) => void;
+
+  copyPoolDialogData: any;
+  copyPoolDialogOpen: boolean;
+  toggleCopyPoolDialog: (newStatus: boolean, newCopyDialogData: any) => void;
 }
 
 const useStore = create<Store>((set, get) => ({
@@ -126,6 +131,14 @@ const useStore = create<Store>((set, get) => ({
   toggleTimelineDialog: (newStatus: boolean) =>
     set(() => ({
       timelineDialogOpen: newStatus,
+    })),
+
+  copyPoolDialogData: null,
+  copyPoolDialogOpen: false,
+  toggleCopyPoolDialog: (newStatus: boolean, newCopyDialogData: any) =>
+    set(() => ({
+      copyPoolDialogOpen: newStatus,
+      copyPoolDialogData: newCopyDialogData,
     })),
 }));
 

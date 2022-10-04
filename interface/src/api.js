@@ -1,6 +1,7 @@
 import memoize from "lodash/memoize";
 import Urbit from "@urbit/http-api";
 import { isDev, log } from "./helpers";
+import updates from "./subscriptions/updates";
 
 const api = {
   createApi: memoize(() => {
@@ -21,7 +22,8 @@ const api = {
     urb.onError = (message) => log("onError: ", message);
     urb.onOpen = () => log("urbit onOpen");
     urb.onRetry = () => log("urbit onRetry");
-    //not sure this is needed in release build
+    //sub to our frontend updates
+    urb.subscribe(updates)
     urb.connect();
 
     return urb;
@@ -212,6 +214,20 @@ const api = {
     return api
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: newDeadline });
+  },
+  copyPool: async (oldPin, title) => {
+    const poolToCopy = {
+      "copy-pool": {
+        "old-pin": oldPin,
+        title,
+        admins: [],
+        captains: [],
+        viewers: [],
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: poolToCopy });
   },
 };
 export default api;

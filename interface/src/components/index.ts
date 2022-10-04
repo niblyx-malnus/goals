@@ -7,6 +7,7 @@ import LeaveDialog from "./LeaveDialog";
 import Snackie from "./Snackie";
 import Log from "./Log";
 import TimelineDialog from "./TimelineDialog";
+import CopyPoolDialog from "./CopyPoolDialog";
 
 export {
   EditInput,
@@ -17,5 +18,6 @@ export {
   LeaveDialog,
   Snackie,
   Log,
-  TimelineDialog
+  TimelineDialog,
+  CopyPoolDialog
 };

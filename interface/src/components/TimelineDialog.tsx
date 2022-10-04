@@ -9,12 +9,14 @@ import Stack from "@mui/material/Stack";
 import useStore from "../store";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton";
+import ClearIcon from "@mui/icons-material/Clear";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import dayjs, { Dayjs } from "dayjs";
 //TODO: get the mobile picker working https://mui.com/x/react-date-pickers/getting-started/
-//TODO: update all the aria here and elsewhere 
+//TODO: update all the aria here and elsewhere
 
 export default function TimelineDialog() {
   const open = useStore((store: any) => store.timelineDialogOpen);
@@ -23,10 +25,8 @@ export default function TimelineDialog() {
     (store: any) => store.toggleTimelineDialog
   );
 
-  const [kickoffValue, setKickoffValue] = React.useState<Dayjs | null>(dayjs());
-  const [deadlineValue, setDeadlineValue] = React.useState<Dayjs | null>(
-    dayjs()
-  );
+  const [kickoffValue, setKickoffValue] = React.useState<Dayjs | null>(null);
+  const [deadlineValue, setDeadlineValue] = React.useState<Dayjs | null>(null);
 
   const handleKickoffChange = (newValue: Dayjs | null) => {
     setKickoffValue(newValue);
@@ -46,34 +46,67 @@ export default function TimelineDialog() {
       <Dialog
         open={open}
         onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+        onClick={(event) => event.stopPropagation()}
+        aria-labelledby="timeline-dialog-title"
+        aria-describedby="timeline-dialog-description"
         fullWidth
       >
-        <DialogTitle id="alert-dialog-title" fontWeight={"bold"}>
+        <DialogTitle id="timeline-dialog-title" fontWeight={"bold"}>
           Manage Timeline
         </DialogTitle>
         <DialogContent>
           <Stack
             //TODO: updated stacks across the app to use direction
-            direction={"row"}
-            spacing={1}
+            direction={"column"}
+            spacing={2}
             paddingTop={1}
           >
-            <DesktopDatePicker
-              label="Kickoff"
-              value={kickoffValue}
-              inputFormat="MM/DD/YYYY"
-              onChange={handleKickoffChange}
-              renderInput={(params) => <TextField {...params} />}
-            />
-            <DesktopDatePicker
-              label="Deadline"
-              value={deadlineValue}
-              inputFormat="MM/DD/YYYY"
-              onChange={handleDeadlineChange}
-              renderInput={(params) => <TextField {...params} />}
-            />
+            <Stack
+              //TODO: updated stacks across the app to use direction
+              direction={"row"}
+              spacing={1}
+              alignItems="center"
+              justifyContent="center"
+            >
+              <DesktopDatePicker
+                label="Kickoff"
+                value={kickoffValue}
+                inputFormat="MM/DD/YYYY"
+                onChange={handleKickoffChange}
+                renderInput={(params) => <TextField {...params} fullWidth />}
+              />
+              <IconButton
+                aria-label="add ship to pool"
+                size="small"
+                onClick={() => null}
+                //  disabled={trying}
+              >
+                <ClearIcon />
+              </IconButton>
+            </Stack>
+            <Stack
+              //TODO: updated stacks across the app to use direction
+              direction={"row"}
+              spacing={1}
+              alignItems="center"
+              justifyContent="center"
+            >
+              <DesktopDatePicker
+                label="Deadline"
+                value={deadlineValue}
+                inputFormat="MM/DD/YYYY"
+                onChange={handleDeadlineChange}
+                renderInput={(params) => <TextField {...params} fullWidth />}
+              />
+              <IconButton
+                aria-label="add ship to pool"
+                size="small"
+                //onClick={handleAdd}
+                //disabled={trying}
+              >
+                <ClearIcon />
+              </IconButton>
+            </Stack>
           </Stack>
         </DialogContent>
         <DialogActions>

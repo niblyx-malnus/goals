@@ -8,8 +8,6 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
-  //TODO: removing because it causes rerending, add back later
-  //TODO: hook this up to
   <React.StrictMode>
     <App />
   </React.StrictMode>
