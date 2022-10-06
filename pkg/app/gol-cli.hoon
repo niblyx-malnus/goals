@@ -291,7 +291,7 @@
       :: [%new-pool title=@t]
       %new-pool
     =*  poke-our  ~(poke-our pass:io /mod-command/new-pool)
-    [(poke-our %goal-store goal-action+!>([%new-pool title.command ~]))]~
+    [(poke-our %goal-store goal-action+!>([%new-pool title.command]))]~
       ::
       :: [%delete-pool-goal h=@t]
       %delete-pool-goal
@@ -310,7 +310,7 @@
       %copy-pool
     =*  poke-our  ~(poke-our pass:io /mod-command/copy-pool)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store goal-action+!>([%copy-pool pin.res title.command ~]))]~
+    [(poke-our %goal-store goal-action+!>([%copy-pool pin.res title.command]))]~
       ::
       ::  [%add-goal desc=@t]                
       %add-goal

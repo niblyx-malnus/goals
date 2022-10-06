@@ -7,19 +7,8 @@
   ^-  action
   %.  jon
   %-  of
-  :~  :-  %new-pool
-      %-  ot
-      :~  title+so
-          upds+dejs-pool-perm-upds 
-      ==
-      ::
-      :-  %copy-pool
-      %-  ot
-      :~  old-pin+dejs-pin
-          title+so
-          upds+dejs-pool-perm-upds 
-      ==
-      ::
+  :~  [%new-pool (ot ~[title+so])]
+      [%copy-pool (ot ~[old-pin+dejs-pin title+so])]
       :-  %spawn-goal
       %-  ot
       :~  pin+dejs-pin

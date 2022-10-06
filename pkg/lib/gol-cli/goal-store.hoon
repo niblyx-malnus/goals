@@ -90,13 +90,12 @@
 ::
 ++  new-pool
   |=  $:  title=@t
-          upds=(list [ship (unit (unit pool-role:gol))])
           own=ship
           mod=ship
           now=@da
       ==
   ^-  home-cud:goal-store
-  =+  [pin pool]=(new-pool:puls title upds own now)
+  =+  [pin pool]=(new-pool:puls title ~ own now)
   :+  pin
     [[pin mod] %spawn-pool pool]~
   store(pools (~(put by pools.store) pin pool))
@@ -114,13 +113,12 @@
 ++  copy-pool
   |=  $:  =old=pin:gol
           title=@t
-          upds=(list [ship (unit (unit pool-role:gol))])
           own=ship
           mod=ship
           now=@da
       ==
   ^-  home-cud:goal-store
-  =+  [pin pool]=(copy-pool:puls old-pin title upds own now)
+  =+  [pin pool]=(copy-pool:puls old-pin title ~ own now)
   :+  pin
     [[pin mod] %spawn-pool pool]~
   (update-store pin [%spawn-pool pool]~ pool)

@@ -2,21 +2,9 @@
 |%
 ::
 +$  action
-  $%  $:  %new-pool
-          title=@t
-          upds=(list [=ship role=(unit (unit pool-role))])
-      ==
-      $:  %copy-pool 
-          =old=pin
-          title=@t
-          upds=(list [=ship role=(unit (unit pool-role))])
-      ==
-      $:  %spawn-goal
-        =pin
-        upid=(unit id)
-        desc=@t
-        actionable=?
-      ==
+  $%  [%new-pool title=@t]
+      [%copy-pool =old=pin title=@t]
+      [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
       [%edit-goal-desc =id desc=@t]
       [%edit-pool-title =pin title=@t]
       [%delete-pool =pin]

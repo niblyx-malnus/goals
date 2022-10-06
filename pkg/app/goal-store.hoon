@@ -66,7 +66,6 @@
         %+  convert-home-cud:hc  ~
         %:  new-pool:gs
           title.action
-          upds.action
           src.bowl
           our.bowl
           now.bowl
@@ -78,7 +77,6 @@
         %:  copy-pool:gs
           old-pin.action
           title.action
-          upds.action
           src.bowl
           our.bowl
           now.bowl
