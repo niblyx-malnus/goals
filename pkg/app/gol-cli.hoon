@@ -54,8 +54,8 @@
       %2
     :-  (print-cards:prtr ~["%gol-cli: Hit ENTER to re-initialize."])
     %=  this
-      handles  *handles:vyu
-      views  (~(put by *views:vyu) [%all ~] *view:vyu)
+      handles  initial:hdls
+      views    initial:vyuz
     ==
       %1
     $(old (convert-1-to-2:vyu old))
