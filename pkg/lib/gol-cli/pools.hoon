@@ -12,6 +12,7 @@
   =.  birth.pool  birth.pin
   =.  title.pool  title
   =.  creator.pool  own
+  =.  perms.pool  (~(put by perms.pool) own (some %owner))
   =.  pool  pool:abet:(update-pool-perms:(apex:pl pool) upds own)
   [pin pool]
 ::
