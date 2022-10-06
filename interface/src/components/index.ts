@@ -8,6 +8,7 @@ import Snackie from "./Snackie";
 import Log from "./Log";
 import TimelineDialog from "./TimelineDialog";
 import CopyPoolDialog from "./CopyPoolDialog";
+import YokingActionBar from "./YokingActionBar";
 
 export {
   EditInput,
@@ -19,5 +20,6 @@ export {
   Snackie,
   Log,
   TimelineDialog,
-  CopyPoolDialog
+  CopyPoolDialog,
+  YokingActionBar
 };

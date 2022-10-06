@@ -12,7 +12,7 @@ export interface PinId {
   birth: string;
   owner: string;
 }
-
+export type Yoke = "move" | "prioritize" | "precede";
 export type SnackBarData = { message: string; severity: string } | null;
 export type FilterGoals = null | "complete" | "incomplete";
 export type Order = "asc" | "dsc";

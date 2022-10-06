@@ -30,6 +30,9 @@ interface TreeItemProps {
   poolRole: string;
   pin: PinId;
   isCaptain: boolean;
+  inSelectionMode: boolean;
+  disabled: boolean;
+  yokingGoalId: string;
 }
 
 export interface RecursiveTreeProps {
@@ -51,19 +54,32 @@ const TreeItem = memo(
     pin,
     poolRole,
     isCaptain,
-  }: TreeItemProps) => {
+    inSelectionMode,
+    disabled,
+    yokingGoalId,
+  }: //inSelectMode
+  TreeItemProps) => {
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
     const [selected, setSelected] = useState(isSelected);
+    const [yoking, setYoking] = useState<boolean>(false);
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [trying, setTrying] = useState<boolean>(false);
     const collapseAll = useStore((store) => store.collapseAll);
-    const disableActions = trying || editingTitle || addingGoal;
-
+    const disableActions = trying || editingTitle || addingGoal || disabled;
     useEffect(() => {
       //everytime collapse all changes, we force isOpen value to comply
       toggleItemOpen(collapseAll.status);
     }, [collapseAll.count]);
+
+    useEffect(() => {
+      //did yoking originated from this goal?
+      if (yokingGoalId && yokingGoalId === idObject.birth) {
+        setYoking(true);
+      } else {
+        setYoking(false);
+      }
+    }, [yokingGoalId]);
     const handleAdd = () => {
       toggleItemOpen(true);
       setAddingGoal(true);
@@ -97,6 +113,18 @@ const TreeItem = memo(
         );
       }
     };
+    const getColor = () => {
+      if (inSelectionMode) {
+        if (yoking) {
+          return "orange";
+        }
+        if (selected) {
+          return "purple";
+        }
+      }
+      if (goal.togls.actionable) return orange[50];
+      return "auto";
+    };
     const renderTitle = () => {
       const noEditPermTitle = (
         <Box
@@ -125,11 +153,14 @@ const TreeItem = memo(
       return !editingTitle ? (
         <Box
           sx={{
-            backgroundColor: goal.togls.actionable ? orange[50] : "auto",
+            backgroundColor: getColor(),
             padding: 0.2,
             paddingLeft: 1,
             paddingRight: 1,
             borderRadius: 1,
+          }}
+          onClick={() => {
+            inSelectionMode && !yoking && setSelected(!selected);
           }}
         >
           <Typography
@@ -291,7 +322,15 @@ const TreeItem = memo(
   }
 );
 
-const RecursiveTree = ({ goalList, pin, onSelectCallback, poolRole }: any) => {
+const RecursiveTree = ({
+  goalList,
+  pin,
+  onSelectCallback,
+  poolRole,
+  inSelectionMode,
+  disabled,
+  yokingGoalId,
+}: any) => {
   const filterGoals = useStore((store) => store.filterGoals);
   const ship = shipName();
   const createTree = (goal: any) => {
@@ -322,6 +361,9 @@ const RecursiveTree = ({ goalList, pin, onSelectCallback, poolRole }: any) => {
         pin={pin}
         poolRole={poolRole}
         isCaptain={isCaptain}
+        inSelectionMode={inSelectionMode}
+        disabled={disabled}
+        yokingGoalId={yokingGoalId}
       >
         {childGoals.map((goal: any) => {
           const currentChildGoalId = goal.id.birth;

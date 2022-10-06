@@ -1,6 +1,19 @@
 import { CreateCssVarsProviderResult } from "@mui/system";
 import create from "zustand";
-import { FilterGoals, Order, SnackBarData } from "../types/types";
+import {
+  FilterGoals,
+  GoalId,
+  Order,
+  PinId,
+  SnackBarData,
+  Yoke,
+} from "../types/types";
+
+type SelectionYokeData = null | {
+  goalId: GoalId;
+  poolId: PinId;
+  yokeType: Yoke;
+};
 
 interface Store {
   /*
@@ -50,6 +63,13 @@ interface Store {
   copyPoolDialogData: any;
   copyPoolDialogOpen: boolean;
   toggleCopyPoolDialog: (newStatus: boolean, newCopyDialogData: any) => void;
+
+  selectionMode: boolean;
+  selectionModeYokeData: SelectionYokeData;
+  toggleSelectionMode: (
+    newStatus: boolean,
+    newSelectionModeYokeData: SelectionYokeData
+  ) => void;
 }
 
 const useStore = create<Store>((set, get) => ({
@@ -139,6 +159,17 @@ const useStore = create<Store>((set, get) => ({
     set(() => ({
       copyPoolDialogOpen: newStatus,
       copyPoolDialogData: newCopyDialogData,
+    })),
+
+  selectionMode: false,
+  selectionModeYokeData: null,
+  toggleSelectionMode: (
+    newStatus: boolean,
+    newSelectionModeYokeData: SelectionYokeData
+  ) =>
+    set(() => ({
+      selectionMode: newStatus,
+      selectionModeYokeData: newSelectionModeYokeData,
     })),
 }));
 

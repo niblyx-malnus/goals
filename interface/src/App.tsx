@@ -39,6 +39,7 @@ import {
   Log,
   TimelineDialog,
   CopyPoolDialog,
+  YokingActionBar,
 } from "./components";
 
 declare const window: Window &
@@ -48,9 +49,11 @@ declare const window: Window &
     ship: any;
   };
 
-//TODO: disable the actions until subscription is setup/have any pools
 //TODO: add pals integration
+//TODO: add pals integration
+//TODO: add pals integration(easy)
 //TODO: handle sub kick/error
+
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -61,7 +64,7 @@ function App() {
   const setRoleMap = useStore((store) => store.setRoleMap);
   const fetchedPools = useStore((store) => store.pools);
   const setFetchedPools = useStore((store) => store.setPools);
-  const [channel, setChannel] = useState<null | number>(null);
+
   const [pools, setPools] = useState([]);
   const [loading, setLoading] = useState<Loading>({
     trying: true,
@@ -155,6 +158,10 @@ function App() {
     window["poke"] = api.poke;
   }, []);
   const roleMap = useStore((store: any) => store.roleMap);
+  const selectionMode = useStore((store) => store.selectionMode);
+  const selectionModeYokeData = useStore(
+    (store) => store.selectionModeYokeData
+  );
 
   return (
     <Container sx={{ paddingBottom: 10 }}>
@@ -179,6 +186,17 @@ function App() {
           const goalList = pool.pool.nexus.goals;
           const permList = pool.pool.perms;
           const role = roleMap?.get(poolId);
+          let inSelectionMode = false;
+          let disabled = false;
+          //we toggle into selection mode or disable the pool (disabling is a TODO)
+          if (selectionMode) {
+            //does the yoke selection stem from one of my goals?
+            if (selectionModeYokeData?.poolId.birth === poolId) {
+              inSelectionMode = true;
+            } else {
+              disabled = true;
+            }
+          }
           return (
             <Project
               title={poolTitle}
@@ -194,6 +212,9 @@ function App() {
                 onSelectCallback={onSelect}
                 pin={pool.pin}
                 poolRole={role}
+                inSelectionMode={inSelectionMode}
+                disabled={disabled}
+                yokingGoalId={selectionModeYokeData?.goalId.birth}
               />
             </Project>
           );
@@ -239,7 +260,6 @@ const Project = memo(
   }) => {
     //TODO: add the store type
     const collapseAll = useStore((store: any) => store.collapseAll);
-
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
@@ -431,6 +451,7 @@ function Header() {
   const [newProjectTitle, setNewProjectTitle] = useState<string>("");
   const [trying, setTrying] = useState<boolean>(false);
   const order = useStore((store) => store.order);
+  const selectionMode = useStore((store) => store.selectionMode);
 
   const setFilterGoals = useStore((store) => store.setFilterGoals);
 
@@ -507,8 +528,9 @@ function Header() {
       }}
       zIndex={1}
     >
-      <Log />
       <ShareDialog pals={[]} />
+      {selectionMode ? <YokingActionBar /> : <Log />}
+
       <DeletionDialog />
       <LeaveDialog />
       <TimelineDialog />

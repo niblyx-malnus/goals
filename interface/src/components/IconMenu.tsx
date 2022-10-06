@@ -97,6 +97,9 @@ export default function IconMenu({
   const toggleCopyPoolDialog = useStore(
     (store: any) => store.toggleCopyPoolDialog
   );
+  const toggleSelectionMode = useStore(
+    (store: any) => store.toggleSelectionMode
+  );
   const roleMap = useStore((store: any) => store.roleMap);
   const role = roleMap.get(pin?.birth);
 
@@ -226,7 +229,26 @@ export default function IconMenu({
     handleClose();
     toggleTimelineDialog(true);
   };
-
+  const handleMove = () => {
+    handleClose();
+    toggleSelectionMode(true, { goalId: id, poolId: pin, yokeType: "move" });
+  };
+  const handlePriortize = () => {
+    handleClose();
+    toggleSelectionMode(true, {
+      goalId: id,
+      poolId: pin,
+      yokeType: "prioritize",
+    });
+  };
+  const handlePrecede = () => {
+    handleClose();
+    toggleSelectionMode(true, {
+      goalId: id,
+      poolId: pin,
+      yokeType: "precede",
+    });
+  };
   return (
     <Box className="show-on-hover" sx={{ opacity: open ? 1 : 0 }}>
       <IconButton
@@ -285,6 +307,18 @@ export default function IconMenu({
             <MenuItem onClick={handleTimeline} disableRipple>
               <CalendarMonthIcon fontSize="small" />
               timeline
+            </MenuItem>
+            <MenuItem onClick={handleMove} disableRipple>
+              <CalendarMonthIcon fontSize="small" />
+              move
+            </MenuItem>
+            <MenuItem onClick={handlePriortize} disableRipple>
+              <CalendarMonthIcon fontSize="small" />
+              prioritize
+            </MenuItem>
+            <MenuItem onClick={handlePrecede} disableRipple>
+              <CalendarMonthIcon fontSize="small" />
+              precede
             </MenuItem>
             <MenuItem onClick={deleteGoal} disableRipple>
               <DeleteIcon fontSize="small" />
