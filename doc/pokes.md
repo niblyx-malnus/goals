@@ -33,18 +33,14 @@ Anyone who is a viewer on a pool can see all goals in that pool.
 
 ### Noun
 ```
-$:  %new-pool
-    title=@t
-    upds=(list [=ship role=(unit (unit ?(%admin %spawn)))])
-==
+[%new-pool title=@t]
 ```
 
 ### JSON
 ```
 {
   "new-pool": {
-    "title": "title of new pool",
-    "upds": [{ship: "nec", role=(null or "kick" or "admin" or "spawn")}, {ship: "nec", role=(null or "kick" or "admin" or "spawn")}]
+    "title": "title of new pool"
   }
 }
 ```
@@ -59,11 +55,7 @@ Make a copy of an existing pool.
 
 ### Noun
 ```
-$:  %copy-pool
-    =old=pin
-    title=@t
-    upds=(list [=ship role=(unit (unit ?(%admin %spawn)))])
-==
+[%copy-pool =old=pin title=@t]
 ```
 
 ### JSON
@@ -73,8 +65,7 @@ $:  %copy-pool
     "old-pin": {
       "owner": "zod",
       "birth": "~2000.1.1"
-    },
-    "upds": [{ship: "nec", role=(null or "kick" or "admin" or "spawn")}, {ship: "nec", role=(null or "kick" or "admin" or "spawn")}]
+    }
   }
 }
 ```
@@ -451,4 +442,8 @@ Make a ship a "peon" on a given goal. A "peon" can mark (and unmark) a goal and 
     }
   }
 }
+
+
+,
+    "upds": [{ship: "nec", role=(null or "kick" or "admin" or "spawn")}, {ship: "nec", role=(null or "kick" or "admin" or "spawn")}]
 ```
