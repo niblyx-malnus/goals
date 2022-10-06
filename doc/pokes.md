@@ -31,19 +31,11 @@ Anyone who is a viewer on a pool can see all goals in that pool.
 
 `title` is the title of the new pool.
 
-`admins` have full permissions to add/edit/delete any goal in the pool.
-
-`captains` can spawn a new goal in the root of the pool (without parents) but have no other pool-level permissions.
-
-`viewers` can view the pool and store a copy of the pool on their own ship.
-
 ### Noun
 ```
 $:  %new-pool
     title=@t
-    admins=(set ship)
-    captains=(set ship)
-    viewers=(set ship)
+    upds=(list [=ship role=(unit (unit ?(%admin %spawn)))])
 ==
 ```
 
@@ -52,9 +44,7 @@ $:  %new-pool
 {
   "new-pool": {
     "title": "title of new pool",
-    "admins": ["zod", "nec", "bud"],
-    "captains": ["zod", "nec", "bud"],
-    "viewers": ["zod", "nec", "bud"]
+    "upds": [{ship: "nec", role=(null or "kick" or "admin" or "spawn")}, {ship: "nec", role=(null or "kick" or "admin" or "spawn")}]
   }
 }
 ```
@@ -67,20 +57,12 @@ Make a copy of an existing pool.
 
 `title` is the title of the new pool copy.
 
-`admins` have full permissions to add/edit/delete any goal in the pool.
-
-`captains` can spawn a new goal in the root of the pool (without parents) but have no other pool-level permissions.
-
-`viewers` can view the pool and store a copy of the pool on their own ship.
-
 ### Noun
 ```
 $:  %copy-pool
     =old=pin
     title=@t
-    admins=(set ship)
-    captains=(set ship)
-    viewers=(set ship)
+    upds=(list [=ship role=(unit (unit ?(%admin %spawn)))])
 ==
 ```
 
@@ -92,10 +74,7 @@ $:  %copy-pool
       "owner": "zod",
       "birth": "~2000.1.1"
     },
-    "title": "title of new pool",
-    "admins": ["zod", "nec", "bud"],
-    "captains": ["zod", "nec", "bud"],
-    "viewers": ["zod", "nec", "bud"]
+    "upds": [{ship: "nec", role=(null or "kick" or "admin" or "spawn")}, {ship: "nec", role=(null or "kick" or "admin" or "spawn")}]
   }
 }
 ```
@@ -112,19 +91,13 @@ Create a goal under/owned-by/contained-by an existing goal.
 
 `actionable` denotes whether a goal is allowed to contain further goals or not. An actionable goal cannot contain subgoals.
 
-`captains` are essentially admins; they have full permissions to add/edit/delete this goal, or any of its descendents.
-
-`peons` can mark (and unmark) this goal and any of its descendents complete. This is the only kind of permissions they have.
-
 ### Noun
 ```
 $:  %spawn-goal                                                                  
   =pin                                                                           
   upid=(unit id)    
   desc=@t
-  actionable=?
-  captains=(set ship)                                                              
-  peons=(set ship)                           
+  actionable=?                      
 ==                                                                              
 ```
 
@@ -138,9 +111,7 @@ $:  %spawn-goal
     },
     "upid": (null or "id": { "owner": "zod", "birth": "~2000.1.1" },
     "desc": "description of new goal",
-    "actionable": true,
-    "captains": ["zod", "nec", "bud"],
-    "peons": ["zod", "nec", "bud"]
+    "actionable": true
   }
 }
 ```
