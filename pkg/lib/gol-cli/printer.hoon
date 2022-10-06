@@ -49,50 +49,52 @@
   ==
 ++  perms
   |=  =grip:vyu
-  ?-    -.grip
-    %all  "~"
-      %pool
-    =/  captains  (~(put in captains:(got-pool:scry pin.grip)) owner.pin.grip)
-    ?:  (~(has in captains) our.bowl)
-      "c"
-    "~"
-      %goal
-    =/  captains  (~(put in captains:(got-pool:scry (got-pin:scry id.grip))) owner.id.grip)
-    ?:  (~(has in captains) our.bowl)
-      "c"
-    =/  c-sen  (seniority:scry our.bowl id.grip %c)
-    =/  p-sen  (seniority:scry our.bowl id.grip %p)
-    ?~  c-sen
-      ?~  p-sen
-        "~"
-      "p"
-    "c"
-  ==
+  " "
+  :: ?-    -.grip
+  ::   %all  "~"
+  ::     %pool
+  ::   =/  captains  (~(put in captains:(got-pool:scry pin.grip)) owner.pin.grip)
+  ::   ?:  (~(has in captains) our.bowl)
+  ::     "c"
+  ::   "~"
+  ::     %goal
+  ::   =/  captains  (~(put in captains:(got-pool:scry (got-pin:scry id.grip))) owner.id.grip)
+  ::   ?:  (~(has in captains) our.bowl)
+  ::     "c"
+  ::   =/  c-sen  (seniority:scry our.bowl id.grip %c)
+  ::   =/  p-sen  (seniority:scry our.bowl id.grip %p)
+  ::   ?~  c-sen
+  ::     ?~  p-sen
+  ::       "~"
+  ::     "p"
+  ::   "c"
+  :: ==
 ++  delegates
   |=  =grip:vyu
-  ?-    -.grip
-    %all  "c~ p~"
-      %pool
-    =/  captains  (~(put in captains:(got-pool:scry pin.grip)) owner.pin.grip)
-    ?:  =(1 ~(wyt in captains))  :(weld "c" (trip (scot %p owner.pin.grip)) " p~")
-    "c+ p~"
-      %goal
-    =/  captains  captains:(got-goal:scry id.grip)
-    =/  captain
-      ?:  =(0 ~(wyt in captains))
-        "c~"
-      ?.  =(1 ~(wyt in captains))
-        "c+"
-      (weld "c" (trip (scot %p (snag 0 ~(tap in captains)))))
-    =/  peons  peons:(got-goal:scry id.grip)
-    =/  peon
-      ?:  =(0 ~(wyt in peons))
-        "p~"
-      ?.  =(1 ~(wyt in peons))
-        "p+"
-      (weld "p" (trip (scot %p (snag 0 ~(tap in peons)))))
-    :(weld captain " " peon)
-  ==
+  "     "
+  :: ?-    -.grip
+  ::   %all  "c~ p~"
+  ::     %pool
+  ::   =/  captains  (~(put in captains:(got-pool:scry pin.grip)) owner.pin.grip)
+  ::   ?:  =(1 ~(wyt in captains))  :(weld "c" (trip (scot %p owner.pin.grip)) " p~")
+  ::   "c+ p~"
+  ::     %goal
+  ::   =/  captains  captains:(got-goal:scry id.grip)
+  ::   =/  captain
+  ::     ?:  =(0 ~(wyt in captains))
+  ::       "c~"
+  ::     ?.  =(1 ~(wyt in captains))
+  ::       "c+"
+  ::     (weld "c" (trip (scot %p (snag 0 ~(tap in captains)))))
+  ::   =/  peons  peons:(got-goal:scry id.grip)
+  ::   =/  peon
+  ::     ?:  =(0 ~(wyt in peons))
+  ::       "p~"
+  ::     ?.  =(1 ~(wyt in peons))
+  ::       "p+"
+  ::     (weld "p" (trip (scot %p (snag 0 ~(tap in peons)))))
+  ::   :(weld captain " " peon)
+  :: ==
 ::
 :: get cards to print goal substructure
 ++  nest-print

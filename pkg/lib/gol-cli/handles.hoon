@@ -31,7 +31,7 @@
 ++  initial
   ^-  handles:vyu
   =.  handles  *handles:vyu
-  =/  store  initial:scry
+  =/  =store:gol  initial:scry
   =/  ids=(list grip:vyu)
     (turn ~(tap in ~(key by directory.store)) |=(=id:gol [%goal id]))
   =/  pins=(list grip:vyu)

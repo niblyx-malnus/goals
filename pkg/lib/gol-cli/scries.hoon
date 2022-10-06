@@ -292,27 +292,27 @@
     %roots-uncompleted  roots-uc.pyk
   ==
 ::
-++  seniority
-  |=  [mod=ship =id cp=?(%c %p)]
-  ^-  (unit ^id)
-  =/  pyk=peek
-    .^  peek
-      %gx
-      :~  (scot %p our.bowl)
-          %goal-store
-          (scot %da now.bowl)
-          %goal
-          (scot %p owner.id)
-          (scot %da birth.id)
-          %seniority
-          (scot %p mod)
-          [cp]
-          %goal-peek
-      ==
-    ==
-  ?+  -.pyk  !!
-    %seniority  u-senior.pyk
-  ==
+:: ++  seniority
+::   |=  [mod=ship =id cp=?(%c %p)]
+::   ^-  (unit ^id)
+::   =/  pyk=peek
+::     .^  peek
+::       %gx
+::       :~  (scot %p our.bowl)
+::           %goal-store
+::           (scot %da now.bowl)
+::           %goal
+::           (scot %p owner.id)
+::           (scot %da birth.id)
+::           %seniority
+::           (scot %p mod)
+::           [cp]
+::           %goal-peek
+::       ==
+::     ==
+::   ?+  -.pyk  !!
+::     %seniority  u-senior.pyk
+::   ==
 ::
 ++  harvest
   |=  =id

@@ -1,7 +1,8 @@
 /-  gol=goal, goal-store
-/+  *gol-cli-goal, gol-cli-goals, pl=gol-cli-pool
+/+  *gol-cli-goal, gol-cli-goals, gol-cli-pools, pl=gol-cli-pool
 |_  =store:gol
-+*  gols   ~(. gol-cli-goals +<)  
++*  gols  ~(. gol-cli-goals +<)
+    puls  ~(. gol-cli-pools +<)
 ::
 :: update directory to reflect new goals in a pool
 ++  update-dir
@@ -66,17 +67,11 @@
           upid=(unit id:gol)
           desc=@t
           actionable=?(%.y %.n)
-          =goal-perms:gol
       ==
   =/  pool  (~(got by pools.store) pin)
   =/  =id:gol  (unique-id:gols [our now])
   =/  pore  (apex:pl pool)
-  =.  pore
-    %:  spawn-goal-fixns:pore
-      id          upid
-      desc        actionable
-      goal-perms  mod
-    ==
+  =.  pore  (spawn-goal-fixns:pore id upid desc actionable mod)
   (get-away-cud pin mod pore)
 ::
 ++  move-goal
@@ -90,19 +85,18 @@
   |=  [=pin:gol yok=exposed-yoke:gol mod=ship]
   =/  pool  (~(got by pools.store) pin)
   =/  pore  (apex:pl pool)
-  =.  pore  (yoke:pore yok mod)
+  =.  pore  (yoke-emit:pore yok mod)
   (get-away-cud pin mod pore)
 ::
-:: create a new empty pool with title, initial viewers, admins, captains
-:: admins and captains immediately added as viewers
 ++  new-pool
-  |=  $:  title=@t           captains=(set ship)
-          admins=(set ship)  viewers=(set ship)
-          own=ship           mod=ship
+  |=  $:  title=@t
+          upds=(list [ship (unit (unit pool-role:gol))])
+          own=ship
+          mod=ship
           now=@da
       ==
   ^-  home-cud:goal-store
-  =+  [pin pool]=(new-pool:gols title captains admins viewers own now)
+  =+  [pin pool]=(new-pool:puls title upds own now)
   :+  pin
     [[pin mod] %spawn-pool pool]~
   store(pools (~(put by pools.store) pin pool))
@@ -118,13 +112,15 @@
 ++  archive-pool  !!
 ::
 ++  copy-pool
-  |=  $:  =old=pin:gol         title=@t
-          captains=(set ship)  admins=(set ship)
-          viewers=(set ship)   own=ship
-          mod=ship             now=@da
+  |=  $:  =old=pin:gol
+          title=@t
+          upds=(list [ship (unit (unit pool-role:gol))])
+          own=ship
+          mod=ship
+          now=@da
       ==
   ^-  home-cud:goal-store
-  =+  [pin pool]=(copy-pool:gols old-pin title captains admins viewers own now)
+  =+  [pin pool]=(copy-pool:puls old-pin title upds own now)
   :+  pin
     [[pin mod] %spawn-pool pool]~
   (update-store pin [%spawn-pool pool]~ pool)
@@ -201,34 +197,23 @@
   =.  pore  (set-deadline:pore id moment mod)
   (get-away-cud pin mod pore)
 ::
-++  add-pool-invitees
+++  update-goal-perms
+  |=  [=id:gol chief=ship rec=?(%.y %.n) lus=(set ship) hep=(set ship) mod=ship]
+  ^-  away-cud:goal-store
+  =/  pin  (~(got by directory.store) id)
+  =/  pool  (~(got by pools.store) pin)
+  =/  pore  (apex:pl pool)
+  =.  pore  (update-goal-perms:pore id chief rec lus hep mod)
+  (get-away-cud pin mod pore)
+::
+++  update-pool-perms
   |=  $:  =pin:gol
-          viewers=(set ship)
-          admins=(set ship)
-          captains=(set ship)
+          upds=(list [=ship role=(unit (unit pool-role:gol))])
           mod=ship
       ==
   ^-  away-cud:goal-store
   =/  pool  (~(got by pools.store) pin)
   =/  pore  (apex:pl pool)
-  =.  pore  (add-pool-perms:pore viewers admins captains mod)
-  (get-away-cud pin mod pore)
-::
-++  add-goal-captains
-  |=  [=id:gol captains=(set ship) mod=ship]
-  ^-  away-cud:goal-store
-  =/  pin  (~(got by directory.store) id)
-  =/  pool  (~(got by pools.store) pin)
-  =/  pore  (apex:pl pool)
-  =.  pore  (add-goal-captains:pore id captains mod)
-  (get-away-cud pin mod pore)
-::
-++  add-goal-peons
-  |=  [=id:gol peons=(set ship) mod=ship]
-  ^-  away-cud:goal-store
-  =/  pin  (~(got by directory.store) id)
-  =/  pool  (~(got by pools.store) pin)
-  =/  pore  (apex:pl pool)
-  =.  pore  (add-goal-peons:pore id peons mod)
+  =.  pore  (update-pool-perms:pore upds mod)
   (get-away-cud pin mod pore)
 --
