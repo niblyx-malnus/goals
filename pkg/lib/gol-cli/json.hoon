@@ -10,18 +10,14 @@
   :~  :-  %new-pool
       %-  ot
       :~  title+so
-          admins+dejs-set-ships
-          captains+dejs-set-ships
-          viewers+dejs-set-ships
+          upds+dejs-pool-perm-upds 
       ==
       ::
       :-  %copy-pool
       %-  ot
       :~  old-pin+dejs-pin
           title+so
-          admins+dejs-set-ships
-          captains+dejs-set-ships
-          viewers+dejs-set-ships
+          upds+dejs-pool-perm-upds 
       ==
       ::
       :-  %spawn-goal
@@ -30,8 +26,6 @@
           upid+dejs-unit-id
           desc+so
           actionable+bo
-          captains+dejs-set-ships
-          peons+dejs-set-ships
       ==
       [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
       [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
@@ -43,17 +37,39 @@
       [%unmark-actionable (ot ~[id+dejs-id])]
       [%mark-complete (ot ~[id+dejs-id])]
       [%unmark-complete (ot ~[id+dejs-id])]
-      [%make-goal-captain (ot ~[captain+dejs-ship id+dejs-id])]
-      [%make-goal-peon (ot ~[peon+dejs-ship id+dejs-id])]
-      :-  %invite
+      :-  %update-goal-perms 
       %-  ot
-      :~  pin+dejs-pin
-          admins+dejs-set-ships
-          captains+dejs-set-ships
-          viewers+dejs-set-ships
+      :~  id+dejs-id
+          chief+dejs-ship
+          rec+bo
+          lus+dejs-set-ships
+          hep+dejs-set-ships
       ==
+      [%update-pool-perms (ot ~[pin+dejs-pin upds+dejs-pool-perm-upds])]
       [%unsubscribe (ot ~[pin+dejs-pin])]
   ==
+::
+++  dejs-pool-perm-upds 
+  %-  ar:dejs:format
+  (ot:dejs:format ~[ship+dejs-ship role+dejs-uurole])
+::
+++  dejs-uurole
+  |=  jon=json
+  ?~  jon
+    (some ~)
+  =/  out
+    %.  jon
+    %-  su:dejs:format
+    ;~  pose
+      (cold %kick (jest 'kick'))
+      (cold %admin (jest 'admin'))
+      (cold %spawn (jest 'spawn'))
+    ==
+  =/  out 
+    ?.  ?=(?(%admin %spawn) out)
+      ~
+    (some out)
+  ?:(?=((unit (unit pool-role)) out) out !!)
 ::
 ++  dejs-unit-date  |=(jon=json ?~(jon ~ (some (dejs-date jon))))
 ++  dejs-pin  (pe:dejs:format %pin dejs-id)
@@ -180,19 +196,13 @@
         %trash-pool  ~
         ::
           %pool-perms
-        ?-  +<.upd
-          %add-pool-viewers  (frond +<.upd a+(turn ~(tap in viewers.upd) ship))
-          %rem-pool-viewers  (frond +<.upd a+(turn ~(tap in viewers.upd) ship))
-          %add-pool-admins  (frond +<.upd a+(turn ~(tap in admins.upd) ship))
-          %rem-pool-admins  (frond +<.upd a+(turn ~(tap in admins.upd) ship))
-          %add-pool-captains  (frond +<.upd a+(turn ~(tap in captains.upd) ship))
-          %rem-pool-captains  (frond +<.upd a+(turn ~(tap in captains.upd) ship))
-          %add-perms
-          %-  pairs
-          :~  [%admins a+(turn ~(tap in admins.upd) ship)]
-              [%captains a+(turn ~(tap in captains.upd) ship)]
-              [%viewers a+(turn ~(tap in viewers.upd) ship)]
-          ==
+        :-  %a  %+  turn  upds.upd
+        |=  [chip=@p role=(unit (unit pool-role))] 
+        %-  pairs
+        :~  [%ship (ship chip)]
+            ?~  role
+              [%kick ~]
+            [%role ?~(u.role ~ s+u.u.role)]
         ==
         ::
           %pool-hitch
@@ -208,18 +218,16 @@
           :~  [%nex (enjs-nex nex.upd)]
           ==
         ==
-          ?(%goal-perms %goal-hitch %goal-nexus %goal-togls)
+        ::
+          %goal-perms
+        %+  frond  %nex
+        (enjs-nex nex.upd)
+        ::
+          ?(%goal-hitch %goal-nexus %goal-togls)
         %-  pairs
         :~  [%id (enjs-id id.upd)]
             :-  +>-.upd
             ?-    -.upd
-                %goal-perms
-              ?-  +>-.upd
-                %add-goal-captains  (frond +>-.upd a+(turn ~(tap in captains.upd) ship))
-                %rem-goal-captains  (frond +>-.upd a+(turn ~(tap in captains.upd) ship))
-                %add-goal-peons  (frond +>-.upd a+(turn ~(tap in peons.upd) ship))
-                %rem-goal-peons  (frond +>-.upd a+(turn ~(tap in peons.upd) ship))
-              ==
               ::
                 %goal-hitch
               ?-  +>-.upd
@@ -228,6 +236,7 @@
               ::
                 %goal-nexus
               ?-  +>-.upd
+                %kickoff   ?~(moment.upd ~ s+(scot %da u.moment.upd))
                 %deadline  ?~(moment.upd ~ s+(scot %da u.moment.upd))
               ==
               ::
@@ -303,10 +312,10 @@
       %priority
     (numb priority.pyk)
     ::
-      %seniority
-    %+  frond
-      %senior
-    ?~(u-senior.pyk ~ (enjs-id u.u-senior.pyk))
+    ::   %seniority
+    :: %+  frond
+    ::   %senior
+    :: ?~(u-senior.pyk ~ (enjs-id u.u-senior.pyk))
     ::
       %yung
     %+  frond
@@ -374,18 +383,15 @@
           [%creator (ship creator.pool)]
       ==
       :-  %perms
+      :-  %a  %+  turn  ~(tap by perms.pool) 
+      |=  [chip=@p role=(unit ?(%owner pool-role))] 
       %-  pairs
-      :~  [%admins a+(turn ~(tap in admins.pool) ship)]
-          [%captains a+(turn ~(tap in captains.pool) ship)]
-          [%viewers a+(turn ~(tap in viewers.pool) ship)]
+      :~  [%ship (ship chip)]
+          [%role ?~(role ~ s+u.role)]
       ==
       :-  %nexus
       %-  pairs
       :~  [%goals (enjs-goals goals.pool)]
-      ==
-      :-  %togls
-      %-  pairs
-      :~  [%archived b+archived.pool]
       ==
       :-  %hitch
       %-  pairs
@@ -444,23 +450,32 @@
           [%birth (numb (unm:chrono:userlib birth.goal))]
           [%author (ship author.goal)]
       ==
-      :-  %perms
-      %-  pairs
-      :~  [%captains a+(turn ~(tap in captains.goal) ship)]
-          [%peons a+(turn ~(tap in peons.goal) ship)]
-      ==
       :-  %nexus
       %-  pairs
       :~  [%par ?~(par.goal ~ (enjs-id u.par.goal))]
           [%kids a+(turn ~(tap in kids.goal) enjs-id)]
           [%kickoff (enjs-edge kickoff.goal)]
           [%deadline (enjs-edge deadline.goal)]
-      ==
-      :-  %togls
-      %-  pairs
-      :~  [%complete b+complete.goal]
+          [%complete b+complete.goal]
           [%actionable b+actionable.goal]
-          [%archived b+archived.goal]
+          [%chief (ship chief.goal)]
+          [%spawn a+(turn ~(tap in spawn.goal) ship)]
+          ::
+          :-  %stock  :-  %a
+          %+  turn  stock.goal
+          |=([=id chief=@p] (pairs ~[[%id (enjs-id id)] [%chief (ship chief)]]))
+          ::
+          :-  %ranks  :-  %a
+          %+  turn  ~(tap by ranks.goal)
+          |=([chip=@p =id] (pairs ~[[%ship (ship chip)] [%id (enjs-id id)]]))
+          ::
+          [%prio-left a+(turn ~(tap in prio-left.goal) enjs-id)]
+          [%prio-ryte a+(turn ~(tap in prio-ryte.goal) enjs-id)]
+          [%prec-left a+(turn ~(tap in prec-left.goal) enjs-id)]
+          [%prec-ryte a+(turn ~(tap in prec-ryte.goal) enjs-id)]
+          [%nest-left a+(turn ~(tap in nest-left.goal) enjs-id)]
+          [%nest-ryte a+(turn ~(tap in nest-ryte.goal) enjs-id)]
+
       ==
       :-  %hitch
       %-  pairs
@@ -476,7 +491,20 @@
    :~  [%moment ?~(moment.edge ~ s+(scot %da u.moment.edge))]
        [%inflow a+(turn ~(tap in inflow.edge) enjs-eid)]
        [%outflow a+(turn ~(tap in outflow.edge) enjs-eid)]
+       [%left-bound (enjs-bound left-bound.edge)]
+       [%ryte-bound (enjs-bound ryte-bound.edge)]
+       [%left-plumb (numb left-plumb.edge)]
+       [%ryte-plumb (numb ryte-plumb.edge)]
    ==
+::
+++  enjs-bound
+  =,  enjs:format
+  |=  =bound
+  ^-  json
+  %-  pairs
+  :~  [%moment ?~(moment.bound ~ s+(scot %da u.moment.bound))]
+      [%hereditor (enjs-eid hereditor.bound)]
+  ==
 ::
 ++  enjs-eid
   =,  enjs:format

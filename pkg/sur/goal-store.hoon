@@ -4,24 +4,18 @@
 +$  action
   $%  $:  %new-pool
           title=@t
-          admins=(set ship)
-          captains=(set ship)
-          viewers=(set ship)
+          upds=(list [=ship role=(unit (unit pool-role))])
       ==
       $:  %copy-pool 
-        =old=pin
-        title=@t
-        admins=(set ship)
-        captains=(set ship)
-        viewers=(set ship)
+          =old=pin
+          title=@t
+          upds=(list [=ship role=(unit (unit pool-role))])
       ==
       $:  %spawn-goal
         =pin
         upid=(unit id)
         desc=@t
         actionable=?
-        captains=(set ship)
-        peons=(set ship)
       ==
       [%edit-goal-desc =id desc=@t]
       [%edit-pool-title =pin title=@t]
@@ -34,26 +28,10 @@
       [%unmark-actionable =id]
       [%mark-complete =id]
       [%unmark-complete =id]
-      [%make-goal-captain captain=ship =id]
-      [%make-goal-peon peon=ship =id]
-      $:  %invite
-        =pin
-        admins=(set ship)
-        captains=(set ship)
-        viewers=(set ship)
-      ==
+      [%update-goal-perms =id chief=ship rec=?(%.y %.n) lus=(set ship) hep=(set ship)]
+      [%update-pool-perms =pin upds=(list [=ship role=(unit (unit pool-role))])]
       [%subscribe =pin]
       [%unsubscribe =pin]
-  ==
-::
-+$  pool-perms-update
-  $%  [%add-pool-viewers viewers=(set ship)]
-      [%rem-pool-viewers viewers=(set ship)]  
-      [%add-pool-admins admins=(set ship)]
-      [%rem-pool-admins admins=(set ship)]
-      [%add-pool-captains captains=(set ship)]
-      [%rem-pool-captains captains=(set ship)]
-      [%add-perms admins=(set ship) captains=(set ship) viewers=(set ship)]
   ==
 ::
 +$  pool-hitch-update
@@ -64,19 +42,13 @@
   $%  [%yoke =nex]
   ==
 ::
-+$  goal-perms-update
-  $%  [%add-goal-captains captains=(set ship)]
-      [%rem-goal-captains captains=(set ship)]
-      [%add-goal-peons peons=(set ship)]
-      [%rem-goal-peons peons=(set ship)]
-  ==
-::
 +$  goal-hitch-update
   $%  [%desc desc=@t]
   ==
 ::
 +$  goal-nexus-update
-  $%  [%deadline moment=(unit @da)]
+  $%  [%kickoff moment=(unit @da)]
+      [%deadline moment=(unit @da)]
   ==
 ::
 +$  goal-togls-update
@@ -89,10 +61,10 @@
       [%trash-pool ~]
       [%spawn-goal =nex =id =goal]
       [%trash-goal =nex del=(set id)]
-      [%pool-perms pool-perms-update]
+      [%pool-perms upds=(list [=ship role=(unit (unit pool-role))])]
       [%pool-hitch pool-hitch-update]
       [%pool-nexus pool-nexus-update]
-      [%goal-perms =id goal-perms-update]
+      [%goal-perms =nex]
       [%goal-hitch =id goal-hitch-update]
       [%goal-nexus =id goal-nexus-update]
       [%goal-togls =id goal-togls-update]
@@ -100,7 +72,7 @@
 +$  away-update  [mod=ship update]
 ::
 +$  home-update  [[=pin mod=ship] update]
-::
+:: ::
 +$  peek
   $%  [%initial =store]
       [%pool-keys keys=(set pin)]
@@ -113,7 +85,6 @@
       [%plumb depth=@ud]
       [%anchor depth=@ud]
       [%priority priority=@ud]
-      [%seniority u-senior=(unit id)]
       [%yung yung=(list id)]
       [%yung-uncompleted yung-uc=(list id)]
       [%yung-virtual yung-vr=(list id)]

@@ -8,14 +8,16 @@
       state-1
       state-2
       state-3
+      state-4
   ==
 +$  state-0  state-0:gol
 +$  state-1  state-1:gol
 +$  state-2  state-2:gol
 +$  state-3  state-3:gol
++$  state-4  state-4:gol
 +$  card  card:agent:gall
 --
-=|  state-3
+=|  state-4
 =*  state  -
 ::
 %+  verb  |
@@ -39,8 +41,10 @@
   =/  old  !<(versioned-state old-vase)
   |-
   ?-    -.old
-      %3
+      %4
     `this(state old)
+      %3
+    $(old (convert-3-to-4:gol old))
       %2
     $(old (convert-2-to-3:gol old))
       %1
@@ -57,30 +61,24 @@
       =/  action  !<(action:goal-store vase)
       ?-    -.action
           ::
-          :: [%new-pool title=@t admins=(set ship) captains=(set ship) viewers=(set ship)]
           %new-pool
         ?>  =(src.bowl our.bowl)
         %+  convert-home-cud:hc  ~
         %:  new-pool:gs
           title.action
-          admins.action
-          captains.action
-          viewers.action
+          upds.action
           src.bowl
           our.bowl
           now.bowl
         ==
           ::
-          :: [%copy-pool =old=pin title=@t admins=(set ship) captains=(set ship) viewers=(set ship)]
           %copy-pool
         ?>  =(src.bowl our.bowl)
         %+  convert-home-cud:hc  ~
         %:  copy-pool:gs
           old-pin.action
           title.action
-          admins.action
-          captains.action
-          viewers.action
+          upds.action
           src.bowl
           our.bowl
           now.bowl
@@ -94,7 +92,7 @@
           [%give %kick ~[/[`@`+<.pin.action]/[`@`+>.pin.action]] ~]~
         (delete-pool:gs pin.action our.bowl)
           ::
-          :: [%spawn-goal =pin upid=(unit id) desc=@t actionable=? =goal-perms]
+          :: [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
           %spawn-goal
         ?.  =(our.bowl owner.pin.action)
           =*  poke-other  ~(poke-other pass:hc /away/spawn-goal)
@@ -107,8 +105,6 @@
           upid.action
           desc.action
           actionable.action
-          captains.action
-          peons.action
         ==
           ::
           :: [%delete-goal =id]
@@ -203,39 +199,42 @@
         %+  convert-away-cud:hc  ~
         (unmark-complete:gs id.action src.bowl)
           ::
-          :: [%make-goal-captain captain=ship =id]
-          %make-goal-captain
+          %update-goal-perms
         ?.  =(our.bowl owner.id.action)
-          =*  poke-other  ~(poke-other pass:hc /away/make-goal-captain)
+          =*  poke-other  ~(poke-other pass:hc /away/update-goal-perms)
           :_  state
           [(poke-other owner.id.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
-        (add-goal-captains:gs id.action (sy ~[captain.action]) src.bowl)
+        %:  update-goal-perms:gs
+          id.action
+          chief.action
+          rec.action
+          lus.action
+          hep.action
+          src.bowl
+        ==
           ::
-          :: [%make-goal-peon peon=ship =id]
-          %make-goal-peon
-        ?.  =(our.bowl owner.id.action)
-          =*  poke-other  ~(poke-other pass:hc /away-make-goal-peon)
+          %update-pool-perms
+        =*  poke-other  ~(poke-other pass:hc /away/update-pool-perms)
+        ?.  =(our.bowl owner.pin.action)
           :_  state
-          [(poke-other owner.id.action goal-action+!>(action))]~
-        %+  convert-away-cud:hc  ~
-        (add-goal-peons:gs id.action (sy ~[peon.action]) src.bowl)
-          ::
-          :: [%invite invitee=ship =pin]
-          %invite
-        ?.  =(our.bowl owner.pin.action)  ~|(%not-owner !!)
-        =*  poke-other  ~(poke-other pass:hc /invite)
+          [(poke-other owner.pin.action goal-action+!>(action))]~
+        =/  pool  (~(got by pools) pin.action)
+        =/  diff  (~(pool-diff pl pool) upds.action)
         %+  convert-away-cud:hc
-          %+  turn  
-            %~  tap  in
-            (~(uni in (~(uni in viewers.action) admins.action)) captains.action)
-          |=  =ship
-          (poke-other ship goal-action+!>([%subscribe pin.action]))
-        %:  add-pool-invitees:gs
+          ;:  weld
+            ^-  (list card)
+            %+  turn  invite.diff
+            |=  =ship
+            (poke-other ship goal-action+!>([%subscribe pin.action]))
+            ^-  (list card)
+            %+  turn  remove.diff
+            |=  =ship
+            [%give %kick ~[/[`@`+<.pin.action]/[`@`+>.pin.action]] `ship]
+          ==
+        %:  update-pool-perms:gs
           pin.action
-          viewers.action
-          admins.action
-          captains.action
+          upds.action
           src.bowl
         ==
           ::
@@ -347,11 +346,11 @@
         [%priority ~]
       ``goal-peek+!>(priority+(~(priority pl pool) id))
       ::
-        [%seniority @ @ ~]
-      =/  mod  (slav %p i.t.t.t.t.t.path)
-      =/  cp  i.t.t.t.t.t.t.path
-      ?>  ?=(?(%c %p) cp)
-      ``goal-peek+!>(seniority+(~(seniority pl pool) mod id cp))
+      ::   [%seniority @ @ ~]
+      :: =/  mod  (slav %p i.t.t.t.t.t.path)
+      :: =/  cp  i.t.t.t.t.t.t.path
+      :: ?>  ?=(?(%c %p) cp)
+      :: ``goal-peek+!>(seniority+(~(seniority pl pool) mod id cp))
     ==
       [%x %pool @ @ *]
     =/  owner  (slav %p i.t.t.path)
@@ -368,10 +367,10 @@
         [%roots *]
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
-        ``goal-peek+!>(roots+~(roots pl pool))
+        ``goal-peek+!>(roots+(hi-to-lo roots):~(. pl pool))
         ::
           [%uncompleted ~]
-        ``goal-peek+!>(roots-uncompleted+~(uncompleted-roots pl pool))
+        ``goal-peek+!>(roots-uncompleted+(hi-to-lo uncompleted-roots):~(. pl pool))
       ==
     ==
   ==

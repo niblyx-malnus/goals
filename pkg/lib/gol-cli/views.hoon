@@ -24,7 +24,18 @@
   =/  store  initial:scry
   =/  ids=(list grip:vyu)  (turn ~(tap in ~(key by directory.store)) |=(=id:gol [%goal id]))
   =/  pins=(list grip:vyu)  (turn ~(tap in ~(key by pools.store)) |=(=pin:gol [%pool pin]))
-  (add-views :(weld ids pins `(list grip:vyu)`[%all ~]~))
+  =.  views  (add-views :(weld ids pins `(list grip:vyu)`[%all ~]~))
+  =/  idx  0
+  |-
+  ?:  =(idx (lent pins))
+    views
+  =/  pin  (snag idx pins)
+  %=  $
+    idx  +(idx)
+    views
+      =.  views  (collapsify [%all ~] pin %normal %.y %.n)
+      (collapsify pin pin %normal %.y %.n)
+  ==
 ::
 ++  add-views
   |=  grips=(list grip:vyu)

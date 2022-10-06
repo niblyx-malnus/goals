@@ -52,10 +52,10 @@
   |-
   ?-    -.old
       %2
-    :-  ~
+    :-  (print-cards:prtr ~["%gol-cli: Hit ENTER to re-initialize."])
     %=  this
-      handles  initial:hdls
-      views    initial:vyuz
+      handles  *handles:vyu
+      views  (~(put by *views:vyu) [%all ~] *view:vyu)
     ==
       %1
     $(old (convert-1-to-2:vyu old))
@@ -79,8 +79,18 @@
             %&  %normal
             %|  %normal-completed
           ==
-        :_  this
-        (nest-print:prtr context def-cols:hc mode)
+          :_  this
+          (nest-print:prtr context def-cols:hc mode)
+        :: If handles/views not initialized yet, initialize
+        :: ?.  =(1 ~(wyt by views))
+        ::   :_  this
+        ::   (nest-print:prtr context def-cols:hc mode)
+        :: =*  poke-self  ~(poke-self pass:io /print-context)
+        :: :-  [(poke-self view-action+!>(print+~))]~
+        :: %=  this
+        ::   handles  initial:hdls
+        ::   views    initial:vyuz
+        :: ==
         ::
         :: [%change-context c=grip]
         %change-context
@@ -114,12 +124,14 @@
   ?+    wire  (on-agent:def wire sign)
     :: poke-ack/nack on a view-command wire prompts a print
       [%view-command *]
+    ?:  =(wire /view-command/print-context)
+      `this
     =*  poke-self  ~(poke-self pass:io /print-context)
     :_  this
     [(poke-self view-action+!>(print+~))]~
       [%mod-command *]
     :_  this
-    (print-cards:prtr ~["Hit ENTER for updates."])
+    (print-cards:prtr ~["%gol-cli: Hit ENTER for updates."])
     ::
       [%goals ~]
     ?>  =(src.bowl our.bowl)
@@ -279,7 +291,7 @@
       :: [%new-pool title=@t]
       %new-pool
     =*  poke-our  ~(poke-our pass:io /mod-command/new-pool)
-    [(poke-our %goal-store goal-action+!>([%new-pool title.command ~ ~ ~]))]~
+    [(poke-our %goal-store goal-action+!>([%new-pool title.command ~]))]~
       ::
       :: [%delete-pool-goal h=@t]
       %delete-pool-goal
@@ -298,7 +310,7 @@
       %copy-pool
     =*  poke-our  ~(poke-our pass:io /mod-command/copy-pool)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store goal-action+!>([%copy-pool pin.res title.command ~ ~ ~]))]~
+    [(poke-our %goal-store goal-action+!>([%copy-pool pin.res title.command ~]))]~
       ::
       ::  [%add-goal desc=@t]                
       %add-goal
@@ -308,12 +320,12 @@
       (print-cards:prtr ~["ERROR: Cannot add goal outside of a pool."])
         %pool
       :~  %+  poke  [owner.pin.context %goal-store]
-          goal-action+!>([%spawn-goal pin.context ~ desc.command %| ~ ~])
+          goal-action+!>([%spawn-goal pin.context ~ desc.command %|])
       ==
         %goal
       =/  pin  (got-pin:scry id.context)
       :~  %+  poke  [owner.id.context %goal-store]
-          goal-action+!>([%spawn-goal pin (some id.context) desc.command %| ~ ~])
+          goal-action+!>([%spawn-goal pin (some id.context) desc.command %|])
       ==
     ==
       ::
@@ -342,12 +354,13 @@
       ::
       :: [%print-context ~]
       %print-context
+    =*  poke-self  ~(poke-self pass:io /view-command/print-context)
     =/  mode
       ?-  hide-completed
         %&  %normal
         %|  %normal-completed
       ==
-    (nest-print:prtr context def-cols:hc mode)
+    [(poke-self view-action+!>(print+~))]~
       ::
       ::  [%change-context c=(unit @t)]            
       %change-context
