@@ -230,6 +230,8 @@
               ==
               ::
                 %goal-togls
+              %+  frond
+              %togls-updated
               ?-  +>-.upd
                 %complete  b+complete.upd
                 %actionable  b+actionable.upd
