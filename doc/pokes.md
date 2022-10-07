@@ -10,15 +10,15 @@ Available pokes for `%goal-store` as nouns and as JSON.
 %edit-pool-title                                                             
 %delete-pool                                                                 
 %delete-goal                                                                    
-%yoke                                                                  
+%yoke     
+%move-goal
 %set-deadline                                                                   
 %mark-actionable                                                                
 %unmark-actionable                                                              
 %mark-complete                                                                  
 %unmark-complete  
-%invite
-%make-goal-captain
-%make-goal-peon
+%update-goal-perms
+%update-pool-perms
 ```
 
 ## %new-pool
@@ -250,6 +250,38 @@ There are 8 kinds of "yokes":
 }
 ```
 
+
+## %move-goal
+### Description
+Move a goal.
+
+### Noun
+```
+[%move-goal =pin cid=id upid=(unit id)]                                                              
+```
+
+### JSON
+```
+{
+  "move-goal": {
+    "pin": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    },
+    "cid": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    },
+    "upid":
+    null OR
+    {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    }
+  }
+}
+```
+
 ## %set-deadline
 ### Description
 Set the deadline of a goal.
@@ -368,82 +400,60 @@ Unmark a goal complete. No succeeding goals can already be marked complete.
 }
 ```
 
-## %invite
+## %update-goal-perms
 ### Description
-Invite a set of ships to become viewers on a pool.
+Update goal permissions.
 
 ### Noun
 ```
-[%invite =pin admins=(set ship) captains=(set ship) viewers=(set ship)]
+[%update-goal-perms =id chief=ship rec=?(%.y %.n) lus=(set ship) hep=(set ship)]
 ```
 
 ### JSON
 ```
 {
-  "invite": {
+  "update-goal-perms": {
+    "id": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    },  
+    "chief": "zod",
+    "rec": true,
+    "lus": ["nec", "bud", "wes"],
+    "hep": ["sev", "per", "sut"]
+  }
+}
+```
+
+
+## %update-pool-perms
+### Description
+Update pool permissions and invite new viewers or kick existing viewers.
+
+### Noun
+```
+[%update-pool-perms =pin upds=(list [=ship rule=(unit (unit ?(%admin %spawn)))])]
+```
+
+### JSON
+```
+{
+  "update-pool-perms": {
     "pin": {
       "owner": "zod",
       "birth": "~2000.1.1"
     },   
-    "admins": ["zod", "nec", "bud"],
-    "captains": ["zod", "nec", "bud"],
-    "viewers": ["zod", "nec", "bud"]
+    "upds":
+      [
+        {
+          ship: "nec",
+          role=(null or "kick" or "admin" or "spawn")
+        }, 
+        {
+          ship: "nec", 
+          role=(null or "kick" or "admin" or "spawn")
+        }
+      ]
   }
 }
-```
-
-## %make-goal-captain
-### Description
-Make a ship a "captain" on a given goal. A "captain" has broad permissions on a goal and all its descendents.
-
-`captain` is the ship you want to make a "captain".
-
-`id` is the goal id of the goal you want to make `captain` a "captain" of.
-
-### Noun
-```
-[%make-goal-captain chef=ship =id]
-```
-
-### JSON
-```
-{
-  "make-goal-captain": {
-    "captain": "zod",
-    "id": {
-      "owner": "zod",
-      "birth": "~2000.1.1"
-    }
-  }
-}
-```
-
-## %make-goal-peon
-### Description
-Make a ship a "peon" on a given goal. A "peon" can mark (and unmark) a goal and all its descendents complete.
-
-`peon` is the ship you want to make a "peon".
-
-`id` is the goal id of the goal you want to make `peon` a "peon" of.
-
-### Noun
-```
-[%make-goal-peon peon=ship =id]                                                      
-```
-
-### JSON
-```
-{
-  "make-goal-peon": {
-    "peon": "zod",
-    "id": {
-      "owner": "zod",
-      "birth": "~2000.1.1"
-    }
-  }
-}
-
-
-,
-    "upds": [{ship: "nec", role=(null or "kick" or "admin" or "spawn")}, {ship: "nec", role=(null or "kick" or "admin" or "spawn")}]
 ```
