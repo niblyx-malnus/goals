@@ -477,6 +477,8 @@ Update pool permissions and invite new viewers or kick existing viewers.
 
 `upds` is a list of ship/role pairs where you are updating ship's permissions on this pool to be role. `role` can be `null` if you want to make the ship a viewer, `admin` if you want to make them an `admin`, `spawn` if you want to give them spawn privileges, or `kick` if you want to remove them from the pool.
 
+(If you are not poking using JSON, `~` corresponds to kick, `[~ ~]` corresponds to `null`, `[~ %admin]` corresponds to `admin`, and `[~ %spawn]` corresponds to `spawn`.)
+
 ### Noun
 ```
 [%update-pool-perms =pin upds=(list [=ship role=(unit (unit ?(%admin %spawn)))])]
