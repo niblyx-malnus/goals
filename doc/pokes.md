@@ -256,6 +256,12 @@ There are 8 kinds of "yokes":
 ### Description
 Move a goal.
 
+`pin` is the id of the pool the goals are located in.
+
+`cid` is the id of the goal you are moving (child id).
+
+`upid` is the id of the goal you are moving the first goal under (null if you are moving to the root of the pool).
+
 ### Noun
 ```
 [%move-goal =pin cid=id upid=(unit id)]                                                              
@@ -431,6 +437,16 @@ Unmark a goal complete. No succeeding goals can already be marked complete.
 ### Description
 Update goal permissions.
 
+`id` is the id of the goal whose perms you are updating.
+
+`chief` is the new chief of the goal.
+
+`rec` is a flag. If rec is true, the chief will recursively be replaced on all goal descendents. If rec is false only the current goals chief will be replaced.
+
+`lus` is a set of ships to add to the goal's spawn set. Ships with spawn privileges on a goal can spawn new goals under that goal on which they become the chief.
+
+`hep` is a set of ships to remove from the goal's spawn set. Ships with spawn privileges on a goal can spawn new goals under that goal on which they become the chief.
+
 ### Noun
 ```
 [%update-goal-perms =id chief=ship rec=?(%.y %.n) lus=(set ship) hep=(set ship)]
@@ -457,9 +473,13 @@ Update goal permissions.
 ### Description
 Update pool permissions and invite new viewers or kick existing viewers.
 
+`pin` is the id of the pool whose perms you are updating.
+
+`upds` is a list of ship/role pairs where you are updating ship's permissions on this pool to be role. `role` can be `null` if you want to make the ship a viewer, `admin` if you want to make them an `admin`, `spawn` if you want to give them spawn privileges, or `kick` if you want to remove them from the pool.
+
 ### Noun
 ```
-[%update-pool-perms =pin upds=(list [=ship rule=(unit (unit ?(%admin %spawn)))])]
+[%update-pool-perms =pin upds=(list [=ship role=(unit (unit ?(%admin %spawn)))])]
 ```
 
 ### JSON
