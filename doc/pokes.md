@@ -12,6 +12,7 @@ Available pokes for `%goal-store` as nouns and as JSON.
 %delete-goal                                                                    
 %yoke     
 %move-goal
+%set-kickoff
 %set-deadline                                                                   
 %mark-actionable                                                                
 %unmark-actionable                                                              
@@ -278,6 +279,32 @@ Move a goal.
       "owner": "zod",
       "birth": "~2000.1.1"
     }
+  }
+}
+```
+
+## %set-kickoff
+### Description
+Set the kickoff of a goal.
+
+`id` is the goal id of the goal whose kickoff you want to set.
+
+`kickoff` is the optional datetime you will use to set the kickoff.
+
+### Noun
+```
+[%set-kickoff =id kickoff=(unit @da)]                                         
+```
+
+### JSON
+```
+{
+  "set-kickoff": {
+    "id": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    },
+    "kickoff": (null or "~2000.1.1")
   }
 }
 ```
