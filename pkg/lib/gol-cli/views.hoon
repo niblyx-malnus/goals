@@ -22,7 +22,7 @@
   ^-  views:vyu
   =.  views  *views:vyu
   =/  store  initial:scry
-  =/  ids=(list grip:vyu)  (turn ~(tap in ~(key by directory.store)) |=(=id:gol [%goal id]))
+  =/  ids=(list grip:vyu)  (turn ~(tap in ~(key by index.store)) |=(=id:gol [%goal id]))
   =/  pins=(list grip:vyu)  (turn ~(tap in ~(key by pools.store)) |=(=pin:gol [%pool pin]))
   =.  views  (add-views :(weld ids pins `(list grip:vyu)`[%all ~]~))
   =/  idx  0

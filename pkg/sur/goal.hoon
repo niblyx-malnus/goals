@@ -34,7 +34,7 @@
 +$  npool       npool:s4
 +$  pools       pools:s4
 ::
-+$  directory   directory:s4
++$  index   index:s4
 ::
 +$  store       store:s4
 ::
@@ -43,7 +43,7 @@
   +$  id  id:s3
   +$  eid  eid:s3
   +$  pin  pin:s3
-  +$  directory  directory:s3
+  +$  index  directory:s3
   +$  goal-froze  goal-froze:s3
       :: +$  togl
       ::   $:  mod=ship
@@ -117,7 +117,10 @@
   ::
   +$  pool-perms  (map ship (unit ?(%owner pool-role)))
   ::
-  +$  pool-nexus  =goals
+  +$  pool-nexus
+    $:  =goals
+        cache=(map id goals)
+    ==
   ::
   +$  pool
     $:  pool-froze
@@ -136,7 +139,11 @@
   ::
   +$  pools  (map pin pool)
   ::
-  +$  store  [=directory =pools]
+  +$  store  
+    $:  =index
+        =pools
+        cache=pools
+    ==
   --
 ::
 ++  s3
@@ -660,7 +667,7 @@
   =|  =npool:s4
   =.  froze.npool  froze.^npool
   =.  perms.npool  (pool-perms-3-to-4 owner.froze.^npool perms.^npool)
-  =.  nexus.npool  (goals-3-to-4 goals.nexus.^npool)
+  =.  goals.nexus.npool  (goals-3-to-4 goals.nexus.^npool)
   =.  hitch.npool  hitch.^npool
   npool
 ::
@@ -680,6 +687,7 @@
   :*  %4
       directory.store.state-3
       (pools-3-to-4 pools.store.state-3)
+      *pools
   ==
 ::
 ++  convert-2-to-3

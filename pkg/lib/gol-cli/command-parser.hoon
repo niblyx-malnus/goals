@@ -15,8 +15,6 @@
     parse-new-pool                            :: %np
     parse-delete-pool-goal
     parse-copy-pool                         
-    parse-make-goal-captain
-    parse-make-goal-peon
     parse-add-goal                            :: %ag
     parse-edit-goal-desc                      :: %eg
     parse-edit-pool-title                     :: %ep

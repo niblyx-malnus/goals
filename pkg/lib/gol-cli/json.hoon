@@ -7,8 +7,11 @@
   ^-  action
   %.  jon
   %-  of
-  :~  [%new-pool (ot ~[title+so])]
-      [%copy-pool (ot ~[old-pin+dejs-pin title+so])]
+  :~  [%spawn-pool (ot ~[title+so])]
+      [%clone-pool (ot ~[old-pin+dejs-pin title+so])]
+      [%cache-pool (ot ~[pin+dejs-pin])]
+      [%renew-pool (ot ~[pin+dejs-pin])]
+      [%trash-pool (ot ~[pin+dejs-pin])]
       :-  %spawn-goal
       %-  ot
       :~  pin+dejs-pin
@@ -16,11 +19,12 @@
           desc+so
           actionable+bo
       ==
-      [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
-      [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
-      [%delete-pool (ot ~[pin+dejs-pin])]
-      [%delete-goal (ot ~[id+dejs-id])]
-      [%yoke (ot ~[pin+dejs-pin yok+dejs-yoke])]
+      [%cache-goal (ot ~[id+dejs-id])]
+      [%renew-goal (ot ~[id+dejs-id])]
+      [%trash-goal (ot ~[id+dejs-id])]
+      [%yoke (ot ~[yok+dejs-yoke])]
+      [%move (ot ~[cid+dejs-id upid+dejs-unit-id])]
+      [%set-kickoff (ot ~[id+dejs-id kickoff+dejs-unit-date])]
       [%set-deadline (ot ~[id+dejs-id deadline+dejs-unit-date])]
       [%mark-actionable (ot ~[id+dejs-id])]
       [%unmark-actionable (ot ~[id+dejs-id])]
@@ -35,6 +39,9 @@
           hep+dejs-set-ships
       ==
       [%update-pool-perms (ot ~[pin+dejs-pin upds+dejs-pool-perm-upds])]
+      [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
+      [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
+      [%subscribe (ot ~[pin+dejs-pin])]
       [%unsubscribe (ot ~[pin+dejs-pin])]
   ==
 ::
@@ -212,7 +219,19 @@
         %+  frond  %nex
         (enjs-nex nex.upd)
         ::
-          ?(%goal-hitch %goal-nexus %goal-togls)
+          %goal-togls
+        %-  pairs
+        :~  [%id (enjs-id id.upd)]
+            :-  %togls-updated
+            %+  frond
+              +>-.upd
+            ?-  +>-.upd
+              %complete  b+complete.upd
+              %actionable  b+actionable.upd
+            ==
+        ==
+        ::
+          ?(%goal-hitch %goal-nexus)
         %-  pairs
         :~  [%id (enjs-id id.upd)]
             :-  +>-.upd
@@ -227,14 +246,6 @@
               ?-  +>-.upd
                 %kickoff   ?~(moment.upd ~ s+(scot %da u.moment.upd))
                 %deadline  ?~(moment.upd ~ s+(scot %da u.moment.upd))
-              ==
-              ::
-                %goal-togls
-              %+  frond
-              %togls-updated
-              ?-  +>-.upd
-                %complete  b+complete.upd
-                %actionable  b+actionable.upd
               ==
             ==
         ==
@@ -339,14 +350,15 @@
   |=  =store
   ^-  json
   %-  pairs
-  :~  [%directory (enjs-directory directory.store)]
+  :~  [%index (enjs-index index.store)]
       [%pools (enjs-pools pools.store)]
+      [%cache (enjs-pools cache.store)]
   ==
 ::
-++  enjs-directory
+++  enjs-index
   =,  enjs:format
-  |=  =directory
-  :-  %a  %+  turn  ~(tap by directory)
+  |=  =index
+  :-  %a  %+  turn  ~(tap by index)
   |=  [=id =pin] 
   %-  pairs
   :~  [%id (enjs-id id)]
@@ -383,6 +395,13 @@
       :-  %nexus
       %-  pairs
       :~  [%goals (enjs-goals goals.pool)]
+          :-  %cache
+          :-  %a  %+  turn  ~(tap by cache.pool) 
+          |=  [=id =goals]
+          %-  pairs
+          :~  [%id (enjs-id id)]
+              [%goals (enjs-goals goals)]
+          ==
       ==
       :-  %hitch
       %-  pairs

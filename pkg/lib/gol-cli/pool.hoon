@@ -73,7 +73,7 @@
   ::
   :: Put goal in goals and move under upid
   =.  goals.p  (~(put by goals.p) id goal)
-  =/  pore  (move-goal id upid owner.p) :: divine intervention (owner)
+  =/  pore  (move id upid owner.p) :: divine intervention (owner)
   ::
   =+  pore(efx efx) :: ignore accumulated updates
   ?~  upid
@@ -98,8 +98,6 @@
     ?:  actionable
       (mark-actionable:pore id mod)
     (unmark-actionable:pore id mod)
-  :: TODO: add perms back in
-  ::
   =+  pore(efx efx) :: ignore accumulated updates
   =/  nex
     ?~  upid
@@ -118,75 +116,158 @@
   |-
   ?:  =(idx (lent kids))
     output
-  $(idx +(idx), output (~(uni in output) (progeny (snag idx kids))))
-::
-:: purge goal from goals
-++  purge-goal
-  |=  =id:gol
-  ^-  _this
-  =;  goals
-    this(goals.p goals)
-  %.  id
-  %~  del
-    by
-  %-  ~(run by goals.p)
-  |=  =goal:gol
-  %=  goal
-    par   ?~(par.goal ~ ?:(=(u.par.goal id) ~ par.goal))
-    kids  (~(del in kids.goal) id)
-    inflow.kickoff
-      (~(del in (~(del in inflow.kickoff.goal) [%k id])) [%d id])
-    outflow.kickoff
-      (~(del in (~(del in outflow.kickoff.goal) [%k id])) [%d id])
-    inflow.deadline
-      (~(del in (~(del in inflow.deadline.goal) [%k id])) [%d id])
-    outflow.deadline
-      (~(del in (~(del in outflow.deadline.goal) [%k id])) [%d id])
+  %=  $
+    idx  +(idx)
+    output  (~(uni in output) (progeny (snag idx kids)))
   ==
 ::
-:: Get all goals to which this goal is related
-++  get-overlaps
-  |=  =id:gol
-  ^-  (set id:gol)
-  =/  goal  (~(got by goals.p) id)
-  =/  output  *(set id:gol)
-  =.  output  
-    ?~  par.goal  
-      output
-    (~(put in output) u.par.goal)
-  =.  output  (~(uni in output) kids.goal)
-  =.  output  %-  ~(uni in output)
-              ^-  (set id:gol)
-              (~(run in inflow.kickoff.goal) |=(=eid:gol id.eid))
-  =.  output  %-  ~(uni in output)
-              ^-  (set id:gol)
-              (~(run in outflow.kickoff.goal) |=(=eid:gol id.eid))
-  =.  output  %-  ~(uni in output)
-              ^-  (set id:gol)
-              (~(run in inflow.deadline.goal) |=(=eid:gol id.eid))
-  %-  ~(uni in output)
-  `(set id:gol)`(~(run in outflow.deadline.goal) |=(=eid:gol id.eid))
+++  partition
+  |=  [p=(set id:gol) q=(set id:gol) mod=ship]
+  ^-  [ids=(set id:gol) pore=_this]
+  ?>  =(0 ~(wyt in (~(int in p) q)))
+  =/  p  ~(tap in p)
+  =/  idx  0
+  =|  ids=(set id:gol)
+  =/  pore  this
+  |-
+  ?:  =(idx (lent p))
+    [ids pore]
+  =/  id  (snag idx p)
+  =/  mup=[ids=(set id:gol) pore=_this]
+    (break-bonds:pore id q mod)
+  %=  $
+    idx  +(idx)
+    ids  (~(uni in ids) ids.mup)
+    pore  pore.mup
+  ==
 ::
-++  delete-goal
+++  break-bonds
+  |=  [=id:gol exes=(set id:gol) mod=ship]
+  ^-  [ids=(set id:gol) pore=_this]
+  =/  pairs  (get-bonds id exes)
+  =/  idx  0
+  =|  ids=(set id:gol)
+  =/  pore  this
+  |-
+  ?:  =(idx (lent pairs))
+    [ids pore]
+  =/  pair  (snag idx pairs)
+  =/  mup=[ids=(set id:gol) pore=_this]
+    (dag-rend:pore p.pair q.pair mod)
+  %=  $
+    idx  +(idx)
+    ids  (~(uni in ids) ids.mup)
+    pore  pore.mup
+  ==
+::
+++  get-bonds
+  |=  [=id:gol ids=(set id:gol)]
+  ^-  (list (pair eid:gol eid:gol))
+  =+  (~(got by goals.p) id)
+  =/  eids=(set eid:gol)
+    %-  %~  uni  in
+        `(set eid:gol)`(~(run in ids) |=(=id:gol [%k id]))
+    `(set eid:gol)`(~(run in ids) |=(=id:gol [%d id]))
+  %~  tap  in
+  %-  %~  uni  in
+      ^-  (set (pair eid:gol eid:gol))
+      %-  ~(run in (~(int in eids) inflow.kickoff))
+      |=(=eid:gol [[%k id] eid])
+  %-  %~  uni  in
+      ^-  (set (pair eid:gol eid:gol))
+      %-  ~(run in (~(int in eids) outflow.kickoff))
+      |=(=eid:gol [[%k id] eid])
+  %-  %~  uni  in
+      ^-  (set (pair eid:gol eid:gol))
+      %-  ~(run in (~(int in eids) inflow.deadline))
+      |=(=eid:gol [[%d id] eid])
+  ^-  (set (pair eid:gol eid:gol))
+  %-  ~(run in (~(int in eids) outflow.deadline))
+  |=(=eid:gol [[%d id] eid])
+::
+++  gat-by
+  |=  [=goals:gol ids=(list id:gol)]
+  ^-  goals:gol
+  =|  =goals:gol
+  =/  idx  0
+  |-
+  ?:  =(idx (lent ids))
+    goals
+  %=  $
+    idx  +(idx)
+    goals
+      =/  id  (snag idx ids)
+      (~(put in goals) id (~(got by ^goals) id))
+  ==
+::
+++  gus-by
+  |=  [=goals:gol ids=(list id:gol)]
+  ^-  goals:gol
+  =/  idx  0
+  |-
+  ?:  =(idx (lent ids))
+    goals
+  %=  $
+    idx  +(idx)
+    goals  (~(del in goals) (snag idx ids))
+  ==
+::
+++  cache-goal
   |=  [=id:gol mod=ship]
   ^-  _this
   =/  old  this
+  ::
+  :: Must have permissions on this goal to cache it
+  ?>  (check-goal-perm id mod)
+  ::
+  :: Move goal to root
+  =/  pore  (move id ~ owner.p) :: divine intervention (owner)
+  ::
+  :: Partition subgoals of goal from rest of goals
+  =/  prog  (progeny id)
+  =/  mup=[ids=(set id:gol) pore=_this]
+    (partition:pore prog (~(dif in ~(key by goals.p)) prog) mod)
+  ::
+  :: Add goal and subgoals to cache
+  =.  cache.p.pore.mup
+    %+  ~(put in cache.p.pore.mup)
+      id
+    (gat-by goals.p.pore.mup ~(tap in prog))
+  ::
+  :: Remove goal and subgoals from goals
+  =.  goals.p.pore.mup  (gus-by goals.p.pore.mup ~(tap in prog))
+  ::
+  :: goal's parent gets updated too
+  =.  ids.mup
+    =/  par  par:(~(got by goals.p) id)
+    ?~  par
+      ids.mup
+    (~(put in ids.mup) u.par)
+  ::
+  (emot old [%cache-goal (make-nex ids.mup) id prog]):[pore.mup .]
+::
+++  renew-goal
+  |=  [=id:gol mod=ship]
+  ^-  _this
+  =/  old  this
+  ::
+  :: Must have admin permissions to renew this goal
   ?>  (check-pool-perm mod)
-  =/  prog  ~(tap in (progeny id))
-  =/  ovlp  *(set id:gol)
-  =/  pore  this
-  =/  idx  0
-  |-
-  ?:  =(idx (lent prog))
-    =+  pore
-    %+  emot
-      old
-    [%trash-goal (make-nex (~(dif in ovlp) (sy prog))) (sy prog)]
-  %=  $
-    idx  +(idx)
-    ovlp  (~(uni in ovlp) (get-overlaps:pore (snag idx prog)))
-    pore  (purge-goal:pore (snag idx prog))
-  ==
+  =.  goals.p  (~(uni by goals.p) (~(got by cache.p) id))
+  =.  cache.p  (~(del by cache.p) id)
+  ::
+  (emot old [%renew-goal id])
+::
+++  trash-goal
+  |=  [=id:gol mod=ship]
+  ^-  _this
+  =/  old  this
+  ::
+  :: Must have admin permissions to permanently delete this goal
+  ?>  (check-pool-perm mod)
+  =.  cache.p  (~(del by cache.p) id)
+  ::
+  (emot old [%trash-goal id])
 ::
 ++  got-edge
   |=  =eid:gol
@@ -811,7 +892,7 @@
 ::
 ++  avalanche  |=(=id:gol (avalanche-chief-mod id ~))
 ::
-++  move-goal
+++  move
   |=  [lid=id:gol urid=(unit id:gol) mod=ship]
   ^-  _this
   =/  old  this
@@ -1030,10 +1111,16 @@
     :: spawn/trash
     ::
       [%spawn-goal *]
-    (spawn-goal:spawn-trash [nex id goal]:upd)
+    (spawn-goal:life-cycle [nex id goal]:upd)
+    ::
+      [%cache-goal *]
+    (cache-goal:life-cycle [nex id cas]:upd)
+    ::
+      [%renew-goal *]
+    (renew-goal:life-cycle id.upd)
     ::
       [%trash-goal *]
-    (trash-goal:spawn-trash [nex del]:upd)
+    (trash-goal:life-cycle id.upd)
     :: ------------------------------------------------------------------------
     :: pool-perms
     ::
@@ -1078,7 +1165,7 @@
     (actionable:goal-togls [id actionable]:upd)
   ==
   ::
-  ++  spawn-trash
+  ++  life-cycle
     |%
     ++  spawn-goal
       |=  [=nex:gol =id:gol =goal:gol]
@@ -1086,17 +1173,30 @@
       =.  goals.p  (~(put by goals.p) id goal)
       (apply-nex nex)
     ::
-    ++  trash-goal
-      |=  [=nex:gol del=(set id:gol)]
+    ++  cache-goal
+      |=  [=nex:gol =id:gol cas=(set id:gol)]
       ^-  _this
-      =.  goals.p
-        =/  del  ~(tap in del)
-        =/  idx  0
-        |-  
-        ?:  =(idx (lent del))
-          goals.p
-        $(idx +(idx), goals.p (~(del by goals.p) (snag idx del)))
-      (apply-nex nex)
+      =/  pore  (apply-nex nex)
+      %=  pore
+        cache.p
+          %+  ~(put in cache.p.pore)
+            id
+          (gat-by goals.p.pore ~(tap in cas))
+        goals.p  (gus-by goals.p.pore ~(tap in cas))
+      ==
+    ::
+    ++  renew-goal
+      |=  =id:gol
+      ^-  _this
+      %=  this
+        goals.p  (~(uni by goals.p) (~(got by cache.p) id))
+        cache.p  (~(del by cache.p) id)
+      ==
+    ::
+    ++  trash-goal
+      |=  =id:gol
+      ^-  _this
+      this(cache.p (~(del by cache.p) id))
     --
   ::
   ++  pool-perms

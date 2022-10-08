@@ -12,8 +12,8 @@
     ^-  store:gol
     ?:  (~(has by pools.store) pin)  store :: necessary?
     %=  store
-      directory
-        %-  ~(gas by directory.store)
+      index
+        %-  ~(gas by index.store)
         (turn ~(tap in ~(key by goals.pool)) |=(=id:gol [id pin]))
       pools  (~(put by pools.store) pin pool)
     ==
@@ -21,12 +21,13 @@
   ++  trash-pool
     |=  =pin:gol
     ^-  store:gol
-    :-  %-  ~(gas by *directory:gol)
-        %+  murn  ~(tap by directory.store)
+    :+  %-  ~(gas by *index:gol)
+        %+  murn  ~(tap by index.store)
         |=  [=id:gol =pin:gol]
         ?:  =(pin ^pin)
           ~
         (some [id pin])
-    (~(del by pools.store) pin)
+      (~(del by pools.store) pin)
+    (~(del by cache.store) pin)
   --
 --

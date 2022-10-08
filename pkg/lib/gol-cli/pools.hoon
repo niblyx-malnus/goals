@@ -3,7 +3,7 @@
 |_  store:gol
 +*  gols  ~(. gol-cli-goals +<)
 ::
-++  new-pool
+++  spawn-pool
   |=  [title=@t upds=(list [ship (unit (unit pool-role:gol))]) own=ship now=@da]
   ^-  [pin:gol pool:gol]
   =/  pin  [%pin (unique-id:gols own now)]
@@ -16,7 +16,7 @@
   =.  pool  pool:abet:(update-pool-perms:(apex:pl pool) upds own)
   [pin pool]
 ::
-++  copy-pool
+++  clone-pool
   |=  $:  =old=pin:gol
           title=@t
           upds=(list [ship (unit (unit pool-role:gol))])
@@ -25,9 +25,10 @@
       ==
   ^-  [pin:gol pool:gol]
   =/  old-pool  (~(got by pools) old-pin)
-  =+  [pin pool]=(new-pool title upds own now)
+  =+  [pin pool]=(spawn-pool title upds own now)
   =.  pools  (~(put by pools) pin pool(creator owner.old-pin))
   =/  id-map  (new-ids:gols ~(tap in ~(key by goals.old-pool)) own now)
+  |^
   :-  pin
   %=  pool
     goals
@@ -36,17 +37,39 @@
       |=  [=id:gol =goal:gol]
       :-  (~(got by id-map) id)
       %=  goal
-        author  own
-        par  ?~(par.goal ~ (some (~(got by id-map) u.par.goal)))
-        kids  (~(run in kids.goal) |=(=id:gol (~(got by id-map) id)))
-        inflow.kickoff
-          (~(run in inflow.kickoff.goal) |=(=eid:gol [-.eid (~(got by id-map) id.eid)]))
-        outflow.kickoff
-          (~(run in outflow.kickoff.goal) |=(=eid:gol [-.eid (~(got by id-map) id.eid)]))
-        inflow.deadline
-          (~(run in inflow.deadline.goal) |=(=eid:gol [-.eid (~(got by id-map) id.eid)]))
-        outflow.deadline
-          (~(run in outflow.deadline.goal) |=(=eid:gol [-.eid (~(got by id-map) id.eid)]))
+        par  ?~(par.goal ~ (some (new-id u.par.goal)))
+        kids  (new-set-id kids.goal)
+        ::
+        inflow.kickoff  (new-set-eid inflow.kickoff.goal)
+        outflow.kickoff  (new-set-eid outflow.kickoff.goal)
+        inflow.deadline  (new-set-eid inflow.deadline.goal)
+        outflow.deadline  (new-set-eid outflow.deadline.goal)
+        ::
+        hereditor.left-bound.kickoff
+          (new-eid hereditor.left-bound.kickoff.goal)
+        hereditor.ryte-bound.kickoff
+          (new-eid hereditor.ryte-bound.kickoff.goal)
+        hereditor.left-bound.deadline
+          (new-eid hereditor.left-bound.deadline.goal)
+        hereditor.ryte-bound.deadline
+          (new-eid hereditor.ryte-bound.deadline.goal)
+        ::
+        stock  (turn stock.goal |=([=id:gol =ship] [(new-id id) ship]))
+        ranks
+          %-  ~(gas by ranks.goal)
+          (turn ~(tap by ranks.goal) |=([=ship =id:gol] [ship (new-id id)]))
+        ::
+        prio-left  (new-set-id prio-left.goal)
+        prio-ryte  (new-set-id prio-ryte.goal)
+        prec-left  (new-set-id prec-left.goal)
+        prec-ryte  (new-set-id prec-ryte.goal)
+        nest-left  (new-set-id nest-left.goal)
+        nest-ryte  (new-set-id nest-ryte.goal)
       ==
   ==
+  ++  new-id  |=(=id:gol (~(got by id-map) id))
+  ++  new-eid  |=(=eid:gol [-.eid (new-id id.eid)])
+  ++  new-set-id  |=(=(set id:gol) (~(run in set) new-id))
+  ++  new-set-eid  |=(=(set eid:gol) (~(run in set) new-eid))
+  --
 --

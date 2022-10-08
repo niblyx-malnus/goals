@@ -5,7 +5,7 @@
 ++  unique-id
   |=  [our=ship now=@da]
   ^-  id:gol
-  ?.  ?|  (~(has by directory) [our now])
+  ?.  ?|  (~(has by index) [our now])
           (~(has by pools) [%pin our now])
       ==
     [our now]
@@ -22,7 +22,7 @@
   =/  new-id  (unique-id our now)
   %=  $
     idx  +(idx)
-    directory  (~(put by directory) new-id *pin:gol)
+    index  (~(put by index) new-id *pin:gol)
     map  (~(put by map) (snag idx list) new-id)
   ==
 --

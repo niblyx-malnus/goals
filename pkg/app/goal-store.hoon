@@ -31,7 +31,7 @@
     hc    ~(. +> bowl)
     gs    ~(. gol-cli-goal-store store)
     etch  ~(. gol-cli-etch store)
-    directory  directory.store
+    index  index.store
     pools   pools.store
 ++  on-init   `this
 ++  on-save   !>(state)
@@ -61,20 +61,20 @@
       =/  action  !<(action:goal-store vase)
       ?-    -.action
           ::
-          %new-pool
+          %spawn-pool
         ?>  =(src.bowl our.bowl)
         %+  convert-home-cud:hc  ~
-        %:  new-pool:gs
+        %:  spawn-pool:gs
           title.action
           src.bowl
           our.bowl
           now.bowl
         ==
           ::
-          %copy-pool
+          %clone-pool
         ?>  =(src.bowl our.bowl)
         %+  convert-home-cud:hc  ~
-        %:  copy-pool:gs
+        %:  clone-pool:gs
           old-pin.action
           title.action
           src.bowl
@@ -82,13 +82,32 @@
           now.bowl
         ==
           ::
-          :: [%delete-pool =pin]
-          %delete-pool
+          :: [%cache-pool =pin]
+          %cache-pool
         ?>  =(src.bowl our.bowl)
-        ?.  =(our.bowl owner.pin.action)  ~|(%not-owner !!)
         %+  convert-home-cud:hc
           [%give %kick ~[/[`@`+<.pin.action]/[`@`+>.pin.action]] ~]~
-        (delete-pool:gs pin.action our.bowl)
+        (cache-pool:gs pin.action our.bowl)
+          ::
+          :: [%renew-pool =pin]
+          %renew-pool
+        ?>  =(src.bowl our.bowl)
+        =*  poke-other  ~(poke-other pass:hc /away/renew-pool)
+        %+  convert-home-cud:hc
+            %+  turn
+              %~  tap  in
+              (~(del in ~(key by perms:(~(got by pools) pin.action))) our.bowl)
+            |=  =ship
+            ^-  card
+            (poke-other ship goal-action+!>([%subscribe pin.action]))
+        (renew-pool:gs pin.action our.bowl)
+          ::
+          :: [%trash-pool =pin]
+          %trash-pool
+        ?>  =(src.bowl our.bowl)
+        %+  convert-home-cud:hc
+          [%give %kick ~[/[`@`+<.pin.action]/[`@`+>.pin.action]] ~]~
+        (trash-pool:gs pin.action our.bowl)
           ::
           :: [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
           %spawn-goal
@@ -105,16 +124,35 @@
           actionable.action
         ==
           ::
-          :: [%delete-goal =id]
-          %delete-goal
-        :: for now, only owner can delete goals
+          :: [%cache-goal =id]
+          %cache-goal
+        ?.  =(our.bowl owner.id.action)
+          =*  poke-other  ~(poke-other pass:hc /away/cache-goal)
+          :_  state
+          [(poke-other owner.id.action goal-action+!>(action))]~
+        =/  pool  (~(got by pools.store) (~(got by index) id.action))
+        %+  convert-away-cud:hc  ~
+        (cache-goal:gs id.action our.bowl)
+          ::
+          :: [%renew-goal =id]
+          %renew-goal
+        ?.  =(our.bowl owner.id.action)
+          =*  poke-other  ~(poke-other pass:hc /away/renew-goal)
+          :_  state
+          [(poke-other owner.id.action goal-action+!>(action))]~
+        =/  pool  (~(got by pools.store) (~(got by index) id.action))
+        %+  convert-away-cud:hc  ~
+        (renew-goal:gs id.action our.bowl)
+          ::
+          :: [%trash-goal =id]
+          %trash-goal
         ?.  =(our.bowl owner.id.action)
           =*  poke-other  ~(poke-other pass:hc /away/spawn-goal)
           :_  state
           [(poke-other owner.id.action goal-action+!>(action))]~
-        =/  pool  (~(got by pools.store) (~(got by directory) id.action))
+        =/  pool  (~(got by pools.store) (~(got by index) id.action))
         %+  convert-away-cud:hc  ~
-        (delete-goal:gs id.action our.bowl)
+        (trash-goal:gs id.action our.bowl)
           ::
           :: [%edit-goal-desc =id desc=@t]
           %edit-goal-desc
@@ -134,23 +172,32 @@
         %+  convert-away-cud:hc  ~
         (edit-pool-title:gs pin.action title.action src.bowl)
           ::
-          :: [%yoke =pin yok=exposed-yoke]
+          :: [%yoke yok=exposed-yoke]
           %yoke
-        ?.  =(our.bowl owner.pin.action)
+        ?.  =(our.bowl owner.lid.yok.action)
           =*  poke-other  ~(poke-other pass:hc /away/yoke)
           :_  state
-          [(poke-other owner.pin.action goal-action+!>(action))]~
+          [(poke-other owner.lid.yok.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
-        (yoke:gs pin.action yok.action src.bowl)
+        (yoke:gs yok.action src.bowl)
           ::
-          :: [%move-goal =pin cid=id upid=(unit id)]
-          %move-goal
-        ?.  =(our.bowl owner.pin.action)
-          =*  poke-other  ~(poke-other pass:hc /away/move-goal)
+          :: [%move cid=id upid=(unit id)]
+          %move
+        ?.  =(our.bowl owner.cid.action)
+          =*  poke-other  ~(poke-other pass:hc /away/move)
           :_  state
-          [(poke-other owner.pin.action goal-action+!>(action))]~
+          [(poke-other owner.cid.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
-        (move-goal:gs pin.action cid.action upid.action src.bowl)
+        (move:gs cid.action upid.action src.bowl)
+          ::
+          :: [%set-kickoff =id deadline=(unit @da)]
+          %set-kickoff
+        ?.  =(our.bowl owner.id.action)
+          =*  poke-other  ~(poke-other pass:hc /away/set-kickoff)
+          :_  state
+          [(poke-other owner.id.action goal-action+!>(action))]~
+        %+  convert-away-cud:hc  ~
+        (set-kickoff:gs id.action kickoff.action src.bowl)
           ::
           :: [%set-deadline =id deadline=(unit @da)]
           %set-deadline
@@ -298,13 +345,13 @@
     ``goal-peek+!>(pool-keys+~(key by pools))
     ::
       [%x %all-goal-keys ~]
-    ``goal-peek+!>(all-goal-keys+~(key by directory))
+    ``goal-peek+!>(all-goal-keys+~(key by index))
     ::
       [%x %goal @ @ *]
     =/  owner  (slav %p i.t.t.path)
     =/  birth  (slav %da i.t.t.t.path)
     =/  id  `id:gol`[owner birth]
-    =/  pin  (~(got by directory) id)
+    =/  pin  (~(got by index) id)
     =/  pool  (~(got by pools) pin)
     =/  goal  (~(got by goals.pool) id)
     ?+    t.t.t.t.path  (on-peek:def path)
@@ -315,7 +362,7 @@
       ``goal-peek+!>(get-goal+(~(get by goals.pool) id))
       ::
         [%get-pin ~]
-      ``goal-peek+!>(get-pin+(~(get by directory) id))
+      ``goal-peek+!>(get-pin+(~(get by index) id))
       ::
         [%yung *]
       ?+    t.t.t.t.t.path  (on-peek:def path)

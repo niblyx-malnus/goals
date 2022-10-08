@@ -36,8 +36,6 @@
       [%unmark-complete h=@t]
       [%harvest h=@t]
       [%invite invitee=ship h=@t]
-      [%make-goal-captain captain=ship h=@t]
-      [%make-goal-peon peon=ship h=@t]
   ==
 ::
 ++  tab-list

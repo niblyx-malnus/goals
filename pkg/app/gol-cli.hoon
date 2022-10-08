@@ -173,25 +173,6 @@
             views  (new-pool:vyuz pin pool.update)
           ==
           ::
-            %trash-goal
-          :-  ~
-          %=  this
-            handles  
-              =/  del  ~(tap in del.update)
-              =/  idx  0
-              |-
-              ?:  =(idx (lent del))
-                handles
-              $(idx +(idx), handles (delete-goal:hdls (snag idx del)))
-            context
-              ?+    -.context  context
-                  %goal
-                ?:  (~(has in del.update) id.context)
-                  [%all ~]
-                context
-              ==
-          ==
-          ::
             %trash-pool
           :-  ~
           =/  new-handles  initial:hdls
@@ -242,7 +223,7 @@
     =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
     ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
     =/  pin  (got-pin:scry id.l)
-    [(poke [owner.id.l %goal-store] goal-action+!>([%move-goal pin id.l (some id.r)]))]~
+    [(poke [owner.id.l %goal-store] goal-action+!>([%move id.l (some id.r)]))]~
       ::
       %held-rend
     =*  poke  ~(poke pass:io [%command %unmove-goal ~])
@@ -250,7 +231,7 @@
     =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
     ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
     =/  pin  (got-pin:scry id.l)
-    [(poke [owner.id.l %goal-store] goal-action+!>([%move-goal pin id.l ~]))]~
+    [(poke [owner.id.l %goal-store] goal-action+!>([%move id.l ~]))]~
       ::
       %nest-yoke
     (yoke-command:hc command %nest-yoke)
@@ -276,41 +257,29 @@
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
     ~[(poke [owner.pin.res %goal-store] goal-action+!>([%invite pin.res ~ ~ (sy ~[invitee.command])]))]
       ::
-      ::  [%make-goal-captain captain=@p =id]
-      %make-goal-captain
-    =*  poke  ~(poke pass:io /mod-command/make-goal-captain)
-    =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    ~[(poke [owner.id.res %goal-store] goal-action+!>([%make-goal-captain captain.command id.res]))]
-      ::
-      ::  [%make-goal-peon peon=@p =id]
-      %make-goal-peon
-    =*  poke  ~(poke pass:io /mod-command/make-goal-peon)
-    =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    ~[(poke [owner.id.res %goal-store] goal-action+!>([%make-goal-peon peon.command id.res]))]
-      ::
       :: [%new-pool title=@t]
       %new-pool
-    =*  poke-our  ~(poke-our pass:io /mod-command/new-pool)
-    [(poke-our %goal-store goal-action+!>([%new-pool title.command]))]~
+    =*  poke-our  ~(poke-our pass:io /mod-command/spawn-pool)
+    [(poke-our %goal-store goal-action+!>([%spawn-pool title.command]))]~
       ::
-      :: [%delete-pool-goal h=@t]
+      :: [%trash-pool-goal h=@t]
       %delete-pool-goal
-    =*  poke-our  ~(poke-our pass:io /mod-command/delete-pool-goal)
+    =*  poke-our  ~(poke-our pass:io /mod-command/trash-pool-goal)
     =+  [msg p]=(invalid-pool-error:prtr h.command)
     ?.  =(~ msg)
       =+  [msg g]=(invalid-goal-error:prtr h.command)
       ?.  =(~ msg)
         (print-cards:prtr ~["Invalid handle."])
-      [(poke-our %goal-store goal-action+!>([%delete-goal id.g]))]~
+      [(poke-our %goal-store goal-action+!>([%trash-goal id.g]))]~
     ?:  =(our.bowl owner.pin.p)
-      [(poke-our %goal-store goal-action+!>([%delete-pool pin.p]))]~
+      [(poke-our %goal-store goal-action+!>([%trash-pool pin.p]))]~
     [(poke-our %goal-store goal-action+!>([%unsubscribe pin.p]))]~
       ::
       :: [%copy-pool h=@t title=@t]
       %copy-pool
     =*  poke-our  ~(poke-our pass:io /mod-command/copy-pool)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store goal-action+!>([%copy-pool pin.res title.command]))]~
+    [(poke-our %goal-store goal-action+!>([%clone-pool pin.res title.command]))]~
       ::
       ::  [%add-goal desc=@t]                
       %add-goal
@@ -458,5 +427,5 @@
   ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
   =/  pin  (got-pin:scry id.l)
   =/  yok  [yoke-tag id.l id.r]
-  [(poke [owner.id.l %goal-store] goal-action+!>([%yoke pin yok]))]~
+  [(poke [owner.id.l %goal-store] goal-action+!>([%yoke yok]))]~
 --
