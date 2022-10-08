@@ -3,15 +3,19 @@ Available pokes for `%goal-store` as nouns and as JSON.
 
 ### Poke List
 ```
-%new-pool
-%copy-pool                                                                     
-%spawn-goal                                                                     
+%spawn-pool
+%clone-pool
+%cache-pool
+%renew-pool
+%trash-pool
+%spawn-goal
+%cache-goal
+%renew-goal
+%trash-goal
 %edit-goal-desc                                                                 
-%edit-pool-title                                                             
-%delete-pool                                                                 
-%delete-goal                                                                    
-%yoke     
-%move-goal
+%edit-pool-title                                                               
+%move
+%yoke
 %set-kickoff
 %set-deadline                                                                   
 %mark-actionable                                                                
@@ -22,7 +26,7 @@ Available pokes for `%goal-store` as nouns and as JSON.
 %update-pool-perms
 ```
 
-## %new-pool
+## %spawn-pool
 
 ### Description
 Create a new pool.
@@ -34,36 +38,105 @@ Anyone who is a viewer on a pool can see all goals in that pool.
 
 ### Noun
 ```
-[%new-pool title=@t]
+[%spawn-pool title=@t]
 ```
 
 ### JSON
 ```
 {
-  "new-pool": {
+  "spawn-pool": {
     "title": "title of new pool"
   }
 }
 ```
 
-## %copy-pool
+## %clone-pool
 ### Description
 Make a copy of an existing pool.
 
-`old-pin` is the "pin" or pool id of the pool you want to copy.
+`pin` is the "pin" or pool id of the pool you want to clone/copy.
 
 `title` is the title of the new pool copy.
 
 ### Noun
 ```
-[%copy-pool =old=pin title=@t]
+[%clone-pool =pin title=@t]
 ```
 
 ### JSON
 ```
 {
-  "copy-pool": {
-    "old-pin": {
+  "clone-pool": {
+    "pin": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    }
+  }
+}
+```
+
+## %cache-pool
+### Description
+Move an active pool to the cache.
+
+`pin` is the "pin" or pool id of the pool you want to cache/archive.
+
+### Noun
+```
+[%cache-pool =pin]
+```
+
+### JSON
+```
+{
+  "cache-pool": {
+    "pin": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    }
+  }
+}
+```
+
+## %renew-pool
+### Description
+Renew a pool from the cache to the active pools.
+
+`pin` is the "pin" or pool id of the pool you want to renew/restore.
+
+### Noun
+```
+[%renew-pool =pin]
+```
+
+### JSON
+```
+{
+  "renew-pool": {
+    "pin": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    }
+  }
+}
+```
+
+## %trash-pool
+### Description
+Delete an existing pool from the active pools or from the cache.
+
+`pin` is the "pin" or pool id of the pool you want to trash/delete.
+
+### Noun
+```
+[%renew-pool =pin]
+```
+
+### JSON
+```
+{
+  "renew-pool": {
+    "pin": {
       "owner": "zod",
       "birth": "~2000.1.1"
     }
@@ -108,74 +181,22 @@ $:  %spawn-goal
 }
 ```
 
-## %edit-goal-desc
+## %cache-goal
 ### Description
-Edit the description of an existing goal.
+Move an active goal and its subgoals to the pool's cache.
 
-`id` is the goal id of the goal whose description you want to edit.
-
-`desc` is the new description of the goal.
+`id` is the id of the goal you want to cache/archive.
 
 ### Noun
 ```
-[%edit-goal-desc =id desc=@t]                                                   
+[%cache-goal =id]
 ```
 
 ### JSON
 ```
 {
-  "edit-goal-desc": {
+  "cache-goal": {
     "id": {
-      "owner": "zod",
-      "birth": "~2000.1.1"
-    },
-    "desc": "new description of goal"
-  }
-}
-```
-
-## %edit-pool-title
-### Description
-Edit the title of an existing pool.
-
-`pin` is the "pin" or pool id of the pool whose title you want to edit.
-
-`title` is the new title of the pool.
-
-### Noun
-```
-[%edit-pool-title =pin title=@t]                                             
-```
-
-### JSON
-```
-{
-  "edit-pool-title": {
-    "pin": {
-      "owner": "zod",
-      "birth": "~2000.1.1"
-    },
-    "title": "new title of pool"
-  }
-}
-```
-
-## %delete-pool
-### Description
-Delete a pool.
-
-`pin` is the "pin" or pool id of the pool you want to delete.
-
-### Noun
-```
-[%delete-pool =pin]                                                          
-```
-
-### JSON
-```
-{
-  "delete-pool": {
-    "pin": {
       "owner": "zod",
       "birth": "~2000.1.1"
     }
@@ -183,21 +204,44 @@ Delete a pool.
 }
 ```
 
-## %delete-goal
+## %renew-goal
 ### Description
-Delete a goal.
+Renew a goal from the cache to the active goals.
 
-`id` is the goal id of the goal you want to delete.
+`id` is the id of the goal you want to renew/restore.
 
 ### Noun
 ```
-[%delete-goal =id]                                                              
+[%renew-goal =id]
 ```
 
 ### JSON
 ```
 {
-  "delete-goal": {
+  "renew-goal": {
+    "id": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    }
+  }
+}
+```
+
+## %trash-goal
+### Description
+Delete a goal from the pool's cache.
+
+`id` is the id of the goal you want to trash/delete.
+
+### Noun
+```
+[%trash-goal =id]
+```
+
+### JSON
+```
+{
+  "trash-goal": {
     "id": {
       "owner": "zod",
       "birth": "~2000.1.1"
@@ -225,17 +269,13 @@ There are 8 kinds of "yokes":
 
 ### Noun
 ```
-[%yoke =pin yok=exposed-yoke]                                               
+[%yoke yok=exposed-yoke]                                               
 ```
 
 ### JSON
 ```
 {
   "yoke": {
-    "pin": {
-      "owner": "zod",
-      "birth": "~2000.1.1"
-    },
     "yok": {
       "yoke": "nest-yoke",
       "lid": {
@@ -252,11 +292,9 @@ There are 8 kinds of "yokes":
 ```
 
 
-## %move-goal
+## %move
 ### Description
 Move a goal.
-
-`pin` is the id of the pool the goals are located in.
 
 `cid` is the id of the goal you are moving (child id).
 
@@ -264,17 +302,13 @@ Move a goal.
 
 ### Noun
 ```
-[%move-goal =pin cid=id upid=(unit id)]                                                              
+[%move =pin cid=id upid=(unit id)]                                                              
 ```
 
 ### JSON
 ```
 {
-  "move-goal": {
-    "pin": {
-      "owner": "zod",
-      "birth": "~2000.1.1"
-    },
+  "move": {
     "cid": {
       "owner": "zod",
       "birth": "~2000.1.1"
@@ -503,6 +537,58 @@ Update pool permissions and invite new viewers or kick existing viewers.
           role=(null or "kick" or "admin" or "spawn")
         }
       ]
+  }
+}
+```
+
+## %edit-goal-desc
+### Description
+Edit the description of an existing goal.
+
+`id` is the goal id of the goal whose description you want to edit.
+
+`desc` is the new description of the goal.
+
+### Noun
+```
+[%edit-goal-desc =id desc=@t]                                                   
+```
+
+### JSON
+```
+{
+  "edit-goal-desc": {
+    "id": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    },
+    "desc": "new description of goal"
+  }
+}
+```
+
+## %edit-pool-title
+### Description
+Edit the title of an existing pool.
+
+`pin` is the "pin" or pool id of the pool whose title you want to edit.
+
+`title` is the new title of the pool.
+
+### Noun
+```
+[%edit-pool-title =pin title=@t]                                             
+```
+
+### JSON
+```
+{
+  "edit-pool-title": {
+    "pin": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    },
+    "title": "new title of pool"
   }
 }
 ```
