@@ -302,7 +302,7 @@ Move a goal.
 
 ### Noun
 ```
-[%move =pin cid=id upid=(unit id)]                                                              
+[%move cid=id upid=(unit id)]                                                              
 ```
 
 ### JSON
