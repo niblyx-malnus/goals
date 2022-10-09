@@ -8,7 +8,7 @@
   %.  jon
   %-  of
   :~  [%spawn-pool (ot ~[title+so])]
-      [%clone-pool (ot ~[old-pin+dejs-pin title+so])]
+      [%clone-pool (ot ~[pin+dejs-pin title+so])]
       [%cache-pool (ot ~[pin+dejs-pin])]
       [%renew-pool (ot ~[pin+dejs-pin])]
       [%trash-pool (ot ~[pin+dejs-pin])]
