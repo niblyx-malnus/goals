@@ -291,9 +291,8 @@ There are 8 kinds of "yokes":
           "owner": "zod",
           "birth": "~2000.1.2"
         }
-      }
-    },
-    {
+      },
+      {
         "yoke": "nest-rend",
         "lid": {
           "owner": "zod",
@@ -304,7 +303,8 @@ There are 8 kinds of "yokes":
           "birth": "~2000.1.4"
         }
       }
-    }
+    ]
+  }
 }
 ```
 
