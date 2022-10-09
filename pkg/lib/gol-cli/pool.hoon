@@ -843,12 +843,22 @@
     ==
   [ids.mup (update-neis:pore.mup lid rid -.yok)]
 ::
-++  yoke-emit
-  |=  [yok=exposed-yoke:gol mod=ship]
+++  yoke-sequence
+  |=  [yoks=(list exposed-yoke:gol) mod=ship]
   ^-  _this
   =/  old  this
-  =/  mup  (yoke yok mod)
-  (emot old [%pool-nexus %yoke (make-nex ids.mup)]):[pore.mup .]
+  =/  idx  0
+  =|  ids=(set id:gol)
+  =/  pore  this
+  |-
+  ?:  =(idx (lent yoks))
+    (emot old [%pool-nexus %yoke (make-nex ids)]):[pore .]
+  =/  mup  (yoke:pore (snag idx yoks) mod)
+  %=  $
+    idx  +(idx)
+    ids  ids.mup
+    pore  pore.mup
+  ==
 ::
 ++  get-ranks
   |=  [=id:gol chief=ship =stock:gol]

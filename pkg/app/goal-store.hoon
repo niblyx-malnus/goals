@@ -172,14 +172,14 @@
         %+  convert-away-cud:hc  ~
         (edit-pool-title:gs pin.action title.action src.bowl)
           ::
-          :: [%yoke yok=exposed-yoke]
+          :: [%yoke =pin yoks=(list exposed-yoke)]
           %yoke
-        ?.  =(our.bowl owner.lid.yok.action)
+        ?.  =(our.bowl owner.pin.action)
           =*  poke-other  ~(poke-other pass:hc /away/yoke)
           :_  state
-          [(poke-other owner.lid.yok.action goal-action+!>(action))]~
+          [(poke-other owner.pin.action goal-action+!>(action))]~
         %+  convert-away-cud:hc  ~
-        (yoke:gs yok.action src.bowl)
+        (yoke:gs pin.action yoks.action src.bowl)
           ::
           :: [%move cid=id upid=(unit id)]
           %move

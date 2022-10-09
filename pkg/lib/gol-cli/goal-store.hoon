@@ -113,11 +113,10 @@
   (get-away-cud pin mod pore)
 ::
 ++  yoke
-  |=  [yok=exposed-yoke:gol mod=ship]
-  =/  pin  (~(got by index.store) lid.yok)
+  |=  [=pin:gol yoks=(list exposed-yoke:gol) mod=ship]
   =/  pool  (~(got by pools.store) pin)
   =/  pore  (apex:pl pool)
-  =.  pore  (yoke-emit:pore yok mod)
+  =.  pore  (yoke-sequence:pore yoks mod)
   (get-away-cud pin mod pore)
 ::
 ++  spawn-pool
