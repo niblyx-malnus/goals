@@ -3,7 +3,7 @@
 ::
 +$  action
   $%  [%spawn-pool title=@t]
-      [%clone-pool =old=pin title=@t]
+      [%clone-pool =pin title=@t]
       [%cache-pool =pin]
       [%renew-pool =pin]
       [%trash-pool =pin]

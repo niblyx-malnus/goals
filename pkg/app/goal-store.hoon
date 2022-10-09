@@ -75,7 +75,7 @@
         ?>  =(src.bowl our.bowl)
         %+  convert-home-cud:hc  ~
         %:  clone-pool:gs
-          old-pin.action
+          pin.action
           title.action
           src.bowl
           our.bowl

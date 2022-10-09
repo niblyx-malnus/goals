@@ -181,13 +181,18 @@
             [%goal (enjs-goal goal.upd)]
         ==
         ::
-        %spawn-pool  (frond %pool (enjs-pool pool.upd))
-        ::
-          %trash-goal  
+          %cache-goal
         %-  pairs
         :~  [%nex (enjs-nex nex.upd)]
-            [%del a+(turn ~(tap in del.upd) enjs-id)]
+            [%id (enjs-id id.upd)]
+            [%cas a+(turn ~(tap in cas.upd) enjs-id)]
         ==
+        ::
+        %renew-goal  (frond %id (enjs-id id.upd))
+        ::
+        %trash-goal  (frond %id (enjs-id id.upd))
+        ::
+        %spawn-pool  (frond %pool (enjs-pool pool.upd))
         ::
         %trash-pool  ~
         ::
