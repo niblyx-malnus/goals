@@ -269,25 +269,42 @@ There are 8 kinds of "yokes":
 
 ### Noun
 ```
-[%yoke yok=exposed-yoke]                                               
+[%yoke =pin yoks=(list exposed-yoke)]                                               
 ```
 
 ### JSON
 ```
 {
   "yoke": {
-    "yok": {
-      "yoke": "nest-yoke",
-      "lid": {
-        "owner": "zod",
-        "birth": "~2000.1.1"
-      },
-      "rid": {
-        "owner": "zod",
-        "birth": "~2000.1.1"
+    "pin": {
+          "owner": "zod",
+          "birth": "~2000.1.2"
+        }
+    "yoks": [
+      {
+        "yoke": "nest-yoke",
+        "lid": {
+          "owner": "zod",
+          "birth": "~2000.1.1"
+        },
+        "rid": {
+          "owner": "zod",
+          "birth": "~2000.1.2"
+        }
+      }
+    },
+    {
+        "yoke": "nest-rend",
+        "lid": {
+          "owner": "zod",
+          "birth": "~2000.1.3"
+        },
+        "rid": {
+          "owner": "zod",
+          "birth": "~2000.1.4"
+        }
       }
     }
-  }
 }
 ```
 
