@@ -23,7 +23,7 @@ const api = {
     urb.onOpen = () => log("urbit onOpen");
     urb.onRetry = () => log("urbit onRetry");
     //sub to our frontend updates
-    urb.subscribe(updates)
+    urb.subscribe(updates);
     urb.connect();
 
     return urb;
@@ -58,7 +58,7 @@ const api = {
   },
   addPool: async (title) => {
     const newPool = {
-      "new-pool": {
+      "spawn-pool": {
         title,
         captains: [],
         admins: [],
@@ -83,7 +83,7 @@ const api = {
   },
   deletePool: async (pin) => {
     const poolToDelete = {
-      "delete-pool": {
+      "trash-pool": {
         pin,
       },
     };
@@ -110,7 +110,7 @@ const api = {
   },
   deleteGoal: async (id) => {
     const goalToDelete = {
-      "delete-goal": {
+      "trash-goal": {
         id,
       },
     };
@@ -217,7 +217,7 @@ const api = {
   },
   copyPool: async (oldPin, title) => {
     const poolToCopy = {
-      "copy-pool": {
+      "clone-pool": {
         "old-pin": oldPin,
         title,
         admins: [],
@@ -228,6 +228,18 @@ const api = {
     return api
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: poolToCopy });
+  },
+  moveGoal: async (pin, goalId, targetGoalId) => {
+    const goalMove = {
+      move: {
+        pin,
+        cid: goalId,
+        upid: targetGoalId,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: goalMove });
   },
 };
 export default api;

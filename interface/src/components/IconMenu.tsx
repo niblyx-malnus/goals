@@ -249,6 +249,24 @@ export default function IconMenu({
       yokeType: "precede",
     });
   };
+
+  const moveGoalToRoot = async () => {
+    handleClose();
+    try {
+      const result = await api.moveGoal(pin, id, null);
+      toggleSnackBar(true, {
+        message: "successfully moved goal",
+        severity: "success",
+      });
+      log("moveGoal result =>", result);
+    } catch (e) {
+      log("moveGoal error =>", e);
+      toggleSnackBar(true, {
+        message: "failed to move goal",
+        severity: "error",
+      });
+    }
+  };
   return (
     <Box className="show-on-hover" sx={{ opacity: open ? 1 : 0 }}>
       <IconButton
@@ -293,7 +311,7 @@ export default function IconMenu({
                 complete
               </MenuItem>
             )}
-            {/*actionable ? (
+            {actionable ? (
               <MenuItem onClick={unmarkActionable} disableRipple>
                 <PlayForWorkIcon fontSize="small" />
                 remove actionable
@@ -303,7 +321,7 @@ export default function IconMenu({
                 <PlayForWorkIcon fontSize="small" />
                 make actionable
               </MenuItem>
-            )*/}
+            )}
             <MenuItem onClick={handleTimeline} disableRipple>
               <CalendarMonthIcon fontSize="small" />
               timeline
@@ -312,14 +330,18 @@ export default function IconMenu({
               <CalendarMonthIcon fontSize="small" />
               move
             </MenuItem>
-            <MenuItem onClick={handlePriortize} disableRipple>
+            <MenuItem onClick={moveGoalToRoot} disableRipple>
+              <CalendarMonthIcon fontSize="small" />
+              move to root
+            </MenuItem>
+            {/* <MenuItem onClick={handlePriortize} disableRipple>
               <CalendarMonthIcon fontSize="small" />
               prioritize
             </MenuItem>
             <MenuItem onClick={handlePrecede} disableRipple>
               <CalendarMonthIcon fontSize="small" />
               precede
-            </MenuItem>
+            </MenuItem>*/}
             <MenuItem onClick={deleteGoal} disableRipple>
               <DeleteIcon fontSize="small" />
               delete

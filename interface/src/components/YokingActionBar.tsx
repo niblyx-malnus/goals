@@ -11,16 +11,51 @@ import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 import Fab from "@mui/material/Fab";
 import Button from "@mui/material/Button";
+import api from "../api";
+import LoadingButton from "@mui/lab/LoadingButton";
+
 export default function YokingActionBar({}) {
+  const [trying, setTrying] = useState<boolean>(false);
   const selectionModeYokeData = useStore(
     (store) => store.selectionModeYokeData
   );
   const toggleSelectionMode = useStore(
     (store: any) => store.toggleSelectionMode
   );
+  const toggleSnackBar = useStore((store) => store.toggleSnackBar);
+  const resetSelectedGoals = useStore((store: any) => store.resetSelectedGoals);
+  const selectedGoals = useStore((store: any) => store.selectedGoals);
   //TODO: add paper for elevation
+  //TODO: call this component something else?
+  const moveGoal = async () => {
+    setTrying(true);
+    const targetGoalId = selectedGoals[0];
+    const goalId = selectionModeYokeData?.goalId;
+    const pin = selectionModeYokeData?.poolId;
+    try {
+      const result = await api.moveGoal(pin, goalId, targetGoalId);
+      toggleSnackBar(true, {
+        message: "successfully moved goal",
+        severity: "success",
+      });
+
+      closeActionBar();
+      log("moveGoal result =>", result);
+    } catch (e) {
+      log("moveGoal error =>", e);
+      toggleSnackBar(true, {
+        message: "failed to move goal",
+        severity: "error",
+      });
+    }
+    setTrying(false);
+  };
+  const closeActionBar = () => {
+    toggleSelectionMode(false, null);
+    resetSelectedGoals([]);
+  };
   return (
-    <Box>
+    <Paper elevation={3}>
       <Stack
         direction="row"
         spacing={2}
@@ -33,37 +68,33 @@ export default function YokingActionBar({}) {
           borderRadius: "4px",
         }}
       >
-        <Button
+        <LoadingButton
           variant="contained"
           onClick={() => {
-            toggleSelectionMode(false, null);
-            log("calling some API or other");
+            //depending on the yoke type, we fire off some APIs
+            const yokeType = selectionModeYokeData?.yokeType;
+            log("yokeType", yokeType);
+            switch (yokeType) {
+              case "move": {
+                moveGoal();
+                break;
+              }
+            }
+            return;
           }}
+          loading={trying}
         >
-          Confirm {selectionModeYokeData?.yokeType} yoke
-        </Button>
+          Confirm {selectionModeYokeData?.yokeType}
+        </LoadingButton>
         <Button
           onClick={() => {
-            toggleSelectionMode(false, null);
+            closeActionBar();
           }}
           variant="outlined"
         >
           cancel
         </Button>
       </Stack>
-      {/*<Box
-        sx={{
-          position: "fixed",
-          bottom: 40,
-          left: 40,
-    
-          backgroundColor: "#fff",
-          padding: 2,
-          borderRadius: '4px',
-        }}
-      >
-        <Typography>hello world</Typography>
-      </Box>*/}
-    </Box>
+    </Paper>
   );
 }

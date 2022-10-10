@@ -12,6 +12,7 @@ const log = (...args: any) => {
   console.log(...args);
 };
 const shipName = () => {
+  //TODO: make this a one time lookup, just memo
   //returns the current ship's name
   return isDev() ? process.env.REACT_APP_SHIP_NAME : window.ship;
 };

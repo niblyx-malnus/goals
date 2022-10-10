@@ -70,6 +70,10 @@ interface Store {
     newStatus: boolean,
     newSelectionModeYokeData: SelectionYokeData
   ) => void;
+  selectedGoalsId: any; //list of goal's ids
+  selectedGoals: any; //list of goals
+  updateSelectedGoal: (newGoal: any) => void;
+  resetSelectedGoals: () => void;
 }
 
 const useStore = create<Store>((set, get) => ({
@@ -130,7 +134,7 @@ const useStore = create<Store>((set, get) => ({
     })),
 
   logList: [],
-  setLogList: (newItem) => {
+  setLogList: (newItem: any) => {
     //append new log item to the log list, adding a timestamp
     const newLogList = get().logList;
     const newerItem = {
@@ -171,6 +175,32 @@ const useStore = create<Store>((set, get) => ({
       selectionMode: newStatus,
       selectionModeYokeData: newSelectionModeYokeData,
     })),
+  selectedGoals: [],
+  selectedGoalsId: [],
+  resetSelectedGoals: () =>
+    set(() => ({
+      selectedGoals: [],
+      selectedGoalsId: [],
+    })),
+  updateSelectedGoal: (newGoalId: any) => {
+    //manage list of selected goals (while yoking/moving)
+    const yokeType: any = get().selectionModeYokeData?.yokeType;
+    let currentSelectedGoals: any = get().selectedGoals;
+    //if the current yoke type is move we don't manage a list, just a single item
+    let newSelectedGoals: any;
+    if (yokeType === "move") {
+      newSelectedGoals = [newGoalId];
+    } else {
+      newSelectedGoals = [...currentSelectedGoals, newGoalId];
+    }
+    const newSelectedGoalsId = newSelectedGoals.map((id: any) => {
+      return id.birth;
+    });
+    set(() => ({
+      selectedGoals: newSelectedGoals,
+      selectedGoalsId: newSelectedGoalsId,
+    }));
+  },
 }));
 
 export default useStore;

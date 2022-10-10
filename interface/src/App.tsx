@@ -86,19 +86,12 @@ function App() {
       //update the perms here, in case they do change
       const { pin, pool } = poolItem;
 
-      if (pin.owner === currShip) {
-        //check if this ship is the owner
-        roleMap.set(pin.birth, "owner");
-      }
-      //check the perms lists for the current ship
-      if (pool.perms.viewers.includes(currShip)) {
-        roleMap.set(pin.birth, "viewer");
-      }
-      if (pool.perms.captains.includes(currShip)) {
-        roleMap.set(pin.birth, "captain");
-      }
-      if (pool.perms.admins.includes(currShip)) {
-        roleMap.set(pin.birth, "admin");
+      //loop through perm list to look for the curnt ship and update the rolemap
+      for (const permElement of pool.perms) {
+        if (permElement.ship === currShip) {
+          roleMap.set(pin.birth, permElement.role);
+          break;
+        }
       }
       //create our nested data structure we use for rendering
       const newNestedGoals = createDataTree(pool.nexus.goals);

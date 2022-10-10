@@ -19,6 +19,7 @@ import Avatar from "@mui/material/Avatar";
 
 import { log, shipName } from "../helpers";
 import { blue, orange, yellow } from "@mui/material/colors";
+import { off } from "process";
 interface TreeItemProps {
   readonly id: number;
   readonly onSelectCallback: (id: number) => void;
@@ -66,11 +67,23 @@ const TreeItem = memo(
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [trying, setTrying] = useState<boolean>(false);
     const collapseAll = useStore((store) => store.collapseAll);
-    const disableActions = trying || editingTitle || addingGoal || disabled;
+    const selectedGoals = useStore((store) => store.selectedGoals);
+    const selectedGoalsId = useStore((store) => store.selectedGoalsId);
+    const updateSelectedGoal = useStore((store) => store.updateSelectedGoal);
+
+    const disableActions = trying || editingTitle || addingGoal; // || disabled; TODO: find a better way to do disabled (overlay?)
     useEffect(() => {
       //everytime collapse all changes, we force isOpen value to comply
       toggleItemOpen(collapseAll.status);
     }, [collapseAll.count]);
+    useEffect(() => {
+      //check if this goal is in the selected goals list
+      if (selectedGoalsId.includes(idObject.birth)) {
+        setSelected(true);
+      } else {
+        setSelected(false);
+      }
+    }, [selectedGoals]);
 
     useEffect(() => {
       //did yoking originated from this goal?
@@ -103,8 +116,8 @@ const TreeItem = memo(
           <IconMenu
             type="goal"
             //TODO: just pass togls entirely to this
-            actionable={goal.togls.actionable}
-            complete={goal.togls.complete}
+            actionable={goal.nexus.actionable}
+            complete={goal.nexus.complete}
             id={idObject}
             pin={pin}
             setParentTrying={setTrying}
@@ -122,15 +135,14 @@ const TreeItem = memo(
           return "purple";
         }
       }
-      if (goal.togls.actionable) return orange[50];
+      if (goal.nexus.actionable) return orange[50];
       return "auto";
     };
     const renderTitle = () => {
       const noEditPermTitle = (
         <Box
           sx={{
-            backgroundColor: goal.togls.actionable ? orange[50] : "auto",
-
+            backgroundColor: goal.nexus.actionable ? orange[50] : "auto",
             padding: 0.2,
             paddingLeft: 1,
             paddingRight: 1,
@@ -141,7 +153,7 @@ const TreeItem = memo(
             variant="h6"
             color={"text.primary"}
             style={{
-              textDecoration: goal.togls.complete ? "line-through" : "auto",
+              textDecoration: goal.nexus.complete ? "line-through" : "auto",
             }}
           >
             {label}
@@ -160,7 +172,7 @@ const TreeItem = memo(
             borderRadius: 1,
           }}
           onClick={() => {
-            inSelectionMode && !yoking && setSelected(!selected);
+            inSelectionMode && !yoking && updateSelectedGoal(idObject);
           }}
         >
           <Typography
@@ -170,7 +182,7 @@ const TreeItem = memo(
               !disableActions && setEditingTitle(true);
             }}
             style={{
-              textDecoration: goal.togls.complete ? "line-through" : "auto",
+              textDecoration: goal.nexus.complete ? "line-through" : "auto",
             }}
           >
             {label}
@@ -269,7 +281,7 @@ const TreeItem = memo(
               className="show-on-hover"
               sx={{ opacity: 0 }}
             >
-              {goal.perms.captains.map((item: any, index: number) => {
+              {goal.perms?.captains.map((item: any, index: number) => {
                 return (
                   <Chip
                     key={item}
@@ -339,13 +351,14 @@ const RecursiveTree = ({
     const childGoals = goal.childNodes;
     //filter out complete or incomplete goals if store says so
     if (
-      (currentGoal.togls.complete && filterGoals === "complete") ||
-      (!currentGoal.togls.complete && filterGoals === "incomplete")
+      (currentGoal.nexus.complete && filterGoals === "complete") ||
+      (!currentGoal.nexus.complete && filterGoals === "incomplete")
     )
       return null;
 
     //we need to know if the current ship is a captain on this goal
-    const isCaptain = currentGoal.perms.captains.includes(ship);
+    //TODO: update this to work with the new stuff, should probably be a captainMap
+    const isCaptain = true; // currentGoal.perms.captains.includes(ship);
 
     return (
       <TreeItem

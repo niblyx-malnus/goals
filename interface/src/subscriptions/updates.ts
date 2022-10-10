@@ -7,8 +7,9 @@ import {
   newPoolAction,
   updatePoolTitleAction,
   updateGoalDescAction,
-  toggleCompleteAction,
+  updateToglsAction,
   updatePoolPermsAction,
+  handleYoke,
 } from "../store/actions";
 const setLogList = useStore.getState().setLogList;
 
@@ -66,9 +67,11 @@ const updateHandler = (update: any) => {
       }
       case "goal-togls": {
         const hed: any = update.hed;
-        let { complete, id }: any = update.tel[actionName];
 
-        toggleCompleteAction(id, hed.pin, complete);
+        let { id }: any = update.tel[actionName];
+        const toglChange = update.tel[actionName]["togls-updated"];
+
+        updateToglsAction(id, hed.pin, toglChange);
 
         break;
       }
@@ -77,6 +80,12 @@ const updateHandler = (update: any) => {
 
         updatePoolPermsAction(hed.pin, update.tel[actionName]);
 
+        break;
+      }
+      case "pool-nexus": {
+        const hed: any = update.hed;
+        let { yoke }: any = update.tel[actionName];
+        handleYoke(hed.pin, yoke.nex);
         break;
       }
     }
