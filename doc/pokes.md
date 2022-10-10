@@ -258,7 +258,7 @@ There are 8 kinds of "yokes":
 
 ```
 [%held-yoke lid rid]  creates an ownership/containment relationship: lid is owned/contained by rid
-[%held-rend-strict lid rid]  breaks an ownership/containment relationship: lid is no longer owned/contained by rid
+[%held-rend lid rid]  breaks an ownership/containment relationship: lid is no longer owned/contained by rid
 [%nest-yoke lid rid]  creates a "virtual nesting" relationship; lid is virtually nested under rid
 [%nest-rend lid rid]  breaks a "virtual nesting" relationship; lid is no longer directly virtually nested under rid
 [%prec-yoke lid rid]  creates a precedence relationship; lid precedes rid
