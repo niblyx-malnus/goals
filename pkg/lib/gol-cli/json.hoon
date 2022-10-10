@@ -8,7 +8,7 @@
   %.  jon
   %-  of
   :~  [%spawn-pool (ot ~[title+so])]
-      [%clone-pool (ot ~[old-pin+dejs-pin title+so])]
+      [%clone-pool (ot ~[pin+dejs-pin title+so])]
       [%cache-pool (ot ~[pin+dejs-pin])]
       [%renew-pool (ot ~[pin+dejs-pin])]
       [%trash-pool (ot ~[pin+dejs-pin])]
@@ -22,7 +22,7 @@
       [%cache-goal (ot ~[id+dejs-id])]
       [%renew-goal (ot ~[id+dejs-id])]
       [%trash-goal (ot ~[id+dejs-id])]
-      [%yoke (ot ~[yok+dejs-yoke])]
+      [%yoke (ot ~[pin+dejs-pin yoks+dejs-yoke-seq])]
       [%move (ot ~[cid+dejs-id upid+dejs-unit-id])]
       [%set-kickoff (ot ~[id+dejs-id kickoff+dejs-unit-date])]
       [%set-deadline (ot ~[id+dejs-id deadline+dejs-unit-date])]

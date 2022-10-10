@@ -11,7 +11,7 @@
       [%cache-goal =id]
       [%renew-goal =id]
       [%trash-goal =id]
-      [%yoke yok=exposed-yoke]
+      [%yoke =pin yoks=(list exposed-yoke)]
       [%move cid=id upid=(unit id)]
       [%set-kickoff =id kickoff=(unit @da)]
       [%set-deadline =id deadline=(unit @da)]

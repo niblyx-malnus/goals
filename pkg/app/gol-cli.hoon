@@ -427,5 +427,5 @@
   ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
   =/  pin  (got-pin:scry id.l)
   =/  yok  [yoke-tag id.l id.r]
-  [(poke [owner.id.l %goal-store] goal-action+!>([%yoke yok]))]~
+  [(poke [owner.id.l %goal-store] goal-action+!>([%yoke pin ~[yok]]))]~
 --

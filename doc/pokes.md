@@ -258,7 +258,7 @@ There are 8 kinds of "yokes":
 
 ```
 [%held-yoke lid rid]  creates an ownership/containment relationship: lid is owned/contained by rid
-[%held-rend-strict lid rid]  breaks an ownership/containment relationship: lid is no longer owned/contained by rid
+[%held-rend lid rid]  breaks an ownership/containment relationship: lid is no longer owned/contained by rid
 [%nest-yoke lid rid]  creates a "virtual nesting" relationship; lid is virtually nested under rid
 [%nest-rend lid rid]  breaks a "virtual nesting" relationship; lid is no longer directly virtually nested under rid
 [%prec-yoke lid rid]  creates a precedence relationship; lid precedes rid
@@ -269,24 +269,41 @@ There are 8 kinds of "yokes":
 
 ### Noun
 ```
-[%yoke yok=exposed-yoke]                                               
+[%yoke =pin yoks=(list exposed-yoke)]                                               
 ```
 
 ### JSON
 ```
 {
   "yoke": {
-    "yok": {
-      "yoke": "nest-yoke",
-      "lid": {
-        "owner": "zod",
-        "birth": "~2000.1.1"
+    "pin": {
+          "owner": "zod",
+          "birth": "~2000.1.2"
+        }
+    "yoks": [
+      {
+        "yoke": "nest-yoke",
+        "lid": {
+          "owner": "zod",
+          "birth": "~2000.1.1"
+        },
+        "rid": {
+          "owner": "zod",
+          "birth": "~2000.1.2"
+        }
       },
-      "rid": {
-        "owner": "zod",
-        "birth": "~2000.1.1"
+      {
+        "yoke": "nest-rend",
+        "lid": {
+          "owner": "zod",
+          "birth": "~2000.1.3"
+        },
+        "rid": {
+          "owner": "zod",
+          "birth": "~2000.1.4"
+        }
       }
-    }
+    ]
   }
 }
 ```
@@ -302,7 +319,7 @@ Move a goal.
 
 ### Noun
 ```
-[%move =pin cid=id upid=(unit id)]                                                              
+[%move cid=id upid=(unit id)]                                                              
 ```
 
 ### JSON
