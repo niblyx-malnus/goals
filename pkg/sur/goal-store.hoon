@@ -20,7 +20,7 @@
       [%mark-complete =id]
       [%unmark-complete =id]
       [%update-goal-perms =id chief=ship rec=?(%.y %.n) spawn=(set ship)]
-      [%update-pool-perms =pin new=(map ship (unit pool-role))]
+      [%update-pool-perms =pin new=pool-perms]
       [%edit-goal-desc =id desc=@t]
       [%edit-pool-title =pin title=@t]
       [%subscribe =pin]

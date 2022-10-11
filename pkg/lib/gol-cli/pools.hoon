@@ -12,7 +12,6 @@
   =.  birth.pool  birth.pin
   =.  title.pool  title
   =.  creator.pool  own
-  =.  perms.pool  (~(put by perms.pool) own (some %owner))
   [pin pool]
 ::
 ++  clone-pool

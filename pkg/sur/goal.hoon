@@ -115,7 +115,7 @@
   ::
   +$  pool-role  ?(%admin %spawn)
   ::
-  +$  pool-perms  (map ship (unit ?(%owner pool-role)))
+  +$  pool-perms  (map ship (unit pool-role))
   ::
   +$  pool-nexus
     $:  =goals
@@ -634,7 +634,6 @@
 ++  pool-perms-3-to-4
   |=  [owner=ship pool-perms:s3]
   =|  =pool-perms:s4
-  =.  pool-perms  (~(put by pool-perms) owner (some %owner))
   =.  pool-perms
     %-  ~(gas by pool-perms)
     %+  murn

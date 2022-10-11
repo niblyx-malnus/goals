@@ -1058,7 +1058,7 @@
 :: If role is [~ u=~], make ship basic viewer.
 :: If role is [~ u=[~ u=?(%admin %spawn)]], make ship ?(%admin %spawn).
 ++  update-pool-perms
-  |=  [new=(map ship (unit pool-role:gol)) mod=ship]
+  |=  [new=pool-perms:gol mod=ship]
   ^-  _this
   =/  upds  (perms-to-upds new)
   =/  old  this
@@ -1077,7 +1077,7 @@
   ==
 ::
 ++  perms-to-upds
-  |=  new=(map ship (unit pool-role:gol))
+  |=  new=pool-perms:gol
   ^-  (list [=ship role=(unit (unit pool-role:gol))])
   =/  upds  
     %+  turn
@@ -1092,7 +1092,7 @@
   |=(=ship [ship ~])
 ::
 ++  pool-diff
-  |=  new=(map ship (unit pool-role:gol))
+  |=  new=pool-perms:gol
   ^-  [remove=(list ship) invite=(list ship)]
   =/  remove  ~(tap in (~(dif in ~(key by perms.p)) ~(key by new)))
   =/  invite  ~(tap in (~(dif in ~(key by new)) ~(key by perms.p)))

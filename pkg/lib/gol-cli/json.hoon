@@ -188,7 +188,7 @@
         ::
           %pool-perms
         :-  %a  %+  turn  ~(tap by new.upd) 
-        |=  [chip=@p role=(unit ?(%owner pool-role))] 
+        |=  [chip=@p role=(unit pool-role)] 
         %-  pairs
         :~  [%ship (ship chip)]
             [%role ?~(role ~ s+u.role)]
@@ -380,7 +380,7 @@
       ==
       :-  %perms
       :-  %a  %+  turn  ~(tap by perms.pool) 
-      |=  [chip=@p role=(unit ?(%owner pool-role))] 
+      |=  [chip=@p role=(unit pool-role)] 
       %-  pairs
       :~  [%ship (ship chip)]
           [%role ?~(role ~ s+u.role)]

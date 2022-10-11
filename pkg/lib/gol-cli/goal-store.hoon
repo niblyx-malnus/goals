@@ -258,7 +258,7 @@
 ::
 ++  update-pool-perms
   |=  $:  =pin:gol
-          new=(map ship (unit pool-role:gol))
+          new=pool-perms:gol
           mod=ship
       ==
   ^-  away-cud:goal-store
