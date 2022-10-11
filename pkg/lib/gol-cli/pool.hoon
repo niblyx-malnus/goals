@@ -637,7 +637,7 @@
   ^-  ?
   ?:  =(ship owner.p)  ~|("Cannot change owner perms." !!)
   ?>  (check-pool-perm mod)
-  ?.  =((~(got by perms.p) ship) (some %admin))  %&
+  ?.  =((~(get by perms.p) ship) (some (some %admin)))  %&
   ?:  |(=(mod owner.p) =(mod ship))  %&
   ~|("not-owner-or-self" !!)
 ::
