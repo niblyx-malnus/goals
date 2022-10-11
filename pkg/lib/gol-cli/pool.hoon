@@ -580,9 +580,10 @@
 ++  check-pool-perm
   |=  mod=ship
   ^-  ?
+  ?:  =(mod owner.p)  %&
   =/  perm  (~(got by perms.p) mod)
   ?~  perm  %|
-  ?:  ?=(?(%owner %admin) u.perm)  %&  %|
+  ?:  ?=(%admin u.perm)  %&  %|
 ::
 ++  check-root-spawn-perm
   |=  mod=ship
