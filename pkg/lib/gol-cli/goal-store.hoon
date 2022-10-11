@@ -126,7 +126,7 @@
           now=@da
       ==
   ^-  home-cud:goal-store
-  =+  [pin pool]=(spawn-pool:puls title ~ own now)
+  =+  [pin pool]=(spawn-pool:puls title own now)
   :+  pin
     [[pin mod] %spawn-pool pool]~
   store(pools (~(put by pools.store) pin pool))
@@ -170,7 +170,7 @@
           now=@da
       ==
   ^-  home-cud:goal-store
-  =+  [pin pool]=(clone-pool:puls old-pin title ~ own now)
+  =+  [pin pool]=(clone-pool:puls old-pin title own now)
   :+  pin
     [[pin mod] %spawn-pool pool]~
   (update-store pin [%spawn-pool pool]~ pool)
@@ -248,22 +248,22 @@
   (get-away-cud pin mod pore)
 ::
 ++  update-goal-perms
-  |=  [=id:gol chief=ship rec=?(%.y %.n) lus=(set ship) hep=(set ship) mod=ship]
+  |=  [=id:gol chief=ship rec=?(%.y %.n) spawn=(set ship) mod=ship]
   ^-  away-cud:goal-store
   =/  pin  (~(got by index.store) id)
   =/  pool  (~(got by pools.store) pin)
   =/  pore  (apex:pl pool)
-  =.  pore  (update-goal-perms:pore id chief rec lus hep mod)
+  =.  pore  (update-goal-perms:pore id chief rec spawn mod)
   (get-away-cud pin mod pore)
 ::
 ++  update-pool-perms
   |=  $:  =pin:gol
-          upds=(list [=ship role=(unit (unit pool-role:gol))])
+          new=(map ship (unit pool-role:gol))
           mod=ship
       ==
   ^-  away-cud:goal-store
   =/  pool  (~(got by pools.store) pin)
   =/  pore  (apex:pl pool)
-  =.  pore  (update-pool-perms:pore upds mod)
+  =.  pore  (update-pool-perms:pore new mod)
   (get-away-cud pin mod pore)
 --

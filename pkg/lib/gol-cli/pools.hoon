@@ -4,7 +4,7 @@
 +*  gols  ~(. gol-cli-goals +<)
 ::
 ++  spawn-pool
-  |=  [title=@t upds=(list [ship (unit (unit pool-role:gol))]) own=ship now=@da]
+  |=  [title=@t own=ship now=@da]
   ^-  [pin:gol pool:gol]
   =/  pin  [%pin (unique-id:gols own now)]
   =|  =pool:gol
@@ -13,19 +13,17 @@
   =.  title.pool  title
   =.  creator.pool  own
   =.  perms.pool  (~(put by perms.pool) own (some %owner))
-  =.  pool  pool:abet:(update-pool-perms:(apex:pl pool) upds own)
   [pin pool]
 ::
 ++  clone-pool
   |=  $:  =old=pin:gol
           title=@t
-          upds=(list [ship (unit (unit pool-role:gol))])
           own=ship
           now=@da
       ==
   ^-  [pin:gol pool:gol]
   =/  old-pool  (~(got by pools) old-pin)
-  =+  [pin pool]=(spawn-pool title upds own now)
+  =+  [pin pool]=(spawn-pool title own now)
   =.  pools  (~(put by pools) pin pool(creator owner.old-pin))
   =/  id-map  (new-ids:gols ~(tap in ~(key by goals.old-pool)) own now)
   |^

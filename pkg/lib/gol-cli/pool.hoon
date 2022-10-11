@@ -33,6 +33,7 @@
   =.  outflow.kickoff.goal  (~(put in *(set eid:gol)) [%d id])
   =.  inflow.deadline.goal  (~(put in *(set eid:gol)) [%k id])
   ::
+  :: Initialize redundant data
   =.  goals.p  (~(put by goals.p) id goal) :: temporarily simulate adding goal
   ::
   =.  ranks.goal  (get-ranks id chief ~)
@@ -127,26 +128,27 @@
     output  (~(uni in output) (progeny (snag idx kids)))
   ==
 ::
+:: Partition the set of goals q from its complement q- in goals.p
 ++  partition
-  |=  [p=(set id:gol) q=(set id:gol) mod=ship]
+  |=  [q=(set id:gol) mod=ship]
   ^-  [ids=(set id:gol) pore=_this]
-  ?>  =(0 ~(wyt in (~(int in p) q)))
-  =/  p  ~(tap in p)
+  =/  q-  (~(dif in ~(key by goals.p)) q)
+  =/  q  ~(tap in q)
   =/  idx  0
   =|  ids=(set id:gol)
   =/  pore  this
   |-
-  ?:  =(idx (lent p))
+  ?:  =(idx (lent q))
     [ids pore]
-  =/  id  (snag idx p)
-  =/  mup=[ids=(set id:gol) pore=_this]
-    (break-bonds:pore id q mod)
+  =/  id  (snag idx q)
+  =/  mup  (break-bonds:pore id q- mod)
   %=  $
     idx  +(idx)
     ids  (~(uni in ids) ids.mup)
     pore  pore.mup
   ==
 ::
+:: Break bonds between a goal and a set of other goals
 ++  break-bonds
   |=  [=id:gol exes=(set id:gol) mod=ship]
   ^-  [ids=(set id:gol) pore=_this]
@@ -158,14 +160,14 @@
   ?:  =(idx (lent pairs))
     [ids pore]
   =/  pair  (snag idx pairs)
-  =/  mup=[ids=(set id:gol) pore=_this]
-    (dag-rend:pore p.pair q.pair mod)
+  =/  mup  (dag-rend:pore p.pair q.pair mod)
   %=  $
     idx  +(idx)
     ids  (~(uni in ids) ids.mup)
     pore  pore.mup
   ==
 ::
+:: Get the bonds which exist between a goal and a set of other goals
 ++  get-bonds
   |=  [=id:gol ids=(set id:gol)]
   ^-  (list (pair eid:gol eid:gol))
@@ -191,6 +193,7 @@
   %-  ~(run in (~(int in eids) outflow.deadline))
   |=(=eid:gol [[%d id] eid])
 ::
+:: Get the submap of goals consisting of ids
 ++  gat-by
   |=  [=goals:gol ids=(list id:gol)]
   ^-  goals:gol
@@ -206,6 +209,7 @@
       (~(put in goals) id (~(got by ^goals) id))
   ==
 ::
+:: Remove all the goal objects associated with ids from goals
 ++  gus-by
   |=  [=goals:gol ids=(list id:gol)]
   ^-  goals:gol
@@ -218,6 +222,7 @@
     goals  (~(del in goals) (snag idx ids))
   ==
 ::
+:: Move goal and subgoals from main goals to cache
 ++  cache-goal
   |=  [=id:gol mod=ship]
   ^-  _this
@@ -233,8 +238,7 @@
   ::
   :: Partition subgoals of goal from rest of goals
   =/  prog  (progeny id)
-  =.  mup
-    (partition:pore prog (~(dif in ~(key by goals.p)) prog) mod)
+  =.  mup  (partition:pore prog mod)
   =.  pore  pore.mup
   =.  ids  (~(uni in ids) ids.mup)
   ::
@@ -247,15 +251,9 @@
   :: Remove goal and subgoals from goals
   =.  goals.p.pore  (gus-by goals.p.pore ~(tap in prog))
   ::
-  :: goal's parent gets updated too
-  =.  ids
-    =/  par  par:(~(got by goals.p) id)
-    ?~  par
-      ids
-    (~(put in ids) u.par)
-  ::
   (emot old [%cache-goal (make-nex ids) id prog]):[pore .]
 ::
+:: Restore goal from cache to main goals
 ++  renew-goal
   |=  [=id:gol mod=ship]
   ^-  _this
@@ -268,6 +266,7 @@
   ::
   (emot old [%renew-goal id])
 ::
+:: Permanently delete goal (must be in cache)
 ++  trash-goal
   |=  [=id:gol mod=ship]
   ^-  _this
@@ -606,24 +605,41 @@
   =/  goal  (~(got by goals.p) id)
   (~(has in spawn.goal) mod)
 ::
+:: Checks if mod can move lid under urid
 ++  check-move-perm
-  |=  [lid=id:gol rid=id:gol mod=ship]
+  |=  [lid=id:gol urid=(unit id:gol) mod=ship]
   ^-  ?
   ?:  (check-pool-perm mod)  %&
+  :: Can only move to root with admin-level pool permissions
+  ?~  urid  %|
+  :: Can move lid under u.urid if you have permissions on a goal
+  :: which contains them both
   =/  l-goal  (~(got by goals.p) lid)
-  =/  r-goal  (~(got by goals.p) rid)
+  =/  r-goal  (~(got by goals.p) u.urid)
   =/  l-rank  (~(get by ranks.l-goal) mod)
   =/  r-rank  (~(get by ranks.r-goal) mod)
   ?~  l-rank  %|
   ?~  r-rank  %|
   ?:  =(u.l-rank u.r-rank)  %&
   ::
-  :: if chief of root of lid and goal-perms of rid
-  ?:  ?&  =(mod chief:(snag 0 (flop `stock:gol`[[lid chief.l-goal] stock.l-goal])))
-          (check-goal-perm rid mod)
+  :: if chief of root of lid and permissions on u.urid
+  ?:  ?&  .=  mod
+              =<  chief
+              (snag 0 (flop `stock:gol`[[lid chief.l-goal] stock.l-goal]))
+          (check-goal-perm u.urid mod)
       ==
     %&
   %|
+::
+:: Checks if mod can modify ship's pool permissions
+++  check-ship-mod
+  |=  [=ship mod=ship]
+  ^-  ?
+  ?:  =(ship owner.p)  ~|("Cannot change owner perms." !!)
+  ?>  (check-pool-perm mod)
+  ?.  =((~(got by perms.p) ship) (some %admin))  %&
+  ?:  |(=(mod owner.p) =(mod ship))  %&
+  ~|("not-owner-or-self" !!)
 ::
 ++  renew-bound
   |=  [=eid:gol dir=?(%l %r)]
@@ -918,12 +934,7 @@
   =/  old  this
   ::
   :: Check mod permissions
-  ?>  ?~  urid  
-        :: Can move to root with admin-level pool permissions
-        (check-pool-perm mod)
-      :: Can move lid under u.urid if you have permissions on a goal
-      :: which contains them both
-      (check-move-perm lid u.urid mod)
+  ?>  (check-move-perm lid urid mod)
   ::
   :: Identify ids to be modified
   =/  l  (~(got by goals.p) lid)
@@ -1047,19 +1058,16 @@
 :: If role is [~ u=~], make ship basic viewer.
 :: If role is [~ u=[~ u=?(%admin %spawn)]], make ship ?(%admin %spawn).
 ++  update-pool-perms
-  |=  [upds=(list [=ship role=(unit (unit pool-role:gol))]) mod=ship]
+  |=  [new=(map ship (unit pool-role:gol)) mod=ship]
   ^-  _this
+  =/  upds  (perms-to-upds new)
   =/  old  this
   =/  idx  0
   |-
   ?:  =(idx (lent upds))
-    (emot:this(efx efx) old [%pool-perms upds])
+    (emot old [%pool-perms perms.p])
   =/  upd  (snag idx upds)
-  ?:  =(ship.upd owner.p)  ~&("Cannot change owner perms." !!)
-  ?>  (check-pool-perm mod)
-  ?.  ?.  =((~(got by perms.p) ship.upd) (some %admin))  %&
-      |(=(mod owner.p) =(mod ship.upd))
-  ~|("not-owner-self" !!)
+  ?>  (check-ship-mod ship.upd mod)
   %=  $
     idx  +(idx)
     perms.p
@@ -1068,31 +1076,30 @@
       (~(put by perms.p) ship.upd u.role.upd)
   ==
 ::
+++  perms-to-upds
+  |=  new=(map ship (unit pool-role:gol))
+  ^-  (list [=ship role=(unit (unit pool-role:gol))])
+  =/  upds  
+    %+  turn
+      ~(tap by new)
+    |=  [=ship role=(unit pool-role:gol)]
+    [ship (some role)]
+  %+  weld
+    upds
+  ^-  (list [=ship role=(unit (unit pool-role:gol))])
+  %+  turn
+    ~(tap in (~(dif in ~(key by perms.p)) ~(key by new)))
+  |=(=ship [ship ~])
+::
 ++  pool-diff
-  |=  [upds=(list [=ship role=(unit (unit pool-role:gol))])]
+  |=  new=(map ship (unit pool-role:gol))
   ^-  [remove=(list ship) invite=(list ship)]
-  =/  remove=(list ship)
-    %+  murn
-      upds
-    |=  [=ship role=(unit (unit pool-role:gol))]
-    ?~  role
-      ?.  (~(has by perms.p) ship)
-        ~
-      (some ship)
-    ~
-  =/  invite=(list ship)
-    %+  murn
-      upds
-    |=  [=ship role=(unit (unit pool-role:gol))]
-    ?~  role
-      ~
-    ?:  (~(has by perms.p) ship)
-      ~
-    (some ship)
+  =/  remove  ~(tap in (~(dif in ~(key by perms.p)) ~(key by new)))
+  =/  invite  ~(tap in (~(dif in ~(key by new)) ~(key by perms.p)))
   [remove invite]
 ::
 ++  update-goal-perms
-  |=  [=id:gol chief=ship rec=?(%.y %.n) lus=(set ship) hep=(set ship) mod=ship]
+  |=  [=id:gol chief=ship rec=?(%.y %.n) spawn=(set ship) mod=ship]
   ^-  _this
   =/  old  this
   ::
@@ -1102,7 +1109,6 @@
   ::
   :: Update spawn perms
   =/  goal  (~(got by goals.p) id)
-  =/  spawn  (~(dif in (~(uni in spawn.goal) lus)) hep)
   =.  goals.p  (~(put by goals.p) id goal(spawn spawn))
   ::
   :: Update chief, stock and ranks
@@ -1150,7 +1156,7 @@
     :: pool-perms
     ::
       [%pool-perms *]
-    (pool-perms upds.upd)
+    (pool-perms new.upd)
     ::
     :: ------------------------------------------------------------------------
     :: pool-hitch
@@ -1224,21 +1230,7 @@
       this(cache.p (~(del by cache.p) id))
     --
   ::
-  ++  pool-perms
-    |=  upds=(list [=ship role=(unit (unit pool-role:gol))])
-    ^-  _this
-    =/  idx  0
-    |-
-    ?:  =(idx (lent upds))
-      this
-    =/  upd  (snag idx upds)
-    %=  $
-      idx  +(idx)
-      perms.p
-        ?~  role.upd
-          (~(del by perms.p) ship.upd)
-        (~(put by perms.p) ship.upd u.role.upd)
-    ==
+  ++  pool-perms  |=(perms=pool-perms:gol `_this`this(perms.p perms))
   ::
   ++  pool-hitch
     |%

@@ -254,8 +254,7 @@
           id.action
           chief.action
           rec.action
-          lus.action
-          hep.action
+          spawn.action
           src.bowl
         ==
           ::
@@ -265,7 +264,7 @@
           :_  state
           [(poke-other owner.pin.action goal-action+!>(action))]~
         =/  pool  (~(got by pools) pin.action)
-        =/  diff  (~(pool-diff pl pool) upds.action)
+        =/  diff  (~(pool-diff pl pool) new.action)
         %+  convert-away-cud:hc
           ;:  weld
             ^-  (list card)
@@ -279,7 +278,7 @@
           ==
         %:  update-pool-perms:gs
           pin.action
-          upds.action
+          new.action
           src.bowl
         ==
           ::
