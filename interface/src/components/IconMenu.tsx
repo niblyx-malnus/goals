@@ -334,11 +334,11 @@ export default function IconMenu({
               <CalendarMonthIcon fontSize="small" />
               move to root
             </MenuItem>
-            {/* <MenuItem onClick={handlePriortize} disableRipple>
+            <MenuItem onClick={handlePriortize} disableRipple>
               <CalendarMonthIcon fontSize="small" />
               prioritize
             </MenuItem>
-            <MenuItem onClick={handlePrecede} disableRipple>
+            {/*  <MenuItem onClick={handlePrecede} disableRipple>
               <CalendarMonthIcon fontSize="small" />
               precede
             </MenuItem>*/}

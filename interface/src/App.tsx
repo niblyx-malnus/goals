@@ -85,7 +85,10 @@ function App() {
     const newProjects = fetchedPools.map((poolItem: any, id: any) => {
       //update the perms here, in case they do change
       const { pin, pool } = poolItem;
-
+      if (pin.owner === currShip) {
+        //check if this ship is the owner
+        roleMap.set(pin.birth, "owner");
+      }
       //loop through perm list to look for the curnt ship and update the rolemap
       for (const permElement of pool.perms) {
         if (permElement.ship === currShip) {
@@ -94,6 +97,9 @@ function App() {
         }
       }
       //create our nested data structure we use for rendering
+      //TODO: check nest-left of each goal for virtual children
+      //::and create a copy with a unique id and a virtual:true flag
+      //TODO: create a map of virtual children ids to real ids for use with actions later
       const newNestedGoals = createDataTree(pool.nexus.goals);
       return {
         ...poolItem,

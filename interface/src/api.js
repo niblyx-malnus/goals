@@ -150,13 +150,11 @@ const api = {
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: goalToMark });
   },
-  updatePoolPermissions: async (pin, viewers, captains, admins) => {
+  updatePoolPermissions: async (pin, newRoleList) => {
     const newPoolPerms = {
-      invite: {
+      "update-pool-perms": {
         pin,
-        admins,
-        captains,
-        viewers,
+        new: newRoleList,
       },
     };
     return api
@@ -240,6 +238,17 @@ const api = {
     return api
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: goalMove });
+  },
+  yoke: async (pin, yokeList) => {
+    const yokeSequence = {
+      yoke: {
+        pin,
+        yoks: yokeList,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: yokeSequence });
   },
 };
 export default api;

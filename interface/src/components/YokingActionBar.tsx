@@ -50,6 +50,41 @@ export default function YokingActionBar({}) {
     }
     setTrying(false);
   };
+  const yoke = async () => {
+    setTrying(true);
+    //TODO: finish generalising this for use with all the other yokes
+    //TODO: include rending
+    //for now, we make an array of yokes over selectedGoals
+    //list where lid is goalId and rid is in item of selectedGoals
+
+    const goalId = selectionModeYokeData?.goalId;
+    const pin = selectionModeYokeData?.poolId;
+    const yokeType = selectionModeYokeData?.yokeType;
+    const yokeList = selectedGoals.map((selectedGoalId: any) => {
+      return {
+        yoke: "prio-yoke",
+        lid: goalId,
+        rid: selectedGoalId,
+      };
+    });
+    try {
+      const result = await api.yoke(pin, yokeList);
+      toggleSnackBar(true, {
+        message: "successfully " + yokeType,
+        severity: "success",
+      });
+
+      //closeActionBar();
+      log("yoke result =>", result);
+    } catch (e) {
+      log("yoke error =>", e);
+      toggleSnackBar(true, {
+        message: "failed to " + yokeType,
+        severity: "error",
+      });
+    }
+    setTrying(false);
+  };
   const closeActionBar = () => {
     toggleSelectionMode(false, null);
     resetSelectedGoals([]);
@@ -78,6 +113,9 @@ export default function YokingActionBar({}) {
               case "move": {
                 moveGoal();
                 break;
+              }
+              default: {
+                yoke();
               }
             }
             return;

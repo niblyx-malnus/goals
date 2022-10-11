@@ -30,12 +30,12 @@ interface ChipData {
 const ob = require("urbit-ob");
 export default function ShareDialog({ pals }: { pals: any }) {
   const [inputValue, setInputValue] = useState<string>("~");
+
   const [role, setRole] = useState("Viewer");
   const open = useStore((store: any) => store.shareDialogOpen);
   const toggleShareDialog = useStore((store: any) => store.toggleShareDialog);
   const shareDialogData = useStore((store: any) => store.shareDialogData);
   const toggleSnackBar = useStore((store) => store.toggleSnackBar);
-
   const roleMap = useStore((store: any) => store.roleMap);
 
   const onClose = () => {
@@ -97,7 +97,19 @@ export default function ShareDialog({ pals }: { pals: any }) {
 
     if (role === "Viewer") {
       const viewerExists = viewerList.some(checkForShip);
+      const capExists = captainList.some(checkForShip);
+      const adminExists = adminList.some(checkForShip);
 
+      if (capExists) {
+        setPathErrorMessage("This ship is a captain");
+        setPathError(true);
+        return;
+      }
+      if (adminExists) {
+        setPathErrorMessage("This ship is an admin");
+        setPathError(true);
+        return;
+      }
       if (viewerExists) {
         setPathErrorMessage("This viewer already exists");
         setPathError(true);
@@ -111,6 +123,7 @@ export default function ShareDialog({ pals }: { pals: any }) {
     } else if (role === "Captain") {
       const capExists = captainList.some(checkForShip);
       const adminExists = adminList.some(checkForShip);
+      const viewerExists = viewerList.some(checkForShip);
 
       if (capExists) {
         setPathErrorMessage("This captain already exists");
@@ -119,6 +132,11 @@ export default function ShareDialog({ pals }: { pals: any }) {
       }
       if (adminExists) {
         setPathErrorMessage("This ship is an admin");
+        setPathError(true);
+        return;
+      }
+      if (viewerExists) {
+        setPathErrorMessage("This ship is a viewer");
         setPathError(true);
         return;
       }
@@ -127,27 +145,10 @@ export default function ShareDialog({ pals }: { pals: any }) {
         { key: captainList.length + 1, label, canDelete: true },
       ];
       setCaptainList(newCaptainList);
-      //if a cap  is added, we'll also add it the viewerList list
-      const viewerExists = viewerList.some(checkForShip);
-      let newViewerList;
-      if (viewerExists) {
-        newViewerList = viewerList.map((item: any) => {
-          if (item.label === label) {
-            return { ...item, canDelete: false };
-          }
-          return item;
-        });
-      } else {
-        newViewerList = [
-          ...viewerList,
-          { key: viewerList.length + 1, label, canDelete: false },
-        ];
-      }
-      setViewerList(newViewerList);
     } else {
       const capExists = captainList.some(checkForShip);
       const adminExists = adminList.some(checkForShip);
-
+      const viewerExists = viewerList.some(checkForShip);
       if (capExists) {
         setPathErrorMessage("This captain already exists");
         setPathError(true);
@@ -158,28 +159,16 @@ export default function ShareDialog({ pals }: { pals: any }) {
         setPathError(true);
         return;
       }
+      if (viewerExists) {
+        setPathErrorMessage("This ship is a viewer");
+        setPathError(true);
+        return;
+      }
       const newAdminList = [
         ...adminList,
         { key: adminList.length + 1, label, canDelete: true },
       ];
       setAdminList(newAdminList);
-
-      const viewerExists = viewerList.some(checkForShip);
-      let newViewerList;
-      if (viewerExists) {
-        newViewerList = viewerList.map((item: any) => {
-          if (item.label === label) {
-            return { ...item, canDelete: false };
-          }
-          return item;
-        });
-      } else {
-        newViewerList = [
-          ...viewerList,
-          { key: viewerList.length + 1, label, canDelete: false },
-        ];
-      }
-      setViewerList(newViewerList);
     }
     setInputValue("~");
   };
@@ -226,15 +215,20 @@ export default function ShareDialog({ pals }: { pals: any }) {
   const updatePoolPerms = async () => {
     setTrying(true);
     try {
-      //convert chips to a data list
-      const viewers = viewerList.map((item) => item.label);
-      const captains = captainList.map((item) => item.label);
-      const admins = adminList.map((item) => item.label);
+      const newRoleList: any = [];
+      //create our new role list to send
+      adminList.forEach((item) => {
+        newRoleList.push({ role: "admin", ship: item.label });
+      });
+      captainList.forEach((item) => {
+        newRoleList.push({ role: "spawn", ship: item.label });
+      });
+      viewerList.forEach((item) => {
+        newRoleList.push({ role: null, ship: item.label });
+      });
       const result = await api.updatePoolPermissions(
         shareDialogData.pin,
-        viewers,
-        captains,
-        admins
+        newRoleList
       );
       toggleSnackBar(true, {
         message: "successfully updated pool permissions",
@@ -253,29 +247,33 @@ export default function ShareDialog({ pals }: { pals: any }) {
   };
   useEffect(() => {
     if (!shareDialogData) return;
-    //construct our chips from the permlist, everytime we display this
+
+    let adminList: string[] = [];
+    let captainList: string[] = [];
+    let viewerList: string[] = [];
+    //contains at least the owner ship, we ignore it
+    //we break down the map of role to ship into it's own list of ships
+    shareDialogData.permList.forEach((perm: any) => {
+      if (perm.role === "admin") {
+        adminList.push(perm.ship);
+      } else if (perm.role === "captain") {
+        captainList.push(perm.ship);
+      } else if (perm.role === null) {
+        viewerList.push(perm.ship);
+      }
+    });
     //get the current role related to this ship
     const myRole = roleMap.get(shareDialogData.pin.birth);
     const canEditAdmins = myRole !== "admin";
-    const permList = shareDialogData.permList; //TODO: handle not having this?
-    let viewerChips = permList.viewers.map((item: any, index: any) => {
+    //construct our chips from the permlist
+    let viewerChips = viewerList.map((item: any, index: any) => {
       return { key: index, label: item, canDelete: true };
     });
-    const captainChips = permList.captains.map((item: any, index: any) => {
+    const captainChips = captainList.map((item: any, index: any) => {
       return { key: index, label: item, canDelete: true };
     });
-    const adminChips = permList.admins.map((item: any, index: any) => {
+    const adminChips = adminList.map((item: any, index: any) => {
       return { key: index, label: item, canDelete: canEditAdmins };
-    });
-    //create links beetween caps/admins and viewers
-    viewerChips = viewerChips.map((item: any) => {
-      if (
-        permList.captains.includes(item.label) ||
-        permList.admins.includes(item.label)
-      ) {
-        return { ...item, canDelete: false };
-      }
-      return item;
     });
     setViewerList(viewerChips);
     setCaptainList(captainChips);
