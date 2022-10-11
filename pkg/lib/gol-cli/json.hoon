@@ -35,38 +35,28 @@
       :~  id+dejs-id
           chief+dejs-ship
           rec+bo
-          lus+dejs-set-ships
-          hep+dejs-set-ships
+          spawn+dejs-set-ships
       ==
-      [%update-pool-perms (ot ~[pin+dejs-pin upds+dejs-pool-perm-upds])]
+      [%update-pool-perms (ot ~[pin+dejs-pin new+dejs-pool-perms])]
       [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
       [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
       [%subscribe (ot ~[pin+dejs-pin])]
       [%unsubscribe (ot ~[pin+dejs-pin])]
   ==
 ::
-++  dejs-pool-perm-upds 
-  %-  ar:dejs:format
-  (ot:dejs:format ~[ship+dejs-ship role+dejs-uurole])
-::
-++  dejs-uurole
+++  dejs-pool-perms
   |=  jon=json
-  ?~  jon
-    (some ~)
-  =/  out
-    %.  jon
-    %-  su:dejs:format
+  %-  ~(gas by *(map ship (unit pool-role)))
+  %.  jon
+  %-  ar:dejs:format
+  (ot:dejs:format ~[ship+dejs-ship role+dejs-unit-role])
+++  dejs-unit-role  |=(jon=json ?~(jon ~ (some (dejs-role jon))))
+++  dejs-role  (su:dejs:format parse-role)
+++  parse-role
     ;~  pose
-      (cold %kick (jest 'kick'))
       (cold %admin (jest 'admin'))
       (cold %spawn (jest 'spawn'))
     ==
-  =/  out 
-    ?.  ?=(?(%admin %spawn) out)
-      ~
-    (some out)
-  ?:(?=((unit (unit pool-role)) out) out !!)
-::
 ++  dejs-unit-date  |=(jon=json ?~(jon ~ (some (dejs-date jon))))
 ++  dejs-pin  (pe:dejs:format %pin dejs-id)
 ++  dejs-unit-id  |=(jon=json ?~(jon ~ (some (dejs-id jon))))
@@ -197,13 +187,11 @@
         %trash-pool  ~
         ::
           %pool-perms
-        :-  %a  %+  turn  upds.upd
-        |=  [chip=@p role=(unit (unit pool-role))] 
+        :-  %a  %+  turn  ~(tap by new.upd) 
+        |=  [chip=@p role=(unit ?(%owner pool-role))] 
         %-  pairs
         :~  [%ship (ship chip)]
-            ?~  role
-              [%kick ~]
-            [%role ?~(u.role ~ s+u.u.role)]
+            [%role ?~(role ~ s+u.role)]
         ==
         ::
           %pool-hitch
