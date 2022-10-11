@@ -22,15 +22,31 @@
   (emit upd)
 ::
 ++  init-goal
-  |=  =id:gol
+  |=  [=id:gol chief=ship]
   ^-  goal:gol
   =|  =goal:gol
   =.  owner.goal  owner.id
   =.  birth.goal  birth.id
+  =.  chief.goal  chief
   :: 
   :: Initialize edges
   =.  outflow.kickoff.goal  (~(put in *(set eid:gol)) [%d id])
   =.  inflow.deadline.goal  (~(put in *(set eid:gol)) [%k id])
+  ::
+  =.  goals.p  (~(put by goals.p) id goal) :: temporarily simulate adding goal
+  ::
+  =.  ranks.goal  (get-ranks id chief ~)
+  ::
+  =.  left-bound.kickoff.goal  (renew-bound [%k id] %l)
+  =.  ryte-bound.kickoff.goal  (renew-bound [%k id] %r)
+  =.  left-bound.deadline.goal  (renew-bound [%d id] %l)
+  =.  ryte-bound.deadline.goal  (renew-bound [%d id] %r)
+  ::
+  =.  left-plumb.kickoff.goal  (renew-plumb [%k id] %l)
+  =.  ryte-plumb.kickoff.goal  (renew-plumb [%k id] %r)
+  =.  left-plumb.deadline.goal  (renew-plumb [%d id] %l)
+  =.  ryte-plumb.deadline.goal  (renew-plumb [%d id] %r)
+  ::
   goal
 ::
 ++  make-nex
@@ -57,12 +73,8 @@
 ::
 ++  spawn-goal
   |=  [=id:gol upid=(unit id:gol) mod=ship]
-  ^-  _this
+  ^-  [ids=(set id:gol) pore=_this]
   =/  old  this
-  ::
-  :: Initialize goal
-  =/  goal  (init-goal id)
-  =.  goal  goal(chief mod)
   ::
   :: Check mod permissions
   =/  par-perm
@@ -71,16 +83,12 @@
     (check-goal-spawn-perm u.upid mod)
   ?>  par-perm
   ::
+  :: Initialize goal
+  =/  goal  (init-goal id mod)
+  ::
   :: Put goal in goals and move under upid
   =.  goals.p  (~(put by goals.p) id goal)
-  =/  pore  (move id upid owner.p) :: divine intervention (owner)
-  ::
-  =+  pore(efx efx) :: ignore accumulated updates
-  ?~  upid
-    (emot old [%spawn-goal *nex:gol id (~(got by goals.p) id)])
-  %+  emot
-    old
-  [%spawn-goal (make-nex (sy ~[u.upid])) id (~(got by goals.p) id)]
+  (move id upid owner.p) :: divine intervention (owner)
 ::
 :: wit all da fixin's
 ++  spawn-goal-fixns
@@ -92,17 +100,15 @@
       ==
   ^-  _this
   =/  old  this
-  =/  pore  (spawn-goal id upid mod)
+  =/  mup  (spawn-goal id upid mod)
+  =/  pore  pore.mup
   =.  pore  (edit-goal-desc:pore id desc mod)
   =.  pore
     ?:  actionable
       (mark-actionable:pore id mod)
     (unmark-actionable:pore id mod)
   =+  pore(efx efx) :: ignore accumulated updates
-  =/  nex
-    ?~  upid
-      *nex:gol
-    (make-nex (sy ~[u.upid]))
+  =/  nex  (make-nex ids.mup)
   (emot old [%spawn-goal nex id (~(got by goals.p) id)])
 ::
 :: All descendents including self
@@ -221,30 +227,34 @@
   ?>  (check-goal-perm id mod)
   ::
   :: Move goal to root
-  =/  pore  (move id ~ owner.p) :: divine intervention (owner)
+  =/  mup  (move id ~ owner.p) :: divine intervention (owner)
+  =/  pore  pore.mup
+  =/  ids  ids.mup
   ::
   :: Partition subgoals of goal from rest of goals
   =/  prog  (progeny id)
-  =/  mup=[ids=(set id:gol) pore=_this]
+  =.  mup
     (partition:pore prog (~(dif in ~(key by goals.p)) prog) mod)
+  =.  pore  pore.mup
+  =.  ids  (~(uni in ids) ids.mup)
   ::
   :: Add goal and subgoals to cache
-  =.  cache.p.pore.mup
-    %+  ~(put in cache.p.pore.mup)
+  =.  cache.p.pore
+    %+  ~(put in cache.p.pore)
       id
-    (gat-by goals.p.pore.mup ~(tap in prog))
+    (gat-by goals.p.pore ~(tap in prog))
   ::
   :: Remove goal and subgoals from goals
-  =.  goals.p.pore.mup  (gus-by goals.p.pore.mup ~(tap in prog))
+  =.  goals.p.pore  (gus-by goals.p.pore ~(tap in prog))
   ::
   :: goal's parent gets updated too
-  =.  ids.mup
+  =.  ids
     =/  par  par:(~(got by goals.p) id)
     ?~  par
-      ids.mup
-    (~(put in ids.mup) u.par)
+      ids
+    (~(put in ids) u.par)
   ::
-  (emot old [%cache-goal (make-nex ids.mup) id prog]):[pore.mup .]
+  (emot old [%cache-goal (make-nex ids) id prog]):[pore .]
 ::
 ++  renew-goal
   |=  [=id:gol mod=ship]
@@ -904,7 +914,7 @@
 ::
 ++  move
   |=  [lid=id:gol urid=(unit id:gol) mod=ship]
-  ^-  _this
+  ^-  [ids=(set id:gol) pore=_this]
   =/  old  this
   ::
   :: Check mod permissions
@@ -915,16 +925,16 @@
       :: which contains them both
       (check-move-perm lid u.urid mod)
   ::
-  :: Identify ids to be modified (nux)
+  :: Identify ids to be modified
   =/  l  (~(got by goals.p) lid)
-  =/  nux=(set id:gol)
+  =/  ids=(set id:gol)
     ?~  par.l
       (sy ~[lid])
     (sy ~[lid u.par.l])
-  =.  nux
+  =.  ids
     ?~  urid
-      nux
-    (~(put in nux) u.urid)
+      ids
+    (~(put in ids) u.urid)
   ::
   :: If par.l is non-null, remove lid from its kids
   =/  mup=[ids=(set id:gol) pore=_this]
@@ -934,7 +944,7 @@
     =.  goals.p  (~(put by goals.p) u.par.l q(kids (~(del in kids.q) lid)))
     (yoke [%held-rend lid u.par.l] mod)
   =/  pore  pore.mup
-  =.  nux  (~(uni in nux) ids.mup) :: cascading updates
+  =.  ids  (~(uni in ids) ids.mup) :: cascading updates
   ::
   :: Replace lid's par with urid (null or unit of id)
   =.  l  (~(got by goals.p.pore) lid) :: l has changed
@@ -943,7 +953,7 @@
   :: Update stock and ranks
   =.  mup  (avalanche:pore lid)
   =.  pore  pore.mup
-  =.  nux  (~(uni in nux) ids.mup) :: avalanche updates
+  =.  ids  (~(uni in ids) ids.mup) :: avalanche updates
   ::
   :: If urid is non-null, put lid in u.urid's kids
   =.  mup
@@ -953,10 +963,15 @@
     =.  goals.p.pore
       (~(put by goals.p.pore) u.urid r(kids (~(put in kids.r) lid)))
     (yoke:pore [%held-yoke lid u.urid] mod)
-  =.  pore  pore.mup
-  =.  nux  (~(uni in nux) ids.mup) :: cascading updates
-  :: 
-  (emot old [%pool-nexus %yoke (make-nex nux)]):[pore(efx efx) .]
+  ::
+  [(~(uni in ids) ids.mup) pore.mup]
+::
+++  move-emot
+  |=  [lid=id:gol urid=(unit id:gol) mod=ship]
+  ^-  _this
+  =/  old  this
+  =/  mup  (move lid urid mod)
+  (emot old [%pool-nexus %yoke (make-nex ids.mup)]):[pore.mup .]
 ::
 ++  mark-actionable
   |=  [=id:gol mod=ship]

@@ -109,9 +109,9 @@
   =/  pin  (~(got by index.store) cid)
   =/  pool  (~(got by pools.store) pin)
   =/  pore  (apex:pl pool)
-  =.  pore  (move:pore cid upid mod)
+  =.  pore  (move-emot:pore cid upid mod)
   (get-away-cud pin mod pore)
-::
+::::
 ++  yoke
   |=  [=pin:gol yoks=(list exposed-yoke:gol) mod=ship]
   =/  pool  (~(got by pools.store) pin)
