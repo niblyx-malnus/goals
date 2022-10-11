@@ -19,6 +19,7 @@
           desc+so
           actionable+bo
       ==
+      [%waste-goal (ot ~[id+dejs-id])]
       [%cache-goal (ot ~[id+dejs-id])]
       [%renew-goal (ot ~[id+dejs-id])]
       [%trash-goal (ot ~[id+dejs-id])]
@@ -169,6 +170,13 @@
         :~  [%nex (enjs-nex nex.upd)]
             [%id (enjs-id id.upd)]
             [%goal (enjs-goal goal.upd)]
+        ==
+        ::
+          %waste-goal
+        %-  pairs
+        :~  [%nex (enjs-nex nex.upd)]
+            [%id (enjs-id id.upd)]
+            [%waz a+(turn ~(tap in waz.upd) enjs-id)]
         ==
         ::
           %cache-goal
