@@ -588,9 +588,10 @@
 ++  check-root-spawn-perm
   |=  mod=ship
   ^-  ?
+  ?:  =(mod owner.p)  %&
   =/  perm  (~(get by perms.p) mod)
   ?~  perm  %|       :: not viewer
-  ?~  u.perm  %|  %& :: no %owner, %admin, or %spawn privileges
+  ?~  u.perm  %|  %& :: no %admin or %spawn privileges
 ::
 ++  check-goal-perm
   |=  [=id:gol mod=ship]
