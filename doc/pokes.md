@@ -70,7 +70,8 @@ Make a copy of an existing pool.
     "pin": {
       "owner": "zod",
       "birth": "~2000.1.1"
-    }
+    },
+  "title": "new title"
   }
 }
 ```
