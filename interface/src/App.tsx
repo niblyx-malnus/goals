@@ -41,6 +41,7 @@ import {
   CopyPoolDialog,
   YokingActionBar,
 } from "./components";
+import { v4 as uuidv4 } from "uuid";
 
 declare const window: Window &
   typeof globalThis & {
@@ -96,11 +97,52 @@ function App() {
           break;
         }
       }
-      //create our nested data structure we use for rendering
-      //TODO: check nest-left of each goal for virtual children
-      //::and create a copy with a unique id and a virtual:true flag
-      //TODO: create a map of virtual children ids to real ids for use with actions later
-      const newNestedGoals = createDataTree(pool.nexus.goals);
+      //create a map of goal to id(birth)
+      const goalsMap = new Map();
+      pool.nexus.goals.forEach((item: any) => {
+        goalsMap.set(item.id.birth, item);
+      });
+
+      const virtualChildren: any = [];
+      pool.nexus.goals.forEach((shallowGoal: any) => {
+        /**
+         * if we have nest left, we have virtual children;
+         * so we make a copy of the goal assicoated with them
+         *  and make the needed changes to the data structure
+         */
+        shallowGoal.goal.nexus["nest-left"].map((item: any) => {
+          //fetch the goal assosicated with this id from our map
+          const saGoal = goalsMap.get(item.birth);
+          if (saGoal) {
+            const newId = uuidv4();
+            //update parent id to be reflect virtualisation
+            //update id to avoid duplication and
+            //add an id to refer to the original goal for actions
+            const virtualGoal = {
+              id: { ...saGoal.id, birth: newId },
+              goal: {
+                ...saGoal.goal,
+                isVirtual: true,
+                virtualId: saGoal.id,
+                nexus: {
+                  ...saGoal.goal.nexus,
+                  par: {
+                    ...saGoal.goal.nexus.par,
+                    birth: shallowGoal.id.birth,
+                  },
+                },
+              },
+            };
+            virtualChildren.push(virtualGoal);
+          }
+        });
+      });
+      //create our nested data structure we use for rendering (createDataTree)
+      //merge the current pool's goals with virtual children if any
+      const newNestedGoals = createDataTree([
+        ...pool.nexus.goals,
+        ...virtualChildren,
+      ]);
       return {
         ...poolItem,
         pool: { ...pool, nexus: { goals: newNestedGoals } },
@@ -288,7 +330,6 @@ const Project = memo(
             type="pool"
             pin={pin}
             setParentTrying={setTrying}
-            positionLeft={goalsLength === 0 ? -35 : -30}
           />
         );
       }

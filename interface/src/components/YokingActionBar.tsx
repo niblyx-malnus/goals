@@ -60,9 +60,10 @@ export default function YokingActionBar({}) {
     const goalId = selectionModeYokeData?.goalId;
     const pin = selectionModeYokeData?.poolId;
     const yokeType = selectionModeYokeData?.yokeType;
+    const yokeName = selectionModeYokeData?.yokeName;
     const yokeList = selectedGoals.map((selectedGoalId: any) => {
       return {
-        yoke: "prio-yoke",
+        yoke: yokeName + "-yoke",
         lid: goalId,
         rid: selectedGoalId,
       };

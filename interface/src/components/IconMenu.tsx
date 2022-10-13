@@ -67,24 +67,27 @@ const StyledMenu = styled((props: MenuProps) => (
 
 export default function IconMenu({
   complete = false,
-  id,
+  goalId,
   pin,
   type,
   setParentTrying,
   poolData,
-  positionLeft,
   actionable,
+  isVirtual = false,
+  virtualId,
 }: {
   actionable?: any;
   complete?: boolean;
+  goalId?: GoalId;
+  virtualId?: GoalId;
 
-  id?: GoalId;
   pin?: PinId;
   type: "pool" | "goal";
   setParentTrying: Function;
   poolData?: any;
-  positionLeft: number;
+  isVirtual?: boolean;
 }) {
+  const id = isVirtual ? virtualId : goalId;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const toggleShareDialog = useStore((store: any) => store.toggleShareDialog);
@@ -239,6 +242,7 @@ export default function IconMenu({
       goalId: id,
       poolId: pin,
       yokeType: "prioritize",
+      yokeName: "prio",
     });
   };
   const handlePrecede = () => {
@@ -247,6 +251,16 @@ export default function IconMenu({
       goalId: id,
       poolId: pin,
       yokeType: "precede",
+      yokeName: "prec",
+    });
+  };
+  const handleNest = () => {
+    handleClose();
+    toggleSelectionMode(true, {
+      goalId: id,
+      poolId: pin,
+      yokeType: "nest",
+      yokeName: "nest",
     });
   };
 
@@ -338,10 +352,14 @@ export default function IconMenu({
               <CalendarMonthIcon fontSize="small" />
               prioritize
             </MenuItem>
-            {/*  <MenuItem onClick={handlePrecede} disableRipple>
+            <MenuItem onClick={handleNest} disableRipple>
+              <CalendarMonthIcon fontSize="small" />
+              virtually nest
+            </MenuItem>
+            <MenuItem onClick={handlePrecede} disableRipple>
               <CalendarMonthIcon fontSize="small" />
               precede
-            </MenuItem>*/}
+            </MenuItem>
             <MenuItem onClick={deleteGoal} disableRipple>
               <DeleteIcon fontSize="small" />
               delete

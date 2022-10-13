@@ -118,10 +118,11 @@ const TreeItem = memo(
             //TODO: just pass togls entirely to this
             actionable={goal.nexus.actionable}
             complete={goal.nexus.complete}
-            id={idObject}
+            goalId={idObject}
             pin={pin}
             setParentTrying={setTrying}
-            positionLeft={0}
+            isVirtual={goal.isVirtual}
+            virtualId={goal.virtualId} //refers to the original goal(none-virtualised counterpart of this one)
           />
         );
       }
@@ -156,7 +157,7 @@ const TreeItem = memo(
               textDecoration: goal.nexus.complete ? "line-through" : "auto",
             }}
           >
-            {label}
+            {label} {goal.isVirtual && " (virtual)"}
           </Typography>
         </Box>
       );
@@ -185,7 +186,7 @@ const TreeItem = memo(
               textDecoration: goal.nexus.complete ? "line-through" : "auto",
             }}
           >
-            {label}
+            {label} {goal.isVirtual && " (virtual)"}
           </Typography>
         </Box>
       ) : (

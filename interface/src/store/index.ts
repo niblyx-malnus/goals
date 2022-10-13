@@ -13,6 +13,7 @@ type SelectionYokeData = null | {
   goalId: GoalId;
   poolId: PinId;
   yokeType: Yoke;
+  yokeName: string;
 };
 
 interface Store {
