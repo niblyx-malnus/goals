@@ -13,12 +13,17 @@ function NewGoalInput({
   parentId,
   pin,
   under = false,
+  isVirtual = false,
+  virtualParentId,
 }: {
   callback: Function;
   parentId?: GoalId;
   pin: PinId;
   under: boolean;
+  virtualParentId?: GoalId;
+  isVirtual?: boolean;
 }) {
+
   const [value, setValue] = useState<string>("");
   const [trying, setTrying] = useState<boolean>(false);
 
@@ -45,7 +50,11 @@ function NewGoalInput({
     setTrying(true);
 
     try {
-      const result = await api.addGoal(value, pin, parentId);
+      const result = await api.addGoal(
+        value,
+        pin,
+        isVirtual ? virtualParentId : parentId
+      );
       log("addGoal result =>", result);
     } catch (e) {
       toggleSnackBar(true, {

@@ -171,6 +171,7 @@ function newGoalAction(
         }
         return goalItem;
       });
+      log("newGoals", newGoals);
       if (order === "asc") {
         newGoals.push({ goal: newGoal, id: newGoalId });
       } else {
@@ -230,8 +231,8 @@ function handleYoke(pinId: PinId, nexusList: any) {
   const state = useStore.getState();
   const pools = state.pools;
   const setPools = state.setPools;
-  //go through pools select our pool, and update the goals (their nexus) that need to be update 
-  //create a map for ease of interaction 
+  //go through pools select our pool, and update the goals (their nexus) that need to be update
+  //create a map for ease of interaction
   const nexusMap = new Map();
   nexusList.forEach((nex: any) => {
     nexusMap.set(nex.id.birth, nex.goal);

@@ -80,12 +80,12 @@ export default function IconMenu({
   complete?: boolean;
   goalId?: GoalId;
   virtualId?: GoalId;
+  isVirtual?: boolean;
 
   pin?: PinId;
   type: "pool" | "goal";
   setParentTrying: Function;
   poolData?: any;
-  isVirtual?: boolean;
 }) {
   const id = isVirtual ? virtualId : goalId;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

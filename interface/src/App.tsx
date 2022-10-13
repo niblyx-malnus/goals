@@ -104,6 +104,38 @@ function App() {
       });
 
       const virtualChildren: any = [];
+
+      function connect(goal: any, parentId: any) {
+        //recursively build virtual children connections
+        //flushing them out to the flat pool.nexus.goals
+        goal.goal.nexus.kids.forEach((virtualChildId: any) => {
+          const newId = uuidv4();
+          //update parent id to be reflect virtualisation
+          //update id to avoid duplication and
+          //add an id to refer to the original goal for actions
+          const virtualChildGoal = goalsMap.get(virtualChildId.birth);
+
+          const newVirtualChildGoal = {
+            id: { ...virtualChildGoal.id, birth: newId },
+            goal: {
+              ...virtualChildGoal.goal,
+              isVirtual: true,
+              virtualId: virtualChildGoal.id,
+              nexus: {
+                ...virtualChildGoal.goal.nexus,
+                par: {
+                  ...virtualChildGoal.goal.nexus.par,
+                  birth: parentId,
+                },
+              },
+            },
+          };
+          virtualChildren.push(newVirtualChildGoal);
+
+          connect(newVirtualChildGoal, newId);
+        });
+      }
+      log("pool.nexus.goals", pool.nexus.goals);
       pool.nexus.goals.forEach((shallowGoal: any) => {
         /**
          * if we have nest left, we have virtual children;
@@ -113,13 +145,14 @@ function App() {
         shallowGoal.goal.nexus["nest-left"].map((item: any) => {
           //fetch the goal assosicated with this id from our map
           const saGoal = goalsMap.get(item.birth);
+
           if (saGoal) {
-            const newId = uuidv4();
+            const parentId = uuidv4();
             //update parent id to be reflect virtualisation
             //update id to avoid duplication and
             //add an id to refer to the original goal for actions
-            const virtualGoal = {
-              id: { ...saGoal.id, birth: newId },
+            const parentVirtualGoal = {
+              id: { ...saGoal.id, birth: parentId },
               goal: {
                 ...saGoal.goal,
                 isVirtual: true,
@@ -133,7 +166,10 @@ function App() {
                 },
               },
             };
-            virtualChildren.push(virtualGoal);
+            virtualChildren.push(parentVirtualGoal);
+
+            connect(parentVirtualGoal, parentId);
+           log('virtualChildren',(virtualChildren);
           }
         });
       });

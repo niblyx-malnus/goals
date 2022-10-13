@@ -326,6 +326,8 @@ const TreeItem = memo(
               parentId={idObject}
               under={true}
               callback={() => setAddingGoal(false)}
+              isVirtual={goal.isVirtual}
+              virtualParentId={goal.virtualId} //refers to the original goal(none-virtualised counterpart of this one)
             />
           )}
           {children}
