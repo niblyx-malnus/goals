@@ -222,6 +222,31 @@
     goals  (~(del in goals) (snag idx ids))
   ==
 ::
+:: Permanently delete goal and subgoals directly
+++  waste-goal
+  |=  [=id:gol mod=ship]
+  ^-  _this
+  =/  old  this
+  ::
+  :: Must have permissions on this goal to waste it
+  ?>  (check-goal-perm id mod)
+  ::
+  :: Move goal to root
+  =/  mup  (move id ~ owner.p) :: divine intervention (owner)
+  =/  pore  pore.mup
+  =/  ids  ids.mup
+  ::
+  :: Partition subgoals of goal from rest of goals
+  =/  prog  (progeny id)
+  =.  mup  (partition:pore prog mod)
+  =.  pore  pore.mup
+  =.  ids  (~(uni in ids) ids.mup)
+  ::
+  :: Remove goal and subgoals from goals
+  =.  goals.p.pore  (gus-by goals.p.pore ~(tap in prog))
+  ::
+  (emot old [%waste-goal (make-nex ids) id prog]):[pore .]
+::
 :: Move goal and subgoals from main goals to cache
 ++  cache-goal
   |=  [=id:gol mod=ship]
@@ -1146,6 +1171,9 @@
       [%spawn-goal *]
     (spawn-goal:life-cycle [nex id goal]:upd)
     ::
+      [%waste-goal *]
+    (waste-goal:life-cycle [nex id waz]:upd)
+    ::
       [%cache-goal *]
     (cache-goal:life-cycle [nex id cas]:upd)
     ::
@@ -1205,6 +1233,12 @@
       ^-  _this
       =.  goals.p  (~(put by goals.p) id goal)
       (apply-nex nex)
+    ::
+    ++  waste-goal
+      |=  [=nex:gol =id:gol waz=(set id:gol)]
+      ^-  _this
+      =/  pore  (apply-nex nex)
+      pore(goals.p (gus-by goals.p.pore ~(tap in waz)))
     ::
     ++  cache-goal
       |=  [=nex:gol =id:gol cas=(set id:gol)]

@@ -9,6 +9,7 @@ Available pokes for `%goal-store` as nouns and as JSON.
 %renew-pool
 %trash-pool
 %spawn-goal
+%waste-goal
 %cache-goal
 %renew-goal
 %trash-goal
@@ -70,7 +71,8 @@ Make a copy of an existing pool.
     "pin": {
       "owner": "zod",
       "birth": "~2000.1.1"
-    }
+    },
+  "title": "new title"
   }
 }
 ```
@@ -177,6 +179,29 @@ $:  %spawn-goal
     "upid": (null or "id": { "owner": "zod", "birth": "~2000.1.1" },
     "desc": "description of new goal",
     "actionable": true
+  }
+}
+```
+
+## %waste-goal
+### Description
+Permanently delete an active goal directly.
+
+`id` is the id of the goal you want to directly permanently delete.
+
+### Noun
+```
+[%waste-goal =id]
+```
+
+### JSON
+```
+{
+  "waste-goal": {
+    "id": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    }
   }
 }
 ```

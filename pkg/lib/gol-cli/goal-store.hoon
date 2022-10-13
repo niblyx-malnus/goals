@@ -31,6 +31,9 @@
           [%spawn-goal *]
         (~(put by index.store) id.upd pin)
         ::
+          [%waste-goal *]
+        (gus-by-index ~(tap in waz.upd))
+        ::
           [%trash-goal *]
         =/  pool  (~(got by pools.store) (~(got by index.store) id.upd))
         =/  keys  ~(key by (~(got by cache.pool) id.upd))
@@ -75,6 +78,15 @@
   =/  =id:gol  (unique-id:gols [our now])
   =/  pore  (apex:pl pool)
   =.  pore  (spawn-goal-fixns:pore id upid desc actionable mod)
+  (get-away-cud pin mod pore)
+::
+++  waste-goal
+  |=  [=id:gol mod=ship]
+  ^-  away-cud:goal-store
+  =/  pin  (~(got by index.store) id)
+  =/  pool  (~(got by pools.store) pin)
+  =/  pore  (apex:pl pool)
+  =.  pore  (waste-goal:pore id mod)
   (get-away-cud pin mod pore)
 ::
 ++  cache-goal
