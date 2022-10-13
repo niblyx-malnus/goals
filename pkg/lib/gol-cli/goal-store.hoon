@@ -80,15 +80,6 @@
   =.  pore  (spawn-goal-fixns:pore id upid desc actionable mod)
   (get-away-cud pin mod pore)
 ::
-++  waste-goal
-  |=  [=id:gol mod=ship]
-  ^-  away-cud:goal-store
-  =/  pin  (~(got by index.store) id)
-  =/  pool  (~(got by pools.store) pin)
-  =/  pore  (apex:pl pool)
-  =.  pore  (waste-goal:pore id mod)
-  (get-away-cud pin mod pore)
-::
 ++  cache-goal
   |=  [=id:gol mod=ship]
   ^-  away-cud:goal-store
