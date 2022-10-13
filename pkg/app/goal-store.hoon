@@ -124,16 +124,6 @@
           actionable.action
         ==
           ::
-          :: [%waste-goal =id]
-          %waste-goal
-        ?.  =(our.bowl owner.id.action)
-          =*  poke-other  ~(poke-other pass:hc /away/waste-goal)
-          :_  state
-          [(poke-other owner.id.action goal-action+!>(action))]~
-        =/  pool  (~(got by pools.store) (~(got by index) id.action))
-        %+  convert-away-cud:hc  ~
-        (waste-goal:gs id.action our.bowl)
-          ::
           :: [%cache-goal =id]
           %cache-goal
         ?.  =(our.bowl owner.id.action)

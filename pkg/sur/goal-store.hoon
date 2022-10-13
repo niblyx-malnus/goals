@@ -8,7 +8,6 @@
       [%renew-pool =pin]
       [%trash-pool =pin]
       [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
-      [%waste-goal =id]
       [%cache-goal =id]
       [%renew-goal =id]
       [%trash-goal =id]

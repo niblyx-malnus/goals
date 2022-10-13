@@ -19,7 +19,6 @@
           desc+so
           actionable+bo
       ==
-      [%waste-goal (ot ~[id+dejs-id])]
       [%cache-goal (ot ~[id+dejs-id])]
       [%renew-goal (ot ~[id+dejs-id])]
       [%trash-goal (ot ~[id+dejs-id])]

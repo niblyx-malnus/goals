@@ -225,11 +225,7 @@
 :: Permanently delete goal and subgoals directly
 ++  waste-goal
   |=  [=id:gol mod=ship]
-  ^-  _this
-  =/  old  this
-  ::
-  :: Must have permissions on this goal to waste it
-  ?>  (check-goal-perm id mod)
+  ^-  [ids=(set id:gol) =id:gol waz=goals:gol pore=_this]
   ::
   :: Move goal to root
   =/  mup  (move id ~ owner.p) :: divine intervention (owner)
@@ -242,10 +238,13 @@
   =.  pore  pore.mup
   =.  ids  (~(uni in ids) ids.mup)
   ::
+  :: Get deleted goals
+  =/  waz  (gat-by goals.p.pore ~(tap in prog))
+  ::
   :: Remove goal and subgoals from goals
   =.  goals.p.pore  (gus-by goals.p.pore ~(tap in prog))
   ::
-  (emot old [%waste-goal (make-nex ids) id prog]):[pore .]
+  [ids id waz pore]
 ::
 :: Move goal and subgoals from main goals to cache
 ++  cache-goal
@@ -256,27 +255,14 @@
   :: Must have permissions on this goal to cache it
   ?>  (check-goal-perm id mod)
   ::
-  :: Move goal to root
-  =/  mup  (move id ~ owner.p) :: divine intervention (owner)
-  =/  pore  pore.mup
-  =/  ids  ids.mup
-  ::
-  :: Partition subgoals of goal from rest of goals
-  =/  prog  (progeny id)
-  =.  mup  (partition:pore prog mod)
-  =.  pore  pore.mup
-  =.  ids  (~(uni in ids) ids.mup)
+  :: Partition and remove
+  =+  (waste-goal id mod) :: exposes ids, id, waz, and pore
   ::
   :: Add goal and subgoals to cache
-  =.  cache.p.pore
-    %+  ~(put in cache.p.pore)
-      id
-    (gat-by goals.p.pore ~(tap in prog))
+  =.  cache.p.pore  (~(put in cache.p.pore) id waz)
   ::
-  :: Remove goal and subgoals from goals
-  =.  goals.p.pore  (gus-by goals.p.pore ~(tap in prog))
-  ::
-  (emot old [%cache-goal (make-nex ids) id prog]):[pore .]
+  :: Emit update
+  (emot old [%cache-goal (make-nex ids) id ~(key by waz)]):[pore .]
 ::
 :: Restore goal from cache to main goals
 ++  renew-goal
@@ -299,8 +285,19 @@
   ::
   :: Must have admin permissions to permanently delete this goal
   ?>  (check-pool-perm mod)
+  ::
+  ?:  (~(has by goals.p) id)
+    ::
+    :: Delete directly from goals
+    =+  (waste-goal id mod) :: exposes ids, id, waz, and pore
+    ::
+    :: Emit update
+    (emot old [%waste-goal (make-nex ids) id ~(key by waz)]):[pore .]
+  :: 
+  :: Delete from cache
   =.  cache.p  (~(del by cache.p) id)
   ::
+  :: Emit update
   (emot old [%trash-goal id])
 ::
 ++  got-edge
