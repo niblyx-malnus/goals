@@ -169,7 +169,7 @@ function App() {
             virtualChildren.push(parentVirtualGoal);
 
             connect(parentVirtualGoal, parentId);
-           log('virtualChildren',(virtualChildren);
+           log('virtualChildren',virtualChildren);
           }
         });
       });
