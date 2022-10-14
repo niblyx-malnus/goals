@@ -52,22 +52,52 @@ export default function YokingActionBar({}) {
   };
   const yoke = async () => {
     setTrying(true);
-    //TODO: finish generalising this for use with all the other yokes
-    //TODO: include rending
-    //for now, we make an array of yokes over selectedGoals
-    //list where lid is goalId and rid is in item of selectedGoals
 
     const goalId = selectionModeYokeData?.goalId;
     const pin = selectionModeYokeData?.poolId;
     const yokeType = selectionModeYokeData?.yokeType;
     const yokeName = selectionModeYokeData?.yokeName;
-    const yokeList = selectedGoals.map((selectedGoalId: any) => {
-      return {
-        yoke: yokeName + "-yoke",
-        lid: goalId,
-        rid: selectedGoalId,
-      };
+
+    const startingConnectionsMap = new Map();
+    selectionModeYokeData?.startingConnections.map((item: any) => {
+      startingConnectionsMap.set(item.id, item);
     });
+    //create our yokes (yoke(create-maintain)-rend(remove))
+    const yokeList: any = [];
+
+    //intersections between selected goals and  starting connections  (yokes)
+    selectedGoals.forEach((id: any) => {
+      if (startingConnectionsMap.has(id.birth)) {
+        yokeList.push({
+          yoke: yokeName + "-yoke",
+          lid: goalId,
+          rid: id,
+        });
+      }
+    });
+    //goals that exists in starting connections but doesn't exist in selecedGoals (rends)
+    startingConnectionsMap.forEach((id: any) => {
+      if (!selectedGoals.has(id.birth)) {
+        yokeList.push({
+          yoke: yokeName + "-rend",
+          lid: goalId,
+          rid: id,
+        });
+      }
+    });
+    //goals that doesn't exist in starting connections but got added to selected goals (yokes)
+    selectedGoals.forEach((id: any) => {
+      if (!startingConnectionsMap.has(id.birth)) {
+        yokeList.push({
+          yoke: yokeName + "-yoke",
+          lid: goalId,
+          rid: id,
+        });
+      }
+    });
+
+    log("yokeList", yokeList);
+
     try {
       const result = await api.yoke(pin, yokeList);
       toggleSnackBar(true, {

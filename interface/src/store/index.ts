@@ -1,5 +1,6 @@
 import { CreateCssVarsProviderResult } from "@mui/system";
 import create from "zustand";
+import { log } from "../helpers";
 import {
   FilterGoals,
   GoalId,
@@ -14,6 +15,7 @@ type SelectionYokeData = null | {
   poolId: PinId;
   yokeType: Yoke;
   yokeName: string;
+  startingConnections: any;
 };
 
 interface Store {
@@ -71,9 +73,9 @@ interface Store {
     newStatus: boolean,
     newSelectionModeYokeData: SelectionYokeData
   ) => void;
-  selectedGoalsId: any; //list of goal's ids
-  selectedGoals: any; //list of goals
-  updateSelectedGoal: (newGoal: any) => void;
+  selectedGoals: Map<string, GoalId>; //map of goal id to goal (selected ones)
+  setSelectedGoals: (newSelectedGoals: any) => void;
+  updateSelectedGoal: (newGoal: any, status: boolean) => void;
   resetSelectedGoals: () => void;
 }
 
@@ -176,30 +178,33 @@ const useStore = create<Store>((set, get) => ({
       selectionMode: newStatus,
       selectionModeYokeData: newSelectionModeYokeData,
     })),
-  selectedGoals: [],
-  selectedGoalsId: [],
+  selectedGoals: new Map(),
   resetSelectedGoals: () =>
     set(() => ({
-      selectedGoals: [],
-      selectedGoalsId: [],
+      selectedGoals: new Map(),
     })),
-  updateSelectedGoal: (newGoalId: any) => {
-    //manage list of selected goals (while yoking/moving)
-    const yokeType: any = get().selectionModeYokeData?.yokeType;
-    let currentSelectedGoals: any = get().selectedGoals;
-    //if the current yoke type is move we don't manage a list, just a single item
-    let newSelectedGoals: any;
-    if (yokeType === "move") {
-      newSelectedGoals = [newGoalId];
-    } else {
-      newSelectedGoals = [...currentSelectedGoals, newGoalId];
-    }
-    const newSelectedGoalsId = newSelectedGoals.map((id: any) => {
-      return id.birth;
+  setSelectedGoals: (newSelectedGoals: any) => {
+    const newSelectedGoalsMap = new Map();
+    newSelectedGoals.forEach((id: any) => {
+      newSelectedGoalsMap.set(id.birth, id);
     });
     set(() => ({
-      selectedGoals: newSelectedGoals,
-      selectedGoalsId: newSelectedGoalsId,
+      selectedGoals: newSelectedGoalsMap,
+    }));
+  },
+  updateSelectedGoal: (newGoalId: any, status: boolean) => {
+    //TODO: handle move
+    //manage list of selected goals (while yoking/moving)
+    let currentSelectedGoals: any = new Map(get().selectedGoals);
+    //status: true => add a goal
+    //status: false => remove a goal
+    if (status) {
+      currentSelectedGoals.set(newGoalId.birth, newGoalId);
+    } else {
+      currentSelectedGoals.delete(newGoalId.birth);
+    }
+    set(() => ({
+      selectedGoals: currentSelectedGoals,
     }));
   },
 }));

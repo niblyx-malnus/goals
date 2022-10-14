@@ -68,7 +68,6 @@ const TreeItem = memo(
     const [trying, setTrying] = useState<boolean>(false);
     const collapseAll = useStore((store) => store.collapseAll);
     const selectedGoals = useStore((store) => store.selectedGoals);
-    const selectedGoalsId = useStore((store) => store.selectedGoalsId);
     const updateSelectedGoal = useStore((store) => store.updateSelectedGoal);
 
     const disableActions = trying || editingTitle || addingGoal; // || disabled; TODO: find a better way to do disabled (overlay?)
@@ -76,9 +75,10 @@ const TreeItem = memo(
       //everytime collapse all changes, we force isOpen value to comply
       toggleItemOpen(collapseAll.status);
     }, [collapseAll.count]);
+    
     useEffect(() => {
       //check if this goal is in the selected goals list
-      if (selectedGoalsId.includes(idObject.birth)) {
+      if (selectedGoals.has(idObject.birth)) {
         setSelected(true);
       } else {
         setSelected(false);
@@ -120,6 +120,7 @@ const TreeItem = memo(
             complete={goal.nexus.complete}
             goalId={idObject}
             pin={pin}
+            currentGoal={goal}
             setParentTrying={setTrying}
             isVirtual={goal.isVirtual}
             virtualId={goal.virtualId} //refers to the original goal(none-virtualised counterpart of this one)
@@ -173,7 +174,8 @@ const TreeItem = memo(
             borderRadius: 1,
           }}
           onClick={() => {
-            inSelectionMode && !yoking && updateSelectedGoal(idObject);
+          
+              updateSelectedGoal(idObject, !selected);
           }}
         >
           <Typography

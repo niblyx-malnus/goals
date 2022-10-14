@@ -75,6 +75,7 @@ export default function IconMenu({
   actionable,
   isVirtual = false,
   virtualId,
+  currentGoal,
 }: {
   actionable?: any;
   complete?: boolean;
@@ -86,6 +87,7 @@ export default function IconMenu({
   type: "pool" | "goal";
   setParentTrying: Function;
   poolData?: any;
+  currentGoal?: any;
 }) {
   const id = isVirtual ? virtualId : goalId;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -103,6 +105,7 @@ export default function IconMenu({
   const toggleSelectionMode = useStore(
     (store: any) => store.toggleSelectionMode
   );
+  const setSelectedGoals = useStore((store: any) => store.setSelectedGoals);
   const roleMap = useStore((store: any) => store.roleMap);
   const role = roleMap.get(pin?.birth);
 
@@ -238,27 +241,38 @@ export default function IconMenu({
   };
   const handlePriortize = () => {
     handleClose();
+    const startingConnections = currentGoal.nexus["prio-ryte"];
+
     toggleSelectionMode(true, {
       goalId: id,
       poolId: pin,
       yokeType: "prioritize",
+      startingConnections: startingConnections,
+
       yokeName: "prio",
     });
   };
   const handlePrecede = () => {
     handleClose();
+    const startingConnections = currentGoal.nexus["prec-ryte"];
+
     toggleSelectionMode(true, {
       goalId: id,
       poolId: pin,
       yokeType: "precede",
+      startingConnections: startingConnections,
       yokeName: "prec",
     });
   };
   const handleNest = () => {
     handleClose();
+    //we find all [yoke]-ryte connection here and update selectedGoals
+    const startingConnections = currentGoal.nexus["nest-ryte"];
+    setSelectedGoals(startingConnections);
     toggleSelectionMode(true, {
       goalId: id,
       poolId: pin,
+      startingConnections: startingConnections,
       yokeType: "nest",
       yokeName: "nest",
     });

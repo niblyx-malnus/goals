@@ -108,32 +108,34 @@ function App() {
       function connect(goal: any, parentId: any) {
         //recursively build virtual children connections
         //flushing them out to the flat pool.nexus.goals
-        goal.goal.nexus.kids.forEach((virtualChildId: any) => {
-          const newId = uuidv4();
-          //update parent id to be reflect virtualisation
-          //update id to avoid duplication and
-          //add an id to refer to the original goal for actions
-          const virtualChildGoal = goalsMap.get(virtualChildId.birth);
-          log("virtualChildGoal", virtualChildGoal.goal.hitch);
-          const newVirtualChildGoal = {
-            id: { ...virtualChildGoal.id, birth: newId },
-            goal: {
-              ...virtualChildGoal.goal,
-              isVirtual: true,
-              virtualId: virtualChildGoal.id,
-              nexus: {
-                ...virtualChildGoal.goal.nexus,
-                par: {
-                  ...virtualChildGoal.goal.nexus.par,
-                  birth: parentId,
+        [...goal.goal.nexus.kids, ...goal.goal.nexus["nest-left"]].forEach(
+          (virtualChildId: any) => {
+            const newId = uuidv4();
+            //update parent id to be reflect virtualisation
+            //update id to avoid duplication and
+            //add an id to refer to the original goal for actions
+            const virtualChildGoal = goalsMap.get(virtualChildId.birth);
+            log("virtualChildGoal", virtualChildGoal.goal.hitch);
+            const newVirtualChildGoal = {
+              id: { ...virtualChildGoal.id, birth: newId },
+              goal: {
+                ...virtualChildGoal.goal,
+                isVirtual: true,
+                virtualId: virtualChildGoal.id,
+                nexus: {
+                  ...virtualChildGoal.goal.nexus,
+                  par: {
+                    ...virtualChildGoal.goal.nexus.par,
+                    birth: parentId,
+                  },
                 },
               },
-            },
-          };
-          virtualChildren.push(newVirtualChildGoal);
+            };
+            virtualChildren.push(newVirtualChildGoal);
 
-          connect(newVirtualChildGoal, newId);
-        });
+            connect(newVirtualChildGoal, newId);
+          }
+        );
       }
       log("pool.nexus.goals", pool.nexus.goals);
       pool.nexus.goals.forEach((shallowGoal: any) => {
