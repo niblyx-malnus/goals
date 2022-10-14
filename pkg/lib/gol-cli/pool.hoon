@@ -768,30 +768,111 @@
     goals.p  (~(put by goals.p) id.eid (update-edge eid edge))
   ==
 ::
-++  update-neis
-  |=  [lid=id:gol rid=id:gol =yoke-tag:gol]
+++  fix-neighbors
+  |=  [lid=id:gol rid=id:gol]
   ^-  _this
+  |^
   =/  l-goal  (~(got by goals.p) lid)
   =/  r-goal  (~(got by goals.p) rid)
-  =.  l-goal  
-    ?+  yoke-tag  l-goal
-      %prio-rend  l-goal(prio-ryte (~(del in prio-ryte.l-goal) rid))
-      %prio-yoke  l-goal(prio-ryte (~(put in prio-ryte.l-goal) rid))
-      %prec-rend  l-goal(prec-ryte (~(del in prec-ryte.l-goal) rid))
-      %prec-yoke  l-goal(prec-ryte (~(put in prec-ryte.l-goal) rid))
-      %nest-rend  l-goal(nest-ryte (~(del in nest-ryte.l-goal) rid))
-      %nest-yoke  l-goal(nest-ryte (~(put in nest-ryte.l-goal) rid))
-    ==
-  =.  r-goal  
-    ?+  yoke-tag  r-goal
-      %prio-rend  r-goal(prio-left (~(del in prio-left.r-goal) lid))
-      %prio-yoke  r-goal(prio-left (~(put in prio-left.r-goal) lid))
-      %prec-rend  r-goal(prec-left (~(del in prec-left.r-goal) lid))
-      %prec-yoke  r-goal(prec-left (~(put in prec-left.r-goal) lid))
-      %nest-rend  r-goal(nest-left (~(del in nest-left.r-goal) lid))
-      %nest-yoke  r-goal(nest-left (~(put in nest-left.r-goal) lid))
-    ==
+  =.  l-goal  (fix-neighbors l-goal)
+  =.  r-goal  (fix-neighbors r-goal)
   this(goals.p (~(gas by goals.p) ~[[lid l-goal] [rid r-goal]]))
+  ::
+  ++  fix-neighbors
+    |=  =goal:gol
+    ^-  goal:gol
+    |^
+    =.  prio-left.goal  prio-left
+    =.  prio-ryte.goal  prio-ryte
+    =.  prec-left.goal  prec-left
+    =.  prec-ryte.goal  prec-ryte
+    =.  nest-left.goal  nest-left
+    =.  nest-ryte.goal  nest-ryte
+    goal
+    ::
+    ++  exclude-par
+      |=  =(set id:gol)
+      ^-  (^set id:gol)
+      ?~  par.goal
+        set
+      (~(del in set) u.par.goal)
+    ::
+    ++  exclude-kids
+      |=  =(set id:gol)
+      ^-  (^set id:gol)
+      (~(dif in set) kids.goal)
+    ::  
+    ++  prio-left
+      ^-  (set id:gol)
+      %-  exclude-par
+      %-  ~(gas in *(set id:gol))
+      %+  murn
+        ~(tap in inflow.kickoff.goal)
+      |=  =eid:gol
+      ?-  -.eid
+        %d  ~
+        %k  (some id.eid)
+      ==
+    ::  
+    ++  prio-ryte
+      ^-  (set id:gol)
+      %-  exclude-kids
+      %-  ~(gas in *(set id:gol))
+      %+  murn
+        ~(tap in outflow.kickoff.goal)
+      |=  =eid:gol
+      ?-  -.eid
+        %d  ~
+        %k  (some id.eid)
+      ==
+    ::  
+    ++  prec-left
+      ^-  (set id:gol)
+      %-  ~(gas in *(set id:gol))
+      %+  murn
+        ~(tap in inflow.kickoff.goal)
+      |=  =eid:gol
+      ?-  -.eid
+        %k  ~
+        %d  (some id.eid)
+      ==
+    ::  
+    ++  prec-ryte
+      ^-  (set id:gol)
+      %-  ~(gas in *(set id:gol))
+      %+  murn
+        ~(tap in outflow.deadline.goal)
+      |=  =eid:gol
+      ?-  -.eid
+        %d  ~
+        %k  (some id.eid)
+      ==
+    ::  
+    ++  nest-left
+      ^-  (set id:gol)
+      %-  exclude-kids
+      %-  ~(gas in *(set id:gol))
+      %+  murn
+        ~(tap in inflow.deadline.goal)
+      |=  =eid:gol
+      ?-  -.eid
+        %k  ~
+        %d  (some id.eid)
+      ==
+    ::  
+    ++  nest-ryte
+      ^-  (set id:gol)
+      %-  exclude-par
+      %-  ~(gas in *(set id:gol))
+      %+  murn
+        ~(tap in outflow.deadline.goal)
+      |=  =eid:gol
+      ?-  -.eid
+        %k  ~
+        %d  (some id.eid)
+      ==
+    --
+  --
 ::
 ++  dag-yoke
   |=  [e1=eid:gol e2=eid:gol mod=ship]
@@ -891,7 +972,7 @@
       =/  myp  (dag-rend:pore.mup [%k rid] [%k lid] mod)
       [(~(uni in ids.mup) ids.myp) pore.myp]
     ==
-  [ids.mup (update-neis:pore.mup lid rid -.yok)]
+  [ids.mup (fix-neighbors:pore.mup lid rid)]
 ::
 ++  yoke-sequence
   |=  [yoks=(list exposed-yoke:gol) mod=ship]
