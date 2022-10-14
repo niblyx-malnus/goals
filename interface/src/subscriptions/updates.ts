@@ -38,7 +38,7 @@ const updateHandler = (update: any) => {
         newPoolAction({ pool, pin: hed.pin });
         break;
       }
-      case "trash-goal": {
+      case "waste-goal": {
         let { del }: any = update.tel[actionName];
         const hed: any = update.hed;
 

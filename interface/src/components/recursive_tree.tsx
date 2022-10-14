@@ -204,6 +204,8 @@ const TreeItem = memo(
             pin={pin}
             id={idObject}
             setParentTrying={setTrying}
+            isVirtual={goal.isVirtual}
+            virtualGoalId={goal.virtualId} //refers to the original goal(none-virtualised counterpart of this one)
           />
         </div>
       );

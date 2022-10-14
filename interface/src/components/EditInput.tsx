@@ -14,6 +14,8 @@ function EditInput({
   pin,
   id,
   type,
+  isVirtual = false,
+  virtualGoalId,
 }: {
   title: string;
   onDone: Function;
@@ -21,6 +23,8 @@ function EditInput({
   pin?: PinId;
   id?: GoalId;
   type: "pool" | "goal";
+  virtualGoalId?: GoalId;
+  isVirtual?: boolean;
 }) {
   const [value, setValue] = useState<string>("");
   const [metaVars, setMetaVars] = useState<any>({
@@ -81,7 +85,10 @@ function EditInput({
     setParentTrying(true);
     setTrying(true);
     try {
-      const result = await api.editGoalDesc(id, value);
+      const result = await api.editGoalDesc(
+        isVirtual ? virtualGoalId : id,
+        value
+      );
       log("editGoalDesc result => ", result);
     } catch (e) {
       toggleSnackBar(true, {
@@ -129,7 +136,7 @@ function EditInput({
     <InputBase
       sx={{
         flex: 1,
-       display: "inline-block",
+        display: "inline-block",
         minWidth: metaVars.inputMinWidth,
         width: "100%",
         padding: 0.2,

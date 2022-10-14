@@ -147,31 +147,35 @@ function newGoalAction(
   newGoalId: GoalId,
   pinId: PinId,
   newGoal: any,
-  nexus: any = null
+  nexusList: any = null
 ) {
   const state = useStore.getState();
   const pools = state.pools;
   const order = state.order;
   const setPools = state.setPools;
-  //select project using pinId and then add the goal to the goal list
-  //if nexus(add-under(nesting)) is provided, we find the goal provided in the nexus and update it with the new data
-
+  //select project using pinId and then add the goal to the goal list, we also update all the goal's in the given nexus list
+  const nexusMap = new Map();
+  nexusList.forEach((nex: any) => {
+    nexusMap.set(nex.id.birth, nex.goal);
+  });
   const newPools = pools.map((poolItem: any, poolIndex: number) => {
     const { pin } = poolItem;
     if (pin.birth === pinId.birth) {
       const newGoals = poolItem.pool.nexus.goals.map((goalItem: any) => {
-        if (nexus?.length > 0 && nexus[0].id.birth === goalItem.id.birth) {
+        if (nexusMap.has(goalItem.id.birth)) {
           return {
             ...goalItem,
             goal: {
               ...goalItem.goal,
-              ...nexus.goal,
+              nexus: {
+                ...goalItem.goal.nexus,
+                ...nexusMap.get(goalItem.id.birth),
+              },
             },
           };
         }
         return goalItem;
       });
-      log("newGoals", newGoals);
       if (order === "asc") {
         newGoals.push({ goal: newGoal, id: newGoalId });
       } else {

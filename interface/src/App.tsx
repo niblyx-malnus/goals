@@ -54,7 +54,7 @@ declare const window: Window &
 //TODO: add pals integration
 //TODO: add pals integration(easy)
 //TODO: handle sub kick/error
-
+//TODO: order the virtual children
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -102,7 +102,7 @@ function App() {
       pool.nexus.goals.forEach((item: any) => {
         goalsMap.set(item.id.birth, item);
       });
-
+      log("goalsMap", goalsMap);
       const virtualChildren: any = [];
 
       function connect(goal: any, parentId: any) {
@@ -114,7 +114,7 @@ function App() {
           //update id to avoid duplication and
           //add an id to refer to the original goal for actions
           const virtualChildGoal = goalsMap.get(virtualChildId.birth);
-
+          log("virtualChildGoal", virtualChildGoal.goal.hitch);
           const newVirtualChildGoal = {
             id: { ...virtualChildGoal.id, birth: newId },
             goal: {
@@ -145,7 +145,7 @@ function App() {
         shallowGoal.goal.nexus["nest-left"].map((item: any) => {
           //fetch the goal assosicated with this id from our map
           const saGoal = goalsMap.get(item.birth);
-
+          log("saGoal", saGoal.goal);
           if (saGoal) {
             const parentId = uuidv4();
             //update parent id to be reflect virtualisation
@@ -169,7 +169,7 @@ function App() {
             virtualChildren.push(parentVirtualGoal);
 
             connect(parentVirtualGoal, parentId);
-           log('virtualChildren',virtualChildren);
+            log("virtualChildren", virtualChildren);
           }
         });
       });
