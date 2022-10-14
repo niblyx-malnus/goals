@@ -29,10 +29,13 @@ export default function YokingActionBar({}) {
   //TODO: call this component something else?
   const moveGoal = async () => {
     setTrying(true);
-    const targetGoalId = selectedGoals[0];
-    const goalId = selectionModeYokeData?.goalId;
-    const pin = selectionModeYokeData?.poolId;
+
     try {
+      const targetGoalId = [...selectedGoals.values()][0];
+    
+      
+      const goalId = selectionModeYokeData?.goalId;
+      const pin = selectionModeYokeData?.poolId;
       const result = await api.moveGoal(pin, goalId, targetGoalId);
       toggleSnackBar(true, {
         message: "successfully moved goal",
