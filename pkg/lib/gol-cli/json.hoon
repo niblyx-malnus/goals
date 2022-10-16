@@ -191,6 +191,10 @@
         ::
         %spawn-pool  (frond %pool (enjs-pool pool.upd))
         ::
+        %cache-pool  (frond %pin (enjs-pin pin.upd))
+        ::
+        %renew-pool  (frond %pin (enjs-pin pin.upd))
+        ::
         %trash-pool  ~
         ::
           %pool-perms
@@ -447,6 +451,25 @@
       [%kids a+(turn ~(tap in kids.nexus) enjs-id)]
       [%kickoff (enjs-edge kickoff.nexus)]
       [%deadline (enjs-edge deadline.nexus)]
+      [%complete b+complete.nexus]
+      [%actionable b+actionable.nexus]
+      [%chief (ship chief.nexus)]
+      [%spawn a+(turn ~(tap in spawn.nexus) ship)]
+      ::
+      :-  %stock  :-  %a
+      %+  turn  stock.nexus
+      |=([=id chief=@p] (pairs ~[[%id (enjs-id id)] [%chief (ship chief)]]))
+      ::
+      :-  %ranks  :-  %a
+      %+  turn  ~(tap by ranks.nexus)
+      |=([chip=@p =id] (pairs ~[[%ship (ship chip)] [%id (enjs-id id)]]))
+      ::
+      [%prio-left a+(turn ~(tap in prio-left.nexus) enjs-id)]
+      [%prio-ryte a+(turn ~(tap in prio-ryte.nexus) enjs-id)]
+      [%prec-left a+(turn ~(tap in prec-left.nexus) enjs-id)]
+      [%prec-ryte a+(turn ~(tap in prec-ryte.nexus) enjs-id)]
+      [%nest-left a+(turn ~(tap in nest-left.nexus) enjs-id)]
+      [%nest-ryte a+(turn ~(tap in nest-ryte.nexus) enjs-id)]
   ==
 ::
 ++  enjs-goal
@@ -460,33 +483,7 @@
           [%birth (numb (unm:chrono:userlib birth.goal))]
           [%author (ship author.goal)]
       ==
-      :-  %nexus
-      %-  pairs
-      :~  [%par ?~(par.goal ~ (enjs-id u.par.goal))]
-          [%kids a+(turn ~(tap in kids.goal) enjs-id)]
-          [%kickoff (enjs-edge kickoff.goal)]
-          [%deadline (enjs-edge deadline.goal)]
-          [%complete b+complete.goal]
-          [%actionable b+actionable.goal]
-          [%chief (ship chief.goal)]
-          [%spawn a+(turn ~(tap in spawn.goal) ship)]
-          ::
-          :-  %stock  :-  %a
-          %+  turn  stock.goal
-          |=([=id chief=@p] (pairs ~[[%id (enjs-id id)] [%chief (ship chief)]]))
-          ::
-          :-  %ranks  :-  %a
-          %+  turn  ~(tap by ranks.goal)
-          |=([chip=@p =id] (pairs ~[[%ship (ship chip)] [%id (enjs-id id)]]))
-          ::
-          [%prio-left a+(turn ~(tap in prio-left.goal) enjs-id)]
-          [%prio-ryte a+(turn ~(tap in prio-ryte.goal) enjs-id)]
-          [%prec-left a+(turn ~(tap in prec-left.goal) enjs-id)]
-          [%prec-ryte a+(turn ~(tap in prec-ryte.goal) enjs-id)]
-          [%nest-left a+(turn ~(tap in nest-left.goal) enjs-id)]
-          [%nest-ryte a+(turn ~(tap in nest-ryte.goal) enjs-id)]
-
-      ==
+      [%nexus (enjs-goal-nexus nexus:`ngoal`goal)]
       :-  %hitch
       %-  pairs
       :~  [%desc s+desc.goal]
