@@ -206,7 +206,7 @@
     idx  +(idx)
     goals
       =/  id  (snag idx ids)
-      (~(put in goals) id (~(got by ^goals) id))
+      (~(put by goals) id (~(got by ^goals) id))
   ==
 ::
 :: Remove all the goal objects associated with ids from goals
@@ -219,7 +219,7 @@
     goals
   %=  $
     idx  +(idx)
-    goals  (~(del in goals) (snag idx ids))
+    goals  (~(del by goals) (snag idx ids))
   ==
 ::
 :: Permanently delete goal and subgoals directly
