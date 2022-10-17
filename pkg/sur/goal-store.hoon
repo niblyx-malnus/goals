@@ -1,4 +1,4 @@
-/-  *goal
+/-  *goal, *group
 |%
 ::
 +$  action
@@ -73,6 +73,7 @@
 :: ::
 +$  peek
   $%  [%initial =store]
+      [%groups =groups]
       [%pool-keys keys=(set pin)]
       [%all-goal-keys keys=(set id)]
       [%harvest harvest=(list id)]

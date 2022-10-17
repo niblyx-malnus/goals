@@ -1,3 +1,4 @@
+/-  *group
 /+  *gol-cli-help
 |%
 ::
@@ -143,6 +144,7 @@
     $:  =index
         =pools
         cache=pools
+        =groups
     ==
   --
 ::
@@ -687,6 +689,7 @@
       directory.store.state-3
       (pools-3-to-4 pools.store.state-3)
       *pools
+      *groups
   ==
 ::
 ++  convert-2-to-3

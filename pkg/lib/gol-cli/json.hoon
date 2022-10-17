@@ -1,5 +1,5 @@
 /-  *goal, *goal-store
-/+  *gol-cli-help
+/+  *gol-cli-help, group-store
 |%
 ++  dejs-action
   =,  dejs:format
@@ -268,6 +268,9 @@
     %-  pairs
     :~  [%store (enjs-store store.pyk)]
     ==
+    ::
+    %groups  (frond %groups (initial:enjs:group-store [%initial groups.pyk]))
+    ::
       %pool-keys
     %+  frond
       %pool-keys

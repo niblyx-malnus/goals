@@ -151,6 +151,7 @@
       %-  (slog '%gol-cli: Got kick from %goal-store, resubscribing...' ~)
       :_  this
       [%pass wire %agent [src.bowl %goal-store] %watch wire]~
+      ::
         %fact
       ?+    p.cage.sign  (on-agent:def wire sign)
           %goal-home-update

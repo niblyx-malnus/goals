@@ -1,7 +1,7 @@
-/-  gol=goal, goal-store
+/-  gol=goal, goal-store, group-store
 /+  dbug, default-agent, verb, agentio,
     gol-cli-goals, gol-cli-goal-store, pl=gol-cli-pool,
-    gol-cli-etch
+    gol-cli-etch, group-update
 |%
 +$  versioned-state
   $%  state-0
@@ -25,17 +25,23 @@
 ^-  agent:gall
 =<
 |_  =bowl:gall
-+*  this  .
++*  this    .
     def   ~(. (default-agent this %.n) bowl)
     io    ~(. agentio bowl)
     hc    ~(. +> bowl)
     gs    ~(. gol-cli-goal-store store)
     etch  ~(. gol-cli-etch store)
-    index  index.store
-    pools  pools.store
-    cache  cache.store
-++  on-init   `this
+    index   index.store
+    pools   pools.store
+    cache   cache.store
+    groups  groups.store
+++  on-init   
+  ^-  (quip card _this)
+  :_  this
+  [(~(watch-our pass:io /groups) %group-store /groups)]~
+::
 ++  on-save   !>(state)
+::
 ++  on-load
   |=  =old=vase
   ^-  (quip card _this)
@@ -43,7 +49,8 @@
   |-
   ?-    -.old
       %4
-    `this(state old)
+    :_  this(state old)
+    [(~(watch-our pass:io /groups) %group-store /groups)]~
       %3
     $(old (convert-3-to-4:gol old))
       %2
@@ -341,6 +348,9 @@
       [%x %initial ~]
     ``goal-peek+!>(initial+store)
     ::
+      [%x %groups ~]
+    ``goal-peek+!>(groups+groups.store)
+    ::
       [%x %pool-keys ~]
     ``goal-peek+!>(pool-keys+~(key by pools))
     ::
@@ -458,6 +468,30 @@
           ==
         :_  this(store (etch:etch pin ~[+.update]))
         ~[(fact:io goal-home-update+!>([[pin mod.update] +.update]) ~[/goals])]
+      ==
+    ==
+      [%groups ~]
+    ?>  =(src.bowl our.bowl)
+    ?+    -.sign  (on-agent:def wire sign)
+        %watch-ack
+      ?~  p.sign
+        ((slog '%goal-store: Watch /groups succeeded.' ~) `this)
+      ((slog '%goal-store: Watch /groups failed.' ~) `this)
+      ::
+        %kick
+      %-  (slog '%goal-store: Got kick from %group-store, resubscribing...' ~)
+      :_  this
+      [%pass wire %agent [our.bowl %group-store] %watch wire]~
+      ::
+        %fact
+      ?+    p.cage.sign  (on-agent:def wire sign)
+          ?(%group-update-0 %group-action)
+        =/  =update:group-store  !<(update:group-store q.cage.sign)
+        :-  ~
+        %=  this
+          groups.store
+            (~(group-update group-update [groups our.bowl]) update)
+        ==
       ==
     ==
   ==
