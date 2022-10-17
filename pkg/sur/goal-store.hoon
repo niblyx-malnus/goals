@@ -51,6 +51,8 @@
 ::
 +$  update
   $%  [%spawn-pool =pool]
+      [%cache-pool =pin]
+      [%renew-pool =pin]
       [%trash-pool ~]
       [%spawn-goal =nex =id =goal]
       [%waste-goal =nex =id waz=(set id)]
