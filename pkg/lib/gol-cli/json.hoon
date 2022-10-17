@@ -403,13 +403,18 @@
       :-  %nexus
       %-  pairs
       :~  [%goals (enjs-goals goals.pool)]
-          :-  %cache
-          :-  %a  %+  turn  ~(tap by cache.pool) 
-          |=  [=id =goals]
-          %-  pairs
-          :~  [%id (enjs-id id)]
-              [%goals (enjs-goals goals)]
-          ==
+          =/  cache
+            =/  cache  *goals
+            =/  idx  0
+            =/  list
+              %+  turn  ~(val by cache.pool)
+              |=  =goals
+              ~(tap by goals)
+            |-
+            ?:  =(idx (lent list))
+              cache
+            $(idx +(idx), cache (~(gas by cache) (snag idx list)))
+          [%cache (enjs-goals cache)]
       ==
       :-  %hitch
       %-  pairs
@@ -499,7 +504,7 @@
    |=  =edge:goal
    ^-  json
    %-  pairs
-   :~  [%moment ?~(moment.edge ~ s+(scot %da u.moment.edge))]
+   :~  [%moment ?~(moment.edge ~ (numb (unm:chrono:userlib u.moment.edge)))]
        [%inflow a+(turn ~(tap in inflow.edge) enjs-eid)]
        [%outflow a+(turn ~(tap in outflow.edge) enjs-eid)]
        [%left-bound (enjs-bound left-bound.edge)]
