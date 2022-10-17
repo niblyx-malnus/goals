@@ -1,60 +1,9 @@
 /-  gol=goal, goal-store
-/+  *gol-cli-goal, gol-cli-goals, gol-cli-pools, pl=gol-cli-pool
+/+  *gol-cli-goal, gol-cli-goals, gol-cli-pools, gol-cli-etch, pl=gol-cli-pool
 |_  =store:gol
 +*  gols  ~(. gol-cli-goals +<)
     puls  ~(. gol-cli-pools +<)
-::
-:: update index to reflect new goals in a pool
-++  update-dir
-  |=  [=pin:gol efx=(list update:goal-store)]
-  ^-  index:gol
-  |^
-  =/  idx  0
-  |-
-  ?:  =(idx (lent efx))
-    index.store
-  =/  upd  (snag idx efx)
-  %=  $
-    idx  +(idx)
-    index.store
-      ?+    upd  index.store
-          [%spawn-pool *]
-        %-  ~(gas by index.store) 
-        %+  turn
-          ~(tap in ~(key by goals.pool.upd))
-        |=  =id:gol
-        [id pin]
-        ::
-          [%trash-pool *]
-        (gus-by-index ~(tap in ~(key by goals:(~(got by pools.store) pin))))
-        ::
-          [%spawn-goal *]
-        (~(put by index.store) id.upd pin)
-        ::
-          [%waste-goal *]
-        (gus-by-index ~(tap in waz.upd))
-        ::
-          [%trash-goal *]
-        =/  pool  (~(got by pools.store) (~(got by index.store) id.upd))
-        =/  keys  ~(key by (~(got by cache.pool) id.upd))
-        (gus-by-index ~(tap in keys))
-      ==
-  ==
-  ++  gus-by-index
-    |=  ids=(list id:gol)
-    =/  idx  0
-    |-
-    ?:  =(idx (lent ids))
-      index.store
-    $(idx +(idx), index.store (~(del in index.store) (snag idx ids)))
-  --
-::
-++  update-store
-  |=  [=pin:gol efx=(list update:goal-store) =pool:gol]
-  ^-  store:gol
-  :+  (update-dir pin efx)
-    (~(put by pools.store) pin pool)
-  cache.store
+    etch  ~(. gol-cli-etch store)
 ::
 ++  get-away-cud
   |=  [=pin:gol mod=ship pore=_pl]
@@ -65,7 +14,7 @@
     |=  upd=update:goal-store
     ^-  away-update:goal-store
     [mod upd]
-  (update-store pin abet:pore)
+  (etch:etch pin efx:abet:pore)
 ::
 ++  spawn-goal
   |=  $:  [=pin:gol mod=ship]
@@ -109,6 +58,7 @@
 ::
 ++  move
   |=  [cid=id:gol upid=(unit id:gol) mod=ship]
+  ^-  away-cud:goal-store
   =/  pin  (~(got by index.store) cid)
   =/  pool  (~(got by pools.store) pin)
   =/  pore  (apex:pl pool)
@@ -117,6 +67,7 @@
 ::::
 ++  yoke
   |=  [=pin:gol yoks=(list exposed-yoke:gol) mod=ship]
+  ^-  away-cud:goal-store
   =/  pool  (~(got by pools.store) pin)
   =/  pore  (apex:pl pool)
   =.  pore  (yoke-sequence:pore yoks mod)
@@ -132,7 +83,7 @@
   =+  [pin pool]=(spawn-pool:puls title own now)
   :+  pin
     [[pin mod] %spawn-pool pool]~
-  store(pools (~(put by pools.store) pin pool))
+  (etch:etch pin [%spawn-pool pool]~)
 ::
 ++  trash-pool
   |=  [=pin:gol mod=ship]
@@ -140,19 +91,15 @@
   ?>  =(mod owner.pin)
   :+  pin
     [[pin mod] %trash-pool ~]~
-  :+  (update-dir pin [%trash-pool ~]~)
-    (~(del by pools.store) pin)
-  (~(del by cache.store) pin)
+  (etch:etch pin [%trash-pool ~]~)
 ::
 ++  cache-pool
   |=  [=pin:gol mod=ship]
   ^-  home-cud:goal-store
   ?>  =(mod owner.pin)
   :+  pin
-    [[pin mod] %trash-pool ~]~
-  :+  (update-dir pin [%trash-pool ~]~)
-    (~(del by pools.store) pin)
-  (~(put by cache.store) pin (~(got by pools.store) pin))
+    [[pin mod] %cache-pool pin]~
+  (etch:etch pin [%cache-pool pin]~)
 ::
 ++  renew-pool
   |=  [=pin:gol mod=ship]
@@ -160,10 +107,8 @@
   ?>  =(mod owner.pin)
   =/  pool  (~(got by cache.store) pin)
   :+  pin
-    [[pin mod] %spawn-pool pool]~
-  :+  (update-dir pin [%spawn-pool pool]~)
-    (~(put by pools.store) pin pool)
-  (~(del by cache.store) pin)
+    [[pin mod] %renew-pool pin]~
+  (etch:etch pin [%renew-pool pin]~)
 ::
 ++  clone-pool
   |=  $:  =old=pin:gol
@@ -176,7 +121,7 @@
   =+  [pin pool]=(clone-pool:puls old-pin title own now)
   :+  pin
     [[pin mod] %spawn-pool pool]~
-  (update-store pin [%spawn-pool pool]~ pool)
+  (etch:etch pin [%spawn-pool pool]~)
 ::
 ++  edit-goal-desc
   |=  [=id:gol desc=@t mod=ship]

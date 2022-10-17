@@ -80,11 +80,11 @@
             %|  %normal-completed
           ==
           :_  this
-          (nest-print:prtr context def-cols:hc mode)
+          (print-context:prtr context def-cols:hc mode)
         :: If handles/views not initialized yet, initialize
         :: ?.  =(1 ~(wyt by views))
         ::   :_  this
-        ::   (nest-print:prtr context def-cols:hc mode)
+        ::   (print-context:prtr context def-cols:hc mode)
         :: =*  poke-self  ~(poke-self pass:io /print-context)
         :: :-  [(poke-self view-action+!>(print+~))]~
         :: %=  this
@@ -172,18 +172,6 @@
             handles  (new-pool:hdls pin pool.update)
             views  (new-pool:vyuz pin pool.update)
           ==
-          ::
-            %trash-pool
-          :-  ~
-          =/  new-handles  initial:hdls
-          %=  this
-            handles  new-handles
-            views  initial:vyuz
-            context
-              ?.  (~(has by gh.new-handles) context)
-                [%all ~]
-              context
-          ==
         ==
       ==
     ==
@@ -257,33 +245,46 @@
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
     ~[(poke [owner.pin.res %goal-store] goal-action+!>([%invite pin.res ~ ~ (sy ~[invitee.command])]))]
       ::
-      :: [%new-pool title=@t]
-      %new-pool
+      :: [%spawn-pool title=@t]
+      %spawn-pool
     =*  poke-our  ~(poke-our pass:io /mod-command/spawn-pool)
     [(poke-our %goal-store goal-action+!>([%spawn-pool title.command]))]~
       ::
-      :: [%trash-pool-goal h=@t]
-      %delete-pool-goal
-    =*  poke-our  ~(poke-our pass:io /mod-command/trash-pool-goal)
-    =+  [msg p]=(invalid-pool-error:prtr h.command)
-    ?.  =(~ msg)
-      =+  [msg g]=(invalid-goal-error:prtr h.command)
-      ?.  =(~ msg)
-        (print-cards:prtr ~["Invalid handle."])
-      [(poke-our %goal-store goal-action+!>([%trash-goal id.g]))]~
-    ?:  =(our.bowl owner.pin.p)
-      [(poke-our %goal-store goal-action+!>([%trash-pool pin.p]))]~
-    [(poke-our %goal-store goal-action+!>([%unsubscribe pin.p]))]~
-      ::
-      :: [%copy-pool h=@t title=@t]
-      %copy-pool
-    =*  poke-our  ~(poke-our pass:io /mod-command/copy-pool)
+      :: [%clone-pool h=@t title=@t]
+      %clone-pool
+    =*  poke-our  ~(poke-our pass:io /mod-command/clone-pool)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
     [(poke-our %goal-store goal-action+!>([%clone-pool pin.res title.command]))]~
       ::
-      ::  [%add-goal desc=@t]                
-      %add-goal
-    =*  poke  ~(poke pass:io /mod-command/add-goal)
+      :: [%cache-pool h=@t]
+      %cache-pool
+    =*  poke-our  ~(poke-our pass:io /mod-command/cache-pool)
+    =*  poke-self  ~(poke-self pass:io /view-command/change-context)
+    =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
+    ;:  weld
+      [(poke-our %goal-store goal-action+!>([%cache-pool pin.res]))]~
+      [(poke-self view-action+!>([%change-context [%all ~]]))]~
+    ==
+      ::
+      :: [%renew-pool h=@t]
+      %renew-pool
+    =*  poke-our  ~(poke-our pass:io /mod-command/renew-pool)
+    =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
+    [(poke-our %goal-store goal-action+!>([%renew-pool pin.res]))]~
+      ::
+      :: [%trash-pool h=@t]
+      %trash-pool
+    =*  poke-our  ~(poke-our pass:io /mod-command/trash-pool)
+    =*  poke-self  ~(poke-self pass:io /view-command/change-context)
+    =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
+    ;:  weld
+      [(poke-our %goal-store goal-action+!>([%trash-pool pin.res]))]~
+      [(poke-self view-action+!>([%change-context [%all ~]]))]~
+    ==
+      ::
+      ::  [%spawn-goal desc=@t]                
+      %spawn-goal
+    =*  poke  ~(poke pass:io /mod-command/spawn-goal)
     ?-    -.context
         %all
       (print-cards:prtr ~["ERROR: Cannot add goal outside of a pool."])
@@ -297,6 +298,24 @@
           goal-action+!>([%spawn-goal pin (some id.context) desc.command %|])
       ==
     ==
+      ::
+      :: [%cache-goal h=@t]
+      %cache-goal
+    =*  poke-our  ~(poke-our pass:io /mod-command/cache-goal)
+    =+  [msg res]=(invalid-goal-id-error:prtr h.command)  ?.  =(~ msg)  msg
+    [(poke-our %goal-store goal-action+!>([%cache-goal id.res]))]~
+      ::
+      :: [%renew-goal h=@t]
+      %renew-goal
+    =*  poke-our  ~(poke-our pass:io /mod-command/renew-goal)
+    =+  [msg res]=(invalid-goal-id-error:prtr h.command)  ?.  =(~ msg)  msg
+    [(poke-our %goal-store goal-action+!>([%renew-goal id.res]))]~
+      ::
+      :: [%trash-goal h=@t]
+      %trash-goal
+    =*  poke-our  ~(poke-our pass:io /mod-command/trash-goal)
+    =+  [msg res]=(invalid-goal-id-error:prtr h.command)  ?.  =(~ msg)  msg
+    [(poke-our %goal-store goal-action+!>([%trash-goal id.res]))]~
       ::
       ::  [%set-deadline h=@t d=(unit @da)]
       %set-deadline

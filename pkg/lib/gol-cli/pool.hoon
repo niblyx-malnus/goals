@@ -140,8 +140,7 @@
   |-
   ?:  =(idx (lent q))
     [ids pore]
-  =/  id  (snag idx q)
-  =/  mup  (break-bonds:pore id q- mod)
+  =/  mup  (break-bonds:pore (snag idx q) q- mod)
   %=  $
     idx  +(idx)
     ids  (~(uni in ids) ids.mup)
@@ -225,7 +224,7 @@
 :: Permanently delete goal and subgoals directly
 ++  waste-goal
   |=  [=id:gol mod=ship]
-  ^-  [ids=(set id:gol) =id:gol waz=goals:gol pore=_this]
+  ^-  [=nex:gol =id:gol waz=goals:gol pore=_this]
   ::
   :: Move goal to root
   =/  mup  (move id ~ owner.p) :: divine intervention (owner)
@@ -238,13 +237,14 @@
   =.  pore  pore.mup
   =.  ids  (~(uni in ids) ids.mup)
   ::
-  :: Get deleted goals
+  :: Get nex and deleted goals
+  =/  nex  (make-nex:pore ids)
   =/  waz  (gat-by goals.p.pore ~(tap in prog))
   ::
   :: Remove goal and subgoals from goals
   =.  goals.p.pore  (gus-by goals.p.pore ~(tap in prog))
   ::
-  [ids id waz pore]
+  [nex id waz pore]
 ::
 :: Move goal and subgoals from main goals to cache
 ++  cache-goal
@@ -256,13 +256,13 @@
   ?>  (check-goal-perm id mod)
   ::
   :: Partition and remove
-  =+  (waste-goal id mod) :: exposes ids, id, waz, and pore
+  =+  (waste-goal id mod) :: exposes nex, id, waz, and pore
   ::
   :: Add goal and subgoals to cache
-  =.  cache.p.pore  (~(put in cache.p.pore) id waz)
+  =.  cache.p.pore  (~(put by cache.p.pore) id waz)
   ::
   :: Emit update
-  (emot old [%cache-goal (make-nex ids) id ~(key by waz)]):[pore .]
+  (emot:pore old [%cache-goal nex id ~(key by waz)])
 ::
 :: Restore goal from cache to main goals
 ++  renew-goal
@@ -289,10 +289,10 @@
   ?:  (~(has by goals.p) id)
     ::
     :: Delete directly from goals
-    =+  (waste-goal id mod) :: exposes ids, id, waz, and pore
+    =+  (waste-goal id mod) :: exposes nex, id, waz, and pore
     ::
     :: Emit update
-    (emot old [%waste-goal (make-nex ids) id ~(key by waz)]):[pore .]
+    (emot:pore old [%waste-goal nex id ~(key by waz)])
   :: 
   :: Delete from cache
   =.  cache.p  (~(del by cache.p) id)
@@ -386,7 +386,7 @@
     ^-  [? visited=(set eid:gol)]
     =/  new-path=(list eid:gol)  [eid path]
     =/  i  (find [eid]~ path) 
-    ?.  =(~ i)  ?~(i !! ~&([%cycle (flop (scag u.i new-path))] !!))
+    ?.  =(~ i)  ?~(i !! ~|([%cycle (flop (scag u.i new-path))] !!))
     ?:  &(=(-.eid %d) !complete:(~(got by goals.p) id.eid))  [%& visited]
     =.  visited  (~(put in visited) eid)
     =/  idx  0
@@ -422,7 +422,7 @@
     ^-  [? visited=(set eid:gol)]
     =/  new-path=(list eid:gol)  [eid path]
     =/  i  (find [eid]~ path) 
-    ?.  =(~ i)  ?~(i !! ~&([%cycle (flop (scag u.i new-path))] !!))
+    ?.  =(~ i)  ?~(i !! ~|([%cycle (flop (scag u.i new-path))] !!))
     ?:  &(=(-.eid %d) complete:(~(got by goals.p) id.eid))  [%& visited]
     =.  visited  (~(put in visited) eid)
     =/  idx  0
@@ -456,7 +456,7 @@
     ^-  [descendents=(set id:gol) visited=(map eid:gol (set id:gol))]
     =/  new-path=(list eid:gol)  [eid path]
     =/  i  (find [eid]~ path) 
-    ?.  =(~ i)  ?~(i !! ~&([%cycle (flop (scag u.i new-path))] !!))
+    ?.  =(~ i)  ?~(i !! ~|([%cycle (flop (scag u.i new-path))] !!))
     =/  inflow  inflow:(got-edge eid)
     =/  idx  0
     =/  inflow  ~(tap in inflow)
@@ -547,7 +547,7 @@
     ^-  (set id:gol)
     =/  new-path=(list id:gol)  [id path]
     =/  i  (find [id]~ path) 
-    ?.  =(~ i)  ?~(i !! ~&([%cycle (flop (scag u.i new-path))] !!))
+    ?.  =(~ i)  ?~(i !! ~|([%cycle (flop (scag u.i new-path))] !!))
     =/  goal  (~(got by goals.p) id)
     =/  prio  (prio goal)
     =/  idx  0
@@ -581,7 +581,7 @@
     ^-  [? visited=(set eid:gol)]
     =/  new-path=(list eid:gol)  [e2 path]
     =/  i  (find [e2]~ path) 
-    ?.  =(~ i)  ?~(i !! ~&([%cycle (flop (scag u.i new-path))] !!))
+    ?.  =(~ i)  ?~(i !! ~|([%cycle (flop (scag u.i new-path))] !!))
     =/  inflow  inflow:(got-edge e2)
     ?:  (~(has in inflow) e1)  [%& visited]
     =.  visited  (~(put in visited) e2)
@@ -1109,7 +1109,7 @@
   =/  old  this
   ?>  (check-goal-perm id mod)
   =/  goal  (~(got by goals.p) id)
-  ?:  (left-uncompleted id)  ~&("left-uncompleted" !!)
+  ?:  (left-uncompleted id)  ~|("left-uncompleted" !!)
   =.  goals.p  (~(put by goals.p) id goal(complete %&))
   (emot old [%goal-togls id %complete %.y])
 ::
@@ -1324,7 +1324,7 @@
       =/  pore  (apply-nex nex)
       %=  pore
         cache.p
-          %+  ~(put in cache.p.pore)
+          %+  ~(put by cache.p.pore)
             id
           (gat-by goals.p.pore ~(tap in cas))
         goals.p  (gus-by goals.p.pore ~(tap in cas))

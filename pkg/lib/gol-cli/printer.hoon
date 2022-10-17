@@ -12,110 +12,27 @@
 ::
 ++  hrz  `tape`(reap 80 '-')
 ::
-++  info
-  |=  =grip:vyu
-  =/  tz  (trip (~(got by utc-offsets:dates) utc-offset))
-  =/  owner  (owner grip)
-  =/  permissions  (perms grip)
-  =/  delegates  (delegates grip)
-  =/  par-hdl  
-    ?-    -.grip
-      %all  "   "
-      %pool  " ~ "
-        %goal
-      =/  goal  (got-goal:scry +.grip)
-      ?~  par.goal
-        "{(col-data [%pool (got-pin:scry +.grip)] %handle)}"
-      "{(col-data [%goal u.par.goal] %handle)}"
-    ==
-  :~  ;:  weld
-        owner
-        `tape`(reap (sub 80 :(add (lent owner) 4 (lent tz))) ' ')
-        "UTC "
-        tz
-      ==
-      ;:  weld
-        delegates
-        `tape`(reap (sub 80 :(add (lent delegates) 5)) ' ')
-        par-hdl
-      ==
-  ==
-++  owner
-  |=  =grip:vyu
-  ?-    -.grip
-    %all  "o~"
-    %pool  (weld "o" (trip (scot %p owner.pin.grip)))
-    %goal  (weld "o" (trip (scot %p owner.id.grip)))
-  ==
-++  perms
-  |=  =grip:vyu
-  " "
-  :: ?-    -.grip
-  ::   %all  "~"
-  ::     %pool
-  ::   =/  captains  (~(put in captains:(got-pool:scry pin.grip)) owner.pin.grip)
-  ::   ?:  (~(has in captains) our.bowl)
-  ::     "c"
-  ::   "~"
-  ::     %goal
-  ::   =/  captains  (~(put in captains:(got-pool:scry (got-pin:scry id.grip))) owner.id.grip)
-  ::   ?:  (~(has in captains) our.bowl)
-  ::     "c"
-  ::   =/  c-sen  (seniority:scry our.bowl id.grip %c)
-  ::   =/  p-sen  (seniority:scry our.bowl id.grip %p)
-  ::   ?~  c-sen
-  ::     ?~  p-sen
-  ::       "~"
-  ::     "p"
-  ::   "c"
-  :: ==
-++  delegates
-  |=  =grip:vyu
-  "     "
-  :: ?-    -.grip
-  ::   %all  "c~ p~"
-  ::     %pool
-  ::   =/  captains  (~(put in captains:(got-pool:scry pin.grip)) owner.pin.grip)
-  ::   ?:  =(1 ~(wyt in captains))  :(weld "c" (trip (scot %p owner.pin.grip)) " p~")
-  ::   "c+ p~"
-  ::     %goal
-  ::   =/  captains  captains:(got-goal:scry id.grip)
-  ::   =/  captain
-  ::     ?:  =(0 ~(wyt in captains))
-  ::       "c~"
-  ::     ?.  =(1 ~(wyt in captains))
-  ::       "c+"
-  ::     (weld "c" (trip (scot %p (snag 0 ~(tap in captains)))))
-  ::   =/  peons  peons:(got-goal:scry id.grip)
-  ::   =/  peon
-  ::     ?:  =(0 ~(wyt in peons))
-  ::       "p~"
-  ::     ?.  =(1 ~(wyt in peons))
-  ::       "p+"
-  ::     (weld "p" (trip (scot %p (snag 0 ~(tap in peons)))))
-  ::   :(weld captain " " peon)
-  :: ==
-::
 :: get cards to print goal substructure
-++  nest-print
-  |=  [=grip:vyu col-names=(list col-name) =mode:vyu]
+++  print-context
+  |=  [ctxt=grip:vyu col-names=(list col-name) =mode:vyu]
   ^-  (list card)
   %-  print-cards 
   =/  lvl :: initial level; printing from context
     ?+  mode  !!
-      %nest-ryte  (dec (get-lvl:scry grip mode))
-      normal-mode:vyu  +((get-lvl:scry grip mode))
-      %prec-ryte  (dec (get-lvl:scry grip mode))
-      %prec-left  +((get-lvl:scry grip mode))
+      normal-mode:vyu  +((get-lvl:scry ctxt mode))
     ==
-  =/  first-block  [grip "" mode lvl %.y %.n %.n *(set grip:vyu) col-names]
+  =/  first-block  [ctxt "" mode lvl %.y %.n %.n *(set grip:vyu) col-names]
+  ::
+  :: Get the actual row information (projects and goals)
   =/  tapes  tapes:(print-family first-block ~)
+  :: 
+  :: prettify with boundaries, column headers, and additional info
   ;:  weld
     ~[hrz]
     ~[(weld (reap toggle-len ' ') (headers col-names))]
     `(list tape)`tapes
     ~[hrz]
-    (info grip)
+    (info ctxt)
   ==
 ::
 ++  next-gen
@@ -282,6 +199,90 @@
       (mul spacer (sub lvl.block (plumb:scry +.grip.block)))
     ==
   ==
+::
+++  info
+  |=  =grip:vyu
+  =/  tz  (trip (~(got by utc-offsets:dates) utc-offset))
+  =/  owner  (owner grip)
+  =/  permissions  (perms grip)
+  =/  delegates  (delegates grip)
+  =/  par-hdl  
+    ?-    -.grip
+      %all  "   "
+      %pool  " ~ "
+        %goal
+      =/  goal  (got-goal:scry +.grip)
+      ?~  par.goal
+        "{(col-data [%pool (got-pin:scry +.grip)] %handle)}"
+      "{(col-data [%goal u.par.goal] %handle)}"
+    ==
+  :~  ;:  weld
+        owner
+        `tape`(reap (sub 80 :(add (lent owner) 4 (lent tz))) ' ')
+        "UTC "
+        tz
+      ==
+      ;:  weld
+        delegates
+        `tape`(reap (sub 80 :(add (lent delegates) 5)) ' ')
+        par-hdl
+      ==
+  ==
+++  owner
+  |=  =grip:vyu
+  ?-    -.grip
+    %all  "o~"
+    %pool  (weld "o" (trip (scot %p owner.pin.grip)))
+    %goal  (weld "o" (trip (scot %p owner.id.grip)))
+  ==
+++  perms
+  |=  =grip:vyu
+  " "
+  :: ?-    -.grip
+  ::   %all  "~"
+  ::     %pool
+  ::   =/  captains  (~(put in captains:(got-pool:scry pin.grip)) owner.pin.grip)
+  ::   ?:  (~(has in captains) our.bowl)
+  ::     "c"
+  ::   "~"
+  ::     %goal
+  ::   =/  captains  (~(put in captains:(got-pool:scry (got-pin:scry id.grip))) owner.id.grip)
+  ::   ?:  (~(has in captains) our.bowl)
+  ::     "c"
+  ::   =/  c-sen  (seniority:scry our.bowl id.grip %c)
+  ::   =/  p-sen  (seniority:scry our.bowl id.grip %p)
+  ::   ?~  c-sen
+  ::     ?~  p-sen
+  ::       "~"
+  ::     "p"
+  ::   "c"
+  :: ==
+++  delegates
+  |=  =grip:vyu
+  "     "
+  :: ?-    -.grip
+  ::   %all  "c~ p~"
+  ::     %pool
+  ::   =/  captains  (~(put in captains:(got-pool:scry pin.grip)) owner.pin.grip)
+  ::   ?:  =(1 ~(wyt in captains))  :(weld "c" (trip (scot %p owner.pin.grip)) " p~")
+  ::   "c+ p~"
+  ::     %goal
+  ::   =/  captains  captains:(got-goal:scry id.grip)
+  ::   =/  captain
+  ::     ?:  =(0 ~(wyt in captains))
+  ::       "c~"
+  ::     ?.  =(1 ~(wyt in captains))
+  ::       "c+"
+  ::     (weld "c" (trip (scot %p (snag 0 ~(tap in captains)))))
+  ::   =/  peons  peons:(got-goal:scry id.grip)
+  ::   =/  peon
+  ::     ?:  =(0 ~(wyt in peons))
+  ::       "p~"
+  ::     ?.  =(1 ~(wyt in peons))
+  ::       "p+"
+  ::     (weld "p" (trip (scot %p (snag 0 ~(tap in peons)))))
+  ::   :(weld captain " " peon)
+  :: ==
 :: 
 :: ----------------------------------------------------------------------------
 :: other printers
@@ -417,8 +418,16 @@
   =/  g  (handle-to-goal:hdls hdl)
   ?~  g  [(print-cards ~["ERROR: Invalid goal handle [{(trip hdl)}]."]) *id:gol *goal:gol]
   [~ u.g]
+:: 
+:: catch invalid goal handle error
+++  invalid-goal-id-error
+  |=  hdl=@t
+  ^-  [(list card) =id:gol]
+  =/  g  (handle-to-goal-id:hdls hdl)
+  ?~  g  [(print-cards ~["ERROR: Invalid goal handle [{(trip hdl)}]."]) *id:gol]
+  [~ u.g]
 ::
-:: catch invalid pool handle error
+:: catch invalid cache handle error
 ++  invalid-pool-error
   |=  hdl=@t
   ^-  [(list card) [=pin:gol =pool:gol]]

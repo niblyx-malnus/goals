@@ -35,7 +35,9 @@
   =/  ids=(list grip:vyu)
     (turn ~(tap in ~(key by index.store)) |=(=id:gol [%goal id]))
   =/  pins=(list grip:vyu)
-    (turn ~(tap in ~(key by pools.store)) |=(=pin:gol [%pool pin]))
+    %+  turn
+      (weld ~(tap in ~(key by pools.store)) ~(tap in ~(key by cache.store)))
+    |=(=pin:gol [%pool pin])
   (add-handles (weld ids pins))
 ::
 ++  add-handles
@@ -115,6 +117,17 @@
     $(idx +(idx))
   (crip (swag [0 idx] tape))
   ::
+:: get goal from handle (?(~ [~ [gid gol]])) returning null if does not
+:: exist
+++  handle-to-goal-id
+  |=  hdl=@t
+  ^-  (unit id:gol)
+  =/  grip  (~(get by hg.handles) hdl)
+  ?~  grip  ~
+  ?-  -.u.grip
+    ?(%all %pool)  ~
+    %goal  (some +.u.grip)
+  ==
 :: get goal from handle (?(~ [~ [gid gol]])) returning null if does not
 :: exist
 ++  handle-to-goal

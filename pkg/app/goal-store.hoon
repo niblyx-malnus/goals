@@ -32,7 +32,8 @@
     gs    ~(. gol-cli-goal-store store)
     etch  ~(. gol-cli-etch store)
     index  index.store
-    pools   pools.store
+    pools  pools.store
+    cache  cache.store
 ++  on-init   `this
 ++  on-save   !>(state)
 ++  on-load
@@ -96,7 +97,7 @@
         %+  convert-home-cud:hc
             %+  turn
               %~  tap  in
-              (~(del in ~(key by perms:(~(got by pools) pin.action))) our.bowl)
+              (~(del in ~(key by perms:(~(got by cache) pin.action))) our.bowl)
             |=  =ship
             ^-  card
             (poke-other ship goal-action+!>([%subscribe pin.action]))
@@ -297,7 +298,7 @@
         =/  wire  /[`@`+<.pin.action]/[`@`+>.pin.action]
         ?<  =(owner.pin.action our.bowl)
         =*  leave-other  ~(leave-other pass:hc wire)
-        :_  state(store (trash-pool:spawn-trash:etch pin.action))
+        :_  state(store (etch:etch pin.action [%trash-pool ~]~))
         :~  (leave-other owner.pin.action)
             (fact:io goal-home-update+!>([[pin.action src.bowl] %trash-pool ~]) ~[/goals])
         ==
@@ -320,7 +321,7 @@
   ==
 ::
 ++  on-leave  on-leave:def
-  :: |=  =path
+  :: |=  =path  ::
   :: ^-  (quip card _this)
   :: ?+    path  (on-watch:def path)
   ::     [@ @ ~]
@@ -400,15 +401,21 @@
     =/  owner  (slav %p i.t.t.path)
     =/  birth  (slav %da i.t.t.t.path)
     =/  pin  `pin:gol`[%pin owner birth]
-    =/  pool  (~(got by pools) pin)
     ?+    t.t.t.t.path  (on-peek:def path)
         [%get-pool ~]
-      ``goal-peek+!>(get-pool+(~(get by pools) pin))
+      :-  ~  :-  ~  :-  %goal-peek
+      !>  :-  %get-pool
+      =/  gep  (~(get by pools) pin)
+      ?~  gep
+        (~(get by cache) pin)
+      gep
       ::
         [%anchor ~]
+      =/  pool  (~(got by pools) pin)
       ``goal-peek+!>(anchor+~(anchor pl pool))
       ::
         [%roots *]
+      =/  pool  (~(got by pools) pin)
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
         ``goal-peek+!>(roots+(hi-to-lo roots):~(. pl pool))
@@ -436,7 +443,7 @@
       ((slog 'Invite failure.' ~) `this)
         %kick
       %-  (slog '%goal-store: Got kick, resubscribing...' ~)
-      :_  this(store (trash-pool:spawn-trash:etch pin))
+      :_  this(store (etch:etch pin [%trash-pool ~]~))
       :~  (fact:io goal-home-update+!>([[pin src.bowl] %trash-pool ~]) ~[/goals])
           [%pass wire %agent [src.bowl %goal-store] %watch wire]
       ==
@@ -444,17 +451,12 @@
       ?>  =(p.cage.sign %goal-away-update)
       =/  update  !<(away-update:goal-store q.cage.sign)
       ?+    +<.update  (on-agent:def wire sign)
-          %spawn-pool
-        :_  this(store (spawn-pool:spawn-trash:etch pin pool.update))
-        ~[(fact:io goal-home-update+!>([[pin src.bowl] +.update]) ~[/goals])]
-        ::
-          $?  %spawn-goal  %trash-goal
+          $?  %spawn-pool
+              %spawn-goal  %trash-goal
               %pool-perms  %pool-hitch  %pool-nexus
               %goal-perms  %goal-hitch  %goal-nexus  %goal-togls
           ==
-        =/  pool  (~(got by pools.store) pin)
-        =/  pore  (apex:pl pool)
-        :_  this(store (update-store:gs pin [+.update]~ pool:abet:(etch:pore +.update)))
+        :_  this(store (etch:etch pin ~[+.update]))
         ~[(fact:io goal-home-update+!>([[pin mod.update] +.update]) ~[/goals])]
       ==
     ==

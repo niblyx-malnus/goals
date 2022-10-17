@@ -3,37 +3,78 @@
 ++  command-parser
   |=  [now=@da =utc-offset:dates]
   ;~  pose
-    parse-invite                              :: %invite
-    parse-held-yoke                           
+    parse-invite                          
+    parse-held-yoke                       
     parse-held-rend
-    parse-nest-yoke                           
+    parse-nest-yoke                       
     parse-nest-rend
     parse-prec-yoke
-    parse-prec-rend                           
-    parse-prio-yoke                           
-    parse-prio-rend                           
-    parse-new-pool                            :: %np
-    parse-delete-pool-goal
-    parse-copy-pool                         
-    parse-add-goal                            :: %ag
-    parse-edit-goal-desc                      :: %eg
-    parse-edit-pool-title                     :: %ep
-    parse-change-context                      :: %cc
+    parse-prec-rend                       
+    parse-prio-yoke                       
+    parse-prio-rend                       
+    parse-spawn-pool                        
+    parse-clone-pool                       
+    parse-cache-pool
+    parse-renew-pool
+    parse-trash-pool
+    parse-spawn-goal                        
+    parse-cache-goal
+    parse-renew-goal
+    parse-trash-goal
+    parse-edit-goal-desc                  
+    parse-edit-pool-title                 
+    parse-change-context                  
     parse-hide-completed
     parse-unhide-completed
-    parse-set-utc-offset                      :: %tz
-    parse-collapse                            :: %cp
-    parse-uncollapse                          :: %uc
-    (parse-set-deadline now utc-offset)       :: %sd
+    parse-set-utc-offset                  
+    parse-collapse                        
+    parse-uncollapse                      
+    (parse-set-deadline now utc-offset)   
     parse-mark-actionable
     parse-unmark-actionable
     parse-mark-complete
     parse-unmark-complete
     parse-harvest
-    parse-print-context                       :: %pc
+    parse-print-context                   
   ==
 :: ----------------------------------------------------------------------------
 :: individual command parsers
+::
+++  parse-cache-pool
+  ;~  (glue ace)
+    (cold %cache-pool (jest 'cap'))
+    (cook crip parse-handle)  :: handle argument
+  ==
+::
+++  parse-renew-pool
+  ;~  (glue ace)
+    (cold %renew-pool (jest 'rep'))
+    (cook crip parse-handle)  :: handle argument
+  ==
+::
+++  parse-trash-pool
+  ;~  (glue ace)
+    (cold %trash-pool (jest 'tap'))
+    (cook crip parse-handle)  :: handle argument
+  ==
+::
+++  parse-cache-goal
+  ;~  (glue ace)
+    (cold %cache-goal (jest 'cag'))
+    (cook crip parse-handle)  :: handle argument
+  ==
+::
+++  parse-renew-goal
+  ;~  (glue ace)
+    (cold %renew-goal (jest 'reg'))
+    (cook crip parse-handle)  :: handle argument
+  ==
+::
+++  parse-trash-goal
+  ;~  (glue ace)
+    (cold %trash-goal (jest 'tag'))
+    (cook crip parse-handle)  :: handle argument
+  ==
 ::
 ++  parse-held-yoke
   ;~  (glue ace)
@@ -113,28 +154,22 @@
   ==
 ::
 :: add a goal to the data structure
-++  parse-add-goal
+++  parse-spawn-goal
   ;~  (glue ace)
-    (cold %add-goal (jest 'ag'))    :: command 'ag'
+    (cold %spawn-goal (jest 'ag'))    :: command 'ag'
     (cook crip (star prn))    :: argument text as cord
   ==
 ::
 :: add a new pool to the data structure
-++  parse-new-pool
+++  parse-spawn-pool
   ;~  (glue ace)
-    (cold %new-pool (jest 'np'))    :: command 'np'
+    (cold %spawn-pool (jest 'np'))    :: command 'np'
     (cook crip (star prn))    :: title of new pool
   ==
 ::
-++  parse-delete-pool-goal
+++  parse-clone-pool
   ;~  (glue ace)
-    (cold %delete-pool-goal (jest 'del'))
-    (cook crip parse-handle)  :: handle argument
-  ==
-::
-++  parse-copy-pool
-  ;~  (glue ace)
-    (cold %copy-pool (jest 'copy'))
+    (cold %clone-pool (jest 'copy'))
     (cook crip parse-handle)  :: handle argument
     (cook crip (star prn))    :: title of copied pool
   ==
