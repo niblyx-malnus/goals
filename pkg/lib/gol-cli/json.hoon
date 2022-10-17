@@ -24,8 +24,8 @@
       [%trash-goal (ot ~[id+dejs-id])]
       [%yoke (ot ~[pin+dejs-pin yoks+dejs-yoke-seq])]
       [%move (ot ~[cid+dejs-id upid+dejs-unit-id])]
-      [%set-kickoff (ot ~[id+dejs-id kickoff+dejs-unit-date])]
-      [%set-deadline (ot ~[id+dejs-id deadline+dejs-unit-date])]
+      [%set-kickoff (ot ~[id+dejs-id kickoff+dejs-unit-di])]
+      [%set-deadline (ot ~[id+dejs-id deadline+dejs-unit-di])]
       [%mark-actionable (ot ~[id+dejs-id])]
       [%unmark-actionable (ot ~[id+dejs-id])]
       [%mark-complete (ot ~[id+dejs-id])]
@@ -57,6 +57,7 @@
       (cold %admin (jest 'admin'))
       (cold %spawn (jest 'spawn'))
     ==
+++  dejs-unit-di  |=(jon=json ?~(jon ~ (some (di:dejs:format jon))))
 ++  dejs-unit-date  |=(jon=json ?~(jon ~ (some (dejs-date jon))))
 ++  dejs-pin  (pe:dejs:format %pin dejs-id)
 ++  dejs-unit-id  |=(jon=json ?~(jon ~ (some (dejs-id jon))))
