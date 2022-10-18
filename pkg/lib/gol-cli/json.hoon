@@ -167,28 +167,41 @@
       ?-    -.upd
           %spawn-goal
         %-  pairs
-        :~  [%nex (enjs-nex nex.upd)]
+        :~  [%pin (enjs-pin pin.hom)]
+            [%nex (enjs-nex nex.upd)]
             [%id (enjs-id id.upd)]
             [%goal (enjs-goal goal.upd)]
         ==
         ::
           %waste-goal
         %-  pairs
-        :~  [%nex (enjs-nex nex.upd)]
+        :~  [%pin (enjs-pin pin.hom)]
+            [%nex (enjs-nex nex.upd)]
             [%id (enjs-id id.upd)]
             [%waz a+(turn ~(tap in waz.upd) enjs-id)]
         ==
         ::
           %cache-goal
         %-  pairs
-        :~  [%nex (enjs-nex nex.upd)]
+        :~  [%pin (enjs-pin pin.hom)]
+            [%nex (enjs-nex nex.upd)]
             [%id (enjs-id id.upd)]
             [%cas a+(turn ~(tap in cas.upd) enjs-id)]
         ==
         ::
-        %renew-goal  (frond %id (enjs-id id.upd))
+        %renew-goal  
+        %-  pairs
+        :~  [%pin (enjs-pin pin.hom)]
+            [%id (enjs-id id.upd)]
+            [%ren a+(turn ~(tap in ren.upd) enjs-id)]
+        ==
         ::
-        %trash-goal  (frond %id (enjs-id id.upd))
+        %trash-goal
+        %-  pairs
+        :~  [%pin (enjs-pin pin.hom)]
+            [%id (enjs-id id.upd)]
+            [%tas a+(turn ~(tap in tas.upd) enjs-id)]
+        ==
         ::
         %spawn-pool  (frond %pool (enjs-pool pool.upd))
         ::
