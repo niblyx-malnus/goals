@@ -262,8 +262,8 @@
               ::
                 %goal-nexus
               ?-  +>-.upd
-                %kickoff   ?~(moment.upd ~ s+(scot %da u.moment.upd))
-                %deadline  ?~(moment.upd ~ s+(scot %da u.moment.upd))
+                %kickoff   ?~(moment.upd ~ (numb (unm:chrono:userlib u.moment.upd)))
+                %deadline  ?~(moment.upd ~ (numb (unm:chrono:userlib u.moment.upd)))
               ==
             ==
         ==
