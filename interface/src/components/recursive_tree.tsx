@@ -69,13 +69,18 @@ const TreeItem = memo(
     const collapseAll = useStore((store) => store.collapseAll);
     const selectedGoals = useStore((store) => store.selectedGoals);
     const updateSelectedGoal = useStore((store) => store.updateSelectedGoal);
+    //TODO: remove the add/edit when isArchived
+    const disableActions =
+      (goal.isArchived && goal.nexus.par) ||
+      trying ||
+      editingTitle ||
+      addingGoal; // || disabled; TODO: find a better way to do disabled (overlay?)
 
-    const disableActions = trying || editingTitle || addingGoal; // || disabled; TODO: find a better way to do disabled (overlay?)
     useEffect(() => {
       //everytime collapse all changes, we force isOpen value to comply
       toggleItemOpen(collapseAll.status);
     }, [collapseAll.count]);
-    
+
     useEffect(() => {
       //check if this goal is in the selected goals list
       if (selectedGoals.has(idObject.birth)) {
@@ -124,6 +129,7 @@ const TreeItem = memo(
             setParentTrying={setTrying}
             isVirtual={goal.isVirtual}
             virtualId={goal.virtualId} //refers to the original goal(none-virtualised counterpart of this one)
+            isArchived={goal.isArchived}
           />
         );
       }
@@ -158,7 +164,8 @@ const TreeItem = memo(
               textDecoration: goal.nexus.complete ? "line-through" : "auto",
             }}
           >
-            {label} {goal.isVirtual && " (virtual)"}
+            {label} {goal.isVirtual && " (virtual) "}{" "}
+            {goal.isArchived && " (archived) "}
           </Typography>
         </Box>
       );
@@ -174,8 +181,7 @@ const TreeItem = memo(
             borderRadius: 1,
           }}
           onClick={() => {
-          
-              updateSelectedGoal(idObject, !selected);
+            updateSelectedGoal(idObject, !selected);
           }}
         >
           <Typography
@@ -188,7 +194,8 @@ const TreeItem = memo(
               textDecoration: goal.nexus.complete ? "line-through" : "auto",
             }}
           >
-            {label} {goal.isVirtual && " (virtual)"}
+            {label} {goal.isVirtual && " (virtual) "}{" "}
+            {goal.isArchived && " (archived) "}
           </Typography>
         </Box>
       ) : (

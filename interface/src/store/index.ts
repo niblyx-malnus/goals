@@ -9,7 +9,7 @@ import {
   SnackBarData,
   Yoke,
 } from "../types/types";
-
+//TODO: comment
 type SelectionYokeData = null | {
   goalId: GoalId;
   poolId: PinId;
@@ -27,6 +27,9 @@ interface Store {
    */
   pools: any;
   setPools: (state: any) => void;
+
+  archivedPools: any;
+  setArchivedPools: (state: any) => void;
 
   filterGoals: FilterGoals;
   setFilterGoals: (status: FilterGoals) => void;
@@ -61,7 +64,11 @@ interface Store {
   setLogList: (newLogList: any) => void;
 
   timelineDialogOpen: boolean;
-  toggleTimelineDialog: (newStatus: boolean) => void;
+  timelineDialogData: any;
+  toggleTimelineDialog: (
+    newStatus: boolean,
+    newTimelineDialogData: any
+  ) => void;
 
   copyPoolDialogData: any;
   copyPoolDialogOpen: boolean;
@@ -77,11 +84,23 @@ interface Store {
   setSelectedGoals: (newSelectedGoals: any) => void;
   updateSelectedGoal: (newGoal: any, status: boolean) => void;
   resetSelectedGoals: () => void;
+
+  showArchived: boolean;
+  toggleShowArchived: (newStatus: boolean) => void;
 }
+/**
+ * 
+  const toggleShowArchived = useStore((store) => store.toggleShowArchived);
+  const showArchived = useStore((store) => store.showArchived);
+ */
 
 const useStore = create<Store>((set, get) => ({
   pools: [],
   setPools: (newPools: any) => set(() => ({ pools: newPools })),
+
+  archivedPools: [],
+  setArchivedPools: (newArchivedPools: any) =>
+    set(() => ({ archivedPools: newArchivedPools })),
 
   filterGoals: null,
   setFilterGoals: (newStatus: FilterGoals) =>
@@ -155,9 +174,11 @@ const useStore = create<Store>((set, get) => ({
     }));
   },
   timelineDialogOpen: false,
-  toggleTimelineDialog: (newStatus: boolean) =>
+  timelineDialogData: null,
+  toggleTimelineDialog: (newStatus: boolean, newTimelineDialogData: any) =>
     set(() => ({
       timelineDialogOpen: newStatus,
+      timelineDialogData: newTimelineDialogData,
     })),
 
   copyPoolDialogData: null,
@@ -205,6 +226,77 @@ const useStore = create<Store>((set, get) => ({
     }
     set(() => ({
       selectedGoals: currentSelectedGoals,
+    }));
+  },
+
+  showArchived: false,
+  toggleShowArchived: (newStatus: boolean) => {
+    //toggle showArchived and copy cached pools/goals to the live goals
+    //newStatus => true => add the cached goals/pools
+    //newStatus => false => remove the cached goals/pools if any
+    let pools: any = get().pools;
+    let archivedPools: any = get().archivedPools;
+    log("archivedPools", archivedPools);
+    let newPools: any;
+    if (newStatus) {
+      //go through pool (reviving) cached goals
+      newPools = pools.map((poolItem: any) => {
+        const newGoals = [
+          ...poolItem.pool.nexus.goals,
+          ...poolItem.pool.nexus.cache.map((goalItem: any) => {
+            return {
+              ...goalItem,
+              goal: { ...goalItem.goal, isArchived: true },
+            };
+          }),
+        ];
+        //apppend archived stqtus
+        //actionable archived goals => isArchied true and no par
+        return {
+          ...poolItem,
+          pool: {
+            ...poolItem.pool,
+            nexus: {
+              ...poolItem.pool.nexus,
+              goals: newGoals,
+            },
+          },
+        };
+      });
+      //added the archived pools
+      newPools = [...newPools, ...archivedPools];
+    } else {
+      const cachedPoolsIdList = archivedPools.map((poolItem: any) => {
+        return poolItem.pin.birth;
+      });
+      newPools = pools.filter((poolItem: any) => {
+        return !cachedPoolsIdList.includes(poolItem.pin.birth);
+      });
+      newPools = newPools.map((poolItem: any) => {
+        const cachedGoalsIdList = poolItem.pool.nexus.cache.map(
+          (goalItem: any) => {
+            return goalItem.id.birth;
+          }
+        );
+        const newGoals = poolItem.pool.nexus.goals.filter((goalItem: any) => {
+          return !cachedGoalsIdList.includes(goalItem.id.birth);
+        });
+
+        return {
+          ...poolItem,
+          pool: {
+            ...poolItem.pool,
+            nexus: {
+              ...poolItem.pool.nexus,
+              goals: newGoals,
+            },
+          },
+        };
+      });
+    }
+    set(() => ({
+      pools: newPools,
+      showArchived: newStatus,
     }));
   },
 }));

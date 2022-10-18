@@ -76,12 +76,15 @@ export default function IconMenu({
   isVirtual = false,
   virtualId,
   currentGoal,
+  isArchived = false,
 }: {
   actionable?: any;
   complete?: boolean;
   goalId?: GoalId;
   virtualId?: GoalId;
   isVirtual?: boolean;
+
+  isArchived?: boolean;
 
   pin?: PinId;
   type: "pool" | "goal";
@@ -165,6 +168,26 @@ export default function IconMenu({
     }
     setParentTrying(false);
   };
+  const archivePool = async () => {
+    handleClose();
+    setParentTrying(true);
+
+    try {
+      const result = await api.archivePool(pin);
+      log("archivePool result => ", result);
+      toggleSnackBar(true, {
+        message: "successfully deleted pool",
+        severity: "success",
+      });
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to delete pool",
+        severity: "error",
+      });
+      log("archivePool error => ", e);
+    }
+    setParentTrying(false);
+  };
   const leavePool = async () => {
     handleClose();
     setParentTrying(true);
@@ -201,6 +224,22 @@ export default function IconMenu({
     }
     setParentTrying(false);
   };
+  const archiveGoal = async () => {
+    handleClose();
+    setParentTrying(true);
+
+    try {
+      const result = await api.archiveGoal(id);
+      log("archiveGoal result => ", result);
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to delete goal",
+        severity: "error",
+      });
+      log("archiveGoal error => ", e);
+    }
+    setParentTrying(false);
+  };
   const markActionable = async () => {
     handleClose();
     setParentTrying(true);
@@ -233,10 +272,20 @@ export default function IconMenu({
   };
   const handleTimeline = () => {
     handleClose();
-    toggleTimelineDialog(true);
+    const kickoff = currentGoal.nexus.kickoff?.moment;
+    const deadline = currentGoal.nexus.deadline?.moment;
+    log("kickoff", kickoff);
+    log("deadline", deadline);
+
+    toggleTimelineDialog(true, {
+      goalId: id,
+      kickoff,
+      deadline,
+    });
   };
   const handleMove = () => {
     handleClose();
+
     toggleSelectionMode(true, { goalId: id, poolId: pin, yokeType: "move" });
   };
   const handlePriortize = () => {
@@ -327,6 +376,11 @@ export default function IconMenu({
         onClose={handleClose}
       >
         {type === "goal" ? (
+          //TODO: only admins/owners can delete/archive/restore a goal
+          /*
+        , anyone with permissions on a goal can delete
+          only admins or owner can renew 
+          */
           <div>
             {complete ? (
               <MenuItem onClick={unmarkComplete} disableRipple>
@@ -373,6 +427,14 @@ export default function IconMenu({
             <MenuItem onClick={handlePrecede} disableRipple>
               <CalendarMonthIcon fontSize="small" />
               precede
+            </MenuItem>
+            <MenuItem onClick={archiveGoal} disableRipple>
+              <DeleteIcon fontSize="small" />
+              archive
+            </MenuItem>
+            <MenuItem onClick={archiveGoal} disableRipple>
+              <DeleteIcon fontSize="small" />
+              renew
             </MenuItem>
             <MenuItem onClick={deleteGoal} disableRipple>
               <DeleteIcon fontSize="small" />
@@ -422,19 +484,38 @@ export default function IconMenu({
               make a copy
             </MenuItem>
             {role === "owner" && (
-              <MenuItem
-                onClick={() => {
-                  handleClose();
-                  toggleDeleteDialog(true, {
-                    title: poolData.title,
-                    callback: deletePool,
-                  });
-                }}
-                disableRipple
-              >
-                <DeleteIcon fontSize="small" />
-                delete
-              </MenuItem>
+              <>
+                <MenuItem
+                  onClick={() => {
+                    handleClose();
+                    toggleDeleteDialog(true, {
+                      title: poolData.title,
+                      callback: deletePool,
+                    });
+                  }}
+                  disableRipple
+                >
+                  <DeleteIcon fontSize="small" />
+                  delete
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleClose();
+                    toggleDeleteDialog(true, {
+                      title: poolData.title,
+                      callback: archivePool,
+                    });
+                  }}
+                  disableRipple
+                >
+                  <DeleteIcon fontSize="small" />
+                  archive
+                </MenuItem>
+                <MenuItem onClick={archiveGoal} disableRipple>
+                  <DeleteIcon fontSize="small" />
+                  renew
+                </MenuItem>
+              </>
             )}
           </div>
         )}

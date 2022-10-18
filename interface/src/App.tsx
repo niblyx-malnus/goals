@@ -66,6 +66,8 @@ function App() {
   const fetchedPools = useStore((store) => store.pools);
   const setFetchedPools = useStore((store) => store.setPools);
 
+  const setArchivedPools = useStore((store) => store.setArchivedPools);
+  log("fetchedPools", fetchedPools);
   const [pools, setPools] = useState([]);
   const [loading, setLoading] = useState<Loading>({
     trying: true,
@@ -102,7 +104,6 @@ function App() {
       pool.nexus.goals.forEach((item: any) => {
         goalsMap.set(item.id.birth, item);
       });
-      log("goalsMap", goalsMap);
       const virtualChildren: any = [];
 
       function connect(goal: any, parentId: any) {
@@ -115,7 +116,7 @@ function App() {
             //update id to avoid duplication and
             //add an id to refer to the original goal for actions
             const virtualChildGoal = goalsMap.get(virtualChildId.birth);
-            log("virtualChildGoal", virtualChildGoal.goal.hitch);
+            if (!virtualChildGoal) return;
             const newVirtualChildGoal = {
               id: { ...virtualChildGoal.id, birth: newId },
               goal: {
@@ -137,7 +138,6 @@ function App() {
           }
         );
       }
-      log("pool.nexus.goals", pool.nexus.goals);
       pool.nexus.goals.forEach((shallowGoal: any) => {
         /**
          * if we have nest left, we have virtual children;
@@ -147,8 +147,8 @@ function App() {
         shallowGoal.goal.nexus["nest-left"].map((item: any) => {
           //fetch the goal assosicated with this id from our map
           const saGoal = goalsMap.get(item.birth);
-          log("saGoal", saGoal.goal);
           if (saGoal) {
+            log("saGoal", saGoal.goal);
             const parentId = uuidv4();
             //update parent id to be reflect virtualisation
             //update id to avoid duplication and
@@ -194,6 +194,8 @@ function App() {
     setLoading({ trying: true, success: false, error: false });
     try {
       const result = await api.getData();
+      const groups = await api.getGroupData();
+      log("groups", groups);
       log("fetchInitial result => ", result);
       const resultProjects = result.initial.store.pools;
       //here we enforce asc order for pool to not confuse the users
@@ -201,7 +203,8 @@ function App() {
         return aey.pool.froze.birth - bee.pool.froze.birth;
       });
       const orderedPools = orderPools(preOrderedPools, order);
-
+      //save the cached pools also in a seperate list
+      setArchivedPools(result.initial.store.cache);
       setFetchedPools(orderedPools);
       if (result) {
         setLoading({ trying: false, success: true, error: false });
@@ -233,6 +236,7 @@ function App() {
   };
   useEffect(() => {
     fetchInitial();
+
     window["scry"] = api.scry;
     window["poke"] = api.poke;
   }, []);
@@ -537,6 +541,9 @@ function Header() {
 
   const toggleSnackBar = useStore((store) => store.toggleSnackBar);
 
+  const toggleShowArchived = useStore((store) => store.toggleShowArchived);
+  const showArchived = useStore((store) => store.showArchived);
+
   const [filterCompleteChecked, setFilterCompleteChecked] =
     useState<boolean>(false);
   const [filterIncompleteChecked, setFilterIncompleteChecked] =
@@ -690,7 +697,15 @@ function Header() {
             collapse all
           </Button>
         </Stack>
-
+        <Button
+          sx={{ fontWeight: "bold", justifyContent: " flex-start" }}
+          variant="text"
+          onClick={() => {
+            toggleShowArchived(!showArchived);
+          }}
+        >
+          toggle archived
+        </Button>
         {order === "asc" ? (
           <Button
             sx={{ fontWeight: "bold", justifyContent: " flex-start" }}

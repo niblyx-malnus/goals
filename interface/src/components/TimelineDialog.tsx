@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -15,6 +15,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import dayjs, { Dayjs } from "dayjs";
+import api from "../api";
+import { log } from "../helpers";
+import LoadingButton from "@mui/lab/LoadingButton";
+
 //TODO: get the mobile picker working https://mui.com/x/react-date-pickers/getting-started/
 //TODO: update all the aria here and elsewhere
 
@@ -24,10 +28,20 @@ export default function TimelineDialog() {
   const toggleTimelineDialog = useStore(
     (store: any) => store.toggleTimelineDialog
   );
+  const timelineDialogData = useStore((store: any) => store.timelineDialogData);
 
+  const [trying, setTrying] = useState<boolean>(false);
   const [kickoffValue, setKickoffValue] = React.useState<Dayjs | null>(null);
   const [deadlineValue, setDeadlineValue] = React.useState<Dayjs | null>(null);
+  log("timelineDialogData", timelineDialogData);
+  useEffect(() => {
+    if (timelineDialogData) {
+      const { kickoff, deadline } = timelineDialogData;
 
+      setKickoffValue(kickoff ? dayjs(kickoff) : null);
+      setDeadlineValue(deadline ? dayjs(deadline) : null);
+    }
+  }, [timelineDialogData]);
   const handleKickoffChange = (newValue: Dayjs | null) => {
     setKickoffValue(newValue);
   };
@@ -36,11 +50,32 @@ export default function TimelineDialog() {
   };
 
   const handleClose = () => {
-    toggleTimelineDialog(false);
+    toggleTimelineDialog(false, null);
   };
   const handleConfirm = () => {
-    handleClose();
+    updateTimeline();
   };
+  const updateTimeline = async () => {
+    setTrying(true);
+    try {
+      const kickoffResult = await api.setKickoff(
+        timelineDialogData.goalId,
+        kickoffValue?.unix()
+      );
+      const deadlineResult = await api.setDeadline(
+        timelineDialogData.goalId,
+        deadlineValue?.unix()
+      );
+      log("setDeadline result =>", deadlineResult);
+      log("setKickoff result =>", kickoffResult);
+    } catch (e) {
+      log("updateTimeline error =>", e);
+    }
+    setTrying(false);
+    //    handleClose();
+  };
+
+  if (!timelineDialogData) return null;
   return (
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <Dialog
@@ -76,10 +111,11 @@ export default function TimelineDialog() {
                 renderInput={(params) => <TextField {...params} fullWidth />}
               />
               <IconButton
-                aria-label="add ship to pool"
+                aria-label="clear kickoff input"
                 size="small"
-                onClick={() => null}
-                //  disabled={trying}
+                onClick={() => {
+                  setKickoffValue(null);
+                }}
               >
                 <ClearIcon />
               </IconButton>
@@ -99,10 +135,11 @@ export default function TimelineDialog() {
                 renderInput={(params) => <TextField {...params} fullWidth />}
               />
               <IconButton
-                aria-label="add ship to pool"
+                aria-label="clear deadline input"
                 size="small"
-                //onClick={handleAdd}
-                //disabled={trying}
+                onClick={() => {
+                  setDeadlineValue(null);
+                }}
               >
                 <ClearIcon />
               </IconButton>
@@ -113,9 +150,13 @@ export default function TimelineDialog() {
           <Button sx={{ color: "text.primary" }} onClick={handleClose}>
             cancel
           </Button>
-          <Button variant="contained" onClick={handleConfirm}>
+          <LoadingButton
+            variant="contained"
+            loading={trying}
+            onClick={handleConfirm}
+          >
             save
-          </Button>
+          </LoadingButton>
         </DialogActions>
       </Dialog>
     </LocalizationProvider>

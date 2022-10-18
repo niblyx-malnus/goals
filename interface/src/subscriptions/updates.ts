@@ -10,6 +10,8 @@ import {
   updateToglsAction,
   updatePoolPermsAction,
   handleYoke,
+  archiveGoalAction,
+  archivePoolAction
 } from "../store/actions";
 const setLogList = useStore.getState().setLogList;
 
@@ -39,16 +41,29 @@ const updateHandler = (update: any) => {
         break;
       }
       case "waste-goal": {
-        let { del }: any = update.tel[actionName];
+        let { waz, nex }: any = update.tel[actionName];
         const hed: any = update.hed;
 
-        deleteGoalAction(del, hed.pin);
+        deleteGoalAction(waz, nex, hed.pin);
+        break;
+      }
+      case "cache-goal": {
+        let { cas, nex }: any = update.tel[actionName];
+        const hed: any = update.hed;
+
+        archiveGoalAction(cas, nex, hed.pin);
         break;
       }
       case "trash-pool": {
         const hed: any = update.hed;
 
         deletePoolAction(hed.pin);
+        break;
+      }
+      case "cache-pool": {
+        const hed: any = update.hed;
+
+        archivePoolAction(hed.pin);
         break;
       }
       case "pool-hitch": {

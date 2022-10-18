@@ -52,6 +52,9 @@ const api = {
       log("poke error: ", e);
     }
   },
+  getGroupData: async () => {
+    return api.createApi().scry({ app: "goal-store", path: "/groups" });
+  },
   getData: async () => {
     //gets our main data we display (pools/goals)
     return api.createApi().scry({ app: "goal-store", path: "/initial" });
@@ -91,6 +94,26 @@ const api = {
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: poolToDelete });
   },
+  renewPool: async (pin) => {
+    const poolToRenew = {
+      "renew-pool": {
+        pin,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: poolToRenew });
+  },
+  archivePool: async (pin) => {
+    const poolToArchive = {
+      "cache-pool": {
+        pin,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: poolToArchive });
+  },
   addGoal: async (desc, pin, parentId) => {
     //parent id => add under
     const newGoal = {
@@ -117,6 +140,26 @@ const api = {
     return api
       .createApi()
       .poke({ app: "goal-store", mark: "goal-action", json: goalToDelete });
+  },
+  renewGoal: async (id) => {
+    const goalToRenew = {
+      "renew-goal": {
+        id,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: goalToRenew });
+  },
+  archiveGoal: async (id) => {
+    const goalToArchive = {
+      "cache-goal": {
+        id,
+      },
+    };
+    return api
+      .createApi()
+      .poke({ app: "goal-store", mark: "goal-action", json: goalToArchive });
   },
   editGoalDesc: async (id, newDesc) => {
     const goalToEdit = {
@@ -193,9 +236,9 @@ const api = {
   },
   setKickoff: async (id, date) => {
     const newKickoff = {
-      "set-deadline": {
+      "set-kickoff": {
         id,
-        deadline: date, //null or date
+        kickoff: date, //null or date
       },
     };
     return api
