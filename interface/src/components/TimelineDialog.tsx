@@ -7,7 +7,8 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Stack from "@mui/material/Stack";
 import useStore from "../store";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -33,13 +34,12 @@ export default function TimelineDialog() {
   const [trying, setTrying] = useState<boolean>(false);
   const [kickoffValue, setKickoffValue] = React.useState<Dayjs | null>(null);
   const [deadlineValue, setDeadlineValue] = React.useState<Dayjs | null>(null);
-  log("timelineDialogData", timelineDialogData);
+
   useEffect(() => {
     if (timelineDialogData) {
       const { kickoff, deadline } = timelineDialogData;
-
-      setKickoffValue(kickoff ? dayjs(kickoff) : null);
-      setDeadlineValue(deadline ? dayjs(deadline) : null);
+      setKickoffValue(kickoff ? dayjs.unix(kickoff) : null);
+      setDeadlineValue(deadline ? dayjs.unix(deadline) : null);
     }
   }, [timelineDialogData]);
   const handleKickoffChange = (newValue: Dayjs | null) => {
@@ -77,7 +77,7 @@ export default function TimelineDialog() {
 
   if (!timelineDialogData) return null;
   return (
-    <LocalizationProvider dateAdapter={AdapterMoment}>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Dialog
         open={open}
         onClose={handleClose}
