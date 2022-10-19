@@ -11,7 +11,8 @@ import {
   updatePoolPermsAction,
   handleYoke,
   archiveGoalAction,
-  archivePoolAction
+  archivePoolAction,
+  renewGoalAction
 } from "../store/actions";
 const setLogList = useStore.getState().setLogList;
 
@@ -52,6 +53,13 @@ const updateHandler = (update: any) => {
         const hed: any = update.hed;
 
         archiveGoalAction(cas, nex, hed.pin);
+        break;
+      }
+      case "renew-goal": {
+        let { ren }: any = update.tel[actionName];
+        const hed: any = update.hed;
+
+        renewGoalAction(ren, hed.pin);
         break;
       }
       case "trash-pool": {

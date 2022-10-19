@@ -34,12 +34,11 @@ export default function TimelineDialog() {
   const [trying, setTrying] = useState<boolean>(false);
   const [kickoffValue, setKickoffValue] = React.useState<Dayjs | null>(null);
   const [deadlineValue, setDeadlineValue] = React.useState<Dayjs | null>(null);
-
   useEffect(() => {
     if (timelineDialogData) {
       const { kickoff, deadline } = timelineDialogData;
-      setKickoffValue(kickoff ? dayjs.unix(kickoff) : null);
-      setDeadlineValue(deadline ? dayjs.unix(deadline) : null);
+      setKickoffValue(kickoff ? dayjs(kickoff) : null);
+      setDeadlineValue(deadline ? dayjs(deadline) : null);
     }
   }, [timelineDialogData]);
   const handleKickoffChange = (newValue: Dayjs | null) => {
@@ -60,11 +59,11 @@ export default function TimelineDialog() {
     try {
       const kickoffResult = await api.setKickoff(
         timelineDialogData.goalId,
-        kickoffValue?.unix()
+        kickoffValue?.valueOf()
       );
       const deadlineResult = await api.setDeadline(
         timelineDialogData.goalId,
-        deadlineValue?.unix()
+        deadlineValue?.valueOf()
       );
       log("setDeadline result =>", deadlineResult);
       log("setKickoff result =>", kickoffResult);

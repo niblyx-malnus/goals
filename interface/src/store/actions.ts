@@ -148,8 +148,40 @@ function deleteArchivedGoalAction(toDeleteList: GoalId[], pinId: PinId) {
   });
   setPools(newPools);
 }
-function renewGoalAction() {
+function renewGoalAction(toRenewList: GoalId[], pinId: PinId) {
+  const state = useStore.getState();
+  const pools = state.pools;
+  const setPools = state.setPools;
+
+  const renewIdBirthList = toRenewList.map((id: any) => {
+    return id.birth;
+  });
+  //select the project using pin
   //remove from cached list and goals list and add back to goal list fresh (in case we are showing archived)
+
+  const newPools = pools.map((poolItem: any, poolIndex: number) => {
+    const { pin } = poolItem;
+    if (pin.birth === pinId.birth) {
+      //filter our existing cached goals in goals (in case of showing archive => true)
+      const newGoals = poolItem.pool.nexus.goals.filter((goalItem: any) => {
+        return !renewIdBirthList.includes(goalItem.id.birth);
+      });
+      const newCache = poolItem.pool.nexus.cache.filter((goalItem: any) => {
+        return !renewIdBirthList.includes(goalItem.id.birth);
+      });
+      //add back the renew goal to the goals list
+
+      return {
+        ...poolItem,
+        pool: {
+          ...poolItem.pool,
+          nexus: { ...poolItem.pool.nexus, goals: newGoals, cache: newCache },
+        },
+      };
+    }
+    return poolItem;
+  });
+  setPools(newPools);
 }
 function deleteArchivedPoolAction() {
   //remove from poolList and from the cachedPools(store)
@@ -471,4 +503,5 @@ export {
   handleYoke,
   archiveGoalAction,
   archivePoolAction,
+  renewGoalAction,
 };

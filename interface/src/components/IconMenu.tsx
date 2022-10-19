@@ -240,6 +240,26 @@ export default function IconMenu({
     }
     setParentTrying(false);
   };
+  const renewGoal = async () => {
+    handleClose();
+    setParentTrying(true);
+
+    try {
+      const result = await api.renewGoal(id);
+      log("renewGoal result => ", result);
+      toggleSnackBar(true, {
+        message: "successfully renewd goal",
+        severity: "success",
+      });
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to renew goal",
+        severity: "error",
+      });
+      log("archiveGoal error => ", e);
+    }
+    setParentTrying(false);
+  };
   const markActionable = async () => {
     handleClose();
     setParentTrying(true);
@@ -432,7 +452,7 @@ export default function IconMenu({
               <DeleteIcon fontSize="small" />
               archive
             </MenuItem>
-            <MenuItem onClick={archiveGoal} disableRipple>
+            <MenuItem onClick={renewGoal} disableRipple>
               <DeleteIcon fontSize="small" />
               renew
             </MenuItem>
