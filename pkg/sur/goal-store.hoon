@@ -57,7 +57,7 @@
       [%spawn-goal =pin =nex =id =goal]
       [%waste-goal =pin =nex =id waz=(set id)]
       [%cache-goal =pin =nex =id cas=(set id)]
-      [%renew-goal =pin =id ren=(set id)]
+      [%renew-goal =pin =id ren=goals]
       [%trash-goal =pin =id tas=(set id)]
       [%pool-perms new=pool-perms]
       [%pool-hitch pool-hitch-update]

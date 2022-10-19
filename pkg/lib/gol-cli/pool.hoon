@@ -280,7 +280,7 @@
   =.  goals.p  (~(uni by goals.p) ren)
   =.  cache.p  (~(del by cache.p) id)
   ::
-  (emot old [%renew-goal pin id ~(key by ren)])
+  (emot old [%renew-goal pin id ren])
 ::
 :: Permanently delete goal (must be in cache)
 ++  trash-goal
@@ -1140,19 +1140,6 @@
   =.  goals.p  (~(put by goals.p) id goal(complete %|))
   (emot old [%goal-togls id %complete %.n])
 ::
-++  set-deadline
-  |=  [=id:gol moment=(unit @da) mod=ship]
-  ^-  _this
-  =/  old  this
-  ?>  (check-goal-perm id mod)
-  =/  rb  (ryte-bound [%d id])
-  =/  lb  (left-bound [%d id])
-  ?:  &(!=(+.lb [%d id]) (unit-lth moment -:lb))  ~|("bound-left" !!)
-  ?:  &(!=(+.rb [%d id]) (unit-gth moment -:rb))  ~|("bound-ryte" !!)
-  =/  goal  (~(got by goals.p) id)
-  =.  goals.p  (~(put by goals.p) id goal(moment.deadline moment))
-  (emot old [%goal-nexus id %deadline moment])
-::
 ++  set-kickoff
   |=  [=id:gol moment=(unit @da) mod=ship]
   ^-  _this
@@ -1160,11 +1147,24 @@
   ?>  (check-goal-perm id mod)
   =/  rb  (ryte-bound [%k id])
   =/  lb  (left-bound [%k id])
-  ?:  &(!=(+.lb [%k id]) (unit-lth moment -:lb))  ~|("bound-left" !!)
-  ?:  &(!=(+.rb [%k id]) (unit-gth moment -:rb))  ~|("bound-ryte" !!)
+  ?:  &(!=(+.lb [%k id]) (unit-lth moment -:lb))  ~&("bound-left" ~|("bound-left" !!))
+  ?:  &(!=(+.rb [%k id]) (unit-gth moment -:rb))  ~&("bound-ryte" ~|("bound-ryte" !!))
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(moment.kickoff moment))
   (emot old [%goal-nexus id %kickoff moment])
+::
+++  set-deadline
+  |=  [=id:gol moment=(unit @da) mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-goal-perm id mod)
+  =/  rb  (ryte-bound [%d id])
+  =/  lb  (left-bound [%d id])
+  ?:  &(!=(+.lb [%d id]) (unit-lth moment -:lb))  ~&("bound-left" ~|("bound-left" !!))
+  ?:  &(!=(+.rb [%d id]) (unit-gth moment -:rb))  ~&("bound-ryte" ~|("bound-ryte" !!))
+  =/  goal  (~(got by goals.p) id)
+  =.  goals.p  (~(put by goals.p) id goal(moment.deadline moment))
+  (emot old [%goal-nexus id %deadline moment])
 ::
 :: Update pool permissions for individual ship.
 :: If role is ~, remove ship as viewer.

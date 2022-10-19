@@ -29,6 +29,7 @@
     parse-set-utc-offset                  
     parse-collapse                        
     parse-uncollapse                      
+    (parse-set-kickoff now utc-offset)   
     (parse-set-deadline now utc-offset)   
     parse-mark-actionable
     parse-unmark-actionable
@@ -231,11 +232,20 @@
 ++  parse-print-context
   (cold [%print-context ~] (jest ''))
 ::
+:: set kickoff of a given goal
+++  parse-set-kickoff
+  |=  [now=@da utc-offset=[@dr ?]]
+  ;~  (glue ace)
+    (cold %set-kickoff (jest 'sk'))           :: command 'sk'
+    (cook crip parse-handle)                   :: handle of goal to update deadline of
+    (parse-deadline:dates now utc-offset)      :: get (unit @da) of deadline to update
+  ==
+::
 :: set deadline of a given goal
 ++  parse-set-deadline
   |=  [now=@da utc-offset=[@dr ?]]
   ;~  (glue ace)
-    (cold %set-deadline (jest 'sd'))           :: command 'sd' (and following ace)
+    (cold %set-deadline (jest 'sd'))           :: command 'sd'
     (cook crip parse-handle)                   :: handle of goal to update deadline of
     (parse-deadline:dates now utc-offset)      :: get (unit @da) of deadline to update
   ==

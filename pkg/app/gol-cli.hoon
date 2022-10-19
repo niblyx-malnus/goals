@@ -318,6 +318,12 @@
     =+  [msg res]=(invalid-goal-id-error:prtr h.command)  ?.  =(~ msg)  msg
     [(poke-our %goal-store goal-action+!>([%trash-goal id.res]))]~
       ::
+      ::  [%set-kickoff h=@t k=(unit @da)]
+      %set-kickoff
+    =*  poke  ~(poke pass:io /mod-command/set-kickoff)
+    =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
+    ~[(poke [owner.id.res %goal-store] goal-action+!>([%set-kickoff id.res k.command]))]
+      ::
       ::  [%set-deadline h=@t d=(unit @da)]
       %set-deadline
     =*  poke  ~(poke pass:io /mod-command/set-deadline)

@@ -193,7 +193,7 @@
         %-  pairs
         :~  [%pin (enjs-pin pin.hom)]
             [%id (enjs-id id.upd)]
-            [%ren a+(turn ~(tap in ren.upd) enjs-id)]
+            [%ren (enjs-goals ren.upd)]
         ==
         ::
         %trash-goal

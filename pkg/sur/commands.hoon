@@ -33,6 +33,7 @@
       [%edit-pool-title h=@t title=@t]
       [%collapse h=@t rec=?]
       [%uncollapse h=@t rec=?]
+      [%set-kickoff h=@t k=(unit @d)]
       [%set-deadline h=@t d=(unit @d)]
       [%set-utc-offset hours=@dr ahead=?]
       [%mark-actionable h=@t]
