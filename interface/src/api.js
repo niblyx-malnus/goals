@@ -259,11 +259,8 @@ const api = {
   copyPool: async (oldPin, title) => {
     const poolToCopy = {
       "clone-pool": {
-        "old-pin": oldPin,
+        pin: oldPin,
         title,
-        admins: [],
-        captains: [],
-        viewers: [],
       },
     };
     return api

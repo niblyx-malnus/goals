@@ -118,13 +118,11 @@ function deleteArchivedGoalAction(toDeleteList: GoalId[], pinId: PinId) {
 
   const toDeleteIdList = toDeleteList.map((item: GoalId) => item.birth);
 
-  //select the project using pin, and then filter out goals using toDeleteId
+  //select the project using pin, and then filter out goals from goals/cache using toDeleteId
   const newPools = pools.map((poolItem: any, poolIndex: number) => {
     const { pin } = poolItem;
     if (pin.birth === pinId.birth) {
-      //TODO: comment better
-      //remove from goals and the cache list here
-      //filter out the goals that exist in pools and in toDeleteIdList
+      //filter out the goals that exist in nexus => goals/cache
       let newGoals = poolItem.pool.nexus.goals.filter((goalItem: any) => {
         return !toDeleteIdList.includes(goalItem.id.birth);
       });
@@ -153,8 +151,9 @@ function renewGoalAction(toRenewList: GoalId[], pinId: PinId) {
   const pools = state.pools;
   const setPools = state.setPools;
 
-  const renewIdBirthList = toRenewList.map((id: any) => {
-    return id.birth;
+  const renewGoalsMap = new Map();
+  toRenewList.forEach((goalItem: any) => {
+    renewGoalsMap.set(goalItem.id.birth, goalItem);
   });
   //select the project using pin
   //remove from cached list and goals list and add back to goal list fresh (in case we are showing archived)
@@ -163,14 +162,14 @@ function renewGoalAction(toRenewList: GoalId[], pinId: PinId) {
     const { pin } = poolItem;
     if (pin.birth === pinId.birth) {
       //filter our existing cached goals in goals (in case of showing archive => true)
-      const newGoals = poolItem.pool.nexus.goals.filter((goalItem: any) => {
-        return !renewIdBirthList.includes(goalItem.id.birth);
+      let newGoals = poolItem.pool.nexus.goals.filter((goalItem: any) => {
+        return !renewGoalsMap.has(goalItem.id.birth);
       });
       const newCache = poolItem.pool.nexus.cache.filter((goalItem: any) => {
-        return !renewIdBirthList.includes(goalItem.id.birth);
+        return !renewGoalsMap.has(goalItem.id.birth);
       });
-      //add back the renew goal to the goals list
-
+      //add back the renewed goals to the goals list
+      newGoals = [...newGoals, ...toRenewList];
       return {
         ...poolItem,
         pool: {
@@ -183,11 +182,53 @@ function renewGoalAction(toRenewList: GoalId[], pinId: PinId) {
   });
   setPools(newPools);
 }
-function deleteArchivedPoolAction() {
+function deleteArchivedPoolAction(poolToDelete: PinId) {
   //remove from poolList and from the cachedPools(store)
+  const state = useStore.getState();
+  const pools = state.pools;
+  const setPools = state.setPools;
+
+  const archivedPools = state.archivedPools;
+  const setArchivedPools = state.setArchivedPools;
+
+  //filter our the poolToDelete from the pools (active) list
+  const newPools = pools.filter((poolItem: any) => {
+    const { pin } = poolItem;
+    return pin.birth !== poolToDelete.birth;
+  });
+  //filter out the poolToDelete from the cached pools list
+  const newArchivedPools = archivedPools.filter((poolItem: any) => {
+    const { pin } = poolItem;
+    return pin.birth !== poolToDelete.birth;
+  });
+  log("newArchivedPools", newArchivedPools); 
+  setArchivedPools(newArchivedPools);
+  setPools(newPools);
 }
-function renewPoolAction() {
+function renewPoolAction(poolToRenew: PinId, poolData: any) {
   //remove from cachedPools(store) and remove it from the pools and add it back  (in case we are showing archived)
+  const state = useStore.getState();
+  const pools = state.pools;
+  const setPools = state.setPools;
+
+  const archivedPools = state.archivedPools;
+  const setArchivedPools = state.setArchivedPools;
+
+  //filter our the poolToRenew and add back in after this
+  const newPools = pools.filter((poolItem: any) => {
+    const { pin } = poolItem;
+    return pin.birth !== poolToRenew.birth;
+  });
+  newPools.push({ pin: poolToRenew, pool: poolData });
+  //filter out the poolToRenew from the cached pools list
+  const newArchivedPools = archivedPools.filter((poolItem: any) => {
+    const { pin } = poolItem;
+    return pin.birth !== poolToRenew.birth;
+  });
+  //add the newly cached pool to our cached pools list
+  //TODO
+  setArchivedPools(newArchivedPools);
+  setPools(newPools);
 }
 function archiveGoalAction(
   toCacheGoals: GoalId[],
@@ -228,19 +269,31 @@ function archiveGoalAction(
       newGoals = newGoals.filter((goalItem: any, goalIndex: any) => {
         return !toCacheIdList.includes(goalItem.id.birth);
       });
-
+      //create our new cached goals to be added to the existing cache list
       const incomingCachedGoals = poolItem.pool.nexus.goals.filter(
         (goalItem: any, goalIndex: any) => {
           return !!toCacheIdList.includes(goalItem.id.birth);
         }
       );
+
       //if we happen to be in showing the archives to the user, we have to update them here
       if (showArchived) {
-        newGoals = [...newGoals, ...incomingCachedGoals];
+        newGoals = [
+          ...newGoals,
+          //make sure to include isArchived for the new cache goals to be displayed correctly
+          ...incomingCachedGoals.map((goalItem: any) => {
+            return {
+              ...goalItem,
+              goal: {
+                ...goalItem.goal,
+                isArchived: true,
+              },
+            };
+          }),
+        ];
       }
       // add the incoming cache items to our cacheList and add back the existing items
       const newCache = [...poolItem.pool.nexus.cache, ...incomingCachedGoals];
-      //
       return {
         ...poolItem,
         pool: {
@@ -504,4 +557,7 @@ export {
   archiveGoalAction,
   archivePoolAction,
   renewGoalAction,
+  deleteArchivedGoalAction,
+  renewPoolAction,
+  deleteArchivedPoolAction,
 };

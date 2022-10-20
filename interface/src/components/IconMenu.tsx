@@ -188,6 +188,26 @@ export default function IconMenu({
     }
     setParentTrying(false);
   };
+  const renewPool = async () => {
+    handleClose();
+    setParentTrying(true);
+
+    try {
+      const result = await api.renewPool(pin);
+      log("renewPool result => ", result);
+      toggleSnackBar(true, {
+        message: "successfully renewed pool",
+        severity: "success",
+      });
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to renew pool",
+        severity: "error",
+      });
+      log("renewPool error => ", e);
+    }
+    setParentTrying(false);
+  };
   const leavePool = async () => {
     handleClose();
     setParentTrying(true);
@@ -531,7 +551,7 @@ export default function IconMenu({
                   <DeleteIcon fontSize="small" />
                   archive
                 </MenuItem>
-                <MenuItem onClick={archiveGoal} disableRipple>
+                <MenuItem onClick={renewPool} disableRipple>
                   <DeleteIcon fontSize="small" />
                   renew
                 </MenuItem>

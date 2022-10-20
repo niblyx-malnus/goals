@@ -12,7 +12,10 @@ import {
   handleYoke,
   archiveGoalAction,
   archivePoolAction,
-  renewGoalAction
+  renewGoalAction,
+  deleteArchivedGoalAction,
+  renewPoolAction,
+  deleteArchivedPoolAction,
 } from "../store/actions";
 const setLogList = useStore.getState().setLogList;
 
@@ -62,16 +65,35 @@ const updateHandler = (update: any) => {
         renewGoalAction(ren, hed.pin);
         break;
       }
+      case "trash-goal": {
+        let { tas }: any = update.tel[actionName];
+        const hed: any = update.hed;
+
+        deleteArchivedGoalAction(tas, hed.pin);
+        break;
+      }
       case "trash-pool": {
         const hed: any = update.hed;
 
-        deletePoolAction(hed.pin);
+        deleteArchivedPoolAction(hed.pin);
         break;
       }
       case "cache-pool": {
         const hed: any = update.hed;
 
         archivePoolAction(hed.pin);
+        break;
+      }
+      case "renew-pool": {
+        let { pin, pool }: any = update.tel[actionName];
+
+        renewPoolAction(pin, pool);
+        break;
+      }
+      case "waste-pool": {
+        const hed: any = update.hed;
+
+        deletePoolAction(hed.pin);
         break;
       }
       case "pool-hitch": {
