@@ -84,9 +84,14 @@
     ++  trash-pool
       |=  =pin:gol
       ^-  store:gol
+      =/  goal-ids
+        ?:  (~(has by pools.store) pin)
+          ~(tap in ~(key by goals:(~(got by pools.store) pin)))
+        ?:  (~(has by cache.store) pin)
+          ~(tap in ~(key by goals:(~(got by cache.store) pin)))
+        ~
       %=  store
-        index
-          (gus-by-index ~(tap in ~(key by goals:(~(got by pools.store) pin))))
+        index  (gus-by-index goal-ids)
         pools  (~(del by pools.store) pin)
         cache  (~(del by cache.store) pin)
       ==

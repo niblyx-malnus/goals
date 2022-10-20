@@ -915,8 +915,10 @@
   ?:  (before e2 e1)  ~|("before-e2-e1" !!)
   ::
   :: there must be no bound mismatch between e1 and e2
-  ?:  (unit-gth moment.edge1 -:(ryte-bound e2))  ~|("bound-mismatch" !!)
-  ?:  (unit-lth moment.edge2 -:(left-bound e1))  ~|("bound-mismatch" !!)
+  ?:  (unit-gth moment.edge1 -:(ryte-bound e2))
+    ~&("bound-mismatch" ~|("bound-mismatch" !!))
+  ?:  (unit-lth moment.edge2 -:(left-bound e1))
+    ~&("bound-mismatch" ~|("bound-mismatch" !!))
   ::
   :: dag-yoke
   =.  outflow.edge1  (~(put in outflow.edge1) e2)
