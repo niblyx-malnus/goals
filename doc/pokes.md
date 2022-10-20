@@ -131,13 +131,13 @@ Delete an existing pool from the active pools or from the cache.
 
 ### Noun
 ```
-[%renew-pool =pin]
+[%trash-pool =pin]
 ```
 
 ### JSON
 ```
 {
-  "renew-pool": {
+  "trash-pool": {
     "pin": {
       "owner": "zod",
       "birth": "~2000.1.1"
