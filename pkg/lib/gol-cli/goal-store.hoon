@@ -107,8 +107,8 @@
   ?>  =(mod owner.pin)
   =/  pool  (~(got by cache.store) pin)
   :+  pin
-    [[pin mod] %renew-pool pin]~
-  (etch:etch pin [%renew-pool pin]~)
+    [[pin mod] %renew-pool pin pool]~
+  (etch:etch pin [%renew-pool pin pool]~)
 ::
 ++  clone-pool
   |=  $:  =old=pin:gol

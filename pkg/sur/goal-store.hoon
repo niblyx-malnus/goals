@@ -1,4 +1,4 @@
-/-  *goal, *group
+/-  *goal, *group, metadata-store
 |%
 ::
 +$  action
@@ -52,7 +52,7 @@
 +$  update
   $%  [%spawn-pool =pool]
       [%cache-pool =pin]
-      [%renew-pool =pin]
+      [%renew-pool =pin =pool]
       [%trash-pool ~]
       [%spawn-goal =pin =nex =id =goal]
       [%waste-goal =pin =nex =id waz=(set id)]
@@ -74,6 +74,7 @@
 +$  peek
   $%  [%initial =store]
       [%groups =groups]
+      [%groups-metadata metadata=associations:metadata-store]
       [%pool-keys keys=(set pin)]
       [%all-goal-keys keys=(set id)]
       [%harvest harvest=(list id)]

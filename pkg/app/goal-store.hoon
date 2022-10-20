@@ -1,4 +1,4 @@
-/-  gol=goal, goal-store, group-store
+/-  gol=goal, goal-store, group-store, metadata-store
 /+  dbug, default-agent, verb, agentio,
     gol-cli-goals, gol-cli-goal-store, pl=gol-cli-pool,
     gol-cli-etch, group-update
@@ -350,6 +350,16 @@
     ::
       [%x %groups ~]
     ``goal-peek+!>(groups+groups.store)
+    ::
+      [%x %groups-metadata ~]
+    =/  gmd
+      .^  associations:metadata-store 
+        %gx
+        :~  (scot %p our.bowl)  %metadata-store  (scot %da now.bowl)
+            %app-name  %groups  %noun
+        ==
+      ==
+    ``goal-peek+!>(groups-metadata+gmd)
     ::
       [%x %pool-keys ~]
     ``goal-peek+!>(pool-keys+~(key by pools))

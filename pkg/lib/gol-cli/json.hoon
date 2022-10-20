@@ -1,5 +1,5 @@
 /-  *goal, *goal-store
-/+  *gol-cli-help, group-store
+/+  *gol-cli-help, group-store, metadata-store
 |%
 ++  dejs-action
   =,  dejs:format
@@ -207,7 +207,8 @@
         ::
         %cache-pool  (frond %pin (enjs-pin pin.upd))
         ::
-        %renew-pool  (frond %pin (enjs-pin pin.upd))
+          %renew-pool 
+        (pairs ~[[%pin (enjs-pin pin.upd)] [%pool (enjs-pool pool.upd)]])
         ::
         %trash-pool  ~
         ::
@@ -283,6 +284,9 @@
     ==
     ::
     %groups  (frond %groups (initial:enjs:group-store [%initial groups.pyk]))
+    ::
+      %groups-metadata
+    (frond %metadata (associations:enjs:metadata-store metadata.pyk))
     ::
       %pool-keys
     %+  frond

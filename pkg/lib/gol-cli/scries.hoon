@@ -1,4 +1,4 @@
-/-  *goal-store, *view
+/-  *goal-store, *view, *resource, ms=metadata-store
 |_  =bowl:gall
 ++  initial
   ^-  store
