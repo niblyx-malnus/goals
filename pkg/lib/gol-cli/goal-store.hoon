@@ -89,9 +89,14 @@
   |=  [=pin:gol mod=ship]
   ^-  home-cud:goal-store
   ?>  =(mod owner.pin)
-  :+  pin
-    [[pin mod] %trash-pool ~]~
-  (etch:etch pin [%trash-pool ~]~)
+  :-  pin
+  ?:  (~(has by pools.store) pin)
+    :-  [[pin mod] %waste-pool ~]~
+    (etch:etch pin [%waste-pool ~]~)
+  ?:  (~(has by cache.store) pin)
+    :-  [[pin mod] %trash-pool ~]~
+    (etch:etch pin [%trash-pool ~]~)
+  !!
 ::
 ++  cache-pool
   |=  [=pin:gol mod=ship]

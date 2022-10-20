@@ -35,9 +35,12 @@
     pools   pools.store
     cache   cache.store
     groups  groups.store
+::
 ++  on-init   
   ^-  (quip card _this)
   :_  this
+  ?:  (~(has by wex.bowl) [/groups our.bowl %group-store])
+    ~
   [(~(watch-our pass:io /groups) %group-store /groups)]~
 ::
 ++  on-save   !>(state)
@@ -50,6 +53,8 @@
   ?-    -.old
       %4
     :_  this(state old)
+    ?:  (~(has by wex.bowl) [/groups our.bowl %group-store])
+      ~
     [(~(watch-our pass:io /groups) %group-store /groups)]~
       %3
     $(old (convert-3-to-4:gol old))

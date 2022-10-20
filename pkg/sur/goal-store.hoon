@@ -53,6 +53,7 @@
   $%  [%spawn-pool =pool]
       [%cache-pool =pin]
       [%renew-pool =pin =pool]
+      [%waste-pool ~]
       [%trash-pool ~]
       [%spawn-goal =pin =nex =id =goal]
       [%waste-goal =pin =nex =id waz=(set id)]

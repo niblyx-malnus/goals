@@ -37,7 +37,9 @@
 ::
 ++  on-init
   ^-  (quip card _this)
-  :-  [(~(watch-our pass:io /goals) %goal-store /goals)]~
+  :-  ?:  (~(has by wex.bowl) [/goals our.bowl %goal-store])
+        ~
+      [(~(watch-our pass:io /goals) %goal-store /goals)]~
   %=  this
     handles  *handles:vyu
     views  (~(put by *views:vyu) [%all ~] *view:vyu)
@@ -52,7 +54,12 @@
   |-
   ?-    -.old
       %2
-    :-  (print-cards:prtr ~["%gol-cli: Hit ENTER to re-initialize."])
+    :-  %+  weld
+          (print-cards:prtr ~["%gol-cli: Hit ENTER to re-initialize."])
+        ^-  (list card)
+        ?:  (~(has by wex.bowl) [/goals our.bowl %goal-store])
+          ~
+        [(~(watch-our pass:io /goals) %goal-store /goals)]~
     %=  this
       handles  initial:hdls
       views    initial:vyuz
@@ -74,6 +81,7 @@
         :: [%print ~]
         %print
         ?>  =(src.bowl our.bowl)
+        ~&  wex.bowl
         =/  mode
           ?-  hide-completed
             %&  %normal

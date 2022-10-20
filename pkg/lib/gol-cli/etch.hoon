@@ -18,6 +18,7 @@
       %spawn-pool  (spawn-pool:life-cycle pin pool.upd)
       %cache-pool  (cache-pool:life-cycle pin)
       %renew-pool  (renew-pool:life-cycle pin)
+      %waste-pool  (waste-pool:life-cycle pin)
       %trash-pool  (trash-pool:life-cycle pin)
         ::
         %spawn-goal
@@ -81,18 +82,21 @@
         cache  (~(del by cache.store) pin)
       ==
     ::
+    ++  waste-pool
+      |=  =pin:gol
+      ^-  store:gol
+      %=  store
+        index  %-  gus-by-index
+               ~(tap in ~(key by goals:(~(got by pools.store) pin)))
+        pools  (~(del by pools.store) pin)
+      ==
+    ::
     ++  trash-pool
       |=  =pin:gol
       ^-  store:gol
-      =/  goal-ids
-        ?:  (~(has by pools.store) pin)
-          ~(tap in ~(key by goals:(~(got by pools.store) pin)))
-        ?:  (~(has by cache.store) pin)
-          ~(tap in ~(key by goals:(~(got by cache.store) pin)))
-        ~
       %=  store
-        index  (gus-by-index goal-ids)
-        pools  (~(del by pools.store) pin)
+        index  %-  gus-by-index
+               ~(tap in ~(key by goals:(~(got by cache.store) pin)))
         cache  (~(del by cache.store) pin)
       ==
     --
