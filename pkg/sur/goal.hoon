@@ -485,16 +485,19 @@
     ?:  =(idx (lent flow))  +(lvl) :: add 1 to maximum child depth
     $(idx +(idx), lvl (max lvl (ryte-plumb (snag idx flow))))
   ::
-  :: think of ~ as +inf in the case of lth and -inf in case of gth
-  ++  unit-cmp
-    |=  cmp=$-([@ @] ?)
+  :: think of ~ as +inf
+  ++  loth
     |=  [a=(unit @) b=(unit @)]
     ?~  a  %.n
     ?~  b  %.y
-    (cmp u.a u.b)
+    (lth u.a u.b)
   ::
-  ++  unit-lth  (unit-cmp lth)
-  ++  unit-gth  (unit-cmp gth)
+  :: think of ~ as -inf
+  ++  goth
+    |=  [a=(unit @) b=(unit @)]
+    ?~  a  %.n
+    ?~  b  %.y
+    (gth u.a u.b)
   ::
   ++  head-extremum
     |=  cmp=$-([(unit @) (unit @)] ?)
@@ -504,8 +507,8 @@
     |:  [a=i.-.lst b=i.-.lst]
     ?:  (cmp -.a -.b)  a  b
   ::
-  ++  list-min-head  (head-extremum unit-lth)
-  ++  list-max-head  (head-extremum unit-gth)
+  ++  list-min-head  (head-extremum loth)
+  ++  list-max-head  (head-extremum goth)
   ::
   ++  got-edge
     |=  =eid:s3

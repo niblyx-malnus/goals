@@ -326,16 +326,33 @@
     %d  goal(deadline edge)
   ==
 ::
-:: think of ~ as +inf in the case of lth and -inf in case of gth
-++  unit-cmp
-  |=  cmp=$-([@ @] ?)
+:: think of ~ as +inf
+++  loth
   |=  [a=(unit @) b=(unit @)]
   ?~  a  %.n
   ?~  b  %.y
-  (cmp u.a u.b)
+  (lth u.a u.b)
 ::
-++  unit-lth  (unit-cmp lth)
-++  unit-gth  (unit-cmp gth)
+:: think of ~ as -inf
+++  goth
+  |=  [a=(unit @) b=(unit @)]
+  ?~  a  %.n
+  ?~  b  %.y
+  (gth u.a u.b)
+::
+:: comparing to ~ always returns %.n
+++  lath
+  |=  [a=(unit @) b=(unit @)]
+  ?~  a  %.n
+  ?~  b  %.n
+  (lth u.a u.b)
+::
+:: comparing to ~ always returns %.n
+++  gath
+  |=  [a=(unit @) b=(unit @)]
+  ?~  a  %.n
+  ?~  b  %.n
+  (gth u.a u.b)
 ::
 ++  head-extremum
   |=  cmp=$-([(unit @) (unit @)] ?)
@@ -345,8 +362,8 @@
   |:  [a=i.-.lst b=i.-.lst]
   ?:  (cmp -.a -.b)  a  b
 ::
-++  list-min-head  (head-extremum unit-lth)
-++  list-max-head  (head-extremum unit-gth)
+++  list-min-head  (head-extremum loth)
+++  list-max-head  (head-extremum goth)
 ::
 ++  ryte-bound
   |=  =eid:gol
@@ -915,9 +932,9 @@
   ?:  (before e2 e1)  ~|("before-e2-e1" !!)
   ::
   :: there must be no bound mismatch between e1 and e2
-  ?:  (unit-gth moment.edge1 -:(ryte-bound e2))
+  ?:  (gath moment.edge1 -:(ryte-bound e2))
     ~&("bound-mismatch" ~|("bound-mismatch" !!))
-  ?:  (unit-lth moment.edge2 -:(left-bound e1))
+  ?:  (lath moment.edge2 -:(left-bound e1))
     ~&("bound-mismatch" ~|("bound-mismatch" !!))
   ::
   :: dag-yoke
@@ -1149,8 +1166,8 @@
   ?>  (check-goal-perm id mod)
   =/  rb  (ryte-bound [%k id])
   =/  lb  (left-bound [%k id])
-  ?:  &(!=(+.lb [%k id]) (unit-lth moment -:lb))  ~&("bound-left" ~|("bound-left" !!))
-  ?:  &(!=(+.rb [%k id]) (unit-gth moment -:rb))  ~&("bound-ryte" ~|("bound-ryte" !!))
+  ?:  &(!=(+.lb [%k id]) (lath moment -:lb))  ~&("bound-left" ~|("bound-left" !!))
+  ?:  &(!=(+.rb [%k id]) (gath moment -:rb))  ~&("bound-ryte" ~|("bound-ryte" !!))
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(moment.kickoff moment))
   (emot old [%goal-nexus id %kickoff moment])
@@ -1162,8 +1179,8 @@
   ?>  (check-goal-perm id mod)
   =/  rb  (ryte-bound [%d id])
   =/  lb  (left-bound [%d id])
-  ?:  &(!=(+.lb [%d id]) (unit-lth moment -:lb))  ~&("bound-left" ~|("bound-left" !!))
-  ?:  &(!=(+.rb [%d id]) (unit-gth moment -:rb))  ~&("bound-ryte" ~|("bound-ryte" !!))
+  ?:  &(!=(+.lb [%d id]) (lath moment -:lb))  ~&("bound-left" ~|("bound-left" !!))
+  ?:  &(!=(+.rb [%d id]) (gath moment -:rb))  ~&("bound-ryte" ~|("bound-ryte" !!))
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(moment.deadline moment))
   (emot old [%goal-nexus id %deadline moment])
