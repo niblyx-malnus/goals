@@ -210,6 +210,7 @@
           %renew-pool 
         (pairs ~[[%pin (enjs-pin pin.upd)] [%pool (enjs-pool pool.upd)]])
         ::
+        %waste-pool  ~
         %trash-pool  ~
         ::
           %pool-perms
