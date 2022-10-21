@@ -7,7 +7,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Stack from "@mui/material/Stack";
-import { log } from "../helpers";
+import { log, shipName } from "../helpers";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -59,17 +59,21 @@ export default function GroupsShareDialog() {
     try {
       const group: any = groupsMap.get(groupName);
       const members = group?.members;
-
+      shipName();
       //create the new invites
-      const invites = members.map((ship: string) => {
-        if (role === "Admin") {
-          return { role: "admin", ship };
-        } else if (role === "Chef") {
-          return { role: "spawn", ship };
-        } else if (role === "Viewer") {
-          return { role: null, ship };
-        }
-      });
+      const invites = members
+        .map((ship: string) => {
+          if (role === "Admin") {
+            return { role: "admin", ship };
+          } else if (role === "Chef") {
+            return { role: "spawn", ship };
+          } else if (role === "Viewer") {
+            return { role: null, ship };
+          }
+        })
+        .fitler((invite: any) => {
+          return shipName() !== invite.ship;
+        }); //make sure the current ship is removed from the invites
       //combine invites and the existing perms
       const newRoleList = [
         ...groupsShareDialogData.participants.permList,
