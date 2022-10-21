@@ -19,7 +19,7 @@
 ++  emot
   |=  [old=_this upd=update:goal-store]
   ?.  =(this (etch:old upd)) :: be wary of changes to efx
-  ~|("non-equivalent-update" !!)
+  ~&("non-equivalent-update" ~|("non-equivalent-update" !!))
   (emit upd)
 ::
 ++  init-goal
@@ -304,7 +304,7 @@
   :: 
   :: Delete from cache
   =.  cache.p  (~(del by cache.p) id)
-  ::
+  :: ::
   :: Emit update
   (emot old [%trash-goal pin id ~(key by tas)])
 ::
@@ -411,7 +411,7 @@
     ^-  [? visited=(set eid:gol)]
     =/  new-path=(list eid:gol)  [eid path]
     =/  i  (find [eid]~ path) 
-    ?.  =(~ i)  ?~(i !! ~|([%cycle (flop (scag u.i new-path))] !!))
+    ?.  =(~ i)  ?~(i !! ~&("cycle" ~|([%cycle (flop (scag u.i new-path))] !!)))
     ?:  &(=(-.eid %d) !complete:(~(got by goals.p) id.eid))  [%& visited]
     =.  visited  (~(put in visited) eid)
     =/  idx  0
@@ -447,7 +447,7 @@
     ^-  [? visited=(set eid:gol)]
     =/  new-path=(list eid:gol)  [eid path]
     =/  i  (find [eid]~ path) 
-    ?.  =(~ i)  ?~(i !! ~|([%cycle (flop (scag u.i new-path))] !!))
+    ?.  =(~ i)  ?~(i !! ~&("cycle" ~|([%cycle (flop (scag u.i new-path))] !!)))
     ?:  &(=(-.eid %d) complete:(~(got by goals.p) id.eid))  [%& visited]
     =.  visited  (~(put in visited) eid)
     =/  idx  0
@@ -481,7 +481,7 @@
     ^-  [descendents=(set id:gol) visited=(map eid:gol (set id:gol))]
     =/  new-path=(list eid:gol)  [eid path]
     =/  i  (find [eid]~ path) 
-    ?.  =(~ i)  ?~(i !! ~|([%cycle (flop (scag u.i new-path))] !!))
+    ?.  =(~ i)  ?~(i !! ~&("cycle" ~|([%cycle (flop (scag u.i new-path))] !!)))
     =/  inflow  inflow:(got-edge eid)
     =/  idx  0
     =/  inflow  ~(tap in inflow)
@@ -572,7 +572,7 @@
     ^-  (set id:gol)
     =/  new-path=(list id:gol)  [id path]
     =/  i  (find [id]~ path) 
-    ?.  =(~ i)  ?~(i !! ~|([%cycle (flop (scag u.i new-path))] !!))
+    ?.  =(~ i)  ?~(i !! ~&("cycle" ~|([%cycle (flop (scag u.i new-path))] !!)))
     =/  goal  (~(got by goals.p) id)
     =/  prio  (prio goal)
     =/  idx  0
@@ -606,7 +606,7 @@
     ^-  [? visited=(set eid:gol)]
     =/  new-path=(list eid:gol)  [e2 path]
     =/  i  (find [e2]~ path) 
-    ?.  =(~ i)  ?~(i !! ~|([%cycle (flop (scag u.i new-path))] !!))
+    ?.  =(~ i)  ?~(i !! ~&("cycle" ~|([%cycle (flop (scag u.i new-path))] !!)))
     =/  inflow  inflow:(got-edge e2)
     ?:  (~(has in inflow) e1)  [%& visited]
     =.  visited  (~(put in visited) e2)
@@ -684,11 +684,12 @@
 ++  check-ship-mod
   |=  [=ship mod=ship]
   ^-  ?
-  ?:  =(ship owner.p)  ~|("Cannot change owner perms." !!)
+  ?:  =(ship owner.p)
+    ~&("Cannot change owner perms." ~|("Cannot change owner perms." !!))
   ?>  (check-pool-perm mod)
   ?.  =((~(get by perms.p) ship) (some (some %admin)))  %&
   ?:  |(=(mod owner.p) =(mod ship))  %&
-  ~|("not-owner-or-self" !!)
+  ~&("not-owner-or-self" ~|("not-owner-or-self" !!))
 ::
 ++  renew-bound
   |=  [=eid:gol dir=?(%l %r)]
@@ -910,7 +911,7 @@
       ==
   ::
   :: Cannot relate goal to itself
-  ?:  =(id.e1 id.e2)  ~|("same-goal" !!)
+  ?:  =(id.e1 id.e2)  ~&("same-goal" ~|("same-goal" !!))
   =/  edge1  (got-edge e1)
   =/  edge2  (got-edge e2)
   ::
@@ -919,17 +920,17 @@
   ?:  ?&  complete:(~(got by goals.p) id.e2)
           !complete:(~(got by goals.p) id.e1)
       ==
-    ~|("incomplete-complete" !!)
+    ~&("incomplete-complete" ~|("incomplete-complete" !!))
   ::
   :: Cannot create relationship with the deadline of the right id
   :: if the right id is an actionable goal
   ?:  ?&  =(-.e2 %d)
           actionable:(~(got by goals.p) id.e2)
       ==
-    ~|("right-actionable" !!)
+    ~&("right-actionable" ~|("right-actionable" !!))
   ::
   :: e2 must not come before e1
-  ?:  (before e2 e1)  ~|("before-e2-e1" !!)
+  ?:  (before e2 e1)  ~&("before-e2-21" ~|("before-e2-e1" !!))
   ::
   :: there must be no bound mismatch between e1 and e2
   ?:  (gath moment.edge1 -:(ryte-bound e2))
@@ -956,7 +957,7 @@
       ==
   ::
   :: Cannot unrelate goal from itself
-  ?:  =(id.e1 id.e2)  ~|("same-goal" !!)
+  ?:  =(id.e1 id.e2)  ~&("same-goal" ~|("same-goal" !!))
   ::
   :: Cannot destroy containment of an owned goal
   =/  l  (~(got by goals.p) id.e1)
@@ -964,7 +965,7 @@
   ?:  ?|  &(=(-.e1 %d) =(-.e2 %d) (~(has in kids.r) id.e1))
           &(=(-.e1 %k) =(-.e2 %k) (~(has in kids.l) id.e2))
       ==
-    ~|("owned-goal" !!)
+    ~&("owned-goal" ~|("owned-goal" !!))
   ::
   :: dag-rend
   =/  edge1  (got-edge e1)
@@ -1013,8 +1014,8 @@
     (emot old [%pool-nexus %yoke (make-nex ids)]):[pore .]
   =/  mup  (yoke:pore (snag idx yoks) mod)
   %=  $
-    idx  +(idx)
-    ids  ids.mup
+    idx   +(idx)
+    ids   (~(uni in ids) ids.mup)
     pore  pore.mup
   ==
 ::
@@ -1126,7 +1127,7 @@
       %+  murn
       ~(tap in inflow.deadline.goal) 
       |=(=eid:gol ?:(=(id id.eid) ~ (some eid)))
-    ~|("has-nested" !!)
+    ~&("has-nested" ~|("has-nested" !!))
   =.  goals.p  (~(put by goals.p) id goal(actionable %&))
   (emot old [%goal-togls id %actionable %.y])
 ::
@@ -1136,7 +1137,7 @@
   =/  old  this
   ?>  (check-goal-perm id mod)
   =/  goal  (~(got by goals.p) id)
-  ?:  (left-uncompleted id)  ~|("left-uncompleted" !!)
+  ?:  (left-uncompleted id)  ~&("left-completed" ~|("left-uncompleted" !!))
   =.  goals.p  (~(put by goals.p) id goal(complete %&))
   (emot old [%goal-togls id %complete %.y])
 ::
@@ -1155,7 +1156,7 @@
   =/  old  this
   ?>  (check-goal-perm id mod)
   =/  goal  (~(got by goals.p) id)
-  ?:  (ryte-completed id)  ~|("ryte-completed" !!)
+  ?:  (ryte-completed id)  ~&("ryte-completed" ~|("ryte-completed" !!))
   =.  goals.p  (~(put by goals.p) id goal(complete %|))
   (emot old [%goal-togls id %complete %.n])
 ::

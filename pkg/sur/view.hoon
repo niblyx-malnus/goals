@@ -1,5 +1,15 @@
 /-  *goal, *dates
 |%
++$  state-3
+  $:  %3
+      boot-flag=?
+      =handles:s1
+      =views:s1
+      context=grip:s1
+      hide-completed=?
+      =utc-offset
+  ==
+::
 +$  state-2
   $:  %2
       =handles:s1
@@ -87,6 +97,11 @@
   ::             in the CLI easier
   +$  handles  [hg=(map @t grip) gh=(map grip @t)]
   --
+::
+++  convert-2-to-3
+  |=  =state-2
+  ^-  state-3
+  [%3 %& +.state-2]
 ::
 ++  convert-1-to-2
   |=  =state-1

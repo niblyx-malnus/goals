@@ -8,14 +8,16 @@
   $%  state-0
       state-1
       state-2
+      state-3
   ==
 +$  state-0  state-0:vyu
 +$  state-1  state-1:vyu
 +$  state-2  state-2:vyu
++$  state-3  state-3:vyu
 +$  command  command:commands
 +$  card  card:shoe
 --
-=|  state-2
+=|  state-3
 =*  state  -
 ::
 %+  verb  |
@@ -41,8 +43,10 @@
         ~
       [(~(watch-our pass:io /goals) %goal-store /goals)]~
   %=  this
-    handles  *handles:vyu
-    views  (~(put by *views:vyu) [%all ~] *view:vyu)
+    boot-flag  %&
+    context    [%all ~]
+    handles    *handles:vyu
+    views      (~(put by *views:vyu) [%all ~] *view:vyu)
   ==
 ::
 ++  on-save  !>(state)
@@ -53,17 +57,21 @@
   =/  old  !<(versioned-state old-state)
   |-
   ?-    -.old
-      %2
+      %3
     :-  %+  weld
-          (print-cards:prtr ~["%gol-cli: Hit ENTER to re-initialize."])
+          (print-cards:prtr ~["%gol-cli: Hit ENTER at the %gol-cli prompt to re-initialize."])
         ^-  (list card)
         ?:  (~(has by wex.bowl) [/goals our.bowl %goal-store])
           ~
         [(~(watch-our pass:io /goals) %goal-store /goals)]~
     %=  this
-      handles  initial:hdls
-      views    initial:vyuz
+      boot-flag  %&
+      context    [%all ~]
+      handles    *handles:vyu
+      views      (~(put by *views:vyu) [%all ~] *view:vyu)
     ==
+      %2
+    $(old (convert-2-to-3:vyu old))
       %1
     $(old (convert-1-to-2:vyu old))
       %0
@@ -80,25 +88,23 @@
         ::
         :: [%print ~]
         %print
+        =*  poke-self  ~(poke-self pass:io /print)
         ?>  =(src.bowl our.bowl)
-        ~&  wex.bowl
+        ?:  boot-flag
+          :-  [(poke-self view-action+!>(print+~))]~
+          %=  this
+            boot-flag  %|
+            context    [%all ~]
+            handles    initial:hdls
+            views      initial:vyuz
+          ==
         =/  mode
           ?-  hide-completed
             %&  %normal
             %|  %normal-completed
           ==
-          :_  this
-          (print-context:prtr context def-cols:hc mode)
-        :: If handles/views not initialized yet, initialize
-        :: ?.  =(1 ~(wyt by views))
-        ::   :_  this
-        ::   (print-context:prtr context def-cols:hc mode)
-        :: =*  poke-self  ~(poke-self pass:io /print-context)
-        :: :-  [(poke-self view-action+!>(print+~))]~
-        :: %=  this
-        ::   handles  initial:hdls
-        ::   views    initial:vyuz
-        :: ==
+        :_  this
+        (print-context:prtr context def-cols:hc mode)
         ::
         :: [%change-context c=grip]
         %change-context
