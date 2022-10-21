@@ -1,3 +1,5 @@
+import memoize from "lodash/memoize";
+
 declare const window: Window &
   typeof globalThis & {
     scry: any;
@@ -11,9 +13,8 @@ const log = (...args: any) => {
   if (!isDev()) return;
   console.log(...args);
 };
-const shipName = () => {
-  //TODO: make this a one time lookup, just memo
+const shipName = memoize(() => {
   //returns the current ship's name
   return isDev() ? process.env.REACT_APP_SHIP_NAME : window.ship;
-};
+});
 export { log, isDev, shipName };
