@@ -74,9 +74,11 @@ export default function GroupsShareDialog() {
             return { role: null, ship };
           }
         })
-        .fitler((invite: any) => {
+        //make sure the current ship is removed from the invites
+        .filter((invite: any) => {
           return shipName() !== invite.ship;
-        }); //make sure the current ship is removed from the invites
+        });
+        log('invites',invites)
       //combine invites and the existing perms
       const newRoleList = [
         ...groupsShareDialogData.participants.permList,
