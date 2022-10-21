@@ -201,7 +201,7 @@ function deleteArchivedPoolAction(poolToDelete: PinId) {
     const { pin } = poolItem;
     return pin.birth !== poolToDelete.birth;
   });
-  log("newArchivedPools", newArchivedPools); 
+  log("newArchivedPools", newArchivedPools);
   setArchivedPools(newArchivedPools);
   setPools(newPools);
 }
@@ -245,12 +245,13 @@ function archiveGoalAction(
   toUpdateNexusList.forEach((item: any) => {
     toUpdateNexusMap.set(item.id.birth, item.goal);
   });
-  //select the project using pin, updqte the nexus from the given map and move the cachedGoals to the cache array next to goals
+  //select the project using pin, update the nexus from the given map and move the cachedGoals to the cache array 
   const newPools = pools.map((poolItem: any, poolIndex: number) => {
     const { pin } = poolItem;
     if (pin.birth === pinId.birth) {
       //update the goal's nexus with the given nexus list(when you delete one or more of a goal's children)
-      let newGoals = poolItem.pool.nexus.goals.map((goalItem: any) => {
+      //we hold on to this for other operations
+      const nexUpdatedGoals = poolItem.pool.nexus.goals.map((goalItem: any) => {
         if (toUpdateNexusMap.has(goalItem.id.birth)) {
           return {
             ...goalItem,
@@ -266,17 +267,17 @@ function archiveGoalAction(
         return goalItem;
       });
       //remove the toCache items from newGoals
-      newGoals = newGoals.filter((goalItem: any, goalIndex: any) => {
+      let newGoals = nexUpdatedGoals.filter((goalItem: any, goalIndex: any) => {
         return !toCacheIdList.includes(goalItem.id.birth);
       });
       //create our new cached goals to be added to the existing cache list
-      const incomingCachedGoals = poolItem.pool.nexus.goals.filter(
+      const incomingCachedGoals = nexUpdatedGoals.filter(
         (goalItem: any, goalIndex: any) => {
           return !!toCacheIdList.includes(goalItem.id.birth);
         }
       );
 
-      //if we happen to be in showing the archives to the user, we have to update them here
+      //if we happen to be in showing the archives to the user, we add the new incoming cache goals to the live goals
       if (showArchived) {
         newGoals = [
           ...newGoals,
@@ -292,7 +293,7 @@ function archiveGoalAction(
           }),
         ];
       }
-      // add the incoming cache items to our cacheList and add back the existing items
+      // add the incoming cache items to our cacheList and add back the existing items (merge incoming cache with previous cache)
       const newCache = [...poolItem.pool.nexus.cache, ...incomingCachedGoals];
       return {
         ...poolItem,
