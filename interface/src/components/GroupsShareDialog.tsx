@@ -32,7 +32,8 @@ export default function GroupsShareDialog() {
   );
   const groupsMap = useStore((store: any) => store.groupsMap);
   const groupsList = useStore((store: any) => store.groupsList);
-
+  log("groupsMap", groupsMap);
+  log("groupsList", groupsList);
   const toggleSnackBar = useStore((store) => store.toggleSnackBar);
 
   const handleRoleChange = (event: SelectChangeEvent) => {
@@ -59,7 +60,9 @@ export default function GroupsShareDialog() {
     try {
       const group: any = groupsMap.get(groupName);
       const members = group?.members;
-      shipName();
+      log("group", group);
+      log("members", members);
+
       //create the new invites
       const invites = members
         .map((ship: string) => {
