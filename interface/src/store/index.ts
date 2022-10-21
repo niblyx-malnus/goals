@@ -87,6 +87,16 @@ interface Store {
 
   showArchived: boolean;
   toggleShowArchived: (newStatus: boolean) => void;
+
+  groupsMap: Map<string, any>; // a map of group names to their data
+  groupsList: any; //an array of groups name and their member count
+  setGroupsData: (newGroupsMap: any, newGroupsList: any) => void;
+  groupsShareDialogOpen: boolean;
+  groupsShareDialogData: any;
+  toggleGroupsShareDialog: (
+    newStatus: boolean,
+    newGroupsShareDialogData: any
+  ) => void;
 }
 /**
  * 
@@ -299,6 +309,23 @@ const useStore = create<Store>((set, get) => ({
       showArchived: newStatus,
     }));
   },
+  groupsMap: new Map(),
+  groupsList: [],
+  setGroupsData: (newGroupsMap: any, newGroupsList: any) =>
+    set(() => ({
+      groupsMap: newGroupsMap,
+      groupsList: newGroupsList,
+    })),
+  groupsShareDialogOpen: false,
+  groupsShareDialogData: null,
+  toggleGroupsShareDialog: (
+    newStatus: boolean,
+    newGroupsShareDialogData: any
+  ) =>
+    set(() => ({
+      groupsShareDialogOpen: newStatus,
+      groupsShareDialogData: newGroupsShareDialogData,
+    })),
 }));
 
 export default useStore;

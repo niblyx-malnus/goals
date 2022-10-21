@@ -98,6 +98,9 @@ export default function IconMenu({
   const toggleShareDialog = useStore((store: any) => store.toggleShareDialog);
   const toggleDeleteDialog = useStore((store: any) => store.toggleDeleteDialog);
   const toggleLeaveDialog = useStore((store: any) => store.toggleLeaveDialog);
+  const toggleGroupsShareDialog = useStore(
+    (store: any) => store.toggleGroupsShareDialog
+  );
   const toggleSnackBar = useStore((store) => store.toggleSnackBar);
   const toggleTimelineDialog = useStore(
     (store: any) => store.toggleTimelineDialog
@@ -484,16 +487,32 @@ export default function IconMenu({
         ) : (
           <div>
             {(role === "owner" || role === "admin") && (
-              <MenuItem
-                onClick={() => {
-                  handleClose();
-                  toggleShareDialog(true, poolData);
-                }}
-                disableRipple
-              >
-                <PeopleAltIcon fontSize="small" />
-                manage participants
-              </MenuItem>
+              <>
+                <MenuItem
+                  onClick={() => {
+                    handleClose();
+                    toggleShareDialog(true, poolData);
+                  }}
+                  disableRipple
+                >
+                  <PeopleAltIcon fontSize="small" />
+                  manage participants
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleClose();
+                    toggleGroupsShareDialog(true, {
+                      title: poolData.title,
+                      participants: poolData,
+                      pin
+                    });
+                  }}
+                  disableRipple
+                >
+                  <PeopleAltIcon fontSize="small" />
+                  share with groups
+                </MenuItem>
+              </>
             )}
             {role !== "owner" && (
               <MenuItem
