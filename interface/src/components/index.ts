@@ -9,6 +9,7 @@ import Log from "./Log";
 import TimelineDialog from "./TimelineDialog";
 import CopyPoolDialog from "./CopyPoolDialog";
 import YokingActionBar from "./YokingActionBar";
+import GroupsShareDialog from "./GroupsShareDialog";
 
 export {
   EditInput,
@@ -21,5 +22,6 @@ export {
   Log,
   TimelineDialog,
   CopyPoolDialog,
-  YokingActionBar
+  YokingActionBar,
+  GroupsShareDialog
 };

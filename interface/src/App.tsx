@@ -40,6 +40,7 @@ import {
   TimelineDialog,
   CopyPoolDialog,
   YokingActionBar,
+  GroupsShareDialog,
 } from "./components";
 import { v4 as uuidv4 } from "uuid";
 
@@ -51,10 +52,9 @@ declare const window: Window &
   };
 
 //TODO: add pals integration
-//TODO: add pals integration
-//TODO: add pals integration(easy)
 //TODO: handle sub kick/error
 //TODO: order the virtual children
+//TODO: optimise the share dialog performence
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -65,6 +65,7 @@ function App() {
   const setRoleMap = useStore((store) => store.setRoleMap);
   const fetchedPools = useStore((store) => store.pools);
   const setFetchedPools = useStore((store) => store.setPools);
+  const setGroupsData = useStore((store) => store.setGroupsData);
 
   const setArchivedPools = useStore((store) => store.setArchivedPools);
   log("fetchedPools", fetchedPools);
@@ -216,7 +217,30 @@ function App() {
       setLoading({ trying: false, success: false, error: true });
     }
   };
+  const fetchGroups = async () => {
+    try {
+      const results = await api.getGroupData();
 
+      const groupsMap = new Map(Object.entries(results.groups));
+      const groupsList = Object.entries(results.groups).map((group: any) => {
+        return { name: group[0], memberCount: group[1].members.length };
+      });
+      log("fetchGroups results =>", results);
+      log("groupsMap", groupsMap);
+      log("groupsList", groupsList);
+      setGroupsData(groupsMap, groupsList);
+    } catch (e) {
+      log("fetchGroups error => ", e);
+    }
+  };
+  /* const fetchPals = async () => {
+    try {
+      const results = await api.getPals();
+      log("fetchPals results =>", groups);
+    } catch (e) {
+      log("fetchPals error => ", e);
+    }
+  };*/
   const createDataTree = (dataset: any) => {
     const hashTable = Object.create(null);
     dataset.forEach((aData: any) => {
@@ -236,7 +260,7 @@ function App() {
   };
   useEffect(() => {
     fetchInitial();
-
+    fetchGroups();
     window["scry"] = api.scry;
     window["poke"] = api.poke;
   }, []);
@@ -620,6 +644,7 @@ function Header() {
       <LeaveDialog />
       <TimelineDialog />
       <CopyPoolDialog />
+      <GroupsShareDialog />
       <Snackie />
       <Stack flexDirection="row" alignItems="center">
         <OutlinedInput
