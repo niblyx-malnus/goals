@@ -245,7 +245,7 @@ function archiveGoalAction(
   toUpdateNexusList.forEach((item: any) => {
     toUpdateNexusMap.set(item.id.birth, item.goal);
   });
-  //select the project using pin, update the nexus from the given map and move the cachedGoals to the cache array 
+  //select the project using pin, update the nexus from the given map and move the cachedGoals to the cache array
   const newPools = pools.map((poolItem: any, poolIndex: number) => {
     const { pin } = poolItem;
     if (pin.birth === pinId.birth) {
@@ -482,13 +482,14 @@ function handleYoke(pinId: PinId, nexusList: any) {
   const state = useStore.getState();
   const pools = state.pools;
   const setPools = state.setPools;
+  const order = state.order;
   //go through pools select our pool, and update the goals (their nexus) that need to be update
   //create a map for ease of interaction
   const nexusMap = new Map();
   nexusList.forEach((nex: any) => {
     nexusMap.set(nex.id.birth, nex.goal);
   });
-  const newPools = pools.map((poolItem: any, poolIndex: number) => {
+  let newPools = pools.map((poolItem: any, poolIndex: number) => {
     const { pin } = poolItem;
     if (pin.birth === pinId.birth) {
       const newGoals = poolItem.pool.nexus.goals.map(
@@ -519,20 +520,37 @@ function handleYoke(pinId: PinId, nexusList: any) {
     }
     return poolItem;
   });
-
+  //since left-plumb changes, we have to reoreder the goals (if sorting prio)
+  //TODO: this could happen everytime a list of nexus patches in (add elsewhere, maybe actions?)
+  if (order === "prio") {
+    newPools = orderPools(newPools, order);
+  }
   setPools(newPools);
 }
 
 //this is actually just a helper
 const orderPools = (pools: any, order: Order) => {
   //reorder the pools and then the goals, returns ordered pools
+  function prioCompare(aey: any, bee: any) {
+    const plumbLeftA = aey.goal.nexus.kickoff["left-plumb"];
+    const plumbLeftB = bee.goal.nexus.kickoff["left-plumb"];
+
+    if (plumbLeftA < plumbLeftB) {
+      return -1;
+    }
+    //will order youngest (higher birth) first
+    return birthCompare(aey, bee);
+  }
+  function birthCompare(aey: any, bee: any) {
+    const birthA = aey.goal.froze.birth;
+    const birthB = bee.goal.froze.birth;
+
+    if (order === "asc") return birthA - birthB;
+    return birthB - birthA;
+  }
+  const compareFoo = order === "prio" ? prioCompare : birthCompare;
   const orderedPoolsAndGoals = pools.map((poolItem: any) => {
-    const reorderedGoal = poolItem.pool.nexus.goals.sort(
-      (aey: any, bee: any) => {
-        if (order === "asc") return aey.goal.froze.birth - bee.goal.froze.birth;
-        return bee.goal.froze.birth - aey.goal.froze.birth;
-      }
-    );
+    const reorderedGoal = poolItem.pool.nexus.goals.sort(compareFoo);
     return {
       ...poolItem,
       pool: {

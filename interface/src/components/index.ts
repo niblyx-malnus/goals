@@ -10,6 +10,8 @@ import TimelineDialog from "./TimelineDialog";
 import CopyPoolDialog from "./CopyPoolDialog";
 import YokingActionBar from "./YokingActionBar";
 import GroupsShareDialog from "./GroupsShareDialog";
+import Header from "./Header";
+
 
 export {
   EditInput,
@@ -23,5 +25,6 @@ export {
   TimelineDialog,
   CopyPoolDialog,
   YokingActionBar,
-  GroupsShareDialog
+  GroupsShareDialog,
+  Header
 };

@@ -145,7 +145,7 @@ const useStore = create<Store>((set, get) => ({
       leaveDialogData: newLeaveDialogData,
     })),
 
-  order: "asc",
+  order: "dsc",
   setOrder: (newOrder: Order) =>
     set(() => ({
       order: newOrder,
