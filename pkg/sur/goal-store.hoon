@@ -2,6 +2,8 @@
 |%
 ::
 +$  action
+  $:  pid=@
+  $=  pok
   $%  [%spawn-pool title=@t]
       [%clone-pool =pin title=@t]
       [%cache-pool =pin]
@@ -25,7 +27,7 @@
       [%edit-pool-title =pin title=@t]
       [%subscribe =pin]
       [%unsubscribe =pin]
-  ==
+  ==  ==
 ::
 +$  pool-hitch-update
   $%  [%title title=@t]
@@ -55,11 +57,11 @@
       [%renew-pool =pin =pool]
       [%waste-pool ~]
       [%trash-pool ~]
-      [%spawn-goal =pin =nex =id =goal]
-      [%waste-goal =pin =nex =id waz=(set id)]
-      [%cache-goal =pin =nex =id cas=(set id)]
-      [%renew-goal =pin =id ren=goals]
-      [%trash-goal =pin =id tas=(set id)]
+      [%spawn-goal =nex =id =goal]
+      [%waste-goal =nex =id waz=(set id)]
+      [%cache-goal =nex =id cas=(set id)]
+      [%renew-goal =id ren=goals]
+      [%trash-goal =id tas=(set id)]
       [%pool-perms new=pool-perms]
       [%pool-hitch pool-hitch-update]
       [%pool-nexus pool-nexus-update]
@@ -67,11 +69,12 @@
       [%goal-hitch =id goal-hitch-update]
       [%goal-nexus =id goal-nexus-update]
       [%goal-togls =id goal-togls-update]
+      [%poke-error =tang]
   ==
-+$  away-update  [mod=ship update]
++$  away-update  [[mod=ship pok=@] update]
 ::
-+$  home-update  [[=pin mod=ship] update]
-:: ::
++$  home-update  [[=pin mod=ship pok=@] update]
+::
 +$  peek
   $%  [%initial =store]
       [%groups =groups]
@@ -92,7 +95,4 @@
       [%roots roots=(list id)]
       [%roots-uncompleted roots-uc=(list id)]
   ==
-::
-+$  away-cud  [=pin upd=(list away-update) =store]
-+$  home-cud  [=pin upd=(list home-update) =store]
 --

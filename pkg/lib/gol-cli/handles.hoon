@@ -36,7 +36,7 @@
     (turn ~(tap in ~(key by index.store)) |=(=id:gol [%goal id]))
   =/  pins=(list grip:vyu)
     %+  turn
-      (weld ~(tap in ~(key by pools.store)) ~(tap in ~(key by cache.store)))
+      ~(tap in ~(key by pools.store))
     |=(=pin:gol [%pool pin])
   (add-handles (weld ids pins))
 ::

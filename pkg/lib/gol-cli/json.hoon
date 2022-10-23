@@ -6,42 +6,46 @@
   |=  jon=json
   ^-  action
   %.  jon
-  %-  of
-  :~  [%spawn-pool (ot ~[title+so])]
-      [%clone-pool (ot ~[pin+dejs-pin title+so])]
-      [%cache-pool (ot ~[pin+dejs-pin])]
-      [%renew-pool (ot ~[pin+dejs-pin])]
-      [%trash-pool (ot ~[pin+dejs-pin])]
-      :-  %spawn-goal
-      %-  ot
-      :~  pin+dejs-pin
-          upid+dejs-unit-id
-          desc+so
-          actionable+bo
+  %-  ot
+  :~  pid+ni
+      :-  %pok
+      %-  of
+      :~  [%spawn-pool (ot ~[title+so])]
+          [%clone-pool (ot ~[pin+dejs-pin title+so])]
+          [%cache-pool (ot ~[pin+dejs-pin])]
+          [%renew-pool (ot ~[pin+dejs-pin])]
+          [%trash-pool (ot ~[pin+dejs-pin])]
+          :-  %spawn-goal
+          %-  ot
+          :~  pin+dejs-pin
+              upid+dejs-unit-id
+              desc+so
+              actionable+bo
+          ==
+          [%cache-goal (ot ~[id+dejs-id])]
+          [%renew-goal (ot ~[id+dejs-id])]
+          [%trash-goal (ot ~[id+dejs-id])]
+          [%yoke (ot ~[pin+dejs-pin yoks+dejs-yoke-seq])]
+          [%move (ot ~[cid+dejs-id upid+dejs-unit-id])]
+          [%set-kickoff (ot ~[id+dejs-id kickoff+dejs-unit-di])]
+          [%set-deadline (ot ~[id+dejs-id deadline+dejs-unit-di])]
+          [%mark-actionable (ot ~[id+dejs-id])]
+          [%unmark-actionable (ot ~[id+dejs-id])]
+          [%mark-complete (ot ~[id+dejs-id])]
+          [%unmark-complete (ot ~[id+dejs-id])]
+          :-  %update-goal-perms 
+          %-  ot
+          :~  id+dejs-id
+              chief+dejs-ship
+              rec+bo
+              spawn+dejs-set-ships
+          ==
+          [%update-pool-perms (ot ~[pin+dejs-pin new+dejs-pool-perms])]
+          [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
+          [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
+          [%subscribe (ot ~[pin+dejs-pin])]
+          [%unsubscribe (ot ~[pin+dejs-pin])]
       ==
-      [%cache-goal (ot ~[id+dejs-id])]
-      [%renew-goal (ot ~[id+dejs-id])]
-      [%trash-goal (ot ~[id+dejs-id])]
-      [%yoke (ot ~[pin+dejs-pin yoks+dejs-yoke-seq])]
-      [%move (ot ~[cid+dejs-id upid+dejs-unit-id])]
-      [%set-kickoff (ot ~[id+dejs-id kickoff+dejs-unit-di])]
-      [%set-deadline (ot ~[id+dejs-id deadline+dejs-unit-di])]
-      [%mark-actionable (ot ~[id+dejs-id])]
-      [%unmark-actionable (ot ~[id+dejs-id])]
-      [%mark-complete (ot ~[id+dejs-id])]
-      [%unmark-complete (ot ~[id+dejs-id])]
-      :-  %update-goal-perms 
-      %-  ot
-      :~  id+dejs-id
-          chief+dejs-ship
-          rec+bo
-          spawn+dejs-set-ships
-      ==
-      [%update-pool-perms (ot ~[pin+dejs-pin new+dejs-pool-perms])]
-      [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
-      [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
-      [%subscribe (ot ~[pin+dejs-pin])]
-      [%unsubscribe (ot ~[pin+dejs-pin])]
   ==
 ::
 ++  dejs-pool-perms
@@ -161,10 +165,12 @@
       %-  pairs
       :~  [%pin (enjs-pin pin.hom)]
           [%mod (ship mod.hom)]
+          [%pok (numb pok.hom)]
       ==
       :-  %tel
       %+  frond  -.upd
       ?-    -.upd
+        %poke-error  (frond %tang (enjs-tang tang.upd))
           %spawn-goal
         %-  pairs
         :~  [%pin (enjs-pin pin.hom)]
@@ -563,4 +569,6 @@
   :~  [%owner (ship owner.id)]
       [%birth s+(scot %da birth.id)]
   ==
+::
+++  enjs-tang  |=(=tang a+(turn tang tank:enjs:format))
 --

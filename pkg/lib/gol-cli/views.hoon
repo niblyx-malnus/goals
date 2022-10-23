@@ -25,7 +25,7 @@
   =/  ids=(list grip:vyu)  (turn ~(tap in ~(key by index.store)) |=(=id:gol [%goal id]))
   =/  pins=(list grip:vyu)  
     %+  turn 
-      (weld ~(tap in ~(key by pools.store)) ~(tap in ~(key by cache.store)))
+      ~(tap in ~(key by pools.store))
     |=(=pin:gol [%pool pin])
   =.  views  (add-views :(weld ids pins `(list grip:vyu)`[%all ~]~))
   =/  idx  0

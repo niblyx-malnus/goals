@@ -41,7 +41,7 @@
       [%mark-complete h=@t]
       [%unmark-complete h=@t]
       [%harvest h=@t]
-      [%invite invitee=ship h=@t]
+      [%invite =ship h=@t]
   ==
 ::
 ++  tab-list

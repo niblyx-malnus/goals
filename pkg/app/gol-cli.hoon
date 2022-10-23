@@ -8,14 +8,16 @@
   $%  state-0
       state-1
       state-2
+      state-3
   ==
 +$  state-0  state-0:vyu
 +$  state-1  state-1:vyu
 +$  state-2  state-2:vyu
++$  state-3  state-3:vyu
 +$  command  command:commands
 +$  card  card:shoe
 --
-=|  state-2
+=|  state-3
 =*  state  -
 ::
 %+  verb  |
@@ -37,13 +39,10 @@
 ::
 ++  on-init
   ^-  (quip card _this)
-  :-  ?:  (~(has by wex.bowl) [/goals our.bowl %goal-store])
-        ~
-      [(~(watch-our pass:io /goals) %goal-store /goals)]~
-  %=  this
-    handles  *handles:vyu
-    views  (~(put by *views:vyu) [%all ~] *view:vyu)
-  ==
+  :_  this(views (~(put by *views:vyu) [%all ~] *view:vyu))
+  ?:  (~(has by wex.bowl) [/goals our.bowl %goal-store])
+    ~
+  [(~(watch-our pass:io /goals) %goal-store /goals)]~
 ::
 ++  on-save  !>(state)
 ::
@@ -53,17 +52,23 @@
   =/  old  !<(versioned-state old-state)
   |-
   ?-    -.old
-      %2
+      %3
     :-  %+  weld
-          (print-cards:prtr ~["%gol-cli: Hit ENTER to re-initialize."])
+          (print-cards:prtr ~["%gol-cli: Hit ENTER at the %gol-cli prompt to re-initialize."])
         ^-  (list card)
         ?:  (~(has by wex.bowl) [/goals our.bowl %goal-store])
           ~
         [(~(watch-our pass:io /goals) %goal-store /goals)]~
     %=  this
-      handles  initial:hdls
-      views    initial:vyuz
+      cli        %|
+      tix        0
+      reboot     %&
+      context    [%all ~]
+      handles    *handles:vyu
+      views      (~(put by *views:vyu) [%all ~] *view:vyu)
     ==
+      %2
+    $(old (convert-2-to-3:vyu old))
       %1
     $(old (convert-1-to-2:vyu old))
       %0
@@ -80,25 +85,30 @@
         ::
         :: [%print ~]
         %print
+        =*  poke-self  ~(poke-self pass:io /print)
         ?>  =(src.bowl our.bowl)
-        ~&  wex.bowl
+        ::
+        :: if reboot is %&, initialize handles and views
+        ?:  reboot
+          :-  [(poke-self view-action+!>(print+~))]~
+          %=  this
+            reboot  %|
+            context    [%all ~]
+            handles    initial:hdls
+            views      initial:vyuz
+          ==
+        ::
+        :: otherwise set a timer for automatic console printing
+        :: and print-context normally
         =/  mode
           ?-  hide-completed
             %&  %normal
             %|  %normal-completed
           ==
-          :_  this
-          (print-context:prtr context def-cols:hc mode)
-        :: If handles/views not initialized yet, initialize
-        :: ?.  =(1 ~(wyt by views))
-        ::   :_  this
-        ::   (print-context:prtr context def-cols:hc mode)
-        :: =*  poke-self  ~(poke-self pass:io /print-context)
-        :: :-  [(poke-self view-action+!>(print+~))]~
-        :: %=  this
-        ::   handles  initial:hdls
-        ::   views    initial:vyuz
-        :: ==
+        :_  this(cli %&, tix +(tix))
+        %+  weld
+          [%pass /timers %arvo %b %wait (add now.bowl ~m1)]~
+        (print-context:prtr context def-cols:hc mode)
         ::
         :: [%change-context c=grip]
         %change-context
@@ -139,7 +149,7 @@
     [(poke-self view-action+!>(print+~))]~
       [%mod-command *]
     :_  this
-    (print-cards:prtr ~["%gol-cli: Hit ENTER for updates."])
+    ?:(cli ~ (print-cards:prtr ~["%gol-cli: CLI timed out. Hit ENTER for updates."]))
     ::
       [%goals ~]
     ?>  =(src.bowl our.bowl)
@@ -164,19 +174,23 @@
       ?+    p.cage.sign  (on-agent:def wire sign)
           %goal-home-update
         =*  poke-self  ~(poke-self pass:io /print-context)
-        =+  ^-  [[=pin:gol mod=ship] =update:goal-store]
+        =/  cards
+          ?.  cli
+            ~
+          [(poke-self view-action+!>(print+~))]~
+        =+  ^-  [[=pin:gol mod=ship pok=@] =update:goal-store]
           !<(home-update:goal-store q.cage.sign)
-        ?+    -.update  `this
+        ?+    -.update  [cards this]
           ::
             %spawn-goal
-          :-  ~
+          :-  cards
           %=  this
             handles  (new-goal:hdls id.update)
             views  (new-goal:vyuz id.update)
           ==
           ::
             %spawn-pool
-          :-  ~
+          :-  cards
           %=  this
             handles  (new-pool:hdls pin pool.update)
             views  (new-pool:vyuz pin pool.update)
@@ -185,7 +199,25 @@
       ==
     ==
   ==
-++  on-arvo   on-arvo:def
+::
+++  on-arvo
+  |=  [=wire =sign-arvo]
+  ^-  (quip card _this)
+  ?+    wire  (on-arvo:def wire sign-arvo)
+      [%timers ~]
+    ?+    sign-arvo  (on-arvo:def wire sign-arvo)
+        [%behn %wake *]
+      ?~  error.sign-arvo
+        ?:  =(tix 0)
+          `this(cli %|)
+        =.  tix  (dec tix)
+        ?.  =(tix 0)
+          `this
+        `this(cli %|)
+      (on-arvo:def wire sign-arvo)
+    ==
+  ==
+::
 ++  on-fail   on-fail:def
 ::
 ++  command-parser
@@ -206,6 +238,14 @@
     [cards this]
   ?-    -.command
       ::
+      ::  [%invite =pin ship]
+      %invite
+    =*  poke-our  ~(poke-our pass:io /mod-command/invite)
+    =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
+    =/  pool  (got-pool:scry pin.res)
+    =.  perms.pool  (~(put by perms.pool) ship.command ~) 
+    ~[(poke-our %goal-store goal-action+!>([now.bowl %update-pool-perms pin.res perms.pool]))]
+      ::
       %hide-completed
     =*  poke-self  ~(poke-self pass:io /view-command/hide-completed)
     ~[(poke-self view-action+!>([%hide-completed ~]))]
@@ -215,55 +255,37 @@
     ~[(poke-self view-action+!>([%unhide-completed ~]))]
       ::
       %held-yoke
-    =*  poke  ~(poke pass:io [%command %move-goal ~])
+    =*  poke-our  ~(poke-our pass:io /mod-command/move)
     =+  [msg l]=(invalid-goal-error:prtr l.command)  ?.  =(~ msg)  msg
     =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
     ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
     =/  pin  (got-pin:scry id.l)
-    [(poke [owner.id.l %goal-store] goal-action+!>([%move id.l (some id.r)]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %move id.l (some id.r)]))]~
       ::
       %held-rend
-    =*  poke  ~(poke pass:io [%command %unmove-goal ~])
+    =*  poke-our  ~(poke-our pass:io /mod-command/move)
     =+  [msg l]=(invalid-goal-error:prtr l.command)  ?.  =(~ msg)  msg
     =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
     ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
     =/  pin  (got-pin:scry id.l)
-    [(poke [owner.id.l %goal-store] goal-action+!>([%move id.l ~]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %move id.l ~]))]~
       ::
-      %nest-yoke
-    (yoke-command:hc command %nest-yoke)
-      ::
-      %nest-rend
-    (yoke-command:hc command %nest-rend)
-      ::
-      %prec-yoke
-    (yoke-command:hc command %prec-yoke)
-      ::
-      %prec-rend
-    (yoke-command:hc command %prec-rend)
-      ::
-      %prio-yoke
-    (yoke-command:hc command %prio-yoke)
-      ::
-      %prio-rend
-    (yoke-command:hc command %prio-rend)
-      ::
-      ::  [%invite =pin admins=(set ship) captains=(set ship) viewers=(set ship)]
-      %invite
-    =*  poke  ~(poke pass:io /mod-command/invite)
-    =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    ~[(poke [owner.pin.res %goal-store] goal-action+!>([%invite pin.res ~ ~ (sy ~[invitee.command])]))]
+      $?  %nest-yoke  %nest-rend
+          %prec-yoke  %prec-rend
+          %prio-yoke  %prio-rend
+      ==
+    (yoke-command:hc command)
       ::
       :: [%spawn-pool title=@t]
       %spawn-pool
     =*  poke-our  ~(poke-our pass:io /mod-command/spawn-pool)
-    [(poke-our %goal-store goal-action+!>([%spawn-pool title.command]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %spawn-pool title.command]))]~
       ::
       :: [%clone-pool h=@t title=@t]
       %clone-pool
     =*  poke-our  ~(poke-our pass:io /mod-command/clone-pool)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store goal-action+!>([%clone-pool pin.res title.command]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %clone-pool pin.res title.command]))]~
       ::
       :: [%cache-pool h=@t]
       %cache-pool
@@ -271,7 +293,7 @@
     =*  poke-self  ~(poke-self pass:io /view-command/change-context)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
     ;:  weld
-      [(poke-our %goal-store goal-action+!>([%cache-pool pin.res]))]~
+      [(poke-our %goal-store goal-action+!>([now.bowl %cache-pool pin.res]))]~
       [(poke-self view-action+!>([%change-context [%all ~]]))]~
     ==
       ::
@@ -279,7 +301,7 @@
       %renew-pool
     =*  poke-our  ~(poke-our pass:io /mod-command/renew-pool)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store goal-action+!>([%renew-pool pin.res]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %renew-pool pin.res]))]~
       ::
       :: [%trash-pool h=@t]
       %trash-pool
@@ -287,24 +309,24 @@
     =*  poke-self  ~(poke-self pass:io /view-command/change-context)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
     ;:  weld
-      [(poke-our %goal-store goal-action+!>([%trash-pool pin.res]))]~
+      [(poke-our %goal-store goal-action+!>([now.bowl %trash-pool pin.res]))]~
       [(poke-self view-action+!>([%change-context [%all ~]]))]~
     ==
       ::
       ::  [%spawn-goal desc=@t]                
       %spawn-goal
-    =*  poke  ~(poke pass:io /mod-command/spawn-goal)
+    =*  poke-our  ~(poke-our pass:io /mod-command/spawn-goal)
     ?-    -.context
         %all
       (print-cards:prtr ~["ERROR: Cannot add goal outside of a pool."])
         %pool
-      :~  %+  poke  [owner.pin.context %goal-store]
-          goal-action+!>([%spawn-goal pin.context ~ desc.command %|])
+      :~  %+  poke-our  %goal-store
+          goal-action+!>([now.bowl %spawn-goal pin.context ~ desc.command %|])
       ==
         %goal
       =/  pin  (got-pin:scry id.context)
-      :~  %+  poke  [owner.id.context %goal-store]
-          goal-action+!>([%spawn-goal pin (some id.context) desc.command %|])
+      :~  %+  poke-our  %goal-store
+          goal-action+!>([now.bowl %spawn-goal pin (some id.context) desc.command %|])
       ==
     ==
       ::
@@ -312,31 +334,31 @@
       %cache-goal
     =*  poke-our  ~(poke-our pass:io /mod-command/cache-goal)
     =+  [msg res]=(invalid-goal-id-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store goal-action+!>([%cache-goal id.res]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %cache-goal id.res]))]~
       ::
       :: [%renew-goal h=@t]
       %renew-goal
     =*  poke-our  ~(poke-our pass:io /mod-command/renew-goal)
     =+  [msg res]=(invalid-goal-id-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store goal-action+!>([%renew-goal id.res]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %renew-goal id.res]))]~
       ::
       :: [%trash-goal h=@t]
       %trash-goal
     =*  poke-our  ~(poke-our pass:io /mod-command/trash-goal)
     =+  [msg res]=(invalid-goal-id-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store goal-action+!>([%trash-goal id.res]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %trash-goal id.res]))]~
       ::
       ::  [%set-kickoff h=@t k=(unit @da)]
       %set-kickoff
-    =*  poke  ~(poke pass:io /mod-command/set-kickoff)
+    =*  poke-our  ~(poke-our pass:io /mod-command/set-kickoff)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    ~[(poke [owner.id.res %goal-store] goal-action+!>([%set-kickoff id.res k.command]))]
+    ~[(poke-our %goal-store goal-action+!>([now.bowl %set-kickoff id.res k.command]))]
       ::
       ::  [%set-deadline h=@t d=(unit @da)]
       %set-deadline
-    =*  poke  ~(poke pass:io /mod-command/set-deadline)
+    =*  poke-our  ~(poke-our pass:io /mod-command/set-deadline)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    ~[(poke [owner.id.res %goal-store] goal-action+!>([%set-deadline id.res d.command]))]
+    ~[(poke-our %goal-store goal-action+!>([now.bowl %set-deadline id.res d.command]))]
       ::
       :: [%set-utc-offset hours=@dr ahead=?]
       %set-utc-offset
@@ -345,15 +367,15 @@
       ::
       ::  [%edit-goal-desc h=@t desc=@t]                
       %edit-goal-desc
-    =*  poke  ~(poke pass:io /mod-command/edit-goal-desc)
+    =*  poke-our  ~(poke-our pass:io /mod-command/edit-goal-desc)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke [owner.id.res %goal-store] goal-action+!>([%edit-goal-desc id.res desc.command]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %edit-goal-desc id.res desc.command]))]~
       ::
       ::  [%edit-pool-title h=@t title=@t]
       %edit-pool-title
-    =*  poke  ~(poke pass:io /mod-command/edit-pool-title)
+    =*  poke-our  ~(poke-our pass:io /mod-command/edit-pool-title)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke [owner.pin.res %goal-store] goal-action+!>([%edit-pool-title pin.res title.command]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %edit-pool-title pin.res title.command]))]~
       ::
       :: [%print-context ~]
       %print-context
@@ -394,27 +416,27 @@
       ::
       :: [%mark-actionable h=@t]
       %mark-actionable
-    =*  poke  ~(poke pass:io /mod-command/mark-actionable)
+    =*  poke-our  ~(poke-our pass:io /mod-command/mark-actionable)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke [owner.id.res %goal-store] goal-action+!>([%mark-actionable id.res]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %mark-actionable id.res]))]~
       ::
       :: [%unmark-actionable h=@t]
       %unmark-actionable
-    =*  poke  ~(poke pass:io /mod-command/unmark-actionable)
+    =*  poke-our  ~(poke-our pass:io /mod-command/unmark-actionable)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke [owner.id.res %goal-store] goal-action+!>([%unmark-actionable id.res]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %unmark-actionable id.res]))]~
       ::
       :: [%mark-complete h=@t]
       %mark-complete
-    =*  poke  ~(poke pass:io /mod-command/mark-complete)
+    =*  poke-our  ~(poke-our pass:io /mod-command/mark-complete)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke [owner.id.res %goal-store] goal-action+!>([%mark-complete id.res]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %mark-complete id.res]))]~
       ::
       :: [%unmark-complete h=@t]
       %unmark-complete
-    =*  poke  ~(poke pass:io /mod-command/unmark-complete)
+    =*  poke-our  ~(poke-our pass:io /mod-command/unmark-complete)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke [owner.id.res %goal-store] goal-action+!>([%unmark-complete id.res]))]~
+    [(poke-our %goal-store goal-action+!>([now.bowl %unmark-complete id.res]))]~
   ==
 ::
 ++  can-connect
@@ -453,13 +475,13 @@
 ++  def-cols  ~[%handle %level %deadline %priority]
 ::
 ++  yoke-command
-  |=  [command=[yoke-tag:gol l=@t r=@t] =yoke-tag:gol]
+  |=  command=[yoke-tag:gol l=@t r=@t]
   ^-  (list card)
-  =*  poke  ~(poke pass:io [%command yoke-tag ~])
+  =*  poke-our  ~(poke-our pass:io /mod-command/[-.command])
   =+  [msg l]=(invalid-goal-error:prtr l.command)  ?.  =(~ msg)  msg
   =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
   ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
   =/  pin  (got-pin:scry id.l)
-  =/  yok  [yoke-tag id.l id.r]
-  [(poke [owner.id.l %goal-store] goal-action+!>([%yoke pin ~[yok]]))]~
+  =/  yok  [-.command id.l id.r]
+  [(poke-our %goal-store goal-action+!>([now.bowl %yoke pin ~[yok]]))]~
 --
