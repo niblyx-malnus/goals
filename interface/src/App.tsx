@@ -56,6 +56,7 @@ declare const window: Window &
 //TODO: handle sub kick/error
 //TODO: order the virtual children
 //TODO: optimise the share dialog performence
+//TODO: update filters to work (adding archive filter too)
 interface Loading {
   trying: boolean;
   success: boolean;
