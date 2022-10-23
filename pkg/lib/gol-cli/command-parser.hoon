@@ -3,7 +3,7 @@
 ++  command-parser
   |=  [now=@da =utc-offset:dates]
   ;~  pose
-    parse-invite                          
+    parse-invite
     parse-held-yoke                       
     parse-held-rend
     parse-nest-yoke                       

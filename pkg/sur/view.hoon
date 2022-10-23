@@ -2,7 +2,9 @@
 |%
 +$  state-3
   $:  %3
-      boot-flag=?
+      cli=?(%.y %.n)  :: is CLI active
+      tix=@           :: active timers
+      reboot=?        :: do we need to reboot handles/views
       =handles:s1
       =views:s1
       context=grip:s1
@@ -101,7 +103,7 @@
 ++  convert-2-to-3
   |=  =state-2
   ^-  state-3
-  [%3 %& +.state-2]
+  [%3 %| 0 %& +.state-2]
 ::
 ++  convert-1-to-2
   |=  =state-1

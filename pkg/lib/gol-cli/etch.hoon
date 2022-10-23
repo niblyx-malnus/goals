@@ -14,7 +14,7 @@
   $(idx +(idx), store (etch pin (snag idx upds)))
   ++  etch
     |=  [=pin:gol upd=update:goal-store]
-    ?-    -.upd
+    ?+    -.upd  !!
       %spawn-pool  (spawn-pool:life-cycle pin pool.upd)
       %cache-pool  (cache-pool:life-cycle pin)
       %renew-pool  (renew-pool:life-cycle pin)

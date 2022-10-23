@@ -111,7 +111,7 @@
     (unmark-actionable:pore id mod)
   =+  pore(efx efx) :: ignore accumulated updates
   =/  nex  (make-nex ids.mup)
-  (emot old [%spawn-goal pin nex id (~(got by goals.p) id)])
+  (emot old [%spawn-goal nex id (~(got by goals.p) id)])
 ::
 :: All descendents including self
 ++  progeny
@@ -263,7 +263,7 @@
   =.  cache.p.pore  (~(put by cache.p.pore) id waz)
   ::
   :: Emit update
-  (emot:pore old [%cache-goal pin nex id ~(key by waz)])
+  (emot:pore old [%cache-goal nex id ~(key by waz)])
 ::
 :: Restore goal from cache to main goals
 ++  renew-goal
@@ -280,7 +280,8 @@
   =.  goals.p  (~(uni by goals.p) ren)
   =.  cache.p  (~(del by cache.p) id)
   ::
-  (emot old [%renew-goal pin id ren])
+  :: ren is redundant
+  (emot old [%renew-goal id ren])
 ::
 :: Permanently delete goal (must be in cache)
 ++  trash-goal
@@ -297,7 +298,7 @@
     =+  (waste-goal id mod) :: exposes nex, id, waz, and pore
     ::
     :: Emit update
-    (emot:pore old [%waste-goal pin nex id ~(key by waz)])
+    (emot:pore old [%waste-goal nex id ~(key by waz)])
   ::
   :: store redundant information
   =/  tas  (~(got by cache.p) id)
@@ -305,8 +306,8 @@
   :: Delete from cache
   =.  cache.p  (~(del by cache.p) id)
   :: ::
-  :: Emit update
-  (emot old [%trash-goal pin id ~(key by tas)])
+  :: Emit update; emitting tas is redundant
+  (emot old [%trash-goal id ~(key by tas)])
 ::
 ++  got-edge
   |=  =eid:gol
@@ -637,8 +638,8 @@
   ^-  ?
   ?:  =(mod owner.p)  %&
   =/  perm  (~(get by perms.p) mod)
-  ?~  perm  %|       :: not viewer
-  ?~  u.perm  %|  %& :: no %admin or %spawn privileges
+  ?~  perm  ~|(%not-a-viewer !!)
+  ?~  u.perm  ~|(%no-spawn-privileges !!)  %&
 ::
 ++  check-goal-perm
   |=  [=id:gol mod=ship]
