@@ -155,7 +155,7 @@
           ::
           :: [%cache-goal =id]
           %cache-goal
-        =/  pin  (~(got by index.store) id.pok)
+        =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -168,7 +168,7 @@
           ::
           :: [%renew-goal =id]
           %renew-goal
-        =/  pin  (~(got by index.store) id.pok)
+        =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -181,7 +181,7 @@
           ::
           :: [%trash-goal =id]
           %trash-goal
-        =/  pin  (~(got by index.store) id.pok)
+        =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -194,7 +194,7 @@
           ::
           :: [%edit-goal-desc =id desc=@t]
           %edit-goal-desc
-        =/  pin  (~(got by index.store) id.pok)
+        =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -233,7 +233,7 @@
           ::
           :: [%move cid=id upid=(unit id)]
           %move
-        =/  pin  (~(got by index.store) cid.pok)
+        =/  pin  (got:idx-orm:gol index.store cid.pok)
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -246,7 +246,7 @@
           ::
           :: [%set-kickoff =id kickoff=(unit @da)]
           %set-kickoff
-        =/  pin  (~(got by index.store) id.pok)
+        =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -260,7 +260,7 @@
           ::
           :: [%set-deadline =id deadline=(unit @da)]
           %set-deadline
-        =/  pin  (~(got by index.store) id.pok)
+        =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -275,7 +275,7 @@
           ::
           :: [%mark-actionable =id]
           %mark-actionable
-        =/  pin  (~(got by index.store) id.pok)
+        =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -288,7 +288,7 @@
           ::
           :: [%unmark-actionable =id]
           %unmark-actionable
-        =/  pin  (~(got by index.store) id.pok)
+        =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -301,7 +301,7 @@
           ::
           :: [%mark-complete =id]
           %mark-complete
-        =/  pin  (~(got by index.store) id.pok)
+        =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -314,7 +314,7 @@
           ::
           :: [%unmark-complete =id]
           %unmark-complete
-        =/  pin  (~(got by index.store) id.pok)
+        =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -327,7 +327,7 @@
           ::
           :: [%update-goal-perms =id chief=ship rec=?(%.y %.n) spawn=(set ship)]
           %update-goal-perms
-        =/  pin  (~(got by index.store) id.pok)
+        =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -460,24 +460,28 @@
     ``goal-peek+!>(pool-keys+~(key by pools))
     ::
       [%x %all-goal-keys ~]
-    ``goal-peek+!>(all-goal-keys+~(key by index))
+    :-  ~  :-  ~  :-  %goal-peek
+    !>(all-goal-keys+(turn (tap:idx-orm:gol index) |=([=id:gol pin:gol] id)))
     ::
       [%x %goal @ @ *]
     =/  owner  (slav %p i.t.t.path)
     =/  birth  (slav %da i.t.t.t.path)
     =/  id  `id:gol`[owner birth]
-    =/  pin  (~(got by index) id)
+    =/  pin  (got:idx-orm:gol index id)
     =/  pool  (~(got by pools) pin)
     =/  goal  (~(got by goals.pool) id)
     ?+    t.t.t.t.path  (on-peek:def path)
         [%harvest ~]
       ``goal-peek+!>(harvest+~(tap in (~(leaf-precedents pl pool) id)))
       ::
+        [%full-harvest ~]
+      ``goal-peek+!>(full-harvest+(~(full-harvest pl pool) id))
+      ::
         [%get-goal ~]
       ``goal-peek+!>(get-goal+(~(get by goals.pool) id))
       ::
         [%get-pin ~]
-      ``goal-peek+!>(get-pin+(~(get by index) id))
+      ``goal-peek+!>(get-pin+(get:idx-orm:gol index id))
       ::
         [%yung *]
       ?+    t.t.t.t.t.path  (on-peek:def path)

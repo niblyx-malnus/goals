@@ -27,7 +27,7 @@
       =/  pool  (~(got by pools.store) pin)
       =/  pore  (apex:pl pool)
       %=  store
-        index  (~(put by index.store) id.upd pin)
+        index  (put:idx-orm:gol index.store id.upd pin)
         pools  (~(put by pools.store) pin pool:abet:(etch:pore upd))
       ==
       ::
@@ -35,7 +35,7 @@
       =/  pool  (~(got by pools.store) pin)
       =/  pore  (apex:pl pool)
       %=  store
-        index  (gus-by-index ~(tap in waz.upd))
+        index  (gus-idx-orm ~(tap in waz.upd))
         pools  (~(put by pools.store) pin pool:abet:(etch:pore upd))
       ==
       ::
@@ -43,7 +43,7 @@
       =/  pool  (~(got by pools.store) pin)
       =/  pore  (apex:pl pool)
       %=  store
-        index  (gus-by-index ~(tap in ~(key by (~(got by cache.pool) id.upd))))
+        index  (gus-idx-orm ~(tap in ~(key by (~(got by cache.pool) id.upd))))
         pools  (~(put by pools.store) pin pool:abet:(etch:pore upd))
       ==
       ::
@@ -63,7 +63,8 @@
       ^-  store:gol
       %=  store
         index
-          %-  ~(gas by index.store)
+          %+  gas:idx-orm:gol
+            index.store
           (turn ~(tap in ~(key by goals.pool)) |=(=id:gol [id pin]))
         pools  (~(put by pools.store) pin pool)
       ==
@@ -88,7 +89,7 @@
       |=  =pin:gol
       ^-  store:gol
       %=  store
-        index  %-  gus-by-index
+        index  %-  gus-idx-orm
                ~(tap in ~(key by goals:(~(got by pools.store) pin)))
         pools  (~(del by pools.store) pin)
       ==
@@ -97,17 +98,18 @@
       |=  =pin:gol
       ^-  store:gol
       %=  store
-        index  %-  gus-by-index
+        index  %-  gus-idx-orm
                ~(tap in ~(key by goals:(~(got by cache.store) pin)))
         cache  (~(del by cache.store) pin)
       ==
     --
-  ++  gus-by-index
+  ::
+  ++  gus-idx-orm
     |=  ids=(list id:gol)
     =/  idx  0
     |-
     ?:  =(idx (lent ids))
       index.store
-    $(idx +(idx), index.store (~(del by index.store) (snag idx ids)))
+    $(idx +(idx), index.store +:(del:idx-orm:gol index.store (snag idx ids)))
   --
 --

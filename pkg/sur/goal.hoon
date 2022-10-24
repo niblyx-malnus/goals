@@ -36,6 +36,7 @@
 +$  pools        pools:s4
 ::
 +$  index        index:s4
+++  idx-orm      idx-orm:s4
 ::
 +$  store        store:s4
 ::
@@ -54,7 +55,6 @@
   +$  id  id:s3
   +$  eid  eid:s3
   +$  pin  pin:s3
-  +$  index  directory:s3
   +$  goal-froze  goal-froze:s3
       :: +$  togl
       ::   $:  mod=ship
@@ -150,6 +150,13 @@
   ::
   +$  pools  (map pin pool)
   ::
+  ++  lth-id
+    |=  [a=id b=id]
+    (lth birth.a birth.b)
+  ::
+  +$  index  ((mop id pin) lth-id)
+  ++  idx-orm  ((on id pin) lth-id)
+  ::
   +$  store  
     $:  =index
         =pools
@@ -219,6 +226,7 @@
         [%pool-keys keys=(set pin)]
         [%all-goal-keys keys=(set id)]
         [%harvest harvest=(list id)]
+        [%full-harvest harvest=goals]
         [%get-goal ugoal=(unit goal)]
         [%get-pin upin=(unit pin)]
         [%get-pool upool=(unit pool)]
@@ -770,12 +778,17 @@
   |=  [=pin:s3 =pool:s3]
   ^-  [pin:s4 pool:s4]
   [pin (pool-3-to-4 pool)]
-
+:: ::
+++  index-3-to-4
+  |=  =directory:s3
+  ^-  index:s4
+  (gas:idx-orm:s4 *index:s4 ~(tap by directory))
+::
 ++  convert-3-to-4
   |=  =state-3
   ^-  state-4
   :*  %4
-      :*  directory.store.state-3
+      :*  (index-3-to-4 directory.store.state-3)
           (pools-3-to-4 pools.store.state-3)
           *pools
       == 

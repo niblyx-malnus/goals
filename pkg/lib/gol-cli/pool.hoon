@@ -1,5 +1,5 @@
 /-  gol=goal
-/+  *gol-cli-goal, gol-cli-goals
+/+  *gol-cli-goal
 =|  efx=(list update:gol)
 |_  p=pool:gol
 +*  this  .
@@ -112,6 +112,13 @@
   =+  pore(efx efx) :: ignore accumulated updates
   =/  nex  (make-nex ids.mup)
   (emot old [%spawn-goal nex id (~(got by goals.p) id)])
+::
+++  check-tree
+  |=  [root=id:gol tree=goals:gol]  !!
+::
+:: Make sure tree is indeed a tree containing no ids
+++  spawn-tree
+  |=  [root=id:gol tree=goals:gol upid=(unit id:gol) mod=ship]  !!
 ::
 :: All descendents including self
 ++  progeny
@@ -505,6 +512,12 @@
       visited  visited.cmp
     ==
   --
+::
+:: harvest with full goals
+++  full-harvest
+  |=  =id:gol
+  ^-  goals:gol
+  (gat-by goals.p ~(tap in (leaf-precedents id)))
 ::
 ::  get depth of a given goal (lowest level is depth of 1)
 ++  plumb

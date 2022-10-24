@@ -3,10 +3,18 @@
 |_  store:gol
 +*  gols  ~(. gol-cli-goals +<)
 ::
+:: create unique pool id based on source ship and creation time
+++  unique-pin
+  |=  [own=ship now=@da]
+  ^-  pin:gol
+  ?.  (~(has by pools) [%pin own now])
+    [%pin own now]
+  $(now (add now ~s0..0001))
+::
 ++  spawn-pool
   |=  [title=@t own=ship now=@da]
   ^-  [pin:gol pool:gol]
-  =/  pin  [%pin (unique-id:gols own now)]
+  =/  pin  (unique-pin own now)
   =|  =pool:gol
   =.  owner.pool  owner.pin
   =.  birth.pool  birth.pin
@@ -15,58 +23,55 @@
   [pin pool]
 ::
 ++  clone-pool
-  |=  $:  =old=pin:gol
-          title=@t
-          own=ship
-          now=@da
-      ==
+  |=  [=old=pin:gol title=@t own=ship now=@da]
   ^-  [pin:gol pool:gol]
   =/  old-pool  (~(got by pools) old-pin)
   =+  [pin pool]=(spawn-pool title own now)
-  =.  pools  (~(put by pools) pin pool(creator owner.old-pin))
-  =/  id-map  (new-ids:gols ~(tap in ~(key by goals.old-pool)) own now)
-  |^
-  :-  pin
-  %=  pool
-    goals
-      %-  ~(gas by goals.pool)
-      %+  turn  ~(tap by goals.old-pool)
-      |=  [=id:gol =goal:gol]
-      :-  (~(got by id-map) id)
-      %=  goal
-        par  ?~(par.goal ~ (some (new-id u.par.goal)))
-        kids  (new-set-id kids.goal)
-        ::
-        inflow.kickoff  (new-set-eid inflow.kickoff.goal)
-        outflow.kickoff  (new-set-eid outflow.kickoff.goal)
-        inflow.deadline  (new-set-eid inflow.deadline.goal)
-        outflow.deadline  (new-set-eid outflow.deadline.goal)
-        ::
-        hereditor.left-bound.kickoff
-          (new-eid hereditor.left-bound.kickoff.goal)
-        hereditor.ryte-bound.kickoff
-          (new-eid hereditor.ryte-bound.kickoff.goal)
-        hereditor.left-bound.deadline
-          (new-eid hereditor.left-bound.deadline.goal)
-        hereditor.ryte-bound.deadline
-          (new-eid hereditor.ryte-bound.deadline.goal)
-        ::
-        stock  (turn stock.goal |=([=id:gol =ship] [(new-id id) ship]))
-        ranks
-          %-  ~(gas by ranks.goal)
-          (turn ~(tap by ranks.goal) |=([=ship =id:gol] [ship (new-id id)]))
-        ::
-        prio-left  (new-set-id prio-left.goal)
-        prio-ryte  (new-set-id prio-ryte.goal)
-        prec-left  (new-set-id prec-left.goal)
-        prec-ryte  (new-set-id prec-ryte.goal)
-        nest-left  (new-set-id nest-left.goal)
-        nest-ryte  (new-set-id nest-ryte.goal)
+  =.  pool  pool(creator owner.old-pin)
+  [pin pool(goals goals:(clone-goals:gols goals.old-pool own now))]
+::
+++  clone-goal
+  |=  $:  =old=id:gol
+          upin=(unit pin:gol) :: destination pin; new pool if ~
+          upid=(unit id:gol) :: must be ~ if upin is ~
+          udesc=(unit @t)
+          sfx=@t
+          own=ship
+          now=@da
       ==
-  ==
-  ++  new-id  |=(=id:gol (~(got by id-map) id))
-  ++  new-eid  |=(=eid:gol [-.eid (new-id id.eid)])
-  ++  new-set-id  |=(=(set id:gol) (~(run in set) new-id))
-  ++  new-set-eid  |=(=(set eid:gol) (~(run in set) new-eid))
-  --
+  ^-  [ids=(list id:gol) =pin:gol =pool:gol]
+  ::
+  :: Old pool info
+  =/  old-pin  (got:idx-orm:gol index old-id)
+  =/  old-pool  (~(got by pools) old-pin)
+  ::
+  :: Get goal and goal descendents
+  =/  waz  waz:(waste-goal:(apex:pl old-pool) old-id owner.old-pool)
+  =/  old-goal  (~(got by waz) old-id)
+  =/  new-desc  ?~(udesc desc.old-goal u.udesc)
+  ::
+  :: Update goal descriptions
+  =.  waz  (~(put by waz) old-id old-goal(desc new-desc))
+  =.  waz
+    %-  ~(run by waz)
+    |=  =goal:gol 
+    goal(desc (crip (weld (trip desc.goal) (trip sfx))))
+  ::
+  :: Identify dest pool (spawn one if necessary)
+  =+  ^-  [=dest=pin:gol =dest=pool:gol]
+    ?~  upin
+      =/  title  (crip (weld (trip new-desc) (trip sfx)))
+      (spawn-pool title own now)
+    ?.  =((got:idx-orm:gol index old-id) u.upin)
+      ~|("pin and id do not correspond" !!)
+    [u.upin (~(got by pools) u.upin)]
+  ::
+  :: Clone the goals
+  =+  (clone-goals:gols waz own now)  :: exposes id-map and goals
+  =.  dest-pool  dest-pool(goals goals)
+  ::
+  :: In order for this to work more smoothly need to settle pin vs id
+  :: will pin be changed to human readable names like group channels?
+  :: will id then be pin/birth, only identified by birth datetime?
+  !!
 --

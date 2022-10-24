@@ -314,6 +314,11 @@
       %harvest
     a+(turn harvest.pyk enjs-id)
     ::
+      %full-harvest
+    %+  frond
+      %full-harvest
+    (enjs-goals harvest.pyk)
+    ::
       %get-goal
     %+  frond
       %goal
@@ -407,7 +412,7 @@
 ++  enjs-index
   =,  enjs:format
   |=  =index
-  :-  %a  %+  turn  ~(tap by index)
+  :-  %a  %+  turn  (tap:idx-orm index)
   |=  [=id =pin] 
   %-  pairs
   :~  [%id (enjs-id id)]
