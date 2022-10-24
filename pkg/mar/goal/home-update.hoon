@@ -1,4 +1,4 @@
-/-  *goal-store
+/-  *goal
 /+  *gol-cli-json
 |_  upd=home-update
 ++  grow

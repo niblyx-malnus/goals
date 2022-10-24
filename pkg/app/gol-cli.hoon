@@ -1,5 +1,4 @@
-/-  gol=goal, vyu=view, commands,
-    goal-store, view-store
+/-  gol=goal, vyu=view, commands, view-store
 /+  shoe, verb, dbug, default-agent, agentio,
     gol-cli-handles, gol-cli-views, gol-cli-printer, gol-cli-scries,
     compar=gol-cli-command-parser
@@ -178,8 +177,8 @@
           ?.  cli
             ~
           [(poke-self view-action+!>(print+~))]~
-        =+  ^-  [[=pin:gol mod=ship pok=@] =update:goal-store]
-          !<(home-update:goal-store q.cage.sign)
+        =+  ^-  [[=pin:gol mod=ship pok=@] =update:gol]
+          !<(home-update:gol q.cage.sign)
         ?+    -.update  [cards this]
           ::
             %spawn-goal

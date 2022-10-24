@@ -1,6 +1,6 @@
-/-  gol=goal, goal-store
+/-  gol=goal
 /+  *gol-cli-goal, gol-cli-goals
-=|  efx=(list update:goal-store)
+=|  efx=(list update:gol)
 |_  p=pool:gol
 +*  this  .
     pin   `pin:gol`[%pin owner.p birth.p]
@@ -9,15 +9,15 @@
   this(p pool)
 ::
 ++  abet
-  ^-  [efx=(list update:goal-store) =pool:gol]
+  ^-  [efx=(list update:gol) =pool:gol]
   [(flop efx) p]
 ::
 ++  emit
-  |=  upd=update:goal-store
+  |=  upd=update:gol
   this(efx [upd efx])
 ::
 ++  emot
-  |=  [old=_this upd=update:goal-store]
+  |=  [old=_this upd=update:gol]
   ?.  =(this (etch:old upd)) :: be wary of changes to efx
   ~&("non-equivalent-update" ~|("non-equivalent-update" !!))
   (emit upd)
@@ -638,8 +638,8 @@
   ^-  ?
   ?:  =(mod owner.p)  %&
   =/  perm  (~(get by perms.p) mod)
-  ?~  perm  ~|(%not-a-viewer !!)
-  ?~  u.perm  ~|(%no-spawn-privileges !!)  %&
+  ?~  perm  %|       :: not viewer
+  ?~  u.perm  %|  %& :: no %admin or %spawn privileges
 ::
 ++  check-goal-perm
   |=  [=id:gol mod=ship]
@@ -907,9 +907,10 @@
   ::
   :: Check mod permissions
   :: Can yoke with permissions on *both* goals
-  ?>  ?&  (check-goal-perm id.e1 mod)
+  ?.  ?&  (check-goal-perm id.e1 mod)
           (check-goal-perm id.e2 mod)
       ==
+    ~&("missing-goal-mod-perms" ~|("missing-goal-mod-perms" !!))
   ::
   :: Cannot relate goal to itself
   ?:  =(id.e1 id.e2)  ~&("same-goal" ~|("same-goal" !!))
@@ -953,9 +954,10 @@
   ::
   :: Check mod permissions
   :: Can rend with permissions on *either* goal
-  ?>  ?|  (check-goal-perm id.e1 mod)
+  ?.  ?|  (check-goal-perm id.e1 mod)
           (check-goal-perm id.e2 mod)
       ==
+    ~&("missing-goal-mod-perms" ~|("missing-goal-mod-perms" !!))
   ::
   :: Cannot unrelate goal from itself
   ?:  =(id.e1 id.e2)  ~&("same-goal" ~|("same-goal" !!))
@@ -1068,7 +1070,8 @@
   =/  old  this
   ::
   :: Check mod permissions
-  ?>  (check-move-perm lid urid mod)
+  ?.  (check-move-perm lid urid mod)
+    ~&("missing-goal-move-perms" ~|("missing-goal-move-perms" !!))
   ::
   :: Identify ids to be modified
   =/  l  (~(got by goals.p) lid)
@@ -1268,7 +1271,7 @@
   (emot old [%pool-hitch %title title])
 ::
 ++  etch
-  |=  upd=update:goal-store
+  |=  upd=update:gol
   ^-  _this
   |^
   ?+    upd  !!

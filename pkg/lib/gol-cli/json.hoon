@@ -289,6 +289,10 @@
     %-  pairs
     :~  [%store (enjs-store store.pyk)]
     ==
+      %updates
+    %+  frond
+      %updates
+    a+(turn list.pyk enjs-logged)
     ::
     %groups  (frond %groups (initial:enjs:group-store [%initial groups.pyk]))
     ::
@@ -385,6 +389,19 @@
   :~  [%index (enjs-index index.store)]
       [%pools (enjs-pools pools.store)]
       [%cache (enjs-pools cache.store)]
+  ==
+::
+++  enjs-logged
+  =,  enjs:format
+  |=  =logged
+  (pairs ~[[%time (numb p.logged)] [%entry (enjs-log-update q.logged)]])
+::
+++  enjs-log-update
+  =,  enjs:format
+  |=  =log-update
+  ?-  -.log-update
+    %init  (frond %init (enjs-store +.log-update))
+    %updt  (frond %updt (enjs-home-update +.log-update))
   ==
 ::
 ++  enjs-index

@@ -1,4 +1,4 @@
-/-  gol=goal, goal-store, group-store, metadata-store
+/-  gol=goal, group-store, metadata-store
 /+  dbug, default-agent, verb, agentio,
     pl=gol-cli-pool, gol-cli-goals, gol-cli-pools,
     gol-cli-etch, group-update
@@ -11,11 +11,21 @@
       state-4
   ==
 +$  state-0  state-0:gol
-+$  state-1  state-1:gol
++$  state-1  state-1:gol  
 +$  state-2  state-2:gol
 +$  state-3  state-3:gol
 +$  state-4  state-4:gol
 +$  card  card:agent:gall
+++  log-orm  ((on @ log-update:gol) lth)
+++  unique-time
+  |=  [=time =log:gol]
+  ^-  @
+  =/  unix-ms=@
+    (unm:chrono:userlib time)
+  |-
+  ?.  (has:log-orm log unix-ms)
+    unix-ms
+  $(time (add unix-ms 1))
 --
 =|  state-4
 =*  state  -
@@ -35,11 +45,11 @@
     index   index.store
     pools   pools.store
     cache   cache.store
-    groups  groups.store
 ::
 ++  on-init   
   ^-  (quip card _this)
-  :_  this
+  =/  now=@  (unique-time now.bowl log)
+  :_  this(log (put:log-orm *log:gol now [%init store]))
   ?:  (~(has by wex.bowl) [/groups our.bowl %group-store])
     ~
   [(~(watch-our pass:io /groups) %group-store /groups)]~
@@ -53,7 +63,8 @@
   |-
   ?-    -.old
       %4
-    :_  this(state old)
+    =/  now=@  (unique-time now.bowl log)
+    :_  this(state old(log (put:log-orm *log:gol now [%init store.old])))
     ?:  (~(has by wex.bowl) [/groups our.bowl %group-store])
       ~
     [(~(watch-our pass:io /groups) %group-store /groups)]~
@@ -72,7 +83,7 @@
   =^  cards  state
     ?+    mark  (on-poke:def mark vase)
         %goal-action
-      =/  action=action:goal-store  !<(action:goal-store vase)
+      =/  action=action:gol  !<(action:gol vase)
       =/  pid  pid.action
       =/  pok  pok.action
       ?-    -.pok
@@ -375,10 +386,9 @@
         =/  wire  /[`@`+<.pin.pok]/[`@`+>.pin.pok]
         ?<  =(owner.pin.pok our.bowl)
         =*  leave-other  ~(leave-other pass:hc wire)
-        :_  state(store (etch:etch pin.pok [%trash-pool ~]~))
-        :~  (leave-other owner.pin.pok)
-            (fact:io goal-home-update+!>([[pin.pok src.bowl] %trash-pool ~]) ~[/goals])
-        ==
+        %+  send-home-updates:hc
+          [(leave-other owner.pin.pok)]~
+        [pin.pok src.bowl pid [%trash-pool ~]~]
       ==
     ==
   [cards this]
@@ -394,6 +404,7 @@
     =/  birth  `@da`i.t.path
     =/  pin  `pin:gol`[%pin owner birth]
     =/  pool  (~(got by pools) pin)
+    ?>  (~(has by perms.pool) src.bowl)
     :_  this
     [%give %fact ~ %goal-away-update !>([[our.bowl 0] spawn-pool+pool])]~
   ==
@@ -422,8 +433,18 @@
       [%x %initial ~]
     ``goal-peek+!>(initial+store)
     ::
+      [%x %updates *]
+    ?+    t.t.path  (on-peek:def path)
+        [%all ~]
+      ``goal-peek+!>(updates+(tap:log-orm log))
+      ::
+        [%since @ ~]
+      =/  since=@  (rash i.t.t.t.path dem)
+      ``goal-peek+!>(updates+(tap:log-orm (lot:log-orm log `since ~)))
+    ==
+    ::
       [%x %groups ~]
-    ``goal-peek+!>(groups+groups.store)
+    ``goal-peek+!>(groups+groups)
     ::
       [%x %groups-metadata ~]
     =/  gmd
@@ -525,7 +546,7 @@
   ^-  (quip card _this)
   ?+    wire  (on-agent:def wire sign)
       [%away @ @ @ *]
-    =/  pok  i.t.wire
+    =/  pid  i.t.wire
     =/  owner  `@p`i.t.t.wire
     =/  birth  `@da`i.t.t.t.wire
     =/  pin  `pin:gol`[%pin owner birth]
@@ -533,13 +554,10 @@
         %poke-ack
       ?~  p.sign
         `this
-      :_  this
-      ::
-      :: print out poke-error for debugging
-      %-  (slog u.p.sign)
-      :_  ~   %+  fact:io
-        goal-home-update+!>([[pin our.bowl pok] [%poke-error u.p.sign]])
-      ~[/goals]
+      =^  cards  state
+        %-  (slog u.p.sign)
+        (send-home-updates:hc ~ pin our.bowl pid [%poke-error u.p.sign]~)
+      [cards this]
     ==
     ::
       [@ @ ~] 
@@ -563,21 +581,23 @@
         ~
       ?~  upd
         `this
-      :_  this(store (etch:etch pin [u.upd]~))
-      :~  (fact:io goal-home-update+!>([[pin src.bowl 0] u.upd]) ~[/goals])
-          [%pass wire %agent [src.bowl %goal-store] %watch wire]
-      ==
+      =^  cards  state
+        %+  send-home-updates:hc 
+          [%pass wire %agent [src.bowl %goal-store] %watch wire]~
+        [pin src.bowl 0 [u.upd]~]
+      [cards this]
         %fact
       ?>  =(p.cage.sign %goal-away-update)
-      =/  update  !<(away-update:goal-store q.cage.sign)
+      =/  update  !<(away-update:gol q.cage.sign)
       ?+    +<.update  (on-agent:def wire sign)
           $?  %spawn-pool
               %spawn-goal  %trash-goal
               %pool-perms  %pool-hitch  %pool-nexus
               %goal-perms  %goal-hitch  %goal-nexus  %goal-togls
           ==
-        :_  this(store (etch:etch pin ~[+.update]))
-        ~[(fact:io goal-home-update+!>([[pin mod.update 0] +.update]) ~[/goals])]
+        =^  cards  state
+          (send-home-updates:hc ~ pin mod.update 0 [+.update]~)
+        [cards this]
       ==
     ==
       [%groups ~]
@@ -598,10 +618,7 @@
           ?(%group-update-0 %group-action)
         =/  =update:group-store  !<(update:group-store q.cage.sign)
         :-  ~
-        %=  this
-          groups.store
-            (~(group-update group-update [groups our.bowl]) update)
-        ==
+        this(groups (~(group-update group-update [groups our.bowl]) update))
       ==
     ==
   ==
@@ -614,9 +631,9 @@
     etch  ~(. gol-cli-etch store)
 ::
 ++  en-away-path
-  |=  [pok=@ =pin:gol =term]
+  |=  [pid=@ =pin:gol =term]
   ^-  path
-  /away/[`@`pok]/[`@`owner.pin]/[`@`birth.pin]/[term]
+  /away/[`@`pid]/[`@`owner.pin]/[`@`birth.pin]/[term]
 ::
 ++  pass
   |_  =wire
@@ -639,38 +656,37 @@
 ++  apex-pl  |=(=pin:gol (apex:pl (~(got by pools.store) pin)))
 ::
 ++  send-home-updates
-  |=  [cards=(list card) =pin:gol mod=ship pok=@ upds=(list update:goal-store)]
+  |=  [cards=(list card) =pin:gol mod=ship pid=@ upds=(list update:gol)]
   ^-  (quip card _state)
-  :_  state(store (etch:etch pin upds))
-  %+  weld
-    cards
-  ^-  (list card)
-  %+  turn  upds
-  |=  upd=update:goal-store
-  (fact:io goal-home-update+!>([[pin mod pok] upd]) ~[/goals])
+  =/  idx  0
+  =|  home-cards=(list card)
+  |-
+  ?:  =(idx (lent upds))
+    ::
+    :: this approach using etch duplicates work updating the store
+    :: (but quickest and easiest way to concordantly update index;
+    ::  maybe should update eventually)
+    [(weld cards home-cards) state(store (etch:etch pin upds))]
+  =/  now=@  (unique-time now.bowl log)
+  =/  hom=home-update:gol  [[pin mod pid] (snag idx upds)]
+  %=  $
+    idx  +(idx)
+    log  (put:log-orm log now [%updt hom])
+    home-cards  [(fact:io goal-home-update+!>(hom) ~[/goals]) home-cards]
+  ==
 ::
 ++  send-away-updates
-  |=  [cards=(list card) =pin:gol mod=ship pok=@ pore=_pl]
+  |=  [cards=(list card) =pin:gol mod=ship pid=@ pore=_pl]
   ^-  (quip card _state)
   =+  abet:pore  :: exposes efx and pool
-  ::
-  :: this approach using etch duplicates work updating the store
-  :: (but quickest and easiest way to concordantly update index;
-  ::  maybe should update eventually)
+  =^  home-cards  state  (send-home-updates cards pin mod pid efx)
   :_  state(store (etch:etch pin efx))
-  ;:  weld
-    cards
+  ;:  weld  cards  home-cards
     ::
     :: send away updates
     ^-  (list card)
     %+  turn  efx
-    |=  upd=update:goal-store
-    (fact:io goal-away-update+!>([[mod pok] upd]) ~[/[`@`+<.pin]/[`@`+>.pin]])
-    ::
-    :: send home updates
-    ^-  (list card)
-    %+  turn  efx
-    |=  upd=update:goal-store
-    (fact:io goal-home-update+!>([[pin mod pok] upd]) ~[/goals])
+    |=  upd=update:gol
+    (fact:io goal-away-update+!>([[mod pid] upd]) ~[/[`@`+<.pin]/[`@`+>.pin]])
   ==
 --

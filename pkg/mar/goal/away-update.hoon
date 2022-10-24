@@ -1,4 +1,4 @@
-/-  *goal-store
+/-  *goal
 |_  upd=away-update
 ++  grow
   |%

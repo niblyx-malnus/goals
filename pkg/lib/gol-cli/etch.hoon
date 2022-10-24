@@ -1,10 +1,10 @@
-/-  gol=goal, goal-store
+/-  gol=goal
 /+  pl=gol-cli-pool
 :: apply (etch) updates received from foreign pools
 ::
 |_  =store:gol
 ++  etch
-  |=  [=pin:gol upds=(list update:goal-store)]
+  |=  [=pin:gol upds=(list update:gol)]
   ^-  store:gol
   |^
   =/  idx  0
@@ -13,8 +13,10 @@
     store
   $(idx +(idx), store (etch pin (snag idx upds)))
   ++  etch
-    |=  [=pin:gol upd=update:goal-store]
-    ?+    -.upd  !!
+    |=  [=pin:gol upd=update:gol]
+    ^-  store:gol
+    ?-    -.upd
+      %poke-error  store  :: no-op on poke-error update
       %spawn-pool  (spawn-pool:life-cycle pin pool.upd)
       %cache-pool  (cache-pool:life-cycle pin)
       %renew-pool  (renew-pool:life-cycle pin)
