@@ -73,5 +73,6 @@
   :: In order for this to work more smoothly need to settle pin vs id
   :: will pin be changed to human readable names like group channels?
   :: will id then be pin/birth, only identified by birth datetime?
+  :: also need validators for a pool or goals structure...
   !!
 --

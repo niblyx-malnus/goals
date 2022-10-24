@@ -113,13 +113,6 @@
   =/  nex  (make-nex ids.mup)
   (emot old [%spawn-goal nex id (~(got by goals.p) id)])
 ::
-++  check-tree
-  |=  [root=id:gol tree=goals:gol]  !!
-::
-:: Make sure tree is indeed a tree containing no ids
-++  spawn-tree
-  |=  [root=id:gol tree=goals:gol upid=(unit id:gol) mod=ship]  !!
-::
 :: All descendents including self
 ++  progeny
   |=  =id:gol
