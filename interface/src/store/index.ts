@@ -97,6 +97,9 @@ interface Store {
     newStatus: boolean,
     newGroupsShareDialogData: any
   ) => void;
+
+  harvestData: any;
+  setHarvestData: (newHarvestData: any) => void;
 }
 /**
  * 
@@ -325,6 +328,12 @@ const useStore = create<Store>((set, get) => ({
     set(() => ({
       groupsShareDialogOpen: newStatus,
       groupsShareDialogData: newGroupsShareDialogData,
+    })),
+
+  harvestData: {},
+  setHarvestData: (newHarvestData: any) =>
+    set(() => ({
+      harvestData: newHarvestData,
     })),
 }));
 

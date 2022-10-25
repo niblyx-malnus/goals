@@ -11,6 +11,8 @@ import CopyPoolDialog from "./CopyPoolDialog";
 import YokingActionBar from "./YokingActionBar";
 import GroupsShareDialog from "./GroupsShareDialog";
 import Header from "./Header";
+import HarvestPanel from "./HarvestPanel";
+import GoalItem from "./GoalItem";
 
 
 export {
@@ -26,5 +28,7 @@ export {
   CopyPoolDialog,
   YokingActionBar,
   GroupsShareDialog,
-  Header
+  Header,
+  HarvestPanel,
+  GoalItem
 };

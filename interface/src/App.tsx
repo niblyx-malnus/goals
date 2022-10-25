@@ -5,9 +5,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Box from "@mui/material/Box";
 import api from "./api";
 import styled from "@emotion/styled/macro";
-import OutlinedInput from "@mui/material/OutlinedInput";
 import Container from "@mui/material/Container";
-import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 import NewGoalInput from "./components/NewGoalInput";
@@ -19,30 +17,12 @@ import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import { Order, PinId } from "./types/types";
 import Avatar from "@mui/material/Avatar";
-import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
-import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import { orderPools, orderPoolsAction } from "./store/actions";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
-import Divider from "@mui/material/Divider";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
-import {
-  ShareDialog,
-  DeletionDialog,
-  LeaveDialog,
-  Snackie,
-  Log,
-  TimelineDialog,
-  CopyPoolDialog,
-  YokingActionBar,
-  GroupsShareDialog,
-  Header
-} from "./components";
+import { Header } from "./components";
 import { v4 as uuidv4 } from "uuid";
 
 declare const window: Window &
@@ -70,7 +50,6 @@ function App() {
   const setGroupsData = useStore((store) => store.setGroupsData);
 
   const setArchivedPools = useStore((store) => store.setArchivedPools);
-  log("fetchedPools", fetchedPools);
   const [pools, setPools] = useState([]);
   const [loading, setLoading] = useState<Loading>({
     trying: true,
@@ -227,9 +206,7 @@ function App() {
       const groupsList = Object.entries(results.groups).map((group: any) => {
         return { name: group[0], memberCount: group[1].members.length };
       });
-      log("fetchGroups results =>", results);
-      log("groupsMap", groupsMap);
-      log("groupsList", groupsList);
+
       setGroupsData(groupsMap, groupsList);
     } catch (e) {
       log("fetchGroups error => ", e);
@@ -275,6 +252,7 @@ function App() {
   return (
     <Container sx={{ paddingBottom: 10 }}>
       <Header />
+
       {loading.trying && (
         <Stack flexDirection="row" alignItems="center">
           <CircularProgress size={28} />

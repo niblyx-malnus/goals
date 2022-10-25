@@ -27,6 +27,7 @@ import {
   CopyPoolDialog,
   YokingActionBar,
   GroupsShareDialog,
+  HarvestPanel,
 } from "./";
 
 import MenuItem from "@mui/material/MenuItem";
@@ -132,7 +133,7 @@ export default function Header() {
     >
       <ShareDialog pals={[]} />
       {selectionMode ? <YokingActionBar /> : <Log />}
-
+      <HarvestPanel />
       <DeletionDialog />
       <LeaveDialog />
       <TimelineDialog />
