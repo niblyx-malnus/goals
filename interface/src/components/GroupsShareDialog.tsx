@@ -32,8 +32,7 @@ export default function GroupsShareDialog() {
   );
   const groupsMap = useStore((store: any) => store.groupsMap);
   const groupsList = useStore((store: any) => store.groupsList);
-  log("groupsMap", groupsMap);
-  log("groupsList", groupsList);
+
   const toggleSnackBar = useStore((store) => store.toggleSnackBar);
 
   const handleRoleChange = (event: SelectChangeEvent) => {
@@ -51,7 +50,6 @@ export default function GroupsShareDialog() {
     setGroupName("");
     toggleGroupsShareDialog(false, null);
   };
-  log("groupsShareDialogData", groupsShareDialogData);
 
   const inviteGroupMembers = async () => {
     //we combine the new @p with the existing ones from this pool to construct our new permision lists

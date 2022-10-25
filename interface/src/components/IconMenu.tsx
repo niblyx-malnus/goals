@@ -18,6 +18,7 @@ import Box from "@mui/material/Box";
 import { GoalId, PinId } from "../types/types";
 import { log } from "../helpers";
 import api from "../api";
+import AgricultureIcon from "@mui/icons-material/Agriculture";
 
 import useStore from "../store";
 //TODO: hook up enter button to dialog confirm button everywhere
@@ -77,6 +78,7 @@ export default function IconMenu({
   virtualId,
   currentGoal,
   isArchived = false,
+  harvestGoal = false,
 }: {
   actionable?: any;
   complete?: boolean;
@@ -91,6 +93,7 @@ export default function IconMenu({
   setParentTrying: Function;
   poolData?: any;
   currentGoal?: any;
+  harvestGoal?: boolean;
 }) {
   const id = isVirtual ? virtualId : goalId;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -114,6 +117,8 @@ export default function IconMenu({
   const setSelectedGoals = useStore((store: any) => store.setSelectedGoals);
   const roleMap = useStore((store: any) => store.roleMap);
   const role = roleMap.get(pin?.birth);
+
+  const setHarvestData = useStore((store: any) => store.setHarvestData);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -387,6 +392,28 @@ export default function IconMenu({
       });
     }
   };
+  const handleHarvestGoal = async () => {
+    handleClose();
+
+    try {
+      if (!id) throw Error("no id provided");
+      const result = await api.harvest(id.owner, id.birth);
+      //update the harvest data in our store
+      setHarvestData({
+        startGoalId: id,
+        goals: result["full-harvest"],
+        pin,
+        role,
+        idList: result["full-harvest"]?.map(
+          (goalItem: any) => goalItem.id.birth
+        ),
+      });
+
+      log("handleHarvestGoal result =>", result);
+    } catch (e) {
+      log("handleHarvestGoal error =>", e);
+    }
+  };
   return (
     <Box className="show-on-hover" sx={{ opacity: open ? 1 : 0 }}>
       <IconButton
@@ -421,7 +448,7 @@ export default function IconMenu({
         {type === "goal" ? (
           //TODO: only admins/owners can delete/archive/restore a goal
           /*
-        , anyone with permissions on a goal can delete
+          anyone with permissions on a goal can delete
           only admins or owner can renew 
           */
           <div>
@@ -451,26 +478,35 @@ export default function IconMenu({
               <CalendarMonthIcon fontSize="small" />
               timeline
             </MenuItem>
-            <MenuItem onClick={handleMove} disableRipple>
-              <CalendarMonthIcon fontSize="small" />
-              move
-            </MenuItem>
-            <MenuItem onClick={moveGoalToRoot} disableRipple>
-              <CalendarMonthIcon fontSize="small" />
-              move to root
-            </MenuItem>
-            <MenuItem onClick={handlePriortize} disableRipple>
-              <CalendarMonthIcon fontSize="small" />
-              prioritize
-            </MenuItem>
-            <MenuItem onClick={handleNest} disableRipple>
-              <CalendarMonthIcon fontSize="small" />
-              virtually nest
-            </MenuItem>
-            <MenuItem onClick={handlePrecede} disableRipple>
-              <CalendarMonthIcon fontSize="small" />
-              precede
-            </MenuItem>
+            {/* We hide these from harvest panel */}
+            {!harvestGoal && (
+              <>
+                <MenuItem onClick={handleMove} disableRipple>
+                  <CalendarMonthIcon fontSize="small" />
+                  move
+                </MenuItem>
+                <MenuItem onClick={moveGoalToRoot} disableRipple>
+                  <CalendarMonthIcon fontSize="small" />
+                  move to root
+                </MenuItem>
+                <MenuItem onClick={handleHarvestGoal} disableRipple>
+                  <AgricultureIcon fontSize="small" />
+                  harvest
+                </MenuItem>
+                <MenuItem onClick={handlePriortize} disableRipple>
+                  <CalendarMonthIcon fontSize="small" />
+                  prioritize
+                </MenuItem>
+                <MenuItem onClick={handleNest} disableRipple>
+                  <CalendarMonthIcon fontSize="small" />
+                  virtually nest
+                </MenuItem>
+                <MenuItem onClick={handlePrecede} disableRipple>
+                  <CalendarMonthIcon fontSize="small" />
+                  precede
+                </MenuItem>
+              </>
+            )}
             <MenuItem onClick={archiveGoal} disableRipple>
               <DeleteIcon fontSize="small" />
               archive
@@ -504,7 +540,7 @@ export default function IconMenu({
                     toggleGroupsShareDialog(true, {
                       title: poolData.title,
                       participants: poolData,
-                      pin
+                      pin,
                     });
                   }}
                   disableRipple

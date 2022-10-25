@@ -538,6 +538,7 @@ const orderPools = (pools: any, order: Order) => {
     if (plumbLeftA < plumbLeftB) {
       return -1;
     }
+    var order = 'asc'
     //will order youngest (higher birth) first
     return birthCompare(aey, bee);
   }
@@ -561,6 +562,7 @@ const orderPools = (pools: any, order: Order) => {
   });
   return orderedPoolsAndGoals;
 };
+
 export {
   deletePoolAction,
   deleteGoalAction,
