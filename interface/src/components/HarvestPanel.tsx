@@ -19,7 +19,6 @@ import api from "../api";
 
 const drawerWidth = 300;
 
-
 export default function HarvestPanel() {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
@@ -156,7 +155,6 @@ export default function HarvestPanel() {
                 label={currentGoal.hitch.desc}
                 disabled={true}
                 inSelectionMode={false}
-                isCaptain={false}
                 pin={harvestData.pin}
                 harvestGoal={true}
                 yokingGoalId={"not in selection mode, so I wont use this"}

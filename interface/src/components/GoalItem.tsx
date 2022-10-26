@@ -30,7 +30,6 @@ interface GoalItemProps {
   readonly goal: any;
   poolRole: string;
   pin: PinId;
-  isCaptain: boolean;
   inSelectionMode: boolean;
   disabled: boolean;
   yokingGoalId: string;
@@ -47,7 +46,6 @@ const GoalItem = memo(
     goal,
     pin,
     poolRole,
-    isCaptain,
     inSelectionMode,
     disabled,
     yokingGoalId,
@@ -60,10 +58,22 @@ const GoalItem = memo(
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [trying, setTrying] = useState<boolean>(false);
+    const [isCaptain, setIsCaptian] = useState<boolean>(false);
     const collapseAll = useStore((store) => store.collapseAll);
     const selectedGoals = useStore((store) => store.selectedGoals);
     const updateSelectedGoal = useStore((store) => store.updateSelectedGoal);
     //TODO: remove the add/edit when isArchived
+    useEffect(() => {
+      log("calculating ranks for =>", goal.hitch.desc);
+      //we check at first render/everytime ranks changes(or just goal)
+      //does the current ship has chief/spawn/captain perms on this goal?
+      for (const rank of goal.nexus.ranks) {
+        if (rank.ship === shipName()) {
+          setIsCaptian(true);
+          return;
+        }
+      }
+    }, [goal.nexus.ranks]);
     const disableActions =
       (goal.isArchived && goal.nexus.par) ||
       trying ||
@@ -288,14 +298,16 @@ const GoalItem = memo(
               className="show-on-hover"
               sx={{ opacity: 0 }}
             >
-              {goal.perms?.captains.map((item: any, index: number) => {
+              {goal.nexus.ranks.map((item: any, index: number) => {
                 return (
                   <Chip
-                    key={item}
+                    key={item.ship}
                     sx={{ marginLeft: 1 }}
                     avatar={<Avatar>C</Avatar>}
                     size="small"
-                    label={<Typography fontWeight={"bold"}>{item}</Typography>}
+                    label={
+                      <Typography fontWeight={"bold"}>{item.ship}</Typography>
+                    }
                     color="primary"
                     variant="outlined"
                   />

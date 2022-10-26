@@ -33,10 +33,6 @@ const RecursiveTree = ({
     )
       return null;
 
-    //we need to know if the current ship is a captain on this goal
-    //TODO: update this to work with the new stuff, should probably be a captainMap
-    const isCaptain = true; // currentGoal.perms.captains.includes(ship);
-
     return (
       <GoalItem
         idObject={goal.id}
@@ -50,7 +46,6 @@ const RecursiveTree = ({
         goal={currentGoal}
         pin={pin}
         poolRole={poolRole}
-        isCaptain={isCaptain}
         inSelectionMode={inSelectionMode}
         disabled={disabled}
         yokingGoalId={yokingGoalId}
