@@ -475,7 +475,7 @@
         [%harvest ~]
       =/  pin  (got:idx-orm:gol index id)
       =/  pool  (~(got by pools) pin)
-      ``goal-peek+!>(harvest+~(tap in (~(leaf-precedents pl pool) id)))
+      ``goal-peek+!>(harvest+~(tap in (~(harvest pl pool) id)))
       ::
         [%full-harvest ~]
       =/  pin  (got:idx-orm:gol index id)
@@ -556,12 +556,12 @@
       =/  pool  (~(got by pools) pin)
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
-        ``goal-peek+!>(roots+(hi-to-lo (turn unnested-roots head)):~(. pl pool))
+        ``goal-peek+!>(roots+(hi-to-lo (turn (unnested roots) head)):~(. pl pool))
         ::
           [%uncompleted ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %roots-uncompleted
-        (hi-to-lo (turn uncompleted-unnested-roots head)):~(. pl pool)
+        (hi-to-lo (turn (incomplete (unnested roots)) head)):~(. pl pool)
       ==
     ==
   ==
