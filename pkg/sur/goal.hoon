@@ -2,6 +2,8 @@
 /+  *gol-cli-help
 |%
 ::
+++  vzn  %4
+::
 +$  state-4  [%4 =store:s4 =groups =log:s4]
 +$  state-3  [%3 =store:s3]
 +$  state-2  [%2 =store:s2]
@@ -80,10 +82,10 @@
   +$  moment  (unit @da)
   +$  bound  [=moment hereditor=eid]
   ::
-  +$  edge
+  +$  edge  :: should change to +$node
     $:  =moment
-        inflow=(set eid)
-        outflow=(set eid)
+        inflow=(set eid)  :: should change to incoming
+        outflow=(set eid) :: should change to outgoing
         ::
         =left=bound
         =ryte=bound
@@ -94,7 +96,7 @@
   +$  goal-nexus
     $:  par=(unit id)
         kids=(set id)
-        kickoff=edge
+        kickoff=edge  :: should change to kick-off
         deadline=edge
         ::
         complete=?(%.y %.n)
@@ -194,6 +196,7 @@
     ==
   ::
   +$  update
+    $:  %4
     $%  [%spawn-pool =pool]
         [%cache-pool =pin]
         [%renew-pool =pin =pool]
@@ -204,7 +207,7 @@
         [%cache-goal =nex =id cas=(set id)]
         [%renew-goal =id ren=goals]
         [%trash-goal =id tas=(set id)]
-        [%pool-perms new=pool-perms]
+        [%pool-perms =nex new=pool-perms]
         [%pool-hitch pool-hitch-update]
         [%pool-nexus pool-nexus-update]
         [%goal-perms =nex]
@@ -212,10 +215,10 @@
         [%goal-nexus =id goal-nexus-update]
         [%goal-togls =id goal-togls-update]
         [%poke-error =tang]
-    ==
+    ==  ==
   ::
-  +$  away-update  [[mod=ship pok=@] update]
-  +$  home-update  [[=pin mod=ship pok=@] update]
+  +$  away-update  [[mod=ship pid=@] update]
+  +$  home-update  [[=pin mod=ship pid=@] update]
   ::
   +$  log-update
     $%  [%updt upd=home-update]
@@ -270,6 +273,7 @@
   +$  exposed-yoke  $%([yoke-tag lid=id rid=id])
   ::
   +$  action
+    $:  %4
     $:  pid=@
     $=  pok
     $%  [%spawn-pool title=@t]
@@ -295,8 +299,14 @@
         [%edit-pool-title =pin title=@t]
         [%subscribe =pin]
         [%unsubscribe =pin]
-    ==  ==
+    ==  ==  ==
   --
+::
+:: ============================================================================
+::
+:: STRUCTURES HISTORY
+::
+:: ============================================================================
 ::
 ++  convert-3-to-4
   |=  =state-3

@@ -5,6 +5,7 @@
   =,  dejs:format
   |=  jon=json
   ^-  action
+  :-  vzn
   %.  jon
   %-  ot
   :~  pid+ni
@@ -160,12 +161,13 @@
   |=  hom=home-update
   ^-  json
   =/  upd=update  +.hom
+  =/  upd  +.upd  :: ignore version
   %-  pairs
   :~  :-  %hed
       %-  pairs
       :~  [%pin (enjs-pin pin.hom)]
           [%mod (ship mod.hom)]
-          [%pok (numb pok.hom)]
+          [%pid (numb pid.hom)]
       ==
       :-  %tel
       %+  frond  -.upd

@@ -15,7 +15,7 @@
   ++  etch
     |=  [=pin:gol upd=update:gol]
     ^-  store:gol
-    ?-    -.upd
+    ?-    +<.upd
       %poke-error  store  :: no-op on poke-error update
       %spawn-pool  (spawn-pool:life-cycle pin pool.upd)
       %cache-pool  (cache-pool:life-cycle pin)

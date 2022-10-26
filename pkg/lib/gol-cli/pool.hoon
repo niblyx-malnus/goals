@@ -4,6 +4,7 @@
 |_  p=pool:gol
 +*  this  .
     pin   `pin:gol`[%pin owner.p birth.p]
+++  vzn  %4
 ++  apex
   |=  =pool:gol
   this(p pool)
@@ -19,7 +20,7 @@
 ++  emot
   |=  [old=_this upd=update:gol]
   ?.  =(this (etch:old upd)) :: be wary of changes to efx
-  ~&("non-equivalent-update" ~|("non-equivalent-update" !!))
+  ~|("non-equivalent-update" !!)
   (emit upd)
 ::
 ++  init-goal
@@ -111,7 +112,7 @@
     (unmark-actionable:pore id mod)
   =+  pore(efx efx) :: ignore accumulated updates
   =/  nex  (make-nex ids.mup)
-  (emot old [%spawn-goal nex id (~(got by goals.p) id)])
+  (emot old [vzn %spawn-goal nex id (~(got by goals.p) id)])
 ::
 :: All descendents including self
 ++  progeny
@@ -152,7 +153,11 @@
 ++  break-bonds
   |=  [=id:gol exes=(set id:gol) mod=ship]
   ^-  [ids=(set id:gol) pore=_this]
+  ::
+  :: get the existing bonds between id and its (future) exes
   =/  pairs  (get-bonds id exes)
+  ::
+  :: iterate through and rend each of these bonds
   =/  idx  0
   =|  ids=(set id:gol)
   =/  pore  this
@@ -161,39 +166,54 @@
     [ids pore]
   =/  pair  (snag idx pairs)
   =/  mup  (dag-rend:pore p.pair q.pair mod)
+  ::
+  :: be sure to fix neighbors, as this is a raw dag operation and not an
+  :: exposed yoke
   %=  $
     idx  +(idx)
     ids  (~(uni in ids) ids.mup)
-    pore  pore.mup
+    pore  (fix-neighbors:pore.mup id.p.pair id.q.pair)
   ==
 ::
 :: Get the bonds which exist between a goal and a set of other goals
 ++  get-bonds
   |=  [=id:gol ids=(set id:gol)]
   ^-  (list (pair eid:gol eid:gol))
-  =+  (~(got by goals.p) id)
+  =+  (~(got by goals.p) id)  :: exposes kickoff and deadline
+  ::
+  :: get set of edges based on ids
   =/  eids=(set eid:gol)
     %-  %~  uni  in
         `(set eid:gol)`(~(run in ids) |=(=id:gol [%k id]))
     `(set eid:gol)`(~(run in ids) |=(=id:gol [%d id]))
+  ::
+  :: 
   %~  tap  in
+  ::
+  :: get the edges flowing into id's kickoff
   %-  %~  uni  in
       ^-  (set (pair eid:gol eid:gol))
       %-  ~(run in (~(int in eids) inflow.kickoff))
-      |=(=eid:gol [[%k id] eid])
+      |=(=eid:gol [eid %k id]) :: make sure these are ordered correctly
+  ::
+  :: get the edges flowing out of id's kickoff
   %-  %~  uni  in
       ^-  (set (pair eid:gol eid:gol))
       %-  ~(run in (~(int in eids) outflow.kickoff))
-      |=(=eid:gol [[%k id] eid])
+      |=(=eid:gol [[%k id] eid]) :: make sure these are ordered correctly
+  ::
+  :: get the edges flowing into id's deadline
   %-  %~  uni  in
       ^-  (set (pair eid:gol eid:gol))
       %-  ~(run in (~(int in eids) inflow.deadline))
-      |=(=eid:gol [[%d id] eid])
+      |=(=eid:gol [eid %d id]) :: make sure these are ordered correctly
+  ::
+  :: get the edges flowing out of id's deadline
   ^-  (set (pair eid:gol eid:gol))
   %-  ~(run in (~(int in eids) outflow.deadline))
-  |=(=eid:gol [[%d id] eid])
+  |=(=eid:gol [[%d id] eid]) :: make sure these are ordered correctly
 ::
-:: Get the submap of goals consisting of ids
+:: Get the submap of goals associated with ids
 ++  gat-by
   |=  [=goals:gol ids=(list id:gol)]
   ^-  goals:gol
@@ -233,7 +253,7 @@
   =/  ids  ids.mup
   ::
   :: Partition subgoals of goal from rest of goals
-  =/  prog  (progeny id)
+  =/  prog  (progeny:pore id)
   =.  mup  (partition:pore prog mod)
   =.  pore  pore.mup
   =.  ids  (~(uni in ids) ids.mup)
@@ -263,7 +283,7 @@
   =.  cache.p.pore  (~(put by cache.p.pore) id waz)
   ::
   :: Emit update
-  (emot:pore old [%cache-goal nex id ~(key by waz)])
+  (emot:pore old [vzn %cache-goal nex id ~(key by waz)])
 ::
 :: Restore goal from cache to main goals
 ++  renew-goal
@@ -281,7 +301,7 @@
   =.  cache.p  (~(del by cache.p) id)
   ::
   :: ren is redundant
-  (emot old [%renew-goal id ren])
+  (emot old [vzn %renew-goal id ren])
 ::
 :: Permanently delete goal (must be in cache)
 ++  trash-goal
@@ -298,7 +318,7 @@
     =+  (waste-goal id mod) :: exposes nex, id, waz, and pore
     ::
     :: Emit update
-    (emot:pore old [%waste-goal nex id ~(key by waz)])
+    (emot:pore old [vzn %waste-goal nex id ~(key by waz)])
   ::
   :: store redundant information
   =/  tas  (~(got by cache.p) id)
@@ -307,7 +327,7 @@
   =.  cache.p  (~(del by cache.p) id)
   :: ::
   :: Emit update; emitting tas is redundant
-  (emot old [%trash-goal id ~(key by tas)])
+  (emot old [vzn %trash-goal id ~(key by tas)])
 ::
 ++  got-edge
   |=  =eid:gol
@@ -328,19 +348,24 @@
   ==
 ::
 :: think of ~ as +inf
+:: +inf should only be a ryte-bound if there is no smaller number in between
 ++  loth
   |=  [a=(unit @) b=(unit @)]
-  ?~  a  %.n
-  ?~  b  %.y
+  ?~  a  %.n  :: ~ (+inf) is not less than any number (including itself)
+  ?~  b  %.y  :: any number is less than ~ (+inf)
   (lth u.a u.b)
 ::
 :: think of ~ as -inf
+:: -inf should only be a left-bound if there is no larger number in between
 ++  goth
   |=  [a=(unit @) b=(unit @)]
-  ?~  a  %.n
-  ?~  b  %.y
+  ?~  a  %.n  :: ~ (-inf) is not greater than any number (including itself)
+  ?~  b  %.y  :: any number is greater than ~ (-inf)
   (gth u.a u.b)
 ::
+:: a ~ bounded by a [~ @da] causes no bound-mismatch
+:: a [~ @da] bounded by a ~ causes no bound-mismatch
+:: only a [~ @da] bounded by a [~ @da] can cause a bound-mismatch
 :: comparing to ~ always returns %.n
 ++  lath
   |=  [a=(unit @) b=(unit @)]
@@ -348,7 +373,6 @@
   ?~  b  %.n
   (lth u.a u.b)
 ::
-:: comparing to ~ always returns %.n
 ++  gath
   |=  [a=(unit @) b=(unit @)]
   ?~  a  %.n
@@ -391,6 +415,74 @@
   %+  turn
     ~(tap in inflow.edge)
   left-bound
+::
+:: Trying to consolidate recursive graph exploration...
+::  |=  $:  =eid:gol
+::          path=(list eid:gol)
+::          visited=(set eid:gol)
+::      ==
+++  general-traversal
+  |=  =id:gol
+  ^-  ?
+  |^
+  ::
+  :: There are different initial cases
+  =/  idx  0
+  =/  inflow  ~(tap in inflow:(got-edge [%d id]))
+  |-
+  ?:  =(idx (lent inflow))
+    %|
+  ?:  -:(general-traversal (snag idx inflow) [%d id]~ (sy [%d id]~))
+    %&
+  $(idx +(idx))
+  ++  general-traversal
+    |=  $:  =eid:gol
+            path=(list eid:gol)
+            visited=(set eid:gol)
+        ==
+    ^-  [? visited=(set eid:gol)]  :: return a loobean and a set of visited nodes
+    =/  new-path=(list eid:gol)  [eid path]  :: append to the path from the start node
+    ::
+    :: catch any cycles
+    =/  i  (find [eid]~ path)  :: get the index of eid in the old path if it exists
+    ::
+    :: print the cycle path if this happens
+    ?.  =(~ i)  ?~(i !! ~&("cycle" ~|([%cycle (flop (scag u.i new-path))] !!)))
+    ::
+    :: check a condition on eid
+    :: this condition should be expressed as a function and given to
+    :: general traversal
+    ?:  &(=(-.eid %d) !complete:(~(got by goals.p) id.eid))  [%& visited]
+    ::
+    :: mark an edge visited
+    =.  visited  (~(put in visited) eid)
+    ::
+    :: run over the incoming edges
+    :: this should actually be some function to get a list of node ids
+    :: (eids) from a single node id (eid)
+    =/  idx  0
+    =/  inflow  ~(tap in inflow:(got-edge eid))
+    |-
+    ?:  =(idx (lent inflow))
+      ::
+      :: if we make it to the end without return a yes, return a no
+      [%| visited]
+    ::
+    :: if we've already visited this node, skip ahead
+    ?:  (~(has in visited) (snag idx inflow))
+      $(idx +(idx))
+    ::
+    :: recursively call this again (a kind of comparator...)
+    =/  cmp  (general-traversal (snag idx inflow) new-path visited)
+    ::
+    :: if the comparator returns true, finish; else repeat
+    ?:  -.cmp
+      [%& visited.cmp]
+    ::
+    :: increment index and visited
+    $(idx +(idx), visited visited.cmp)
+  --
+::
 ::
 ++  left-uncompleted
   |=  =id:gol
@@ -464,10 +556,13 @@
     $(idx +(idx), visited visited.cmp)
   --
 ::
-:: if %k and =(0 ~(wyt in inflow)), then return ~
-:: if %k and union of left-preceded of inflow returns ~, return ~
-:: if %d and union of left-preceded of inflow returns ~, return set with id.eid
-:: if union of left-preceded of inflow is non-null, return this set
+:: (1) if the total harvest of an edge's uncompleted inflows is non-null, 
+::     this is its harvest
+:: (2) if an edge is a kickoff and the total harvest of its inflows is ~,
+::     its harvest is ~
+:: (3) if an edge is a deadline and the total harvest of its inflows is ~,
+::     it is its own harvest
+::
 :: visited is (map eid:gol (set id:gol))
 ++  leaf-precedents
   |=  =id:gol
@@ -479,20 +574,46 @@
             path=(list eid:gol)
             visited=(map eid:gol (set id:gol))
         ==
+    ::
+    :: return a set of descendents (a "harvest") and a set of visited nodes
     ^-  [descendents=(set id:gol) visited=(map eid:gol (set id:gol))]
-    =/  new-path=(list eid:gol)  [eid path]
-    =/  i  (find [eid]~ path) 
+    :: 
+    :: append to the path from the start node
+    =/  new-path=(list eid:gol)  [eid path] 
+    ::
+    :: catch any cycles
+    =/  i  (find [eid]~ path) :: get idx of eid in old path if exists
+    :: 
+    :: print the cycle path if this happens
     ?.  =(~ i)  ?~(i !! ~&("cycle" ~|([%cycle (flop (scag u.i new-path))] !!)))
-    =/  inflow  inflow:(got-edge eid)
+    ::
     =/  idx  0
-    =/  inflow  ~(tap in inflow)
+    =/  inflow  ~(tap in inflow:(got-edge eid))
+    :: 
+    :: ignore completed
+    =.  inflow
+      %+  murn
+        inflow
+      |=  =eid:gol
+      =/  goal  (~(got by goals.p) id.eid)
+      ?:  complete.goal
+        ~
+      (some eid)
+    ::
+    :: iterate
     =/  descendents  *(set id:gol)
     |-
     ?:  =(idx (lent inflow))
       =/  descendents
-        ?.  &(=(~ descendents) =(%d -.eid))  descendents
+        ::
+        ?.  &(=(~ descendents) =(%d -.eid))
+          descendents
+        ?:  complete:(~(got by goals.p) id.eid)
+          ~
         (~(put in *(set id:gol)) id.eid)
       [descendents (~(put by visited) eid descendents)]
+    ::
+    :: if we've already visited this node, skip ahead
     ?:  (~(has by visited) (snag idx inflow))
       %=  $
         idx  +(idx)
@@ -526,41 +647,37 @@
   ?:  =(idx (lent gots))  +(lvl) :: add 1 to maximum child depth
   $(idx +(idx), lvl (max lvl (plumb (snag idx gots))))
 ::
-:: get roots
 ++  roots
-  ^-  (list id:gol)
-  %+  turn
-    %+  skim  ~(tap by goals.p)
-    |=  [id:gol =goal:gol]
-    ?&  =(~ par.goal)
-        .=  0
-        %-  lent
-        %+  murn
-          ~(tap in outflow.deadline.goal)
-        |=  =eid:gol
-        ?-  -.eid
-          %k  ~
-          %d  (some id.eid)
-        ==
-    ==
-  |=([=id:gol goal:gol] id)
+  ^-  (list [id:gol goal:gol])
+  %+  skim
+    ~(tap by goals.p)
+  |=([id:gol =goal:gol] =(~ par.goal))
 ::
-++  uncompleted-roots
-  %+  murn  roots
-  |=  =id:gol
-  ?:  complete:(~(got by goals.p) id)
+++  unnested-roots
+  ^-  (list [id:gol goal:gol])
+  %+  skim
+    roots
+  |=  [=id:gol =goal:gol]
+  .=  0
+  %-  lent
+  %+  murn
+    ~(tap in outflow.deadline.goal)
+  |=  =eid:gol
+  ?-  -.eid
+    %k  ~
+    %d  (some id.eid)
+  ==
+::
+++  uncompleted-unnested-roots
+  ^-  (list [id:gol goal:gol])
+  %+  murn  unnested-roots
+  |=  [=id:gol =goal:gol]
+  ?:  complete:goal
     ~
-  (some id)
+  (some [id goal])
 ::
 :: get max depth + 1; depth of "virtual" root node
-++  anchor  
-  ^-  @ud
-  +((roll (turn roots plumb) max))
-::
-++  empt
-  |=  getter=$-(goal:gol (set id:gol))
-  |=  =id:gol
-  =(0 ~(wyt in (getter (~(got by goals.p) id))))
+++  anchor  +((roll (turn (turn roots head) plumb) max))
 ::
 ++  uncompleted
   |=  getter=$-(goal:gol (set id:gol))
@@ -692,11 +809,11 @@
   |=  [=ship mod=ship]
   ^-  ?
   ?:  =(ship owner.p)
-    ~&("Cannot change owner perms." ~|("Cannot change owner perms." !!))
+    ~|("Cannot change owner perms." !!)
   ?>  (check-pool-perm mod)
   ?.  =((~(get by perms.p) ship) (some (some %admin)))  %&
   ?:  |(=(mod owner.p) =(mod ship))  %&
-  ~&("not-owner-or-self" ~|("not-owner-or-self" !!))
+  ~|("not-owner-or-self" !!)
 ::
 ++  renew-bound
   |=  [=eid:gol dir=?(%l %r)]
@@ -916,10 +1033,10 @@
   ?.  ?&  (check-goal-perm id.e1 mod)
           (check-goal-perm id.e2 mod)
       ==
-    ~&("missing-goal-mod-perms" ~|("missing-goal-mod-perms" !!))
+    ~|("missing-goal-mod-perms" !!)
   ::
   :: Cannot relate goal to itself
-  ?:  =(id.e1 id.e2)  ~&("same-goal" ~|("same-goal" !!))
+  ?:  =(id.e1 id.e2)  ~|("same-goal" !!)
   =/  edge1  (got-edge e1)
   =/  edge2  (got-edge e2)
   ::
@@ -928,23 +1045,23 @@
   ?:  ?&  complete:(~(got by goals.p) id.e2)
           !complete:(~(got by goals.p) id.e1)
       ==
-    ~&("incomplete-complete" ~|("incomplete-complete" !!))
+    ~|("incomplete-complete" !!)
   ::
   :: Cannot create relationship with the deadline of the right id
   :: if the right id is an actionable goal
   ?:  ?&  =(-.e2 %d)
           actionable:(~(got by goals.p) id.e2)
       ==
-    ~&("right-actionable" ~|("right-actionable" !!))
+    ~|("right-actionable" !!)
   ::
   :: e2 must not come before e1
-  ?:  (before e2 e1)  ~&("before-e2-21" ~|("before-e2-e1" !!))
+  ?:  (before e2 e1)  ~|("before-e2-e1" !!)
   ::
   :: there must be no bound mismatch between e1 and e2
   ?:  (gath moment.edge1 -:(ryte-bound e2))
-    ~&("bound-mismatch" ~|("bound-mismatch" !!))
+    ~|("bound-mismatch" !!)
   ?:  (lath moment.edge2 -:(left-bound e1))
-    ~&("bound-mismatch" ~|("bound-mismatch" !!))
+    ~|("bound-mismatch" !!)
   ::
   :: dag-yoke
   =.  outflow.edge1  (~(put in outflow.edge1) e2)
@@ -963,10 +1080,10 @@
   ?.  ?|  (check-goal-perm id.e1 mod)
           (check-goal-perm id.e2 mod)
       ==
-    ~&("missing-goal-mod-perms" ~|("missing-goal-mod-perms" !!))
-  ::
+    ~|("missing-goal-mod-perms" !!)
+  :: ::
   :: Cannot unrelate goal from itself
-  ?:  =(id.e1 id.e2)  ~&("same-goal" ~|("same-goal" !!))
+  ?:  =(id.e1 id.e2)  ~|("same-goal" !!)
   ::
   :: Cannot destroy containment of an owned goal
   =/  l  (~(got by goals.p) id.e1)
@@ -974,7 +1091,7 @@
   ?:  ?|  &(=(-.e1 %d) =(-.e2 %d) (~(has in kids.r) id.e1))
           &(=(-.e1 %k) =(-.e2 %k) (~(has in kids.l) id.e2))
       ==
-    ~&("owned-goal" ~|("owned-goal" !!))
+    ~|("owned-goal" !!)
   ::
   :: dag-rend
   =/  edge1  (got-edge e1)
@@ -1020,7 +1137,7 @@
   =/  pore  this
   |-
   ?:  =(idx (lent yoks))
-    (emot old [%pool-nexus %yoke (make-nex ids)]):[pore .]
+    (emot old [vzn %pool-nexus %yoke (make-nex ids)]):[pore .]
   =/  mup  (yoke:pore (snag idx yoks) mod)
   %=  $
     idx   +(idx)
@@ -1077,7 +1194,7 @@
   ::
   :: Check mod permissions
   ?.  (check-move-perm lid urid mod)
-    ~&("missing-goal-move-perms" ~|("missing-goal-move-perms" !!))
+    ~|("missing-goal-move-perms" !!)
   ::
   :: Identify ids to be modified
   =/  l  (~(got by goals.p) lid)
@@ -1125,7 +1242,7 @@
   ^-  _this
   =/  old  this
   =/  mup  (move lid urid mod)
-  (emot old [%pool-nexus %yoke (make-nex ids.mup)]):[pore.mup .]
+  (emot old [vzn %pool-nexus %yoke (make-nex ids.mup)]):[pore.mup .]
 ::
 ++  mark-actionable
   |=  [=id:gol mod=ship]
@@ -1137,9 +1254,9 @@
       %+  murn
       ~(tap in inflow.deadline.goal) 
       |=(=eid:gol ?:(=(id id.eid) ~ (some eid)))
-    ~&("has-nested" ~|("has-nested" !!))
+    ~|("has-nested" !!)
   =.  goals.p  (~(put by goals.p) id goal(actionable %&))
-  (emot old [%goal-togls id %actionable %.y])
+  (emot old [vzn %goal-togls id %actionable %.y])
 ::
 ++  mark-complete
   |=  [=id:gol mod=ship]
@@ -1147,9 +1264,9 @@
   =/  old  this
   ?>  (check-goal-perm id mod)
   =/  goal  (~(got by goals.p) id)
-  ?:  (left-uncompleted id)  ~&("left-completed" ~|("left-uncompleted" !!))
+  ?:  (left-uncompleted id)  ~|("left-uncompleted" !!)
   =.  goals.p  (~(put by goals.p) id goal(complete %&))
-  (emot old [%goal-togls id %complete %.y])
+  (emot old [vzn %goal-togls id %complete %.y])
 ::
 ++  unmark-actionable
   |=  [=id:gol mod=ship]
@@ -1158,7 +1275,7 @@
   ?>  (check-goal-perm id mod)
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(actionable %|))
-  (emot old [%goal-togls id %actionable %.n])
+  (emot old [vzn %goal-togls id %actionable %.n])
 ::
 ++  unmark-complete
   |=  [=id:gol mod=ship]
@@ -1166,9 +1283,9 @@
   =/  old  this
   ?>  (check-goal-perm id mod)
   =/  goal  (~(got by goals.p) id)
-  ?:  (ryte-completed id)  ~&("ryte-completed" ~|("ryte-completed" !!))
+  ?:  (ryte-completed id)  ~|("ryte-completed" !!)
   =.  goals.p  (~(put by goals.p) id goal(complete %|))
-  (emot old [%goal-togls id %complete %.n])
+  (emot old [vzn %goal-togls id %complete %.n])
 ::
 ++  set-kickoff
   |=  [=id:gol moment=(unit @da) mod=ship]
@@ -1177,11 +1294,11 @@
   ?>  (check-goal-perm id mod)
   =/  rb  (ryte-bound [%k id])
   =/  lb  (left-bound [%k id])
-  ?:  &(!=(+.lb [%k id]) (lath moment -:lb))  ~&("bound-left" ~|("bound-left" !!))
-  ?:  &(!=(+.rb [%k id]) (gath moment -:rb))  ~&("bound-ryte" ~|("bound-ryte" !!))
+  ?:  &(!=(+.lb [%k id]) (lath moment -:lb))  ~|("bound-left" !!)
+  ?:  &(!=(+.rb [%k id]) (gath moment -:rb))  ~|("bound-ryte" !!)
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(moment.kickoff moment))
-  (emot old [%goal-nexus id %kickoff moment])
+  (emot old [vzn %goal-nexus id %kickoff moment])
 ::
 ++  set-deadline
   |=  [=id:gol moment=(unit @da) mod=ship]
@@ -1190,14 +1307,82 @@
   ?>  (check-goal-perm id mod)
   =/  rb  (ryte-bound [%d id])
   =/  lb  (left-bound [%d id])
-  ?:  &(!=(+.lb [%d id]) (lath moment -:lb))  ~&("bound-left" ~|("bound-left" !!))
-  ?:  &(!=(+.rb [%d id]) (gath moment -:rb))  ~&("bound-ryte" ~|("bound-ryte" !!))
+  ?:  &(!=(+.lb [%d id]) (lath moment -:lb))  ~|("bound-left" !!)
+  ?:  &(!=(+.rb [%d id]) (gath moment -:rb))  ~|("bound-ryte" !!)
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(moment.deadline moment))
-  (emot old [%goal-nexus id %deadline moment])
+  (emot old [vzn %goal-nexus id %deadline moment])
+::
+++  replace-chiefs
+  |=  kick=(set ship)
+  ^-  [ids=(set id:gol) pore=_this]
+  |^
+  =/  idx  0
+  =|  ids=(set id:gol)
+  =/  pore  this
+  |-
+  ?:  =(idx (lent roots))
+    [ids pore]
+  =/  mup  (replace-chief (head (snag idx roots)) kick)
+  %=  $
+    idx  +(idx)
+    ids  (~(uni in ids) ids.mup)
+    pore  pore(goals.p goals.mup)
+  ==
+  ++  replace-chief
+    |=  [=id:gol kick=(set ship)]
+    ^-  [ids=(set id:gol) =goals:gol]
+    =/  goal  (~(got by goals.p) id)
+    =.  goals.p
+      %+  ~(put by goals.p)
+        id
+      ?.  (~(has in kick) chief.goal)
+        goal
+      ?~  par.goal
+        goal(chief owner.p)
+      =/  poal  (~(got by goals.p) u.par.goal)
+      goal(chief chief.poal)
+    ::
+    =/  ids=(set id:gol)
+      ?:  (~(has in kick) chief.goal)
+        ~
+      (~(put in *(set id:gol)) id)
+    ::
+    =/  idx  0
+    =/  kids  ~(tap in kids.goal)
+    |-
+    ?:  =(idx (lent kids))
+      [ids goals.p]
+    =/  mup  (replace-chief (snag idx kids) kick)
+    %=  $
+      idx  +(idx)
+      ids  (~(uni in ids) ids.mup)
+      goals.p  goals.mup
+    ==
+  --
+::
+++  purge-spawn
+  |=  kick=(set ship)
+  ^-  [ids=(set id:gol) pore=_this]
+  =/  idx  0
+  =|  ids=(set id:gol)
+  =/  goals  ~(tap by goals.p)
+  |-
+  ?:  =(idx (lent goals))
+    [ids this]
+  =+  `[=id:gol =goal:gol]`(snag idx goals)
+  %=  $
+    idx  +(idx)
+    ids  (~(put in ids) id)
+    goals.p  (~(put by goals.p) id goal(spawn (~(dif in spawn.goal) kick)))
+  ==
 ::
 :: Update pool permissions for individual ship.
 :: If role is ~, remove ship as viewer.
+::   If we remove a ship as a viewer, we must remove it from all goal
+::   spawn sets. We must also remove it from all goal chiefs and replace
+::   the chief with its nearest non-deleted ancestor chief or the pool
+::   owner when no ancestor is available.
 :: If role is [~ u=~], make ship basic viewer.
 :: If role is [~ u=[~ u=?(%admin %spawn)]], make ship ?(%admin %spawn).
 ++  update-pool-perms
@@ -1206,13 +1391,18 @@
   =/  upds  (perms-to-upds new)
   =/  old  this
   =/  idx  0
+  =|  kick=(set ship)
   |-
   ?:  =(idx (lent upds))
-    (emot old [%pool-perms perms.p])
+    =/  mup  (replace-chiefs kick)
+    =/  myp  (purge-spawn:pore.mup kick)
+    =/  ids  (~(uni in ids.mup) ids.myp)
+    (emot old [vzn %pool-perms (make-nex ids) perms.p]):[pore.myp .]
   =/  upd  (snag idx upds)
   ?>  (check-ship-mod ship.upd mod)
   %=  $
     idx  +(idx)
+    kick  ?~(role.upd (~(put in kick) ship.upd) kick)
     perms.p
       ?~  role.upd
         (~(del by perms.p) ship.upd)
@@ -1247,8 +1437,12 @@
   =/  old  this
   ::
   :: Check mod permissions
-  ?>  (check-goal-perm id mod)
-  ?>  (~(has by perms.p) chief)
+  ?.  (check-goal-perm id mod)
+    ~|("missing goal perms" !!)
+  ?.  (~(has by perms.p) chief)
+    ~|("chief is a non-viewer" !!)
+  ?.  =(0 ~(wyt in (~(dif in spawn) ~(key by perms.p))))
+    ~|("ships in spawn are non-viewers" !!)
   ::
   :: Update spawn perms
   =/  goal  (~(got by goals.p) id)
@@ -1257,7 +1451,7 @@
   :: Update chief, stock and ranks
   =/  mup  (avalanche-chief-mod id (some [chief rec]))
   ::
-  (emot old [%goal-perms (make-nex ids.mup)]):[pore.mup .]
+  (emot old [vzn %goal-perms (make-nex ids.mup)]):[pore.mup .]
 ::
 ++  edit-goal-desc
   |=  [=id:gol desc=@t mod=ship]
@@ -1266,7 +1460,7 @@
   ?>  (check-goal-perm id mod)
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(desc desc))
-  (emot old [%goal-hitch id %desc desc])
+  (emot old [vzn %goal-hitch id %desc desc])
 :: 
 ++  edit-pool-title
   |=  [title=@t mod=ship]
@@ -1274,13 +1468,13 @@
   =/  old  this
   ?>  (check-pool-perm mod)
   =.  p  p(title title)
-  (emot old [%pool-hitch %title title])
+  (emot old [vzn %pool-hitch %title title])
 ::
 ++  etch
   |=  upd=update:gol
   ^-  _this
   |^
-  ?+    upd  !!
+  ?+    +.upd  !!
     :: ------------------------------------------------------------------------
     :: spawn/trash
     ::

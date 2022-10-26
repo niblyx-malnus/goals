@@ -48,9 +48,9 @@
     %all-goal-keys  keys.pyk
   ==
 ::
-++  got-goal
+++  get-goal
   |=  =id
-  ^-  goal
+  ^-  (unit goal)
   =/  pyk=peek
     .^  peek
       %gx
@@ -65,8 +65,10 @@
       ==
     ==
   ?+  -.pyk  !!
-    %get-goal  ?~(ugoal.pyk !! u.ugoal.pyk)
+    %get-goal  ugoal.pyk
   ==
+::
+++  got-goal  |=(=id `goal`(need (get-goal id)))
 ::
 ++  got-pin
   |=  =id
@@ -88,9 +90,9 @@
     %get-pin  ?~(upin.pyk !! u.upin.pyk)
   ==
 ::
-++  got-pool
+++  get-pool
   |=  =pin
-  ^-  pool
+  ^-  (unit pool)
   =/  pyk=peek
     .^  peek
       %gx
@@ -105,8 +107,10 @@
       ==
     ==
   ?+  -.pyk  !!
-    %get-pool  ?~(upool.pyk !! u.upool.pyk)
+    %get-pool  upool.pyk
   ==
+::
+++  got-pool  |=(=pin `pool`(need (get-pool pin)))
 ::
 ::
 ++  ryte-bound
