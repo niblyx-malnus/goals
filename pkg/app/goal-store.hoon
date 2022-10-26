@@ -3,6 +3,11 @@
     pl=gol-cli-pool, gol-cli-goals, gol-cli-pools,
     gol-cli-etch, group-update
 |%
++$  state-0  state-0:gol
++$  state-1  state-1:gol  
++$  state-2  state-2:gol
++$  state-3  state-3:gol
++$  state-4  state-4:gol
 +$  versioned-state
   $%  state-0
       state-1
@@ -10,11 +15,6 @@
       state-3
       state-4
   ==
-+$  state-0  state-0:gol
-+$  state-1  state-1:gol  
-+$  state-2  state-2:gol
-+$  state-3  state-3:gol
-+$  state-4  state-4:gol
 +$  card  card:agent:gall
 ++  log-orm  ((on @ log-update:gol) lth)
 ++  unique-time
@@ -29,6 +29,7 @@
 --
 =|  state-4
 =*  state  -
+=*  vzn  vzn:gol
 ::
 %+  verb  |
 %-  agent:dbug
@@ -84,6 +85,7 @@
     ?+    mark  (on-poke:def mark vase)
         %goal-action
       =/  action=action:gol  !<(action:gol vase)
+      ?>  =(vzn -.action)  :: assert pokes are correct version
       =/  pid  pid.action
       =/  pok  pok.action
       ?-    -.pok
@@ -91,13 +93,13 @@
           %spawn-pool
         ?>  =(src.bowl our.bowl)
         =+  [pin pool]=(spawn-pool:puls title.pok src.bowl now.bowl)
-        (send-home-updates:hc ~ pin src.bowl pid [%spawn-pool pool]~)
+        (send-home-updates:hc ~ pin src.bowl pid [vzn %spawn-pool pool]~)
           ::
           %clone-pool
         ?>  =(src.bowl our.bowl)
         =+  ^=  [pin pool]
           (clone-pool:puls pin.pok title.pok src.bowl now.bowl)
-        (send-home-updates:hc ~ pin src.bowl pid [%spawn-pool pool]~)
+        (send-home-updates:hc ~ pin src.bowl pid [vzn %spawn-pool pool]~)
           ::
           :: [%cache-pool =pin]
           %cache-pool
@@ -105,7 +107,7 @@
         ?>  =(src.bowl owner.pin.pok)
         %+  send-home-updates:hc
           [%give %kick ~[/[`@`+<.pin.pok]/[`@`+>.pin.pok]] ~]~
-        [pin.pok src.bowl pid [%cache-pool pin.pok]~]
+        [pin.pok src.bowl pid [vzn %cache-pool pin.pok]~]
           ::
           :: [%renew-pool =pin]
           %renew-pool
@@ -118,9 +120,9 @@
               (~(del in ~(key by perms:(~(got by cache) pin.pok))) our.bowl)
             |=  =ship
             ^-  card
-            (poke-other ship goal-action+!>([0 %subscribe pin.pok]))
+            (poke-other ship goal-action+!>([vzn 0 %subscribe pin.pok]))
         =/  pool  (~(got by cache) pin.pok) :: this is redundant information
-        [pin.pok src.bowl pid [%renew-pool pin.pok pool]~]
+        [pin.pok src.bowl pid [vzn %renew-pool pin.pok pool]~]
           ::
           :: [%trash-pool =pin]
           %trash-pool
@@ -129,9 +131,9 @@
         %+  send-home-updates:hc
           [%give %kick ~[/[`@`+<.pin.pok]/[`@`+>.pin.pok]] ~]~
         ?:  (~(has by pools) pin.pok)
-          [pin.pok src.bowl pid [%waste-pool ~]~]
+          [pin.pok src.bowl pid [vzn %waste-pool ~]~]
         ?>  (~(has by cache) pin.pok)
-        [pin.pok src.bowl pid [%trash-pool ~]~]
+        [pin.pok src.bowl pid [vzn %trash-pool ~]~]
           ::
           :: [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
           %spawn-goal
@@ -361,7 +363,7 @@
             ^-  (list card)
             %+  turn  invite.diff
             |=  =ship
-            (poke-other ship goal-action+!>([0 %subscribe pin.pok]))
+            (poke-other ship goal-action+!>([vzn 0 %subscribe pin.pok]))
             ^-  (list card)
             %+  turn  remove.diff
             |=  =ship
@@ -388,7 +390,7 @@
         =*  leave-other  ~(leave-other pass:hc wire)
         %+  send-home-updates:hc
           [(leave-other owner.pin.pok)]~
-        [pin.pok src.bowl pid [%trash-pool ~]~]
+        [pin.pok src.bowl pid [vzn %trash-pool ~]~]
       ==
     ==
   [cards this]
@@ -422,8 +424,10 @@
     ::
     :: 0 is reserved for endogenous updates
     :_  this
-    :_  ~  %-  poke-self
-    goal-action+!>([0 %update-pool-perms pin (~(del by perms.pool) src.bowl)])
+    :_  ~
+    %-  poke-self
+    :-  %goal-action
+    !>([vzn 0 %update-pool-perms pin (~(del by perms.pool) src.bowl)])
   ==
 ::
 ++  on-peek
@@ -467,23 +471,32 @@
     =/  owner  (slav %p i.t.t.path)
     =/  birth  (slav %da i.t.t.t.path)
     =/  id  `id:gol`[owner birth]
-    =/  pin  (got:idx-orm:gol index id)
-    =/  pool  (~(got by pools) pin)
-    =/  goal  (~(got by goals.pool) id)
     ?+    t.t.t.t.path  (on-peek:def path)
         [%harvest ~]
+      =/  pin  (got:idx-orm:gol index id)
+      =/  pool  (~(got by pools) pin)
       ``goal-peek+!>(harvest+~(tap in (~(leaf-precedents pl pool) id)))
       ::
         [%full-harvest ~]
+      =/  pin  (got:idx-orm:gol index id)
+      =/  pool  (~(got by pools) pin)
       ``goal-peek+!>(full-harvest+(~(full-harvest pl pool) id))
       ::
         [%get-goal ~]
+      =/  upin  (get:idx-orm:gol index id)
+      ?~  upin
+        ``goal-peek+!>(get-goal+~)
+      =/  pool  (~(got by pools) u.upin)
+      =/  goal  (~(got by goals.pool) id)
       ``goal-peek+!>(get-goal+(~(get by goals.pool) id))
       ::
         [%get-pin ~]
       ``goal-peek+!>(get-pin+(get:idx-orm:gol index id))
       ::
         [%yung *]
+      =/  pin  (got:idx-orm:gol index id)
+      =/  pool  (~(got by pools) pin)
+      =/  goal  (~(got by goals.pool) id)
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
         ``goal-peek+!>(yung+(hi-to-lo ~(tap in (yung goal))):[~(. pl pool) .])
@@ -502,12 +515,18 @@
       ==
       ::
         [%ryte-bound ~]
+      =/  pin  (got:idx-orm:gol index id)
+      =/  pool  (~(got by pools) pin)
       ``goal-peek+!>(ryte-bound+(~(ryte-bound pl pool) [%d id]))
       ::
         [%plumb ~]
+      =/  pin  (got:idx-orm:gol index id)
+      =/  pool  (~(got by pools) pin)
       ``goal-peek+!>(plumb+(~(plumb pl pool) id))
       ::
         [%priority ~]
+      =/  pin  (got:idx-orm:gol index id)
+      =/  pool  (~(got by pools) pin)
       ``goal-peek+!>(priority+(~(priority pl pool) id))
       ::
       ::   [%seniority @ @ ~]
@@ -537,10 +556,12 @@
       =/  pool  (~(got by pools) pin)
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
-        ``goal-peek+!>(roots+(hi-to-lo roots):~(. pl pool))
+        ``goal-peek+!>(roots+(hi-to-lo (turn unnested-roots head)):~(. pl pool))
         ::
           [%uncompleted ~]
-        ``goal-peek+!>(roots-uncompleted+(hi-to-lo uncompleted-roots):~(. pl pool))
+        :-  ~  :-  ~  :-  %goal-peek
+        !>  :-  %roots-uncompleted
+        (hi-to-lo (turn uncompleted-unnested-roots head)):~(. pl pool)
       ==
     ==
   ==
@@ -560,7 +581,7 @@
         `this
       =^  cards  state
         %-  (slog u.p.sign)
-        (send-home-updates:hc ~ pin our.bowl pid [%poke-error u.p.sign]~)
+        (send-home-updates:hc ~ pin our.bowl pid [vzn %poke-error u.p.sign]~)
       [cards this]
     ==
     ::
@@ -579,9 +600,9 @@
       %-  (slog '%goal-store: Got kick, resubscribing...' ~)
       =/  upd
         ?:  (~(has by pools) pin)
-          (some [%waste-pool ~])
+          (some [vzn %waste-pool ~])
         ?:  (~(has by cache) pin)
-          (some [%trash-pool ~])
+          (some [vzn %trash-pool ~])
         ~
       ?~  upd
         `this
@@ -592,7 +613,9 @@
       [cards this]
         %fact
       ?>  =(p.cage.sign %goal-away-update)
-      =/  update  !<(away-update:gol q.cage.sign)
+      =+  ^-  [[mod=ship pid=@] =update:gol]
+        !<(away-update:gol q.cage.sign)
+      ?>  =(vzn -.update)  :: assert updates are correct version
       ?+    +<.update  (on-agent:def wire sign)
           $?  %spawn-pool
               %spawn-goal  %trash-goal
@@ -600,7 +623,7 @@
               %goal-perms  %goal-hitch  %goal-nexus  %goal-togls
           ==
         =^  cards  state
-          (send-home-updates:hc ~ pin mod.update 0 [+.update]~)
+          (send-home-updates:hc ~ pin mod 0 [update]~)
         [cards this]
       ==
     ==
@@ -683,8 +706,10 @@
   |=  [cards=(list card) =pin:gol mod=ship pid=@ pore=_pl]
   ^-  (quip card _state)
   =+  abet:pore  :: exposes efx and pool
+  ::
+  :: send-home-updates performs state update
   =^  home-cards  state  (send-home-updates cards pin mod pid efx)
-  :_  state(store (etch:etch pin efx))
+  :_  state
   ;:  weld  cards  home-cards
     ::
     :: send away updates
