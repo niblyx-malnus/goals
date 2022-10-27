@@ -523,7 +523,7 @@ Update goal permissions.
 
 ### Noun
 ```
-[%update-goal-perms =id chief=ship rec=?(%.y %.n) lus=(set ship) hep=(set ship)]
+[%update-goal-perms =id chief=ship rec=?(%.y %.n) spawn=(set ship)]
 ```
 
 ### JSON
