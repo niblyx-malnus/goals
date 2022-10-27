@@ -1,8 +1,7 @@
-import React, { Fragment, useState, memo, useEffect } from "react";
+import React, { Fragment, memo } from "react";
 import Box from "@mui/material/Box";
 import { PinId, Tree } from "../types/types";
 import useStore from "../store";
-import { log, shipName } from "../helpers";
 import { GoalItem } from "./";
 export interface RecursiveTreeProps {
   readonly goalList: Tree;
@@ -21,13 +20,13 @@ const RecursiveTree = ({
   yokingGoalId,
 }: any) => {
   const filterGoals = useStore((store) => store.filterGoals);
-  const ship = shipName();
   const createTree = (goal: any) => {
     const currentGoal = goal.goal;
     const currentGoalId = goal.id.birth;
     const childGoals = goal.childNodes;
-    //filter out complete or incomplete goals if store says so
+    //filter out goals based on fitlerGoals value
     if (
+      (!currentGoal.nexus.actionable && filterGoals === "actionable") ||
       (currentGoal.nexus.complete && filterGoals === "complete") ||
       (!currentGoal.nexus.complete && filterGoals === "incomplete")
     )

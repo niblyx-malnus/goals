@@ -14,7 +14,7 @@ export interface PinId {
 }
 export type Yoke = "move" | "prioritize" | "precede";
 export type SnackBarData = { message: string; severity: string } | null;
-export type FilterGoals = null | "complete" | "incomplete";
+export type FilterGoals = null | "complete" | "incomplete" | "actionable";
 export type Order = "asc" | "dsc" | "prio";
 
 export type Tree = ReadonlyArray<TreeBranch>;

@@ -7,12 +7,12 @@ import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 
 import useStore from "../store";
-import { log, shipName } from "../helpers";
+import { log } from "../helpers";
 import CircularProgress from "@mui/material/CircularProgress";
-import { Order, PinId } from "../types/types";
+import { Order } from "../types/types";
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
-import { orderPools, orderPoolsAction } from "../store/actions";
+import { orderPoolsAction } from "../store/actions";
 import Stack from "@mui/material/Stack";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -36,14 +36,11 @@ import InputLabel from "@mui/material/InputLabel";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-const filterOptions = () => [
-  { label: "Complete", value: "complete" },
-  { label: "Incomplete", value: "incomplete" },
-  { label: "Actionable", value: "actionable" },
-];
+const filterOptions = () => ["Complete", "Incomplete", "Actionable"];
 export default function Header() {
   const [newProjectTitle, setNewProjectTitle] = useState<string>("");
   const [trying, setTrying] = useState<boolean>(false);
+  const [filterValue, setFilterValue] = React.useState<string | null>(null);
 
   const order = useStore((store) => store.order);
   const selectionMode = useStore((store) => store.selectionMode);
@@ -61,29 +58,7 @@ export default function Header() {
     useState<boolean>(false);
   const [filterIncompleteChecked, setFilterIncompleteChecked] =
     useState<boolean>(false);
-  const handleSho = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = event.target.checked;
-    setFilterCompleteChecked(event.target.checked);
-    if (filterIncompleteChecked) setFilterIncompleteChecked(false);
-    if (checked) {
-      setFilterGoals("complete");
-    } else {
-      setFilterGoals(null);
-    }
-  };
-  const handleFilterIncompleteChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const checked = event.target.checked;
-    setFilterIncompleteChecked(event.target.checked);
-    if (filterCompleteChecked) setFilterCompleteChecked(false);
 
-    if (checked) {
-      setFilterGoals("incomplete");
-    } else {
-      setFilterGoals(null);
-    }
-  };
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewProjectTitle(event.target.value);
   };
@@ -119,6 +94,24 @@ export default function Header() {
   };
   const handleShowArchived = () => {
     toggleShowArchived(!showArchived);
+  };
+  const handleFilterUpdate = (newValue: string | null) => {
+    log("newValue", newValue);
+    setFilterValue(newValue);
+    if (newValue === null) {
+      //clear filter
+      setFilterGoals(null);
+    } else if (newValue === "Complete") {
+      //activate the complete filter
+      setFilterGoals("incomplete");
+    } else if (newValue === "Incomplete") {
+      //activate the incomplete filter
+      setFilterGoals("complete");
+    } else if (newValue === "Actionable") {
+      //activate the actionable filter
+
+      setFilterGoals("actionable");
+    }
   };
   return (
     <Box
@@ -167,34 +160,6 @@ export default function Header() {
             </InputAdornment>
           }
         />
-        {/* <Stack
-          sx={{ marginLeft: 3 }}
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <FormControlLabel
-            sx={{ height: 36.5 }}
-            label="Filter Completed Goals"
-            control={
-              <Checkbox
-                checked={filterCompleteChecked}
-                onChange={handleSho}
-              />
-            }
-          />
-          <FormControlLabel
-            sx={{ height: 36.5 }}
-            label="Filter Incomplete Goals"
-            control={
-              <Checkbox
-                checked={filterIncompleteChecked}
-                onChange={handleFilterIncompleteChange}
-              />
-            }
-          />
-        </Stack>*/}
-
         <Box sx={{ width: 160 }}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Sorting</InputLabel>
@@ -216,6 +181,10 @@ export default function Header() {
           <Autocomplete
             size="small"
             disablePortal
+            value={filterValue}
+            onChange={(event: any, newValue: string | null) => {
+              handleFilterUpdate(newValue);
+            }}
             id="filter-goals-autocomplete-select"
             options={filterOptions()}
             renderInput={(params) => (

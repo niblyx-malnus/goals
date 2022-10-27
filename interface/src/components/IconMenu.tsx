@@ -1,9 +1,7 @@
 import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
-import Button from "@mui/material/Button";
 import Menu, { MenuProps } from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import EditIcon from "@mui/icons-material/Edit";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import IconButton from "@mui/material/IconButton";
 import CheckIcon from "@mui/icons-material/Check";
@@ -511,10 +509,12 @@ export default function IconMenu({
               <DeleteIcon fontSize="small" />
               archive
             </MenuItem>
-            <MenuItem onClick={renewGoal} disableRipple>
-              <DeleteIcon fontSize="small" />
-              renew
-            </MenuItem>
+            {isArchived && (
+              <MenuItem onClick={renewGoal} disableRipple>
+                <DeleteIcon fontSize="small" />
+                renew
+              </MenuItem>
+            )}
             <MenuItem onClick={deleteGoal} disableRipple>
               <DeleteIcon fontSize="small" />
               delete
