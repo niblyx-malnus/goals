@@ -519,9 +519,7 @@ Update goal permissions.
 
 `rec` is a flag. If rec is true, the chief will recursively be replaced on all goal descendents. If rec is false only the current goals chief will be replaced.
 
-`lus` is a set of ships to add to the goal's spawn set. Ships with spawn privileges on a goal can spawn new goals under that goal on which they become the chief.
-
-`hep` is a set of ships to remove from the goal's spawn set. Ships with spawn privileges on a goal can spawn new goals under that goal on which they become the chief.
+`spawn` is a new set of ships to replace the goal's spawn set.
 
 ### Noun
 ```
@@ -538,8 +536,7 @@ Update goal permissions.
     },  
     "chief": "zod",
     "rec": true,
-    "lus": ["nec", "bud", "wes"],
-    "hep": ["sev", "per", "sut"]
+    "spawn": ["nec", "bud", "wes"]
   }
 }
 ```
