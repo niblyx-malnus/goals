@@ -63,6 +63,7 @@ const GoalItem = memo(
     const selectedGoals = useStore((store) => store.selectedGoals);
     const updateSelectedGoal = useStore((store) => store.updateSelectedGoal);
     //TODO: remove the add/edit when isArchived
+    //TODO: check pool isArchived here
     useEffect(() => {
       log("calculating ranks for =>", goal.hitch.desc);
       //we check at first render/everytime ranks changes(or just goal)

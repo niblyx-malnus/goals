@@ -186,7 +186,11 @@ function App() {
       });
       const orderedPools = orderPools(preOrderedPools, order);
       //save the cached pools also in a seperate list
-      setArchivedPools(result.initial.store.cache);
+      setArchivedPools(
+        result.initial.store.cache.map((poolItem: any) => {
+          return { ...poolItem, pool: { ...poolItem.pool, isArchived: true } };
+        })
+      );
       setFetchedPools(orderedPools);
       if (result) {
         setLoading({ trying: false, success: true, error: false });
@@ -293,6 +297,7 @@ function App() {
               goalsLength={goalList?.length}
               permList={permList}
               role={role}
+              isArchived={pool.pool.isArchived}
             >
               <RecursiveTree
                 goalList={goalList}
@@ -336,6 +341,7 @@ const Project = memo(
     permList,
     poolOwner,
     role,
+    isArchived = false,
   }: {
     title: string;
     pin: PinId;
@@ -344,6 +350,7 @@ const Project = memo(
     permList: any;
     poolOwner: string;
     role: string;
+    isArchived?: boolean;
   }) => {
     //TODO: add the store type
     const collapseAll = useStore((store: any) => store.collapseAll);
@@ -446,6 +453,7 @@ const Project = memo(
         )
       );
     };
+    log("pool isArchived", isArchived);
     return (
       <Box sx={{ marginBottom: 1 }}>
         <StyledTreeItem

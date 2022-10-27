@@ -2,21 +2,27 @@ import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
 import Menu, { MenuProps } from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import Avatar from "@mui/material/Avatar";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import IconButton from "@mui/material/IconButton";
 import CheckIcon from "@mui/icons-material/Check";
-import DeleteIcon from "@mui/icons-material/Delete";
+
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
 import LogoutIcon from "@mui/icons-material/Logout";
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import PlayForWorkIcon from "@mui/icons-material/PlayForWork";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import FolderCopyIcon from "@mui/icons-material/FolderCopy";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import FolderCopyOutlinedIcon from "@mui/icons-material/FolderCopyOutlined";
+import AgricultureOutlinedIcon from "@mui/icons-material/AgricultureOutlined";
+import OpenWithOutlinedIcon from "@mui/icons-material/OpenWithOutlined";
+import LinkOutlinedIcon from "@mui/icons-material/LinkOutlined";
+
+import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import { GoalId, PinId } from "../types/types";
 import { log } from "../helpers";
 import api from "../api";
-import AgricultureIcon from "@mui/icons-material/Agriculture";
 
 import useStore from "../store";
 //TODO: hook up enter button to dialog confirm button everywhere
@@ -108,6 +114,10 @@ export default function IconMenu({
   );
   const toggleCopyPoolDialog = useStore(
     (store: any) => store.toggleCopyPoolDialog
+  );
+
+  const toggleArchiveDialog = useStore(
+    (store: any) => store.toggleArchiveDialog
   );
   const toggleSelectionMode = useStore(
     (store: any) => store.toggleSelectionMode
@@ -461,6 +471,10 @@ export default function IconMenu({
                 complete
               </MenuItem>
             )}
+            <MenuItem onClick={handleHarvestGoal} disableRipple>
+              <AgricultureOutlinedIcon fontSize="small" />
+              harvest
+            </MenuItem>
             {actionable ? (
               <MenuItem onClick={unmarkActionable} disableRipple>
                 <PlayForWorkIcon fontSize="small" />
@@ -472,51 +486,52 @@ export default function IconMenu({
                 make actionable
               </MenuItem>
             )}
+
+            <Divider />
             <MenuItem onClick={handleTimeline} disableRipple>
-              <CalendarMonthIcon fontSize="small" />
+              <CalendarMonthOutlinedIcon fontSize="small" />
               timeline
             </MenuItem>
             {/* We hide these from harvest panel */}
             {!harvestGoal && (
               <>
+                <Divider />
                 <MenuItem onClick={handleMove} disableRipple>
-                  <CalendarMonthIcon fontSize="small" />
+                  <OpenWithOutlinedIcon fontSize="small" />
                   move
                 </MenuItem>
                 <MenuItem onClick={moveGoalToRoot} disableRipple>
-                  <CalendarMonthIcon fontSize="small" />
+                  <OpenWithOutlinedIcon fontSize="small" />
                   move to root
                 </MenuItem>
-                <MenuItem onClick={handleHarvestGoal} disableRipple>
-                  <AgricultureIcon fontSize="small" />
-                  harvest
-                </MenuItem>
+                <Divider />
                 <MenuItem onClick={handlePriortize} disableRipple>
-                  <CalendarMonthIcon fontSize="small" />
+                  <LinkOutlinedIcon fontSize="small" />
                   prioritize
                 </MenuItem>
-                <MenuItem onClick={handleNest} disableRipple>
-                  <CalendarMonthIcon fontSize="small" />
-                  virtually nest
-                </MenuItem>
                 <MenuItem onClick={handlePrecede} disableRipple>
-                  <CalendarMonthIcon fontSize="small" />
+                  <LinkOutlinedIcon fontSize="small" />
                   precede
+                </MenuItem>
+                <MenuItem onClick={handleNest} disableRipple>
+                  <LinkOutlinedIcon fontSize="small" />
+                  virtually nest
                 </MenuItem>
               </>
             )}
+            <Divider />
             <MenuItem onClick={archiveGoal} disableRipple>
-              <DeleteIcon fontSize="small" />
+              <DeleteOutlineOutlinedIcon fontSize="small" />
               archive
             </MenuItem>
             {isArchived && (
               <MenuItem onClick={renewGoal} disableRipple>
-                <DeleteIcon fontSize="small" />
+                <DeleteOutlineOutlinedIcon fontSize="small" />
                 renew
               </MenuItem>
             )}
             <MenuItem onClick={deleteGoal} disableRipple>
-              <DeleteIcon fontSize="small" />
+              <DeleteOutlineOutlinedIcon fontSize="small" />
               delete
             </MenuItem>
           </div>
@@ -531,7 +546,7 @@ export default function IconMenu({
                   }}
                   disableRipple
                 >
-                  <PeopleAltIcon fontSize="small" />
+                  <PeopleAltOutlinedIcon fontSize="small" />
                   manage participants
                 </MenuItem>
                 <MenuItem
@@ -545,7 +560,7 @@ export default function IconMenu({
                   }}
                   disableRipple
                 >
-                  <PeopleAltIcon fontSize="small" />
+                  <PeopleAltOutlinedIcon fontSize="small" />
                   share with groups
                 </MenuItem>
               </>
@@ -565,6 +580,8 @@ export default function IconMenu({
                 leave project
               </MenuItem>
             )}
+            <Divider />
+
             <MenuItem
               onClick={() => {
                 handleClose();
@@ -575,11 +592,32 @@ export default function IconMenu({
               }}
               disableRipple
             >
-              <FolderCopyIcon fontSize="small" />
+              <FolderCopyOutlinedIcon fontSize="small" />
               make a copy
             </MenuItem>
             {role === "owner" && (
               <>
+                <Divider />
+
+                <MenuItem
+                  onClick={() => {
+                    handleClose();
+                    toggleArchiveDialog(true, {
+                      title: poolData.title,
+                      callback: archivePool,
+                    });
+                  }}
+                  disableRipple
+                >
+                  <DeleteOutlineOutlinedIcon fontSize="small" />
+                  archive
+                </MenuItem>
+                {isArchived && (
+                  <MenuItem onClick={renewPool} disableRipple>
+                    <DeleteOutlineOutlinedIcon fontSize="small" />
+                    renew
+                  </MenuItem>
+                )}
                 <MenuItem
                   onClick={() => {
                     handleClose();
@@ -590,25 +628,8 @@ export default function IconMenu({
                   }}
                   disableRipple
                 >
-                  <DeleteIcon fontSize="small" />
+                  <DeleteOutlineOutlinedIcon fontSize="small" />
                   delete
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    handleClose();
-                    toggleDeleteDialog(true, {
-                      title: poolData.title,
-                      callback: archivePool,
-                    });
-                  }}
-                  disableRipple
-                >
-                  <DeleteIcon fontSize="small" />
-                  archive
-                </MenuItem>
-                <MenuItem onClick={renewPool} disableRipple>
-                  <DeleteIcon fontSize="small" />
-                  renew
                 </MenuItem>
               </>
             )}

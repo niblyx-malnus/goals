@@ -74,6 +74,10 @@ interface Store {
   copyPoolDialogOpen: boolean;
   toggleCopyPoolDialog: (newStatus: boolean, newCopyDialogData: any) => void;
 
+  archiveDialogData: any;
+  archiveDialogOpen: boolean;
+  toggleArchiveDialog: (newStatus: boolean, newCopyDialogData: any) => void;
+
   selectionMode: boolean;
   selectionModeYokeData: SelectionYokeData;
   toggleSelectionMode: (
@@ -202,6 +206,14 @@ const useStore = create<Store>((set, get) => ({
       copyPoolDialogData: newCopyDialogData,
     })),
 
+  archiveDialogData: null,
+  archiveDialogOpen: false,
+  toggleArchiveDialog: (newStatus: boolean, newArchiveDialogData: any) =>
+    set(() => ({
+      archiveDialogOpen: newStatus,
+      archiveDialogData: newArchiveDialogData,
+    })),
+
   selectionMode: false,
   selectionModeYokeData: null,
   toggleSelectionMode: (
@@ -263,7 +275,7 @@ const useStore = create<Store>((set, get) => ({
             };
           }),
         ];
-        //apppend archived stqtus
+        //apppend archived status
         //actionable archived goals => isArchied true and no par
         return {
           ...poolItem,

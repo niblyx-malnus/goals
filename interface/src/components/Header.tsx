@@ -28,6 +28,7 @@ import {
   YokingActionBar,
   GroupsShareDialog,
   HarvestPanel,
+  ArchiveDialog
 } from "./";
 
 import MenuItem from "@mui/material/MenuItem";
@@ -53,11 +54,6 @@ export default function Header() {
 
   const toggleShowArchived = useStore((store) => store.toggleShowArchived);
   const showArchived = useStore((store) => store.showArchived);
-
-  const [filterCompleteChecked, setFilterCompleteChecked] =
-    useState<boolean>(false);
-  const [filterIncompleteChecked, setFilterIncompleteChecked] =
-    useState<boolean>(false);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewProjectTitle(event.target.value);
@@ -131,6 +127,7 @@ export default function Header() {
       <LeaveDialog />
       <TimelineDialog />
       <CopyPoolDialog />
+      <ArchiveDialog />
       <GroupsShareDialog />
       <Snackie />
       <Stack direction="row" alignItems="center" spacing={1}>
