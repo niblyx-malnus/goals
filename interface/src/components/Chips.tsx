@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { memo } from "react";
 
 import Stack from "@mui/material/Stack";
 
@@ -11,12 +11,12 @@ const ListItem = styled("li")(({ theme }) => ({
   margin: theme.spacing(0.5),
 }));
 
-export default function Chips({ chipData, onDelete = null }: any) {
+function Chips({ chipData, onDelete = null }: any) {
   return (
     <Stack flexDirection="row" flexWrap="wrap" sx={{ listStyle: "none" }}>
-      {chipData.map((data: any, index: any) => {
+      {chipData.map((data: any) => {
         return (
-          <ListItem key={index}>
+          <ListItem key={data.key}>
             {data.canDelete ? (
               <Chip
                 variant="outlined"
@@ -40,3 +40,4 @@ export default function Chips({ chipData, onDelete = null }: any) {
     </Stack>
   );
 }
+export default memo(Chips);

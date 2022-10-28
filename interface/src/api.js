@@ -327,7 +327,13 @@ const api = {
   harvest: async (owner, birth) => {
     return api
       .createApi()
-      .scry({ app: "goal-store", path: `/goal/~${owner}/${birth}/full-harvest` });
+      .scry({
+        app: "goal-store",
+        path: `/goal/~${owner}/${birth}/full-harvest`,
+      });
+  },
+  getPals: async () => {
+    return api.createApi().scry({ app: "pals", path: "/json" });
   },
 };
 export default api;

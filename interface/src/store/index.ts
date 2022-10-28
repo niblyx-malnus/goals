@@ -104,6 +104,9 @@ interface Store {
 
   harvestData: any;
   setHarvestData: (newHarvestData: any) => void;
+
+  pals: any;
+  setPals: (newPals: any) => void;
 }
 /**
  * 
@@ -347,6 +350,8 @@ const useStore = create<Store>((set, get) => ({
     set(() => ({
       harvestData: newHarvestData,
     })),
+  pals: [],
+  setPals: (newPals: any) => set(() => ({ pals: newPals })),
 }));
 
 export default useStore;
