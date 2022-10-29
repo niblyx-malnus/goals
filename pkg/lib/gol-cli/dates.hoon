@@ -1,5 +1,5 @@
 /-  *dates
-/+  *gol-cli-help
+/+  *gol-cli-util
 |%
 ::
 ::

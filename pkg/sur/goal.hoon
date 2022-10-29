@@ -1,5 +1,5 @@
 /-  *group, ms=metadata-store
-/+  *gol-cli-help
+/+  *gol-cli-util
 |%
 ::
 ++  vzn  %4
@@ -56,6 +56,8 @@
 ++  yoke-tags     yoke-tags:s4
 +$  yoke-tag      yoke-tag:s4
 +$  exposed-yoke  exposed-yoke:s4
++$  nuke          nuke:s4
++$  plex          plex:s4
 +$  action        action:s4
 ::
 ++  s4
@@ -272,6 +274,24 @@
   ::
   +$  exposed-yoke  $%([yoke-tag lid=id rid=id])
   ::
+  +$  nuke
+    $%  [%nuke-prio-left =id]
+        [%nuke-prio-ryte =id]
+        [%nuke-prio =id]
+        [%nuke-prec-left =id]
+        [%nuke-prec-ryte =id]
+        [%nuke-prec =id]
+        [%nuke-prio-prec =id]
+        [%nuke-nest-left =id]
+        [%nuke-nest-ryte =id]
+        [%nuke-nest =id]
+    ==
+  ::
+  +$  plex
+    $%  exposed-yoke
+        nuke
+    ==
+  ::
   +$  action
     $:  %4
     $:  pid=@
@@ -285,7 +305,7 @@
         [%cache-goal =id]
         [%renew-goal =id]
         [%trash-goal =id]
-        [%yoke =pin yoks=(list exposed-yoke)]
+        [%yoke =pin yoks=(list plex)]
         [%move cid=id upid=(unit id)]
         [%set-kickoff =id kickoff=(unit @da)]
         [%set-deadline =id deadline=(unit @da)]
