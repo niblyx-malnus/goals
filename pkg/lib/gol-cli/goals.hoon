@@ -1,5 +1,4 @@
 /-  gol=goal
-/+  *gol-cli-goal
 |_  store:gol
 ::
 :: create unique goal id based on source ship and creation time

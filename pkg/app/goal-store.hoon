@@ -85,7 +85,8 @@
     ?+    mark  (on-poke:def mark vase)
         %goal-action
       =/  action=action:gol  !<(action:gol vase)
-      ?>  =(vzn -.action)  :: assert pokes are correct version
+      ?.  =(vzn -.action)  :: assert pokes are correct version
+        ~|("incompatible version" !!)
       =/  pid  pid.action
       =/  pok  pok.action
       ?-    -.pok
@@ -221,7 +222,7 @@
           (edit-pool-title:(apex-pl:hc pin.pok) title.pok src.bowl)
         (send-away-updates:hc ~ pin.pok src.bowl pid pore)
           ::
-          :: [%yoke =pin yoks=(list exposed-yoke)]
+          :: [%yoke =pin yoks=(list plex)]
           %yoke
         =*  poke-other
           %~  poke-other
@@ -230,7 +231,7 @@
         ?.  =(our.bowl owner.pin.pok)
           :_  state
           [(poke-other owner.pin.pok goal-action+!>(action))]~
-        =/  pore  (yoke-sequence:(apex-pl:hc pin.pok) yoks.pok src.bowl)
+        =/  pore  (plex-sequence:(apex-pl:hc pin.pok) yoks.pok src.bowl)
         (send-away-updates:hc ~ pin.pok src.bowl pid pore)
           ::
           :: [%move cid=id upid=(unit id)]
@@ -496,22 +497,19 @@
         [%yung *]
       =/  pin  (got:idx-orm:gol index id)
       =/  pool  (~(got by pools) pin)
-      =/  goal  (~(got by goals.pool) id)
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
-        ``goal-peek+!>(yung+(hi-to-lo ~(tap in (yung goal))):[~(. pl pool) .])
+        ``goal-peek+!>(yung+(hi-to-lo (yung id)):[~(. pl pool) .])
         ::
           [%uncompleted ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %yung-uncompleted
-            =+  ~(. pl pool)
-            (hi-to-lo ~(tap in ((uncompleted yung) goal)))
+            (hi-to-lo (incomplete (yung id))):[~(. pl pool) .]
         ::
           [%virtual ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %yung-virtual
-            =+  ~(. pl pool)
-            (hi-to-lo ~(tap in (~(dif in (yung goal)) kids.goal)))
+            (hi-to-lo (virt id)):[~(. pl pool) .]
       ==
       ::
         [%ryte-bound ~]
@@ -556,12 +554,12 @@
       =/  pool  (~(got by pools) pin)
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
-        ``goal-peek+!>(roots+(hi-to-lo (turn (unnested roots) head)):~(. pl pool))
+        ``goal-peek+!>(roots+(hi-to-lo (unnested roots)):~(. pl pool))
         ::
           [%uncompleted ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %roots-uncompleted
-        (hi-to-lo (turn (incomplete (unnested roots)) head)):~(. pl pool)
+        (hi-to-lo (incomplete (unnested roots))):~(. pl pool)
       ==
     ==
   ==
@@ -615,7 +613,8 @@
       ?>  =(p.cage.sign %goal-away-update)
       =+  ^-  [[mod=ship pid=@] =update:gol]
         !<(away-update:gol q.cage.sign)
-      ?>  =(vzn -.update)  :: assert updates are correct version
+      ?.  =(vzn -.update)  :: assert updates are correct version
+        ~|("incompatible version" !!)
       ?+    +<.update  (on-agent:def wire sign)
           $?  %spawn-pool
               %spawn-goal  %trash-goal

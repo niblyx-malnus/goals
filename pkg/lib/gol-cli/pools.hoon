@@ -1,5 +1,5 @@
 /-  gol=goal
-/+  *gol-cli-goal, gol-cli-goals, pl=gol-cli-pool
+/+  gol-cli-goals, pl=gol-cli-pool
 |_  store:gol
 +*  gols  ~(. gol-cli-goals +<)
 ::

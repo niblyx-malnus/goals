@@ -1,5 +1,5 @@
 /-  *goal
-/+  *gol-cli-help, group-store, metadata-store
+/+  *gol-cli-util, group-store, metadata-store
 |%
 ++  dejs-action
   =,  dejs:format

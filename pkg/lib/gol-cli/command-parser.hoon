@@ -1,4 +1,4 @@
-/+  dates=gol-cli-dates, *gol-cli-help
+/+  dates=gol-cli-dates, *gol-cli-util
 |%
 ++  command-parser
   |=  [now=@da =utc-offset:dates]
