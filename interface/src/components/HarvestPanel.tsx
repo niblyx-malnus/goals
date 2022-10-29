@@ -7,21 +7,19 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ClearIcon from "@mui/icons-material/Clear";
 
 import useStore from "../store";
 import { GoalItem } from "./";
 import { log } from "../helpers";
 import AgricultureIcon from "@mui/icons-material/Agriculture";
 import api from "../api";
+import Tooltip from "@mui/material/Tooltip";
 
 const drawerWidth = 300;
 
 export default function HarvestPanel() {
-  const theme = useTheme();
-  const [open, setOpen] = useState(false);
+  const open = useStore((store: any) => store.harvestPanelOpen);
   const [harvestGoals, setHarvestGoals] = useState([]);
   const [startGoalTile, setStartGoalTitle] = useState<string>("");
   const fetchedPools = useStore((store) => store.pools);
@@ -54,12 +52,9 @@ export default function HarvestPanel() {
       setHarvestGoals(harvestGoals);
     }
   }, [fetchedPools, harvestData]);
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
 
   const handleDrawerClose = () => {
-    setOpen(false);
+    setHarvestData(false, {});
   };
   const handleHarvestGoal = async () => {
     const { pin, role } = harvestData;
@@ -68,7 +63,7 @@ export default function HarvestPanel() {
     try {
       const result = await api.harvest(id.owner, id.birth);
       //update the harvest data in our store
-      setHarvestData({
+      setHarvestData(true, {
         startGoalId: id,
         goals: result["full-harvest"],
         pin,
@@ -84,17 +79,11 @@ export default function HarvestPanel() {
     }
   };
   return (
-    <Box sx={{ display: "flex" }}>
-      <IconButton
-        color="inherit"
-        aria-label="open drawer"
-        onClick={handleDrawerOpen}
-        edge="start"
-        sx={{ mr: 2, ...(open && { display: "none" }) }}
-      >
-        <MenuIcon />
-      </IconButton>
-
+    <Box
+      sx={{
+        display: "flex",
+      }}
+    >
       <Drawer
         sx={{
           width: drawerWidth,
@@ -118,22 +107,20 @@ export default function HarvestPanel() {
             Harvest Panel
           </Typography>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "ltr" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
+            <ClearIcon />
           </IconButton>
         </Stack>
 
         <Divider />
         <Stack direction="row" alignItems={"center"} margin={1}>
           <Typography color={"text.primary"} variant="h6">
-            Harvesting: ({startGoalTile})
+            {startGoalTile}
           </Typography>
-          <IconButton onClick={() => handleHarvestGoal()}>
-            <AgricultureIcon />
-          </IconButton>
+          <Tooltip title="Click to refresh harvested goals" placement="right" arrow>
+            <IconButton onClick={() => handleHarvestGoal()}>
+              <AgricultureIcon />
+            </IconButton>
+          </Tooltip>
         </Stack>
         <Divider />
         <Stack margin={1}>

@@ -36,7 +36,7 @@ const api = {
       log("scry error: ", e);
     }
   },
-  poke: async ({
+  poke: ({
     app = "cell",
     mark = "sheet",
     json = JSON.stringify([["test"]]),
@@ -46,12 +46,11 @@ const api = {
       log("relay", relay);
       log("app", app);
       log("mark", mark);
-      const response = await api.createApi().poke({
+      return api.createApi().poke({
         app,
         mark,
         json: relay,
       });
-      log("poke response: ", response);
     } catch (e) {
       log("poke error: ", e);
     }
@@ -226,6 +225,21 @@ const api = {
       json: newPoolPerms,
     });
   },
+  updateGoalPermissions: async (id, chief, spawnList, rec) => {
+    const newGoalPerms = {
+      "update-goal-perms": {
+        id,
+        chief,
+        rec,
+        spawn: spawnList,
+      },
+    };
+    return api.poke({
+      app: "goal-store",
+      mark: "goal-action",
+      json: newGoalPerms,
+    });
+  },
   leavePool: async (pin) => {
     const poolToLeave = {
       unsubscribe: {
@@ -325,12 +339,10 @@ const api = {
     });
   },
   harvest: async (owner, birth) => {
-    return api
-      .createApi()
-      .scry({
-        app: "goal-store",
-        path: `/goal/~${owner}/${birth}/full-harvest`,
-      });
+    return api.createApi().scry({
+      app: "goal-store",
+      path: `/goal/~${owner}/${birth}/full-harvest`,
+    });
   },
   getPals: async () => {
     return api.createApi().scry({ app: "pals", path: "/json" });

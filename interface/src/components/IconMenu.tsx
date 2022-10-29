@@ -122,6 +122,9 @@ export default function IconMenu({
   const toggleSelectionMode = useStore(
     (store: any) => store.toggleSelectionMode
   );
+  const toggleGoalPermsDialog = useStore(
+    (store: any) => store.toggleGoalPermsDialog
+  );
   const setSelectedGoals = useStore((store: any) => store.setSelectedGoals);
   const roleMap = useStore((store: any) => store.roleMap);
   const role = roleMap.get(pin?.birth);
@@ -347,20 +350,19 @@ export default function IconMenu({
   const handlePriortize = () => {
     handleClose();
     const startingConnections = currentGoal.nexus["prio-ryte"];
-
+    setSelectedGoals(startingConnections);
     toggleSelectionMode(true, {
       goalId: id,
       poolId: pin,
       yokeType: "prioritize",
       startingConnections: startingConnections,
-
       yokeName: "prio",
     });
   };
   const handlePrecede = () => {
     handleClose();
     const startingConnections = currentGoal.nexus["prec-ryte"];
-
+    setSelectedGoals(startingConnections);
     toggleSelectionMode(true, {
       goalId: id,
       poolId: pin,
@@ -407,7 +409,7 @@ export default function IconMenu({
       if (!id) throw Error("no id provided");
       const result = await api.harvest(id.owner, id.birth);
       //update the harvest data in our store
-      setHarvestData({
+      setHarvestData(true, {
         startGoalId: id,
         goals: result["full-harvest"],
         pin,
@@ -471,10 +473,7 @@ export default function IconMenu({
                 complete
               </MenuItem>
             )}
-            <MenuItem onClick={handleHarvestGoal} disableRipple>
-              <AgricultureOutlinedIcon fontSize="small" />
-              harvest
-            </MenuItem>
+
             {actionable ? (
               <MenuItem onClick={unmarkActionable} disableRipple>
                 <PlayForWorkIcon fontSize="small" />
@@ -488,9 +487,30 @@ export default function IconMenu({
             )}
 
             <Divider />
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                toggleGoalPermsDialog(true, {
+                  pin,
+                  id,
+                  title: currentGoal.hitch.desc,
+                  chief: currentGoal.nexus.chief,
+                  ranks: currentGoal.nexus.ranks,
+                  spawn: currentGoal.nexus.spawn,
+                });
+              }}
+              disableRipple
+            >
+              <PeopleAltOutlinedIcon fontSize="small" />
+              manage participants
+            </MenuItem>
             <MenuItem onClick={handleTimeline} disableRipple>
               <CalendarMonthOutlinedIcon fontSize="small" />
               timeline
+            </MenuItem>
+            <MenuItem onClick={handleHarvestGoal} disableRipple>
+              <AgricultureOutlinedIcon fontSize="small" />
+              harvest
             </MenuItem>
             {/* We hide these from harvest panel */}
             {!harvestGoal && (
@@ -612,12 +632,10 @@ export default function IconMenu({
                   <DeleteOutlineOutlinedIcon fontSize="small" />
                   archive
                 </MenuItem>
-                {isArchived && (
-                  <MenuItem onClick={renewPool} disableRipple>
-                    <DeleteOutlineOutlinedIcon fontSize="small" />
-                    renew
-                  </MenuItem>
-                )}
+                <MenuItem onClick={renewPool} disableRipple>
+                  <DeleteOutlineOutlinedIcon fontSize="small" />
+                  renew
+                </MenuItem>
                 <MenuItem
                   onClick={() => {
                     handleClose();

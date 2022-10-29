@@ -194,8 +194,6 @@ export default function ShareDialog() {
     setCaptainList((chips) =>
       chips.filter((chip) => chip.label !== chipToDelete.label)
     );
-    //delete corrospoding ship in viewerList
-    handleDeleteViewer(chipToDelete);
   };
   const handleDeleteAdmin = (chipToDelete: ChipData) => {
     if (trying) return;
@@ -203,8 +201,6 @@ export default function ShareDialog() {
     setAdminList((chips) =>
       chips.filter((chip) => chip.label !== chipToDelete.label)
     );
-    //delete corrospoding ship in viewerList
-    handleDeleteViewer(chipToDelete);
   };
 
   const handleAdd = (

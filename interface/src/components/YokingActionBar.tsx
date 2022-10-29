@@ -32,8 +32,7 @@ export default function YokingActionBar({}) {
 
     try {
       const targetGoalId = [...selectedGoals.values()][0];
-    
-      
+
       const goalId = selectionModeYokeData?.goalId;
       const pin = selectionModeYokeData?.poolId;
       const result = await api.moveGoal(pin, goalId, targetGoalId);
@@ -124,19 +123,19 @@ export default function YokingActionBar({}) {
     resetSelectedGoals([]);
   };
   return (
-    <Paper elevation={3}>
-      <Stack
-        direction="row"
-        spacing={2}
-        sx={{
-          position: "fixed",
-          bottom: 40,
-          right: 40,
-          backgroundColor: "#fff",
-          padding: 2,
-          borderRadius: "4px",
-        }}
-      >
+    <Paper
+      sx={{
+        position: "fixed",
+        bottom: 40,
+        right: 40,
+        backgroundColor: "#fff",
+        padding: 2,
+        borderRadius: "4px",
+        
+      }}
+      elevation={3}
+    >
+      <Stack direction="row" spacing={2}>
         <LoadingButton
           variant="contained"
           onClick={() => {

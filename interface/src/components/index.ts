@@ -14,6 +14,7 @@ import Header from "./Header";
 import HarvestPanel from "./HarvestPanel";
 import GoalItem from "./GoalItem";
 import ArchiveDialog from "./ArchiveDialog";
+import GoalPermsDialog from "./GoalPermsDialog";
 
 
 export {
@@ -32,5 +33,6 @@ export {
   Header,
   HarvestPanel,
   GoalItem,
-  ArchiveDialog
+  ArchiveDialog,
+  GoalPermsDialog
 };

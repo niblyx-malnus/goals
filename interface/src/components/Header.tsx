@@ -29,6 +29,7 @@ import {
   GroupsShareDialog,
   HarvestPanel,
   ArchiveDialog,
+  GoalPermsDialog,
 } from "./";
 
 import MenuItem from "@mui/material/MenuItem";
@@ -105,7 +106,6 @@ export default function Header() {
       setFilterGoals("complete");
     } else if (newValue === "Actionable") {
       //activate the actionable filter
-
       setFilterGoals("actionable");
     }
   };
@@ -128,6 +128,7 @@ export default function Header() {
       <TimelineDialog />
       <CopyPoolDialog />
       <ArchiveDialog />
+      <GoalPermsDialog />
       <GroupsShareDialog />
       <Snackie />
       <Stack direction="row" alignItems="center" spacing={1}>

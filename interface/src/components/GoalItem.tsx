@@ -58,7 +58,7 @@ const GoalItem = memo(
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [trying, setTrying] = useState<boolean>(false);
-    const [isCaptain, setIsCaptian] = useState<boolean>(false);
+    const [isChief, setIsChief] = useState<boolean>(false);
     const collapseAll = useStore((store) => store.collapseAll);
     const selectedGoals = useStore((store) => store.selectedGoals);
     const updateSelectedGoal = useStore((store) => store.updateSelectedGoal);
@@ -70,7 +70,7 @@ const GoalItem = memo(
       //does the current ship has chief/spawn/captain perms on this goal?
       for (const rank of goal.nexus.ranks) {
         if (rank.ship === shipName()) {
-          setIsCaptian(true);
+          setIsChief(true);
           return;
         }
       }
@@ -109,7 +109,7 @@ const GoalItem = memo(
     };
     const renderIconMenu = () => {
       if (poolRole === "viewer") return;
-      if (poolRole === "captain" && !isCaptain) return;
+      if (poolRole === "captain" && !isChief) return;
       if (trying) {
         return (
           <CircularProgress
@@ -176,7 +176,7 @@ const GoalItem = memo(
         </Box>
       );
       if (poolRole === "viewer") return noEditPermTitle;
-      if (poolRole === "captain" && !isCaptain) return noEditPermTitle;
+      if (poolRole === "captain" && !isChief) return noEditPermTitle;
       return !editingTitle ? (
         <Box
           sx={{
@@ -227,7 +227,10 @@ const GoalItem = memo(
     };
     const renderAddButton = () => {
       if (poolRole === "viewer") return;
-      if (poolRole === "captain" && !isCaptain) return;
+      if (poolRole === "captain" && !isChief) return;
+      //hide add goal in harvest panel
+      if (harvestGoal) return;
+
       return (
         !disableActions && (
           <IconButton
@@ -292,28 +295,25 @@ const GoalItem = memo(
             {renderIconMenu()}
             {renderAddButton()}
           </>
-          {!editingTitle && (
+          {!editingTitle && !harvestGoal && (
             <Stack
               flexDirection={"row"}
               alignItems="center"
               className="show-on-hover"
               sx={{ opacity: 0 }}
             >
-              {goal.nexus.ranks.map((item: any, index: number) => {
-                return (
-                  <Chip
-                    key={item.ship}
-                    sx={{ marginLeft: 1 }}
-                    avatar={<Avatar>C</Avatar>}
-                    size="small"
-                    label={
-                      <Typography fontWeight={"bold"}>{item.ship}</Typography>
-                    }
-                    color="primary"
-                    variant="outlined"
-                  />
-                );
-              })}
+              <Chip
+                sx={{ marginLeft: 1 }}
+                avatar={<Avatar>C</Avatar>}
+                size="small"
+                label={
+                  <Typography fontWeight={"bold"}>
+                    {goal.nexus.chief}
+                  </Typography>
+                }
+                color="primary"
+                variant="outlined"
+              />
             </Stack>
           )}
         </StyledTreeItem>

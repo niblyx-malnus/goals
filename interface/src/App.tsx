@@ -261,7 +261,6 @@ function App() {
   return (
     <Container sx={{ paddingBottom: 10 }}>
       <Header />
-
       {loading.trying && (
         <Stack flexDirection="row" alignItems="center">
           <CircularProgress size={28} />

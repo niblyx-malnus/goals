@@ -102,11 +102,19 @@ interface Store {
     newGroupsShareDialogData: any
   ) => void;
 
+  harvestPanelOpen: boolean;
   harvestData: any;
-  setHarvestData: (newHarvestData: any) => void;
+  setHarvestData: (newHarvestPanelState: boolean, newHarvestData: any) => void;
 
   pals: any;
   setPals: (newPals: any) => void;
+
+  goalPermsDialogOpen: boolean;
+  goalPermsDialogData: any;
+  toggleGoalPermsDialog: (
+    newStatus: boolean,
+    newGoalPermsDialogData: any
+  ) => void;
 }
 /**
  * 
@@ -345,10 +353,20 @@ const useStore = create<Store>((set, get) => ({
       groupsShareDialogData: newGroupsShareDialogData,
     })),
 
+  goalPermsDialogOpen: false,
+  goalPermsDialogData: null,
+  toggleGoalPermsDialog: (newStatus: boolean, newGoalPermsDialogData: any) =>
+    set(() => ({
+      goalPermsDialogOpen: newStatus,
+      goalPermsDialogData: newGoalPermsDialogData,
+    })),
+
+  harvestPanelOpen: false,
   harvestData: {},
-  setHarvestData: (newHarvestData: any) =>
+  setHarvestData: (newHarvestPanelState: boolean, newHarvestData: any) =>
     set(() => ({
       harvestData: newHarvestData,
+      harvestPanelOpen: newHarvestPanelState,
     })),
   pals: [],
   setPals: (newPals: any) => set(() => ({ pals: newPals })),
