@@ -2,7 +2,6 @@ import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
 import Menu, { MenuProps } from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import Avatar from "@mui/material/Avatar";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import IconButton from "@mui/material/IconButton";
 import CheckIcon from "@mui/icons-material/Check";
@@ -17,6 +16,7 @@ import FolderCopyOutlinedIcon from "@mui/icons-material/FolderCopyOutlined";
 import AgricultureOutlinedIcon from "@mui/icons-material/AgricultureOutlined";
 import OpenWithOutlinedIcon from "@mui/icons-material/OpenWithOutlined";
 import LinkOutlinedIcon from "@mui/icons-material/LinkOutlined";
+import RestoreOutlinedIcon from "@mui/icons-material/RestoreOutlined";
 
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
@@ -69,7 +69,6 @@ const StyledMenu = styled((props: MenuProps) => (
     },
   },
 }));
-
 export default function IconMenu({
   complete = false,
   goalId,
@@ -424,6 +423,212 @@ export default function IconMenu({
       log("handleHarvestGoal error =>", e);
     }
   };
+  const renderGoalMenu = () => {
+    if (isArchived)
+      return (
+        <MenuItem onClick={renewGoal} disableRipple>
+          <RestoreOutlinedIcon fontSize="small" />
+          renew
+        </MenuItem>
+      );
+    return (
+      <div>
+        {complete ? (
+          <MenuItem onClick={unmarkComplete} disableRipple>
+            <ClearIcon fontSize="small" />
+            incomplete
+          </MenuItem>
+        ) : (
+          <MenuItem onClick={markComplete} disableRipple>
+            <CheckIcon fontSize="small" />
+            complete
+          </MenuItem>
+        )}
+        {actionable ? (
+          <MenuItem onClick={unmarkActionable} disableRipple>
+            <PlayForWorkIcon fontSize="small" />
+            remove actionable
+          </MenuItem>
+        ) : (
+          <MenuItem onClick={markActionable} disableRipple>
+            <PlayForWorkIcon fontSize="small" />
+            make actionable
+          </MenuItem>
+        )}
+        <Divider />
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            toggleGoalPermsDialog(true, {
+              pin,
+              id,
+              title: currentGoal.hitch.desc,
+              chief: currentGoal.nexus.chief,
+              ranks: currentGoal.nexus.ranks,
+              spawn: currentGoal.nexus.spawn,
+            });
+          }}
+          disableRipple
+        >
+          <PeopleAltOutlinedIcon fontSize="small" />
+          manage participants
+        </MenuItem>
+        <MenuItem onClick={handleTimeline} disableRipple>
+          <CalendarMonthOutlinedIcon fontSize="small" />
+          timeline
+        </MenuItem>
+        <MenuItem onClick={handleHarvestGoal} disableRipple>
+          <AgricultureOutlinedIcon fontSize="small" />
+          harvest
+        </MenuItem>
+        {/* We hide these from harvest panel */}
+        {!harvestGoal && (
+          <>
+            <Divider />
+            <MenuItem onClick={handleMove} disableRipple>
+              <OpenWithOutlinedIcon fontSize="small" />
+              move
+            </MenuItem>
+            <MenuItem onClick={moveGoalToRoot} disableRipple>
+              <OpenWithOutlinedIcon fontSize="small" />
+              move to root
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handlePriortize} disableRipple>
+              <LinkOutlinedIcon fontSize="small" />
+              prioritize
+            </MenuItem>
+            <MenuItem onClick={handlePrecede} disableRipple>
+              <LinkOutlinedIcon fontSize="small" />
+              precede
+            </MenuItem>
+            <MenuItem onClick={handleNest} disableRipple>
+              <LinkOutlinedIcon fontSize="small" />
+              virtually nest
+            </MenuItem>
+          </>
+        )}
+        <Divider />
+        <MenuItem onClick={archiveGoal} disableRipple>
+          <DeleteOutlineOutlinedIcon fontSize="small" />
+          archive
+        </MenuItem>
+
+        <MenuItem onClick={deleteGoal} disableRipple>
+          <DeleteOutlineOutlinedIcon fontSize="small" />
+          delete
+        </MenuItem>
+      </div>
+    );
+  };
+  const renderPoolMenu = () => {
+    if (isArchived) {
+      return (
+        <div>
+          <MenuItem onClick={renewPool} disableRipple>
+            <RestoreOutlinedIcon fontSize="small" />
+            renew
+          </MenuItem>
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        {(role === "owner" || role === "admin") && (
+          <>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                toggleShareDialog(true, poolData);
+              }}
+              disableRipple
+            >
+              <PeopleAltOutlinedIcon fontSize="small" />
+              manage participants
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                toggleGroupsShareDialog(true, {
+                  title: poolData.title,
+                  participants: poolData,
+                  pin,
+                });
+              }}
+              disableRipple
+            >
+              <PeopleAltOutlinedIcon fontSize="small" />
+              share with groups
+            </MenuItem>
+          </>
+        )}
+        {role !== "owner" && (
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              toggleLeaveDialog(true, {
+                title: poolData.title,
+                callback: leavePool,
+              });
+            }}
+            disableRipple
+          >
+            <LogoutIcon fontSize="small" />
+            leave project
+          </MenuItem>
+        )}
+        <Divider />
+
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            toggleCopyPoolDialog(true, {
+              title: poolData.title,
+              pin,
+            });
+          }}
+          disableRipple
+        >
+          <FolderCopyOutlinedIcon fontSize="small" />
+          make a copy
+        </MenuItem>
+        {role === "owner" && (
+          <>
+            <Divider />
+
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                toggleArchiveDialog(true, {
+                  title: poolData.title,
+                  callback: archivePool,
+                });
+              }}
+              disableRipple
+            >
+              <DeleteOutlineOutlinedIcon fontSize="small" />
+              archive
+            </MenuItem>
+
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                toggleDeleteDialog(true, {
+                  title: poolData.title,
+                  callback: deletePool,
+                });
+              }}
+              disableRipple
+            >
+              <DeleteOutlineOutlinedIcon fontSize="small" />
+              delete
+            </MenuItem>
+          </>
+        )}
+      </div>
+    );
+  };
   return (
     <Box className="show-on-hover" sx={{ opacity: open ? 1 : 0 }}>
       <IconButton
@@ -455,204 +660,7 @@ export default function IconMenu({
         open={open}
         onClose={handleClose}
       >
-        {type === "goal" ? (
-          //TODO: only admins/owners can delete/archive/restore a goal
-          /*
-          anyone with permissions on a goal can delete
-          only admins or owner can renew 
-          */
-          <div>
-            {complete ? (
-              <MenuItem onClick={unmarkComplete} disableRipple>
-                <ClearIcon fontSize="small" />
-                incomplete
-              </MenuItem>
-            ) : (
-              <MenuItem onClick={markComplete} disableRipple>
-                <CheckIcon fontSize="small" />
-                complete
-              </MenuItem>
-            )}
-
-            {actionable ? (
-              <MenuItem onClick={unmarkActionable} disableRipple>
-                <PlayForWorkIcon fontSize="small" />
-                remove actionable
-              </MenuItem>
-            ) : (
-              <MenuItem onClick={markActionable} disableRipple>
-                <PlayForWorkIcon fontSize="small" />
-                make actionable
-              </MenuItem>
-            )}
-
-            <Divider />
-            <MenuItem
-              onClick={() => {
-                handleClose();
-                toggleGoalPermsDialog(true, {
-                  pin,
-                  id,
-                  title: currentGoal.hitch.desc,
-                  chief: currentGoal.nexus.chief,
-                  ranks: currentGoal.nexus.ranks,
-                  spawn: currentGoal.nexus.spawn,
-                });
-              }}
-              disableRipple
-            >
-              <PeopleAltOutlinedIcon fontSize="small" />
-              manage participants
-            </MenuItem>
-            <MenuItem onClick={handleTimeline} disableRipple>
-              <CalendarMonthOutlinedIcon fontSize="small" />
-              timeline
-            </MenuItem>
-            <MenuItem onClick={handleHarvestGoal} disableRipple>
-              <AgricultureOutlinedIcon fontSize="small" />
-              harvest
-            </MenuItem>
-            {/* We hide these from harvest panel */}
-            {!harvestGoal && (
-              <>
-                <Divider />
-                <MenuItem onClick={handleMove} disableRipple>
-                  <OpenWithOutlinedIcon fontSize="small" />
-                  move
-                </MenuItem>
-                <MenuItem onClick={moveGoalToRoot} disableRipple>
-                  <OpenWithOutlinedIcon fontSize="small" />
-                  move to root
-                </MenuItem>
-                <Divider />
-                <MenuItem onClick={handlePriortize} disableRipple>
-                  <LinkOutlinedIcon fontSize="small" />
-                  prioritize
-                </MenuItem>
-                <MenuItem onClick={handlePrecede} disableRipple>
-                  <LinkOutlinedIcon fontSize="small" />
-                  precede
-                </MenuItem>
-                <MenuItem onClick={handleNest} disableRipple>
-                  <LinkOutlinedIcon fontSize="small" />
-                  virtually nest
-                </MenuItem>
-              </>
-            )}
-            <Divider />
-            <MenuItem onClick={archiveGoal} disableRipple>
-              <DeleteOutlineOutlinedIcon fontSize="small" />
-              archive
-            </MenuItem>
-            {isArchived && (
-              <MenuItem onClick={renewGoal} disableRipple>
-                <DeleteOutlineOutlinedIcon fontSize="small" />
-                renew
-              </MenuItem>
-            )}
-            <MenuItem onClick={deleteGoal} disableRipple>
-              <DeleteOutlineOutlinedIcon fontSize="small" />
-              delete
-            </MenuItem>
-          </div>
-        ) : (
-          <div>
-            {(role === "owner" || role === "admin") && (
-              <>
-                <MenuItem
-                  onClick={() => {
-                    handleClose();
-                    toggleShareDialog(true, poolData);
-                  }}
-                  disableRipple
-                >
-                  <PeopleAltOutlinedIcon fontSize="small" />
-                  manage participants
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    handleClose();
-                    toggleGroupsShareDialog(true, {
-                      title: poolData.title,
-                      participants: poolData,
-                      pin,
-                    });
-                  }}
-                  disableRipple
-                >
-                  <PeopleAltOutlinedIcon fontSize="small" />
-                  share with groups
-                </MenuItem>
-              </>
-            )}
-            {role !== "owner" && (
-              <MenuItem
-                onClick={() => {
-                  handleClose();
-                  toggleLeaveDialog(true, {
-                    title: poolData.title,
-                    callback: leavePool,
-                  });
-                }}
-                disableRipple
-              >
-                <LogoutIcon fontSize="small" />
-                leave project
-              </MenuItem>
-            )}
-            <Divider />
-
-            <MenuItem
-              onClick={() => {
-                handleClose();
-                toggleCopyPoolDialog(true, {
-                  title: poolData.title,
-                  pin,
-                });
-              }}
-              disableRipple
-            >
-              <FolderCopyOutlinedIcon fontSize="small" />
-              make a copy
-            </MenuItem>
-            {role === "owner" && (
-              <>
-                <Divider />
-
-                <MenuItem
-                  onClick={() => {
-                    handleClose();
-                    toggleArchiveDialog(true, {
-                      title: poolData.title,
-                      callback: archivePool,
-                    });
-                  }}
-                  disableRipple
-                >
-                  <DeleteOutlineOutlinedIcon fontSize="small" />
-                  archive
-                </MenuItem>
-                <MenuItem onClick={renewPool} disableRipple>
-                  <DeleteOutlineOutlinedIcon fontSize="small" />
-                  renew
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    handleClose();
-                    toggleDeleteDialog(true, {
-                      title: poolData.title,
-                      callback: deletePool,
-                    });
-                  }}
-                  disableRipple
-                >
-                  <DeleteOutlineOutlinedIcon fontSize="small" />
-                  delete
-                </MenuItem>
-              </>
-            )}
-          </div>
-        )}
+        {type === "goal" ? renderGoalMenu() : renderPoolMenu()}
       </StyledMenu>
     </Box>
   );

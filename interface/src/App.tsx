@@ -311,6 +311,7 @@ function App() {
                 inSelectionMode={inSelectionMode}
                 disabled={disabled}
                 yokingGoalId={selectionModeYokeData?.goalId.birth}
+                poolArchived={pool.pool.isArchived}
               />
             </Project>
           );
@@ -387,9 +388,25 @@ const Project = memo(
             type="pool"
             pin={pin}
             setParentTrying={setTrying}
+            isArchived={isArchived}
           />
         );
       }
+    };
+    const renderArchivedTag = () => {
+      return (
+        isArchived && (
+          <Chip
+            sx={{ marginLeft: 1 }}
+            size="small"
+            label={
+              <Typography fontWeight={"bold"} color="text.secondary">
+                archived
+              </Typography>
+            }
+          />
+        )
+      );
     };
     const renderTitle = () => {
       if (role === "viewer" || role === "captain") {
@@ -422,7 +439,7 @@ const Project = memo(
             variant="h5"
             fontWeight={"bold"}
             onDoubleClick={() => {
-              !disableActions && setEditingTitle(true);
+              !disableActions && !isArchived && setEditingTitle(true);
             }}
           >
             {title}
@@ -442,6 +459,7 @@ const Project = memo(
     };
     const renderAddButton = () => {
       if (role === "viewer") return;
+      if (isArchived) return;
       return (
         !disableActions && (
           <IconButton
@@ -457,7 +475,6 @@ const Project = memo(
         )
       );
     };
-    log("pool isArchived", isArchived);
     return (
       <Box sx={{ marginBottom: 1 }}>
         <StyledTreeItem
@@ -495,8 +512,7 @@ const Project = memo(
             </Box>
           )}
           {renderTitle()}
-
-          {/*TODO: make this into it's own component(so we don't have to rerender the children)*/}
+          {renderArchivedTag()}
           {renderIconMenu()}
           {renderAddButton()}
           {!editingTitle && (

@@ -1,10 +1,9 @@
-import React, { Fragment, useState, memo, useEffect } from "react";
+import React, {  useState, memo, useEffect } from "react";
 import styled from "@emotion/styled/macro";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Box from "@mui/material/Box";
 import { PinId, Tree } from "../types/types";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import NewGoalInput from "./NewGoalInput";
@@ -18,7 +17,7 @@ import Stack from "@mui/material/Stack";
 import Avatar from "@mui/material/Avatar";
 
 import { log, shipName } from "../helpers";
-import { blue, orange, yellow } from "@mui/material/colors";
+import { blue, orange } from "@mui/material/colors";
 
 interface GoalItemProps {
   readonly id: number;
@@ -34,6 +33,7 @@ interface GoalItemProps {
   disabled: boolean;
   yokingGoalId: string;
   harvestGoal?: boolean;
+  poolArchived?: boolean;
 }
 const GoalItem = memo(
   ({
@@ -50,6 +50,7 @@ const GoalItem = memo(
     disabled,
     yokingGoalId,
     harvestGoal = false,
+    poolArchived = false,
   }: //inSelectMode
   GoalItemProps) => {
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
@@ -59,6 +60,7 @@ const GoalItem = memo(
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [trying, setTrying] = useState<boolean>(false);
     const [isChief, setIsChief] = useState<boolean>(false);
+    const [disableActions, setDisableActions] = useState<boolean>(false);
     const collapseAll = useStore((store) => store.collapseAll);
     const selectedGoals = useStore((store) => store.selectedGoals);
     const updateSelectedGoal = useStore((store) => store.updateSelectedGoal);
@@ -75,11 +77,24 @@ const GoalItem = memo(
         }
       }
     }, [goal.nexus.ranks]);
-    const disableActions =
-      (goal.isArchived && goal.nexus.par) ||
-      trying ||
-      editingTitle ||
-      addingGoal; // || disabled; TODO: find a better way to do disabled (overlay?)
+    useEffect(() => {
+      // || disabled; TODO: find a better way to do disabled (overlay?)
+      log("working on disabled");
+      const disableActions =
+        poolArchived || //an override prop passed from pool defaults to false
+        (goal.isArchived && goal.nexus.par) ||
+        trying ||
+        editingTitle ||
+        addingGoal;
+      setDisableActions(disableActions);
+    }, [
+      goal.isArchived,
+      goal.nexus.par,
+      trying,
+      editingTitle,
+      addingGoal,
+      poolArchived,
+    ]);
 
     useEffect(() => {
       //everytime collapse all changes, we force isOpen value to comply
@@ -121,6 +136,7 @@ const GoalItem = memo(
           />
         );
       }
+
       if (!disableActions) {
         return (
           <IconMenu
@@ -152,29 +168,44 @@ const GoalItem = memo(
       if (goal.nexus.actionable) return orange[50];
       return "auto";
     };
-    const renderTitle = () => {
-      const noEditPermTitle = (
-        <Box
-          sx={{
-            backgroundColor: goal.nexus.actionable ? orange[50] : "auto",
-            padding: 0.2,
-            paddingLeft: 1,
-            paddingRight: 1,
-            borderRadius: 1,
+    const renderArchivedTag = () => {
+      return (
+        goal.isArchived &&
+        !goal.nexus.par && (
+          <Chip
+            sx={{ marginLeft: 1 }}
+            size="small"
+            label={
+              <Typography fontWeight={"bold"} color="text.secondary">
+                archived
+              </Typography>
+            }
+          />
+        )
+      );
+    };
+    const noEditPermTitle = (
+      <Box
+        sx={{
+          backgroundColor: goal.nexus.actionable ? orange[50] : "auto",
+          padding: 0.2,
+          paddingLeft: 1,
+          paddingRight: 1,
+          borderRadius: 1,
+        }}
+      >
+        <Typography
+          variant="h6"
+          color={"text.primary"}
+          style={{
+            textDecoration: goal.nexus.complete ? "line-through" : "auto",
           }}
         >
-          <Typography
-            variant="h6"
-            color={"text.primary"}
-            style={{
-              textDecoration: goal.nexus.complete ? "line-through" : "auto",
-            }}
-          >
-            {label} {goal.isVirtual && " (virtual) "}{" "}
-            {goal.isArchived && " (archived) "}
-          </Typography>
-        </Box>
-      );
+          {label} {goal.isVirtual && " (virtual) "}{" "}
+        </Typography>
+      </Box>
+    );
+    const renderTitle = () => {
       if (poolRole === "viewer") return noEditPermTitle;
       if (poolRole === "captain" && !isChief) return noEditPermTitle;
       return !editingTitle ? (
@@ -192,16 +223,16 @@ const GoalItem = memo(
         >
           <Typography
             variant="h6"
-            color={trying ? "text.disabled" : "text.primary"}
+            //TODO: we want adding a goal to not put on disabled text (maybe?)
+            color={disableActions ? "text.disabled" : "text.primary"}
             onDoubleClick={() => {
-              !disableActions && setEditingTitle(true);
+              !disableActions && !goal.isArchived && setEditingTitle(true);
             }}
             style={{
               textDecoration: goal.nexus.complete ? "line-through" : "auto",
             }}
           >
-            {label} {goal.isVirtual && " (virtual) "}{" "}
-            {goal.isArchived && " (archived) "}
+            {label} {goal.isVirtual && " (virtual) "}
           </Typography>
         </Box>
       ) : (
@@ -230,6 +261,8 @@ const GoalItem = memo(
       if (poolRole === "captain" && !isChief) return;
       //hide add goal in harvest panel
       if (harvestGoal) return;
+      //hide add if is archived
+      if (goal.isArchived) return;
 
       return (
         !disableActions && (
@@ -246,6 +279,7 @@ const GoalItem = memo(
         )
       );
     };
+
     return (
       <Box
         sx={{
@@ -292,6 +326,7 @@ const GoalItem = memo(
               </Box>
             )}
             {renderTitle()}
+            {renderArchivedTag()}
             {renderIconMenu()}
             {renderAddButton()}
           </>

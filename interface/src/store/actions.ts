@@ -30,7 +30,11 @@ function archivePoolAction(toCachePin: PinId) {
   const newPools = pools.filter((poolItem: any, index: number) => {
     const { pin } = poolItem;
     if (pin.birth === toCachePin.birth) {
-      newArchivedPool.push(poolItem);
+      //make sure to include isArchived flag
+      newArchivedPool.push({
+        ...poolItem,
+        pool: { ...poolItem.pool, isArchived: true },
+      });
     }
     return pin.birth !== toCachePin.birth;
   });
@@ -538,7 +542,7 @@ const orderPools = (pools: any, order: Order) => {
     if (plumbLeftA < plumbLeftB) {
       return -1;
     }
-    var order = 'asc'
+    var order = "asc";
     //will order youngest (higher birth) first
     return birthCompare(aey, bee);
   }
