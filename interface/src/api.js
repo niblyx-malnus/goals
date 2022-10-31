@@ -71,7 +71,11 @@ const api = {
         viewers: [],
       },
     };
-    return api.poke({ app: "goal-store-beta", mark: "goal-action", json: newPool });
+    return api.poke({
+      app: "goal-store-beta",
+      mark: "goal-action",
+      json: newPool,
+    });
   },
   editPoolTitle: async (pin, newTitle) => {
     const poolToEdit = {
@@ -136,7 +140,11 @@ const api = {
         actionable: false,
       },
     };
-    return api.poke({ app: "goal-store-beta", mark: "goal-action", json: newGoal });
+    return api.poke({
+      app: "goal-store-beta",
+      mark: "goal-action",
+      json: newGoal,
+    });
   },
   deleteGoal: async (id) => {
     const goalToDelete = {
@@ -323,7 +331,11 @@ const api = {
         upid: targetGoalId,
       },
     };
-    return api.poke({ app: "goal-store-beta", mark: "goal-action", json: goalMove });
+    return api.poke({
+      app: "goal-store-beta",
+      mark: "goal-action",
+      json: goalMove,
+    });
   },
   yoke: async (pin, yokeList) => {
     const yokeSequence = {

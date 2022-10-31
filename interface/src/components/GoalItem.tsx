@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import NewGoalInput from "./NewGoalInput";
 import IconMenu from "./IconMenu";
 import EditInput from "./EditInput";
+import GoalTimeline from "./GoalTimeline";
 import AddIcon from "@mui/icons-material/Add";
 import useStore from "../store";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -18,7 +19,8 @@ import Avatar from "@mui/material/Avatar";
 
 import { log, shipName } from "../helpers";
 import { blue, orange, green, red, purple } from "@mui/material/colors";
-
+//TODO: make some components to simplify the logic of this component
+//TODO: do the updates for goal nexus
 interface GoalItemProps {
   readonly id: number;
   readonly onSelectCallback: (id: number) => void;
@@ -35,6 +37,7 @@ interface GoalItemProps {
   harvestGoal?: boolean;
   poolArchived?: boolean;
 }
+
 const GoalItem = memo(
   ({
     onSelectCallback,
@@ -281,7 +284,14 @@ const GoalItem = memo(
         )
       );
     };
-
+    const renderTimeline = () => {
+      return (
+        <GoalTimeline
+          kickoff={goal.nexus.kickoff}
+          deadline={goal.nexus.deadline}
+        />
+      );
+    };
     return (
       <Box
         sx={{
@@ -329,6 +339,7 @@ const GoalItem = memo(
               </Box>
             )}
             {renderTitle()}
+            {renderTimeline()}
             {renderArchivedTag()}
             {renderIconMenu()}
             {renderAddButton()}

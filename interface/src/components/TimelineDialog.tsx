@@ -59,11 +59,11 @@ export default function TimelineDialog() {
     try {
       const kickoffResult = await api.setKickoff(
         timelineDialogData.goalId,
-        kickoffValue?.valueOf()
+        kickoffValue?.valueOf() || null
       );
       const deadlineResult = await api.setDeadline(
         timelineDialogData.goalId,
-        deadlineValue?.valueOf()
+        deadlineValue?.valueOf() || null
       );
       log("setDeadline result =>", deadlineResult);
       log("setKickoff result =>", kickoffResult);

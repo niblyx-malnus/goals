@@ -531,6 +531,55 @@ function handleYoke(pinId: PinId, nexusList: any) {
   }
   setPools(newPools);
 }
+function updateGoalPermsAction(pinId: PinId, nexusList: any) {
+  const state = useStore.getState();
+  const pools = state.pools;
+  const setPools = state.setPools;
+  const order = state.order;
+  //go through pools select our pool, and update the goals (their nexus) that need to be update
+  //create a map for ease of interaction
+  const nexusMap = new Map();
+  nexusList.forEach((nex: any) => {
+    nexusMap.set(nex.id.birth, nex.goal);
+  });
+  let newPools = pools.map((poolItem: any, poolIndex: number) => {
+    const { pin } = poolItem;
+    if (pin.birth === pinId.birth) {
+      const newGoals = poolItem.pool.nexus.goals.map(
+        (goalItem: any, goalIndex: any) => {
+          if (nexusMap.has(goalItem.id.birth)) {
+            return {
+              ...goalItem,
+              goal: {
+                ...goalItem.goal,
+                nexus: {
+                  ...goalItem.goal.nexus,
+                  ...nexusMap.get(goalItem.id.birth),
+                },
+              },
+            };
+          }
+
+          return goalItem;
+        }
+      );
+      return {
+        ...poolItem,
+        pool: {
+          ...poolItem.pool,
+          nexus: { ...poolItem.pool.nexus, goals: newGoals },
+        },
+      };
+    }
+    return poolItem;
+  });
+  //since left-plumb changes, we have to reoreder the goals (if sorting prio)
+  //TODO: this could happen everytime a list of nexus patches in (add elsewhere, maybe actions?)
+  if (order === "prio") {
+    newPools = orderPools(newPools, order);
+  }
+  setPools(newPools);
+}
 
 //this is actually just a helper
 const orderPools = (pools: any, order: Order) => {
@@ -585,4 +634,5 @@ export {
   deleteArchivedGoalAction,
   renewPoolAction,
   deleteArchivedPoolAction,
+  updateGoalPermsAction,
 };
