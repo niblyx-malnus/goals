@@ -9,7 +9,6 @@ import {
   SnackBarData,
   Yoke,
 } from "../types/types";
-//TODO: comment
 type SelectionYokeData = null | {
   goalId: GoalId;
   poolId: PinId;
@@ -250,12 +249,17 @@ const useStore = create<Store>((set, get) => ({
     }));
   },
   updateSelectedGoal: (newGoalId: any, status: boolean) => {
-    //TODO: handle move
     //manage list of selected goals (while yoking/moving)
     let currentSelectedGoals: any = new Map(get().selectedGoals);
+    const yokeType = get().selectionModeYokeData?.yokeType;
+
     //status: true => add a goal
     //status: false => remove a goal
     if (status) {
+      if (yokeType === "move") {
+        //we clear to manage a single connection when moving
+        currentSelectedGoals.clear();
+      }
       currentSelectedGoals.set(newGoalId.birth, newGoalId);
     } else {
       currentSelectedGoals.delete(newGoalId.birth);

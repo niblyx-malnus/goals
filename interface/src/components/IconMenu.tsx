@@ -194,12 +194,12 @@ export default function IconMenu({
       const result = await api.archivePool(pin);
       log("archivePool result => ", result);
       toggleSnackBar(true, {
-        message: "successfully deleted pool",
+        message: "successfully archived pool",
         severity: "success",
       });
     } catch (e) {
       toggleSnackBar(true, {
-        message: "failed to delete pool",
+        message: "failed to archive pool",
         severity: "error",
       });
       log("archivePool error => ", e);
@@ -271,7 +271,7 @@ export default function IconMenu({
       log("archiveGoal result => ", result);
     } catch (e) {
       toggleSnackBar(true, {
-        message: "failed to delete goal",
+        message: "failed to archive goal",
         severity: "error",
       });
       log("archiveGoal error => ", e);
@@ -286,7 +286,7 @@ export default function IconMenu({
       const result = await api.renewGoal(id);
       log("renewGoal result => ", result);
       toggleSnackBar(true, {
-        message: "successfully renewd goal",
+        message: "successfully renewed goal",
         severity: "success",
       });
     } catch (e) {

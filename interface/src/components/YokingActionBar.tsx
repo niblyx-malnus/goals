@@ -103,16 +103,16 @@ export default function YokingActionBar({}) {
     try {
       const result = await api.yoke(pin, yokeList);
       toggleSnackBar(true, {
-        message: "successfully " + yokeType,
+        message: yokeType + " successful",
         severity: "success",
       });
 
-      //closeActionBar();
+      closeActionBar();
       log("yoke result =>", result);
     } catch (e) {
       log("yoke error =>", e);
       toggleSnackBar(true, {
-        message: "failed to " + yokeType,
+        message: yokeType + " failed",
         severity: "error",
       });
     }
@@ -131,7 +131,6 @@ export default function YokingActionBar({}) {
         backgroundColor: "#fff",
         padding: 2,
         borderRadius: "4px",
-        
       }}
       elevation={3}
     >
@@ -155,7 +154,7 @@ export default function YokingActionBar({}) {
           }}
           loading={trying}
         >
-          Confirm {selectionModeYokeData?.yokeType}
+          {selectionModeYokeData?.yokeType}
         </LoadingButton>
         <Button
           onClick={() => {

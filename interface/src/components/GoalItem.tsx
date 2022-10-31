@@ -1,4 +1,4 @@
-import React, {  useState, memo, useEffect } from "react";
+import React, { useState, memo, useEffect } from "react";
 import styled from "@emotion/styled/macro";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -17,7 +17,7 @@ import Stack from "@mui/material/Stack";
 import Avatar from "@mui/material/Avatar";
 
 import { log, shipName } from "../helpers";
-import { blue, orange } from "@mui/material/colors";
+import { blue, orange, green, red, purple } from "@mui/material/colors";
 
 interface GoalItemProps {
   readonly id: number;
@@ -159,10 +159,10 @@ const GoalItem = memo(
     const getColor = () => {
       if (inSelectionMode) {
         if (yoking) {
-          return "orange";
+          return blue[700];
         }
         if (selected) {
-          return "purple";
+          return blue[200];
         }
       }
       if (goal.nexus.actionable) return orange[50];
@@ -188,7 +188,7 @@ const GoalItem = memo(
       <Box
         sx={{
           backgroundColor: goal.nexus.actionable ? orange[50] : "auto",
-          padding: 0.2,
+          margin: 0.2,
           paddingLeft: 1,
           paddingRight: 1,
           borderRadius: 1,
@@ -199,9 +199,10 @@ const GoalItem = memo(
           color={"text.primary"}
           style={{
             textDecoration: goal.nexus.complete ? "line-through" : "auto",
+            wordBreak: "break-word",
           }}
         >
-          {label} {goal.isVirtual && " (virtual) "}{" "}
+          {label} {goal.isVirtual && " (virtual) "}
         </Typography>
       </Box>
     );
@@ -212,7 +213,7 @@ const GoalItem = memo(
         <Box
           sx={{
             backgroundColor: getColor(),
-            padding: 0.2,
+            margin: 0.2,
             paddingLeft: 1,
             paddingRight: 1,
             borderRadius: 1,
@@ -230,6 +231,7 @@ const GoalItem = memo(
             }}
             style={{
               textDecoration: goal.nexus.complete ? "line-through" : "auto",
+              wordBreak: "break-word",
             }}
           >
             {label} {goal.isVirtual && " (virtual) "}
@@ -283,6 +285,7 @@ const GoalItem = memo(
     return (
       <Box
         sx={{
+          flex: 1,
           "&:hover": {
             "& > div > .helper-bar ": {
               backgroundColor: blue[400],

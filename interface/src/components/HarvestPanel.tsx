@@ -88,6 +88,7 @@ export default function HarvestPanel() {
         sx={{
           width: drawerWidth,
           flexShrink: 0,
+
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
@@ -110,20 +111,35 @@ export default function HarvestPanel() {
             <ClearIcon />
           </IconButton>
         </Stack>
-
         <Divider />
-        <Stack direction="row" alignItems={"center"} margin={1}>
-          <Typography color={"text.primary"} variant="h6">
+        <Stack
+          direction="row"
+          alignItems={"center"}
+          padding={1}
+          flexWrap="wrap"
+        >
+          <Typography
+            color={"text.primary"}
+            variant="h6"
+            sx={{
+              wordWrap: "break-word",
+              width: "100%",
+            }}
+          >
             {startGoalTile}
+            <Tooltip
+              title="Click to refresh harvested goals"
+              placement="right"
+              arrow
+            >
+              <IconButton onClick={() => handleHarvestGoal()} color="primary">
+                <AgricultureIcon />
+              </IconButton>
+            </Tooltip>
           </Typography>
-          <Tooltip title="Click to refresh harvested goals" placement="right" arrow>
-            <IconButton onClick={() => handleHarvestGoal()}>
-              <AgricultureIcon />
-            </IconButton>
-          </Tooltip>
         </Stack>
         <Divider />
-        <Stack margin={1}>
+        <Stack margin={1} direction={"column"}>
           {harvestGoals?.map((goal: any) => {
             const currentGoal = goal.goal;
             const currentGoalId = goal.id.birth;
@@ -148,6 +164,11 @@ export default function HarvestPanel() {
               />
             );
           })}
+          {harvestGoals?.length === 0 && (
+            <Typography color={"text.primary"} variant="h6">
+              Nothing to harvest
+            </Typography>
+          )}
         </Stack>
         <Divider />
       </Drawer>
