@@ -56,11 +56,11 @@ const api = {
     }
   },
   getGroupData: async () => {
-    return api.createApi().scry({ app: "goal-store", path: "/groups" });
+    return api.createApi().scry({ app: "goal-store-beta", path: "/groups" });
   },
   getData: async () => {
     //gets our main data we display (pools/goals)
-    return api.createApi().scry({ app: "goal-store", path: "/initial" });
+    return api.createApi().scry({ app: "goal-store-beta", path: "/initial" });
   },
   addPool: async (title) => {
     const newPool = {
@@ -71,7 +71,7 @@ const api = {
         viewers: [],
       },
     };
-    return api.poke({ app: "goal-store", mark: "goal-action", json: newPool });
+    return api.poke({ app: "goal-store-beta", mark: "goal-action", json: newPool });
   },
   editPoolTitle: async (pin, newTitle) => {
     const poolToEdit = {
@@ -82,7 +82,7 @@ const api = {
     };
 
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: poolToEdit,
     });
@@ -94,7 +94,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: poolToDelete,
     });
@@ -106,7 +106,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: poolToRenew,
     });
@@ -118,7 +118,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: poolToArchive,
     });
@@ -136,7 +136,7 @@ const api = {
         actionable: false,
       },
     };
-    return api.poke({ app: "goal-store", mark: "goal-action", json: newGoal });
+    return api.poke({ app: "goal-store-beta", mark: "goal-action", json: newGoal });
   },
   deleteGoal: async (id) => {
     const goalToDelete = {
@@ -145,7 +145,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: goalToDelete,
     });
@@ -157,7 +157,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: goalToRenew,
     });
@@ -169,7 +169,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: goalToArchive,
     });
@@ -182,7 +182,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: goalToEdit,
     });
@@ -195,7 +195,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: goalToMark,
     });
@@ -207,7 +207,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: goalToMark,
     });
@@ -220,7 +220,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: newPoolPerms,
     });
@@ -235,7 +235,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: newGoalPerms,
     });
@@ -247,7 +247,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: poolToLeave,
     });
@@ -259,7 +259,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: goalToMark,
     });
@@ -271,7 +271,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: goalToMark,
     });
@@ -284,7 +284,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: newKickoff,
     });
@@ -297,7 +297,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: newDeadline,
     });
@@ -310,7 +310,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: poolToCopy,
     });
@@ -323,7 +323,7 @@ const api = {
         upid: targetGoalId,
       },
     };
-    return api.poke({ app: "goal-store", mark: "goal-action", json: goalMove });
+    return api.poke({ app: "goal-store-beta", mark: "goal-action", json: goalMove });
   },
   yoke: async (pin, yokeList) => {
     const yokeSequence = {
@@ -333,14 +333,14 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: "goal-store-beta",
       mark: "goal-action",
       json: yokeSequence,
     });
   },
   harvest: async (owner, birth) => {
     return api.createApi().scry({
-      app: "goal-store",
+      app: "goal-store-beta",
       path: `/goal/~${owner}/${birth}/full-harvest`,
     });
   },

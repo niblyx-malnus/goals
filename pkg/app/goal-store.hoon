@@ -595,7 +595,7 @@
         ((slog 'You\'ve been invited to view a goal!' ~) `this)
       ((slog 'Invite failure.' ~) `this)
         %kick
-      %-  (slog '%goal-store: Got kick, resubscribing...' ~)
+      %-  (slog '%goal-store-beta: Got kick, resubscribing...' ~)
       =/  upd
         ?:  (~(has by pools) pin)
           (some [vzn %waste-pool ~])
@@ -606,7 +606,7 @@
         `this
       =^  cards  state
         %+  send-home-updates:hc 
-          [%pass wire %agent [src.bowl %goal-store] %watch wire]~
+          [%pass wire %agent [src.bowl %goal-store-beta] %watch wire]~
         [pin src.bowl 0 [u.upd]~]
       [cards this]
         %fact
@@ -631,11 +631,11 @@
     ?+    -.sign  (on-agent:def wire sign)
         %watch-ack
       ?~  p.sign
-        ((slog '%goal-store: Watch /groups succeeded.' ~) `this)
-      ((slog '%goal-store: Watch /groups failed.' ~) `this)
+        ((slog '%goal-store-beta: Watch /groups succeeded.' ~) `this)
+      ((slog '%goal-store-beta: Watch /groups failed.' ~) `this)
       ::
         %kick
-      %-  (slog '%goal-store: Got kick from %group-store, resubscribing...' ~)
+      %-  (slog '%goal-store-beta: Got kick from %group-store, resubscribing...' ~)
       :_  this
       [%pass wire %agent [our.bowl %group-store] %watch wire]~
       ::
