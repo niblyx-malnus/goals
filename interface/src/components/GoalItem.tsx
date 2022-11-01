@@ -3,7 +3,7 @@ import styled from "@emotion/styled/macro";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Box from "@mui/material/Box";
-import { PinId, Tree } from "../types/types";
+import { PinId } from "../types/types";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import NewGoalInput from "./NewGoalInput";
@@ -15,7 +15,7 @@ import useStore from "../store";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
-import Avatar from "@mui/material/Avatar";
+import Badge from "@mui/material/Badge";
 
 import { log, shipName } from "../helpers";
 import { blue, orange, green, red, purple } from "@mui/material/colors";
@@ -174,11 +174,28 @@ const GoalItem = memo(
         goal.isArchived &&
         !goal.nexus.par && (
           <Chip
-            sx={{ marginLeft: 1 }}
+            sx={{ marginLeft: 1, marginRight: 1 }}
             size="small"
             label={
               <Typography fontWeight={"bold"} color="text.secondary">
-                archived
+                Archived
+              </Typography>
+            }
+          />
+        )
+      );
+    };
+    const renderVirtualTag = () => {
+      return (
+        goal.isVirtual && (
+          <Chip
+            sx={{ marginLeft: 1, marginRight: 1 }}
+            size="small"
+            variant="outlined"
+            color="primary"
+            label={
+              <Typography fontWeight={"bold"} color="primary">
+                Virtual
               </Typography>
             }
           />
@@ -203,7 +220,7 @@ const GoalItem = memo(
             wordBreak: "break-word",
           }}
         >
-          {label} {goal.isVirtual && " (virtual) "}
+          {label}
         </Typography>
       </Box>
     );
@@ -235,7 +252,7 @@ const GoalItem = memo(
               wordBreak: "break-word",
             }}
           >
-            {label} {goal.isVirtual && " (virtual) "}
+            {label}
           </Typography>
         </Box>
       ) : (
@@ -337,8 +354,10 @@ const GoalItem = memo(
               </Box>
             )}
             {renderTitle()}
-            {renderTimeline()}
             {renderArchivedTag()}
+            {renderVirtualTag()}
+            {renderTimeline()}
+
             {renderIconMenu()}
             {renderAddButton()}
           </>
@@ -350,9 +369,29 @@ const GoalItem = memo(
               sx={{ opacity: 0 }}
             >
               <Chip
-                sx={{ marginLeft: 1 }}
-                avatar={<Avatar>C</Avatar>}
                 size="small"
+                avatar={
+                  <Badge
+                    style={{
+                      borderRadius: 10,
+                      height: 18,
+                      width: 18,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle2"
+                      style={{
+                        textAlign: "center",
+                        lineHeight: "18px",
+                      }}
+                    >
+                      C
+                    </Typography>
+                  </Badge>
+                }
                 label={
                   <Typography fontWeight={"bold"}>
                     {goal.nexus.chief}

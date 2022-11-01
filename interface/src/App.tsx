@@ -16,7 +16,7 @@ import { log, shipName } from "./helpers";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import { Order, PinId } from "./types/types";
-import Avatar from "@mui/material/Avatar";
+import Badge from "@mui/material/Badge";
 import { orderPools, orderPoolsAction } from "./store/actions";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
@@ -519,12 +519,34 @@ const Project = memo(
             <Stack
               flexDirection={"row"}
               alignItems="center"
+              justifyContent={"center"}
               className="show-on-hover"
               sx={{ opacity: 0 }}
             >
               <Chip
-                sx={{ marginLeft: 1 }}
-                avatar={<Avatar>O</Avatar>}
+                avatar={
+                  <Badge
+                    style={{
+                      borderRadius: 10,
+                      height: 18,
+                      width: 18,
+                      display: "flex",
+
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle2"
+                      style={{
+                        textAlign: "center",
+                        lineHeight: "18px",
+                      }}
+                    >
+                      O
+                    </Typography>
+                  </Badge>
+                }
                 size="small"
                 label={<Typography fontWeight={"bold"}>{poolOwner}</Typography>}
                 color="primary"
