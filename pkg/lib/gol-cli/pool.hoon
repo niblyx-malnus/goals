@@ -1078,56 +1078,6 @@
         ==
       cmp
 ::
-++  cascade
-  |=  [=eid:gol dir=?(%l %r)]
-  ^-  (set [eid:gol edge:gol])
-  =/  edge  (got-edge eid)
-  =|  upds=(set [eid:gol edge:gol])
-  =.  upds
-    %-  ~(put in upds)
-    :-  eid
-    ?-    dir
-        %l  :: cascading left; updating right side
-      %=  edge
-        ryte-bound  (renew-bound eid %r)
-        ryte-plumb  (renew-plumb eid %r)
-      ==
-        %r  :: cascading right; updating left side
-      %=  edge
-        left-bound  (renew-bound eid %l)
-        left-plumb  (renew-plumb eid %l)
-      ==
-    ==
-  =/  next
-    %~  tap  in
-    ?-  dir
-      %l  inflow.edge
-      %r  outflow.edge
-    ==
-  =/  idx  0
-  |-
-  ?:  =(idx (lent next))
-    upds
-  %=  $
-    idx  +(idx)
-    upds  (~(uni in upds) (cascade (snag idx next) dir))
-  ==
-::
-++  cascade-update
-  |=  [e1=eid:gol e2=eid:gol]
-  ^-  [ids=(set id:gol) pore=_this]
-  =/  upds  ~(tap in (~(uni in (cascade e1 %l)) (cascade e2 %r)))
-  =/  idx  0
-  :-  (sy (turn upds |=([=eid:gol edge:gol] id.eid)))
-  |-
-  ?:  =(idx (lent upds))
-    this
-  =+  [eid edge]=(snag idx upds)
-  %=  $
-    idx  +(idx)
-    goals.p  (~(put by goals.p) id.eid (update-edge eid edge))
-  ==
-::
 ++  fix-neighbors
   |=  [lid=id:gol rid=id:gol]
   ^-  _this
@@ -1830,6 +1780,9 @@
     :: pool-nexus
     ::
       [%pool-nexus %yoke *]
+    (apply-nex nex.upd)
+    ::
+      [%pool-nexus %date *]
     (apply-nex nex.upd)
     :: ------------------------------------------------------------------------
     :: goal-perms
