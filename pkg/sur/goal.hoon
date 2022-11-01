@@ -136,7 +136,8 @@
   +$  goals  (map id goal)
   ::
   +$  trace
-    $:  left-bounds=(map eid bound)
+    $:  stocks=(map id stock)
+        left-bounds=(map eid bound)
         ryte-bounds=(map eid bound)
         left-plumbs=(map eid @)
         ryte-plumbs=(map eid @)
@@ -395,10 +396,6 @@
       =.  moment.edge  moment:(got-edge eid)
       =.  inflow.edge  inflow:(got-edge eid)
       =.  outflow.edge  outflow:(got-edge eid)
-      =.  left-bound.edge  (left-bound eid)
-      =.  ryte-bound.edge  (ryte-bound eid)
-      =.  left-plumb.edge  (left-plumb eid)
-      =.  ryte-plumb.edge  (ryte-plumb eid)
       edge
     ::
     ++  get-stock

@@ -358,6 +358,7 @@
           ::
           :: [%update-pool-perms =pin new=pool-perms]
           %update-pool-perms
+        ~&  "update-pool-perms"
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -367,13 +368,12 @@
           [(poke-other owner.pin.pok goal-action+!>(action))]~
         =/  pool  (~(got by pools) pin.pok)
         =/  diff  (~(pool-diff pl pool) new.pok)
+        ~&  diff
         %+  send-away-updates:hc
-          ;:  weld
-            ^-  (list card)
+          ;:  welp
             %+  turn  invite.diff
             |=  =ship
             (poke-other ship goal-action+!>([vzn 0 %subscribe pin.pok]))
-            ^-  (list card)
             %+  turn  remove.diff
             |=  =ship
             [%give %kick ~[/[`@`+<.pin.pok]/[`@`+>.pin.pok]] `ship]
@@ -575,6 +575,7 @@
 ++  on-agent
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
+  ~&  wire
   ?+    wire  (on-agent:def wire sign)
       [%away @ @ @ *]
     =/  pid  i.t.wire
