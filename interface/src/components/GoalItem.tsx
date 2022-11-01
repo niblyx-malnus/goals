@@ -70,7 +70,6 @@ const GoalItem = memo(
     //TODO: remove the add/edit when isArchived
     //TODO: check pool isArchived here
     useEffect(() => {
-      log("calculating ranks for =>", goal.hitch.desc);
       //we check at first render/everytime ranks changes(or just goal)
       //does the current ship has chief/spawn/captain perms on this goal?
       for (const rank of goal.nexus.ranks) {
@@ -82,7 +81,6 @@ const GoalItem = memo(
     }, [goal.nexus.ranks]);
     useEffect(() => {
       // || disabled; TODO: find a better way to do disabled (overlay?)
-      log("working on disabled");
       const disableActions =
         poolArchived || //an override prop passed from pool defaults to false
         (goal.isArchived && goal.nexus.par) ||

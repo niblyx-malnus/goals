@@ -73,9 +73,9 @@ const ShareDialogInputs = ({
       onAdd();
     }
   };
-  const validateShipName = () => {
+  const validateShipName = (value: string) => {
     try {
-      const isValid = ob.isValidPatp(inputValue);
+      const isValid = ob.isValidPatp(value);
 
       if (!isValid) {
         setPathErrorMessage("Make sure the ship you entered exists");
@@ -110,6 +110,7 @@ const ShareDialogInputs = ({
         value={inputValue}
         onChange={(event, value) => {
           //we handle this a little different from a standard input
+          log("value====>", value);
           setInputValue(value);
         }}
         renderInput={(params) => (
@@ -212,9 +213,10 @@ export default function ShareDialog() {
     validateShipName: Function
   ) => {
     if (trying) return;
-    //make sure the entered p is for real for real
+    //validate @p
+    //TODO: fix getting input value on enter new text
     try {
-      validateShipName();
+      validateShipName(inputValue);
     } catch (e) {
       log("e", e);
       return;

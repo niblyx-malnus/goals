@@ -5,6 +5,7 @@ import dayjs, { Dayjs } from "dayjs";
 
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import Popover from "@mui/material/Popover";
+import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import { log } from "../helpers";
 
@@ -31,6 +32,8 @@ export default function GoalTimeline({ kickoff, deadline }: any) {
       log("kickoff.moment", kickoff.moment);
 
       setKickoffDate(momentToDateString(kickoff.moment));
+    } else {
+      setKickoffDate(null);
     }
     if (deadline.moment) {
       setDeadlineDate(momentToDateString(deadline.moment));
@@ -38,20 +41,22 @@ export default function GoalTimeline({ kickoff, deadline }: any) {
     } else if (deadline["ryte-bound"]?.moment) {
       setDeadlineDate(momentToDateString(deadline["ryte-bound"].moment));
       setInhertied(true);
+    } else {
+      setDeadlineDate(null);
     }
   }, [kickoff, deadline]);
 
   if (!kickoffDate && !deadlineDate) return null;
   return (
-    <div>
-      <div
+    <Box sx={{ opacity: 0 }} className="show-on-hover">
+      <Box
         aria-owns={open ? "goal-timeline-popover" : undefined}
         aria-haspopup="true"
         onMouseEnter={handlePopoverOpen}
         onMouseLeave={handlePopoverClose}
       >
         <CalendarMonthOutlinedIcon color={inherited ? "disabled" : "primary"} />
-      </div>
+      </Box>
 
       <Popover
         id="goal-timeline-popover"
@@ -87,6 +92,6 @@ export default function GoalTimeline({ kickoff, deadline }: any) {
           )}
         </Stack>
       </Popover>
-    </div>
+    </Box>
   );
 }

@@ -9,14 +9,13 @@ import {
   updateGoalDescAction,
   updateToglsAction,
   updatePoolPermsAction,
-  handleYoke,
   archiveGoalAction,
   archivePoolAction,
   renewGoalAction,
   deleteArchivedGoalAction,
   renewPoolAction,
   deleteArchivedPoolAction,
-  updateGoalPermsAction
+  nexusListAction,
 } from "../store/actions";
 const setLogList = useStore.getState().setLogList;
 
@@ -132,14 +131,21 @@ const updateHandler = (update: any) => {
         const hed: any = update.hed;
         let { nex }: any = update.tel[actionName];
 
-        updateGoalPermsAction(hed.pin, nex);
+        nexusListAction(hed.pin, nex);
 
         break;
       }
       case "pool-nexus": {
         const hed: any = update.hed;
         let { yoke }: any = update.tel[actionName];
-        handleYoke(hed.pin, yoke.nex);
+        nexusListAction(hed.pin, yoke.nex);
+        break;
+      }
+      case "goal-dates": {
+        const hed: any = update.hed;
+        let { nex }: any = update.tel[actionName];
+        
+        nexusListAction(hed.pin, nex);
         break;
       }
       /* case "goal-nexus": {

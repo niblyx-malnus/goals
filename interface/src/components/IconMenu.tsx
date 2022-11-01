@@ -336,6 +336,7 @@ export default function IconMenu({
     log("deadline", deadline);
 
     toggleTimelineDialog(true, {
+      title: currentGoal.hitch.desc,
       goalId: id,
       kickoff,
       deadline,

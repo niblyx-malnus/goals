@@ -34,6 +34,8 @@ export default function TimelineDialog() {
   const [trying, setTrying] = useState<boolean>(false);
   const [kickoffValue, setKickoffValue] = React.useState<Dayjs | null>(null);
   const [deadlineValue, setDeadlineValue] = React.useState<Dayjs | null>(null);
+  const toggleSnackBar = useStore((store) => store.toggleSnackBar);
+
   useEffect(() => {
     if (timelineDialogData) {
       const { kickoff, deadline } = timelineDialogData;
@@ -65,13 +67,21 @@ export default function TimelineDialog() {
         timelineDialogData.goalId,
         deadlineValue?.valueOf() || null
       );
+      toggleSnackBar(true, {
+        message: "successfuly updated timeline",
+        severity: "success",
+      });
       log("setDeadline result =>", deadlineResult);
       log("setKickoff result =>", kickoffResult);
+      handleClose();
     } catch (e) {
       log("updateTimeline error =>", e);
+      toggleSnackBar(true, {
+        message: "failed to update timeline",
+        severity: "error",
+      });
     }
     setTrying(false);
-    //    handleClose();
   };
 
   if (!timelineDialogData) return null;
@@ -86,7 +96,7 @@ export default function TimelineDialog() {
         fullWidth
       >
         <DialogTitle id="timeline-dialog-title" fontWeight={"bold"}>
-          Manage Timeline
+          Manage Timeline ({timelineDialogData.title})
         </DialogTitle>
         <DialogContent>
           <Stack
