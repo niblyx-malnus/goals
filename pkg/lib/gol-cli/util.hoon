@@ -57,4 +57,27 @@
   ?:  =(count idx)
     (mul 2 addr)
   $(count +(count), addr +((mul 2 addr)))
+::
+:: Get submap associated with a list of keys
+++  gat-by
+  |*  [=(map * *) keys=(list *)]
+  =/  new  ^+(map ~)
+  |-
+  ?~  keys
+    new
+  %=  $
+    keys  t.keys
+    new  (~(put by new) i.keys (~(got by map) i.keys))
+  ==
+::
+:: Remove list of keys from map
+++  gus-by
+  |*  [=(map * *) keys=(list *)]
+  |-
+  ?~  keys
+    map
+  %=  $
+    keys  t.keys
+    map  (~(del by map) i.keys)
+  ==
 --

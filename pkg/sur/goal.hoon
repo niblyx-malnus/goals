@@ -27,6 +27,7 @@
 +$  goal          goal:s4
 +$  ngoal         ngoal:s4
 +$  goals         goals:s4
++$  trace         trace:s4
 ::
 +$  pool-froze    pool-froze:s4
 +$  pool-perms    pool-perms:s4
@@ -134,12 +135,20 @@
   ::
   +$  goals  (map id goal)
   ::
+  +$  trace
+    $:  left-bounds=(map eid bound)
+        ryte-bounds=(map eid bound)
+        left-plumbs=(map eid @)
+        ryte-plumbs=(map eid @)
+    ==
+  ::
   +$  pool-role  ?(%admin %spawn)
   ::
   +$  pool-perms  (map ship (unit pool-role))
   ::
   +$  pool-nexus
     $:  =goals
+        =trace
         cache=(map id goals)
     ==
   ::
@@ -181,6 +190,7 @@
   ::
   +$  pool-nexus-update
     $%  [%yoke =nex]
+        [%date =nex]
     ==
   ::
   +$  goal-hitch-update

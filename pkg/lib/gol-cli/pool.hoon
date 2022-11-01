@@ -1,27 +1,37 @@
 /-  gol=goal
+/+  *gol-cli-util
 =|  efx=(list update:gol)
 |_  p=pool:gol
 +*  this  .
     pin   `pin:gol`[%pin owner.p birth.p]
 ++  vzn  %4
+::
+:: return this core with initial value
 ++  apex
   |=  =pool:gol
   this(p pool)
 ::
+:: return this core with final effects list
 ++  abet
   ^-  [efx=(list update:gol) =pool:gol]
   [(flop efx) p]
 ::
+:: emit an effect
 ++  emit
   |=  upd=update:gol
   this(efx [upd efx])
 ::
+:: emit an effect only after checking that updating the data
+:: structure using this effect yields the same result
 ++  emot
   |=  [old=_this upd=update:gol]
+  :: temporarily ignore trace (TO CHANGE LATER)
+  =.  old  old(trace.p trace.p.this)
   ?.  =(this (etch:old upd)) :: be wary of changes to efx
   ~|("non-equivalent-update" !!)
   (emit upd)
 ::
+:: get a node from a node id (edge = node ... woops, confusing)
 ++  got-edge
   |=  =eid:gol
   ^-  edge:gol
@@ -30,6 +40,7 @@
     %k  kickoff.goal
     %d  deadline.goal
   ==
+::
 ::
 ++  update-edge
   |=  [=eid:gol =edge:gol]
@@ -61,6 +72,12 @@
       =/  =ngoal:gol  (~(got by goals.p) id)
       [id ngoal(nexus goal-nexus)]
     ==
+::
+:: ============================================================================
+:: 
+:: SPAWNING/CACHING/TRASHING/RENEWING GOALS
+::
+:: ============================================================================
 ::
 ++  init-goal
   |=  [=id:gol chief=ship]
@@ -230,35 +247,6 @@
   %-  ~(run in (~(int in eids) outflow.deadline))
   |=(=eid:gol [[%d id] eid]) :: make sure these are ordered correctly
 ::
-:: Get the submap of goals associated with ids
-++  gat-by
-  |=  [=goals:gol ids=(list id:gol)]
-  ^-  goals:gol
-  =|  =goals:gol
-  =/  idx  0
-  |-
-  ?:  =(idx (lent ids))
-    goals
-  %=  $
-    idx  +(idx)
-    goals
-      =/  id  (snag idx ids)
-      (~(put by goals) id (~(got by ^goals) id))
-  ==
-::
-:: Remove all the goal objects associated with ids from goals
-++  gus-by
-  |=  [=goals:gol ids=(list id:gol)]
-  ^-  goals:gol
-  =/  idx  0
-  |-
-  ?:  =(idx (lent ids))
-    goals
-  %=  $
-    idx  +(idx)
-    goals  (~(del by goals) (snag idx ids))
-  ==
-::
 :: Permanently delete goal and subgoals directly
 ++  waste-goal
   |=  [=id:gol mod=ship]
@@ -348,6 +336,100 @@
 ::
 :: ============================================================================
 :: 
+:: DEFINE NODE/GOAL SETS
+::
+:: ============================================================================
+::
+++  root-nodes
+  ^-  (list eid:gol)
+  %+  turn
+    %+  skim
+      ~(tap by goals.p)
+    |=([id:gol =goal:gol] =(~ outflow.deadline.goal))
+  |=([=id:gol =goal:gol] [%d id])
+::
+++  leaf-nodes
+  ^-  (list eid:gol)
+  %+  turn
+    %+  skim
+      ~(tap by goals.p)
+    |=([id:gol =goal:gol] =(~ inflow.kickoff.goal))
+  |=([=id:gol =goal:gol] [%k id])
+::
+++  root-goals
+  ^-  (list id:gol)
+  %+  turn
+    %+  skim
+      ~(tap by goals.p)
+    |=([id:gol =goal:gol] =(~ outflow.deadline.goal))
+  |=([=id:gol =goal:gol] id)
+::
+:: parentless goals
+++  orphans
+  ^-  (list id:gol)
+  %+  turn
+    %+  skim
+      ~(tap by goals.p)
+    |=([id:gol =goal:gol] =(~ par.goal))
+  |=([=id:gol =goal:gol] id)
+::
+:: get max depth + 1; depth of "virtual" root node
+++  anchor  +((roll (turn root-goals plumb) max))
+::
+:: accepts a deadline; returns inflowing deadlines
+++  yong
+  |=  =eid:gol
+  ^-  (set eid:gol)
+  ?>  =(%d -.eid)
+  %-  ~(gas in *(set eid:gol))
+  %+  murn
+    ~(tap in (iflo eid))
+  |=  =eid:gol
+  ?-  -.eid
+    %k  ~
+    %d  (some eid)
+  ==
+::
+:: gets the kids and "virtual children" of a goal
+++  yung
+  |=  =id:gol
+  ^-  (list id:gol)
+  (turn ~(tap in (yong [%d id])) |=(=eid:gol id.eid))
+::
+:: gets the "virtual children" of a goal
+++  virt
+  |=  =id:gol
+  ^-  (list id:gol)
+  %~  tap  in
+  %-  %~  dif  in
+      (~(gas in *(set id:gol)) (yung id))
+  kids:(~(got by goals.p) id)
+::
+:: extracts ids of incomplete goals from a list of ids
+++  incomplete
+  |=  ids=(list id:gol)
+  ^-  (list id:gol)
+  (skip ids |=(=id:gol complete:(~(got by goals.p) id)))
+::
+++  to-ends
+  |=  [=eid:gol dir=?(%l %r)]
+  ^-  (set eid:gol)
+  =|  nodes=(set eid:gol)
+  =/  flow
+    %~  tap  in
+      ?-  dir
+        %l  inflow:(got-edge eid)
+        %r  outflow:(got-edge eid)
+      ==
+  |-
+  ?~  flow
+    (~(put in nodes) eid)
+  ?:  (~(has in nodes) i.flow)
+    $(flow t.flow)
+  $(nodes (~(uni in nodes) (to-ends i.flow dir)), flow t.flow)  
+::
+:: ============================================================================
+:: 
 :: TRAVERSALS
 ::
 :: ============================================================================
@@ -358,8 +440,8 @@
   |*  [mald=mold muld=mold]
   :*  flow=|~(eid:gol *(list eid:gol))
       init=|~(eid:gol *mald)
-      stop=|~([eid:gol mald] `?`%.n) :: TODO: should probably include nxt
-      meld=|~([eid:gol mald mald] `mald`!!) :: TODO: should probably include nxt
+      stop=|~([eid:gol mald] `?`%.n)
+      meld=|~([eid:gol mald mald] `mald`!!)
       land=|~([eid:gol out=mald] out)
       exit=|~([eid:gol vis=(map eid:gol mald)] `muld`!!)
   ==
@@ -374,12 +456,12 @@
 :: traverse the underlying DAG (directed acyclic graph)
 ++  traverse
   |*  [mald=mold muld=mold]
-  |=  _(gine mald muld)
+  :: 
+  :: takes an "engine" and a map of already visited nodes and values
+  |=  [_(gine mald muld) visited=(map eid:gol mald)]
   ::
   :: initialize path to catch cycles
-  :: and visited to avoid redundant computation
   =|  path=(list eid:gol)
-  =|  visited=(map eid:gol mald)
   ::
   :: accept single node id
   |=  =eid:gol
@@ -433,6 +515,21 @@
     visited  new-vis
   ==
 ::
+:: chain multiple traversals together, sharing visited map
+++  chain
+  |*  =mold
+  |=  $:  trav=$-([eid:gol (map eid:gol mold)] (map eid:gol mold))
+          nodes=(list eid:gol)
+          vis=(map eid:gol mold)
+      ==
+  ^-  (map eid:gol mold)
+  ?~  nodes
+    vis
+  %=  $
+    nodes  t.nodes
+    vis  (trav i.nodes vis)
+  ==
+::
 ++  iflo  |=(=eid:gol inflow:(got-edge eid))
 ++  oflo  |=(=eid:gol outflow:(got-edge eid))
 ::
@@ -450,7 +547,7 @@
       stop  |=([eid:gol out=?] out)  :: stop on true
       meld  |=([eid:gol a=? b=?] |(a b))
     ==
-  (((traverse ? ?) ginn) src)
+  (((traverse ? ?) ginn ~) src)
 
 :: set of neighbors on path from src to dst
 ++  step-stones
@@ -479,7 +576,7 @@
           ~
         (some eid)
     ==
-  (((traverse ? (set eid:gol)) gine) src)
+  (((traverse ? (set eid:gol)) gine ~) src)
 ::
 ++  done  |=(=id:gol complete:(~(got by goals.p) id))
 ++  nond  |=(=id:gol !complete:(~(got by goals.p) id))
@@ -503,7 +600,7 @@
       stop  |=([eid:gol out=?] out)  :: stop on true
       meld  |=([eid:gol a=? b=?] |(a b))
     ==
-  (((traverse ? ?) ginn) [%d id]) :: start at deadline
+  (((traverse ? ?) ginn ~) [%d id]) :: start at deadline
 ::
 ++  ryte-completed    (get-plete %r)
 ++  left-uncompleted  (get-plete %l)
@@ -539,7 +636,7 @@
         |=  [=eid:gol vis=(map eid:gol (unit ?))]
         =(~ (~(got by vis) eid)) :: if the output is null, yes, plete mismatch
     ==
-  (((traverse (unit ?) ?) gine) [%d id]) :: start at deadline
+  (((traverse (unit ?) ?) gine ~) [%d id]) :: start at deadline
 ::
 :: get uncompleted leaf goals left of id
 ++  harvest
@@ -579,7 +676,7 @@
     ==
   ::
   :: work backwards from deadline
-  (((traverse (set id:gol) (set id:gol)) ginn) [%d id])
+  (((traverse (set id:gol) (set id:gol)) ginn ~) [%d id])
 ::
 :: harvest with full goals
 ++  full-harvest
@@ -612,7 +709,14 @@
     ==
   ::
   :: work backwards from kickoff
-  (((traverse (set id:gol) @) gine) [%k id])
+  (((traverse (set id:gol) @) gine ~) [%k id])
+::
+:: highest to lowest priority (highest being smallest number)
+++  hi-to-lo
+  |=  lst=(list id:gol)
+  %+  sort  lst
+  |=  [a=id:gol b=id:gol]
+  (lth (priority a) (priority b))
 ::
 :: think of ~ as +inf
 :: +inf should only be a ryte-bound if there is no smaller number in between
@@ -645,7 +749,7 @@
 ++  lath  (ath lth)
 ++  gath  (ath gth)
 ::
-++  trem
+++  trem  :: (extremum)
   |=  cmp=$-([(unit @) (unit @)] ?)
   |=([a=(unit @) b=(unit @)] ?:((cmp a b) a b))
 ::
@@ -673,35 +777,28 @@
 ::  omin returns null only if both inputs are null
 ++  omin  (trem loth)
 ::
-++  head-extremum
-  |=  cmp=$-([(unit @) (unit @)] ?)
-  |*  lst=(list [(unit @) *])
-  %+  roll
-    lst
-  |:  [a=-.lst b=-.lst]
-  ?:  (cmp -.a -.b)  a  b
-::
-++  list-min-head  (head-extremum loth)
-++  list-max-head  (head-extremum goth)
-::
-:: get the left or right bound of a node
-++  get-bound
+++  get-bounds
   |=  dir=?(%l %r)
-  |=  =eid:gol
-  ^-  bound:gol
+  |=  [=eid:gol vis=(map eid:gol bound:gol)]
+  ^-  (map eid:gol bound:gol)
   =/  flo  ?-(dir %l iflo, %r oflo)
   =/  cmp  ?-(dir %l goth, %r loth)
-  =/  ginn  (ginn bound:gol)
-  =.  ginn
-    %=  ginn
+  =/  gine  (gine bound:gol (map eid:gol bound:gol))
+  =.  gine
+    %=  gine
       flow  |=(=eid:gol ~(tap in (flo eid)))
       init  |=(=eid:gol [moment:(got-edge eid) eid])
       meld  |=([eid:gol a=bound:gol b=bound:gol] ?:((cmp -.a -.b) a b))
+      exit  |=([=eid:gol vis=(map eid:gol bound:gol)] vis)
     ==
-  (((traverse bound:gol bound:gol) ginn) eid)
+  (((traverse bound:gol (map eid:gol bound:gol)) gine vis) eid)
 ::
-++  ryte-bound  (get-bound %r)
-++  left-bound  (get-bound %l)
+:: get the left or right bound of a node (assumes correct moment order)
+++  ryte-bound  |=(=eid:gol `bound:gol`(~(got by ((get-bounds %r) eid ~)) eid))
+++  left-bound  |=(=eid:gol `bound:gol`(~(got by ((get-bounds %l) eid ~)) eid))
+::
+++  ryte-bounds  ((chain bound:gol) (get-bounds %r) leaf-nodes ~)
+++  left-bounds  ((chain bound:gol) (get-bounds %l) root-nodes ~)
 ::
 :: check entire preceding graph for incorrect moment order
 ++  check-bound-mismatch
@@ -733,39 +830,29 @@
         |=  [=eid:gol vis=(map eid:gol (unit moment:gol))]
         =(~ (~(got by vis) eid)) :: if the output is null, yes, bound mismatch
     ==
-  (((traverse (unit moment:gol) ?) gine) eid) :: start at deadline
+  (((traverse (unit moment:gol) ?) gine ~) eid) :: start at deadline
 ::
 :: length of longest path to root or leaf
 ++  plomb
   |=  dir=?(%l %r)
-  |=  =eid:gol
-  ^-  @
+  |=  [=eid:gol vis=(map eid:gol @)]
+  ^-  (map eid:gol @)
   =/  flo  ?-(dir %l iflo, %r oflo)
-  =/  ginn  (ginn @)
-  =.  ginn
-    %=  ginn
+  =/  gine  (gine @ (map eid:gol @))
+  =.  gine
+    %=  gine
       flow  |=(=eid:gol ~(tap in (flo eid)))
       meld  |=([eid:gol a=@ b=@] (max a b))
       land  |=([eid:gol out=@] +(out))
+      exit  |=([=eid:gol vis=(map eid:gol @)] vis)
     ==
-  (((traverse @ @) ginn) eid)
+  (((traverse @ (map eid:gol @)) gine vis) eid)
 ::
-++  left-plumb  (plomb %l)  :: to leaf
-++  ryte-plumb  (plomb %r)  :: to root
+++  ryte-plumb  |=(=eid:gol `@`(~(got by ((plomb %r) eid ~)) eid)) :: to root
+++  left-plumb  |=(=eid:gol `@`(~(got by ((plomb %l) eid ~)) eid)) :: to leaf
 ::
-:: accepts a deadline; returns inflowing deadlines
-++  yong
-  |=  =eid:gol
-  ^-  (set eid:gol)
-  ?>  =(%d -.eid)
-  %-  ~(gas in *(set eid:gol))
-  %+  murn
-    ~(tap in (iflo eid))
-  |=  =eid:gol
-  ?-  -.eid
-    %k  ~
-    %d  (some eid)
-  ==
+++  ryte-plumbs  ((chain @) (plomb %r) leaf-nodes ~)
+++  left-plumbs  ((chain @) (plomb %l) root-nodes ~)
 ::
 :: get depth of a given goal (lowest level is depth of 1)
 :: this is mostly for printing accurate level information in the CLI
@@ -780,64 +867,72 @@
       meld  |=([eid:gol a=@ b=@] (max a b))
       land  |=([eid:gol out=@] +(out))
     ==
-  (((traverse @ @) ginn) [%d id])
+  (((traverse @ @) ginn ~) [%d id])
 ::
-:: gets the kids and "virtual children" of a goal
-++  yung
-  |=  =id:gol
-  ^-  (list id:gol)
-  (turn ~(tap in (yong [%d id])) |=(=eid:gol id.eid))
-::
-:: gets the "virtual children" of a goal
-++  virt
-  |=  =id:gol
-  ^-  (list id:gol)
-  %~  tap  in
-  %-  %~  dif  in
-      (~(gas in *(set id:gol)) (yung id))
-  kids:(~(got by goals.p) id)
-::
-:: parentless goals
-++  roots
-  ^-  (list id:gol)
-  %+  turn
-    %+  skim
-      ~(tap by goals.p)
-    |=([id:gol =goal:gol] =(~ par.goal))
-  |=([=id:gol =goal:gol] id)
-::
-:: get max depth + 1; depth of "virtual" root node
-++  anchor  +((roll (turn (unnested roots) plumb) max))
-::
-:: extracts ids of unnested goals from a list of ids
-++  unnested
-  |=  ids=(list id:gol)
-  ^-  (list id:gol)
-  %+  skim
-    ids
-  |=  =id:gol
-  .=  0
-  %-  lent
-  %+  murn
-    ~(tap in outflow.deadline:(~(got by goals.p) id))
-  |=  =eid:gol
-  ?-  -.eid
-    %k  ~
-    %d  (some id.eid)
+++  init-trace
+  ^-  trace:gol
+  :*  left-bounds
+      ryte-bounds
+      left-plumbs
+      ryte-plumbs
   ==
 ::
-:: extracts ids of incomplete goals from a list of ids
-++  incomplete
-  |=  ids=(list id:gol)
-  ^-  (list id:gol)
-  (skip ids |=(=id:gol complete:(~(got by goals.p) id)))
+++  refresh-trace
+  |=  [e1=eid:gol e2=eid:gol]
+  ^-  trace:gol
+  :*  ::
+      :: left-bounds
+      %:  (chain bound:gol)
+        (get-bounds %l)
+        root-nodes
+        (gus-by left-bounds.trace.p ~(tap in (to-ends e2 %r)))
+      ==
+      ::
+      :: ryte-bounds
+      %:  (chain bound:gol)
+        (get-bounds %r)
+        leaf-nodes
+        (gus-by ryte-bounds.trace.p ~(tap in (to-ends e1 %l)))
+      ==
+      ::
+      :: left-plumbs
+      %:  (chain @)
+        (plomb %l)
+        root-nodes
+        (gus-by left-plumbs.trace.p ~(tap in (to-ends e2 %r)))
+      ==
+      ::
+      :: ryte-plumbs
+      %:  (chain @)
+        (plomb %r)
+        leaf-nodes
+        (gus-by ryte-plumbs.trace.p ~(tap in (to-ends e1 %l)))
+      ==
+  ==
 ::
-:: highest to lowest priority (highest being smallest number)
-++  hi-to-lo
-  |=  lst=(list id:gol)
-  %+  sort  lst
-  |=  [a=id:gol b=id:gol]
-  (lth (priority a) (priority b))
+++  jellyfish
+  |=  [e1=eid:gol e2=eid:gol]
+  ^-  [ids=(set id:gol) pore=_this]
+  =/  eids  (~(uni in (to-ends e1 %l)) (to-ends e2 %r))
+  =/  ids  `(set id:gol)`(~(run in eids) |=(=eid:gol id.eid))
+  =.  trace.p  (refresh-trace e1 e2)
+  =/  ids-  ~(tap in ids)
+  |-
+  ?~  ids-
+    [ids this]
+  =/  goal  (~(got by goals.p) i.ids-)
+  =.  goal
+     %=  goal
+        left-bound.kickoff  (~(got by left-bounds.trace.p) [%k i.ids-]) 
+        ryte-bound.kickoff  (~(got by ryte-bounds.trace.p) [%k i.ids-]) 
+        left-plumb.kickoff  (~(got by left-plumbs.trace.p) [%k i.ids-]) 
+        ryte-plumb.kickoff  (~(got by ryte-plumbs.trace.p) [%k i.ids-]) 
+        left-bound.deadline  (~(got by left-bounds.trace.p) [%d i.ids-]) 
+        ryte-bound.deadline  (~(got by ryte-bounds.trace.p) [%d i.ids-]) 
+        left-plumb.deadline  (~(got by left-plumbs.trace.p) [%d i.ids-]) 
+        ryte-plumb.deadline  (~(got by ryte-plumbs.trace.p) [%d i.ids-]) 
+      ==
+  $(ids- t.ids-, goals.p (~(put by goals.p) i.ids- goal))
 ::
 :: ============================================================================
 :: 
@@ -918,6 +1013,17 @@
 :: UPDATE REDUNDANT/EXPLICIT GOAL INFORMATION
 ::
 :: ============================================================================
+::
+++  head-extremum
+  |=  cmp=$-([(unit @) (unit @)] ?)
+  |*  lst=(list [(unit @) *])
+  %+  roll
+    lst
+  |:  [a=-.lst b=-.lst]
+  ?:  (cmp -.a -.b)  a  b
+::
+++  list-min-head  (head-extremum loth)
+++  list-max-head  (head-extremum goth)
 ::
 ++  renew-bound
   |=  [=eid:gol dir=?(%l %r)]
@@ -1179,7 +1285,7 @@
   =.  goals.p  (~(put by goals.p) id.e1 (update-edge e1 edge1))
   =.  goals.p  (~(put by goals.p) id.e2 (update-edge e2 edge2))
   :: update bounds, plumbs, and other redundant/explicit information
-  (cascade-update e1 e2)
+  (jellyfish e1 e2)
 ::
 ++  dag-rend
   |=  [e1=eid:gol e2=eid:gol mod=ship]
@@ -1196,7 +1302,6 @@
   ?:  =(id.e1 id.e2)  ~|("same-goal" !!)
   ::
   :: Cannot break relationship between completed goals
-  :: and an uncompleted goal is to the left
   ?:  ?&  complete:(~(got by goals.p) id.e1)
           complete:(~(got by goals.p) id.e2)
       ==
@@ -1217,7 +1322,7 @@
   =.  inflow.edge2  (~(del in inflow.edge2) e1)
   =.  goals.p  (~(put by goals.p) id.e1 (update-edge e1 edge1))
   =.  goals.p  (~(put by goals.p) id.e2 (update-edge e2 edge2))
-  (cascade-update e1 e2)
+  (jellyfish e1 e2)
 ::
 ++  yoke
   |=  [yok=exposed-yoke:gol mod=ship]
@@ -1386,7 +1491,8 @@
     [[u.par.goal chief.poal] stock.poal]
   =.  chief.goal  ?~(zop chief.goal chief.u.zop)
   =.  ranks.goal  (get-ranks id chief.goal stock.goal)
-  =/  pore  this(goals.p (~(put by goals.p) id goal))
+  =.  goals.p  (~(put by goals.p) id goal)
+  =/  pore  this
   =/  idx  0
   =/  kids  ~(tap in kids.goal)
   |-
@@ -1398,7 +1504,7 @@
     ?.  rec.u.zop
       (avalanche-chief-mod:pore (snag idx kids) ~)
     (avalanche-chief-mod:pore (snag idx kids) zop)
-  $(idx +(idx), ids ids.mup, pore pore.mup)
+  $(idx +(idx), ids (~(uni in ids) ids.mup), pore pore.mup)
 ::
 ++  avalanche  |=(=id:gol (avalanche-chief-mod id ~))
 ::
@@ -1415,8 +1521,8 @@
   =/  l  (~(got by goals.p) lid)
   =/  ids=(set id:gol)
     ?~  par.l
-      (sy ~[lid])
-    (sy ~[lid u.par.l])
+      (~(put in *(set id:gol)) lid)
+    (~(gas in *(set id:gol)) ~[lid u.par.l])
   =.  ids
     ?~  urid
       ids
@@ -1513,7 +1619,8 @@
   ?:  &(!=(+.rb [%k id]) (gath moment -:rb))  ~|("bound-ryte" !!)
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(moment.kickoff moment))
-  (emot old [vzn %goal-nexus id %kickoff moment])
+  =/  mup  (jellyfish [%k id] [%k id])
+  (emot old [vzn %pool-nexus %date (make-nex ids.mup)]):[pore.mup .]
 ::
 ++  set-deadline
   |=  [=id:gol moment=(unit @da) mod=ship]
@@ -1526,7 +1633,8 @@
   ?:  &(!=(+.rb [%d id]) (gath moment -:rb))  ~|("bound-ryte" !!)
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(moment.deadline moment))
-  (emot old [vzn %goal-nexus id %deadline moment])
+  =/  mup  (jellyfish [%d id] [%d id])
+  (emot old [vzn %pool-nexus %date (make-nex ids.mup)]):[pore.mup .]
 ::
 ++  replace-chiefs
   |=  kick=(set ship)
@@ -1536,9 +1644,9 @@
   =|  ids=(set id:gol)
   =/  pore  this
   |-
-  ?:  =(idx (lent roots))
+  ?:  =(idx (lent orphans))
     [ids pore]
-  =/  mup  (replace-chief (snag idx roots) kick)
+  =/  mup  (replace-chief (snag idx orphans) kick)
   %=  $
     idx  +(idx)
     ids  (~(uni in ids) ids.mup)

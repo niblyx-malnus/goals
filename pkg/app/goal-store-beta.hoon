@@ -64,6 +64,14 @@
   |-
   ?-    -.old
       %4
+    =.  old
+      %=  old
+        pools.store
+          %-  ~(run by pools.store.old)
+          |=  =pool:gol
+          ^-  pool:gol
+          pool(trace ~(init-trace pl pool))
+      ==
     =/  now=@  (unique-time now.bowl log)
     :_  this(state old(log (put:log-orm *log:gol now [%init store.old])))
     ?:  (~(has by wex.bowl) [/groups our.bowl %group-store])
@@ -554,12 +562,12 @@
       =/  pool  (~(got by pools) pin)
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
-        ``goal-peek+!>(roots+(hi-to-lo (unnested roots)):~(. pl pool))
+        ``goal-peek+!>(roots+(hi-to-lo root-goals):~(. pl pool))
         ::
           [%uncompleted ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %roots-uncompleted
-        (hi-to-lo (incomplete (unnested roots))):~(. pl pool)
+        (hi-to-lo (incomplete root-goals)):~(. pl pool)
       ==
     ==
   ==

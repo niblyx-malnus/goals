@@ -241,6 +241,11 @@
           %-  pairs
           :~  [%nex (enjs-nex nex.upd)]
           ==
+            %date
+          %+  frond  +<.upd
+          %-  pairs
+          :~  [%nex (enjs-nex nex.upd)]
+          ==
         ==
         ::
           %goal-perms
@@ -566,7 +571,7 @@
   |=  =bound
   ^-  json
   %-  pairs
-  :~  [%moment ?~(moment.bound ~ s+(scot %da u.moment.bound))]
+  :~  [%moment ?~(moment.bound ~ (numb (unm:chrono:userlib u.moment.bound)))]
       [%hereditor (enjs-eid hereditor.bound)]
   ==
 ::
