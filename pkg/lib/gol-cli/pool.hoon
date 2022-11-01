@@ -877,6 +877,15 @@
       ryte-plumbs
   ==
 ::
+++  spawn-trace
+  |=  =id:gol
+  ^-  trace:gol
+  :*  ((chain bound:gol) (get-bounds %l) [%d id]~ ~)
+      ((chain bound:gol) (get-bounds %r) [%k id]~ ~)
+      ((chain @) (plomb %l) [%d id]~ ~)
+      ((chain @) (plomb %r) [%k id]~ ~)
+  ==
+::
 ++  refresh-trace
   |=  [e1=eid:gol e2=eid:gol]
   ^-  trace:gol
@@ -1570,7 +1579,7 @@
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(moment.kickoff moment))
   =/  mup  (jellyfish [%k id] [%k id])
-  (emot old [vzn %pool-nexus %date (make-nex ids.mup)]):[pore.mup .]
+  (emot old [vzn %goal-dates (make-nex ids.mup)]):[pore.mup .]
 ::
 ++  set-deadline
   |=  [=id:gol moment=(unit @da) mod=ship]
@@ -1584,7 +1593,7 @@
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(moment.deadline moment))
   =/  mup  (jellyfish [%d id] [%d id])
-  (emot old [vzn %pool-nexus %date (make-nex ids.mup)]):[pore.mup .]
+  (emot old [vzn %goal-dates (make-nex ids.mup)]):[pore.mup .]
 ::
 ++  replace-chiefs
   |=  kick=(set ship)
@@ -1781,8 +1790,10 @@
     ::
       [%pool-nexus %yoke *]
     (apply-nex nex.upd)
+    :: ------------------------------------------------------------------------
+    :: goal-dates
     ::
-      [%pool-nexus %date *]
+      [%goal-dates *]
     (apply-nex nex.upd)
     :: ------------------------------------------------------------------------
     :: goal-perms

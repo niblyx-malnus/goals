@@ -190,7 +190,6 @@
   ::
   +$  pool-nexus-update
     $%  [%yoke =nex]
-        [%date =nex]
     ==
   ::
   +$  goal-hitch-update
@@ -222,6 +221,7 @@
         [%pool-perms =nex new=pool-perms]
         [%pool-hitch pool-hitch-update]
         [%pool-nexus pool-nexus-update]
+        [%goal-dates =nex]
         [%goal-perms =nex]
         [%goal-hitch =id goal-hitch-update]
         [%goal-nexus =id goal-nexus-update]

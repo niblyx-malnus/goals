@@ -241,12 +241,11 @@
           %-  pairs
           :~  [%nex (enjs-nex nex.upd)]
           ==
-            %date
-          %+  frond  +<.upd
-          %-  pairs
-          :~  [%nex (enjs-nex nex.upd)]
-          ==
         ==
+        ::
+          %goal-dates
+        %+  frond  %nex
+        (enjs-nex nex.upd)
         ::
           %goal-perms
         %+  frond  %nex

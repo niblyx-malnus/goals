@@ -49,7 +49,7 @@
       ::
         $?  %cache-goal  %renew-goal
             %pool-perms  %pool-hitch  %pool-nexus
-            %goal-perms  %goal-hitch  %goal-nexus  %goal-togls
+            %goal-perms  %goal-hitch  %goal-nexus  %goal-togls  %goal-dates
         ==
       =/  pool  (~(got by pools.store) pin)
       =/  pore  (apex:pl pool)
