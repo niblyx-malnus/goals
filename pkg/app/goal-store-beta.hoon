@@ -386,11 +386,13 @@
           %subscribe
         =/  pite  /[`@`+<.pin.pok]/[`@`+>.pin.pok]
         ?<  =(owner.pin.pok our.bowl)
-        ?:  (~(has by pools.store) pin.pok)  ~|(%already-subscribed !!)
+        ?:  (~(has by wex.bowl) [pite owner.pin.pok dap.bowl])
+          =*  leave-other  ~(leave-other pass:hc [%leave pite])
+          :_  state
+          [(leave-other owner.pin.pok)]~
         =*  watch-other  ~(watch-other pass:hc pite)
         :_  state
-        :~  (watch-other owner.pin.pok pite)
-        ==
+        [(watch-other owner.pin.pok pite)]~
           ::
           :: [%unsubscribe =pin]
           %unsubscribe
@@ -415,29 +417,30 @@
     =/  birth  `@da`i.t.path
     =/  pin  `pin:gol`[%pin owner birth]
     =/  pool  (~(got by pools) pin)
+    ~&  (~(has by perms.pool) src.bowl)
     ?>  (~(has by perms.pool) src.bowl)
     :_  this
-    [%give %fact ~ %goal-away-update !>([[our.bowl 0] spawn-pool+pool])]~
+    [%give %fact ~ %goal-away-update !>([[our.bowl 0] vzn spawn-pool+pool])]~
   ==
 ::
-++  on-leave
-  |=  =path
-  ^-  (quip card _this)
-  ?+    path  (on-watch:def path)
-      [@ @ ~]
-    =*  poke-self  ~(poke-self pass:io /viewer-leave)
-    =/  owner  `@p`i.path
-    =/  birth  `@da`i.t.path
-    =/  pin  `pin:gol`[%pin owner birth]
-    =/  pool  (~(got by pools) pin)
-    ::
-    :: 0 is reserved for endogenous updates
-    :_  this
-    :_  ~
-    %-  poke-self
-    :-  %goal-action
-    !>([vzn 0 %update-pool-perms pin (~(del by perms.pool) src.bowl)])
-  ==
+++  on-leave  on-leave:def
+  :: |=  =path
+  :: ^-  (quip card _this)
+  :: ?+    path  (on-watch:def path)
+  ::     [@ @ ~]
+  ::   =*  poke-self  ~(poke-self pass:io /viewer-leave)
+  ::   =/  owner  `@p`i.path
+  ::   =/  birth  `@da`i.t.path
+  ::   =/  pin  `pin:gol`[%pin owner birth]
+  ::   =/  pool  (~(got by pools) pin)
+  ::   ::
+  ::   :: 0 is reserved for endogenous updates
+  ::   :_  this
+  ::   :_  ~
+  ::   %-  poke-self
+  ::   :-  %goal-action
+  ::   !>([vzn 0 %update-pool-perms pin (~(del by perms.pool) src.bowl)])
+  :: ==
 ::
 ++  on-peek
   |=  =path
@@ -602,33 +605,37 @@
       ?~  p.sign
         =*  poke-our  ~(poke-our pass:io /invite)
         ((slog 'You\'ve been invited to view a goal!' ~) `this)
-      ((slog 'Invite failure.' ~) `this)
-        %kick
-      %-  (slog '%goal-store-beta: Got kick, resubscribing...' ~)
       =/  upd
         ?:  (~(has by pools) pin)
           (some [vzn %waste-pool ~])
         ?:  (~(has by cache) pin)
           (some [vzn %trash-pool ~])
         ~
+      %-  (slog 'Invite failure.' ~)
+      %-  (slog u.p.sign)
       ?~  upd
         `this
       =^  cards  state
-        %+  send-home-updates:hc 
-          [%pass wire %agent [src.bowl %goal-store-beta] %watch wire]~
-        [pin src.bowl 0 [u.upd]~]
+        (send-home-updates:hc ~ pin our.bowl 0 [u.upd]~)
       [cards this]
+      ::
+        %kick
+      %-  (slog '%goal-store-beta: Got kick, resubscribing...' ~)
+      :_  this
+      [%pass wire %agent [src.bowl %goal-store-beta] %watch wire]~
+      ::
         %fact
       ?>  =(p.cage.sign %goal-away-update)
       =+  ^-  [[mod=ship pid=@] =update:gol]
         !<(away-update:gol q.cage.sign)
       ?.  =(vzn -.update)  :: assert updates are correct version
         ~|("incompatible version" !!)
+      ~|  "crashing on update"
       ?+    +<.update  (on-agent:def wire sign)
           $?  %spawn-pool
               %spawn-goal  %trash-goal
               %pool-perms  %pool-hitch  %pool-nexus
-              %goal-perms  %goal-hitch  %goal-nexus  %goal-togls
+              %goal-perms  %goal-hitch  %goal-nexus  %goal-togls  %goal-dates
           ==
         =^  cards  state
           (send-home-updates:hc ~ pin mod 0 [update]~)
