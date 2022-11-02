@@ -20,7 +20,6 @@ import Badge from "@mui/material/Badge";
 import { log, shipName } from "../helpers";
 import { blue, orange, green, red, purple } from "@mui/material/colors";
 //TODO: make some components to simplify the logic of this component
-//TODO: do the updates for goal nexus
 interface GoalItemProps {
   readonly id: number;
   readonly onSelectCallback: (id: number) => void;

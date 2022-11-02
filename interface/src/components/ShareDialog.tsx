@@ -62,6 +62,7 @@ const ShareDialogInputs = ({
 }) => {
   const pals = useStore((store) => store.pals);
   const [inputValue, setInputValue] = useState<string>("~");
+  const [value, setValue] = useState<string>("~");
   const [role, setRole] = useState("Viewer");
   const [pathErrorMessage, setPathErrorMessage] = useState<string>("");
   const [pathError, setPathError] = useState<boolean>(false);
@@ -107,10 +108,12 @@ const ShareDialogInputs = ({
         id="pals-autocomplete"
         disableClearable
         options={pals}
-        value={inputValue}
+        value={value}
         onChange={(event, value) => {
-          //we handle this a little different from a standard input
-          log("value====>", value);
+          setValue(value);
+        }}
+        inputValue={inputValue}
+        onInputChange={(event, value) => {
           setInputValue(value);
         }}
         renderInput={(params) => (
@@ -146,7 +149,7 @@ const ShareDialogInputs = ({
           onChange={handleRoleChange}
         >
           <MenuItem value={"Viewer"}>Viewer</MenuItem>
-          <MenuItem value={"Captain"}>Captain</MenuItem>
+          <MenuItem value={"Chief"}>Chief</MenuItem>
           {canEditAdmins && <MenuItem value={"Admin"}>Admin</MenuItem>}
         </Select>
       </FormControl>
@@ -170,7 +173,7 @@ export default function ShareDialog() {
   const roleMap = useStore((store: any) => store.roleMap);
 
   const [viewerList, setViewerList] = useState<ChipData[]>([]);
-  const [captainList, setCaptainList] = useState<ChipData[]>([]);
+  const [chiefList, setChiefList] = useState<ChipData[]>([]);
   const [adminList, setAdminList] = useState<ChipData[]>([]);
   const [trying, setTrying] = useState<boolean>(false);
   const [canEditAdmins, setCanEditAdmins] = useState<boolean>(true);
@@ -179,7 +182,7 @@ export default function ShareDialog() {
     toggleShareDialog(false, null);
     //reset our lists
     setViewerList([]);
-    setCaptainList([]);
+    setChiefList([]);
     setAdminList([]);
   };
   const handleDeleteViewer = (chipToDelete: ChipData) => {
@@ -189,10 +192,10 @@ export default function ShareDialog() {
       chips.filter((chip) => chip.label !== chipToDelete.label)
     );
   };
-  const handleDeleteCaptain = (chipToDelete: ChipData) => {
+  const handleDeleteChief = (chipToDelete: ChipData) => {
     if (trying) return;
 
-    setCaptainList((chips) =>
+    setChiefList((chips) =>
       chips.filter((chip) => chip.label !== chipToDelete.label)
     );
   };
@@ -231,11 +234,11 @@ export default function ShareDialog() {
 
     if (role === "Viewer") {
       const viewerExists = viewerList.some(checkForShip);
-      const capExists = captainList.some(checkForShip);
+      const capExists = chiefList.some(checkForShip);
       const adminExists = adminList.some(checkForShip);
 
       if (capExists) {
-        setPathErrorMessage("This ship is a captain");
+        setPathErrorMessage("This ship is a chief");
         setPathError(true);
         return;
       }
@@ -255,13 +258,13 @@ export default function ShareDialog() {
       ];
       log("newViewerList", newViewerList);
       setViewerList(newViewerList);
-    } else if (role === "Captain") {
-      const capExists = captainList.some(checkForShip);
+    } else if (role === "Chief") {
+      const capExists = chiefList.some(checkForShip);
       const adminExists = adminList.some(checkForShip);
       const viewerExists = viewerList.some(checkForShip);
 
       if (capExists) {
-        setPathErrorMessage("This captain already exists");
+        setPathErrorMessage("This chief already exists");
         setPathError(true);
         return;
       }
@@ -275,17 +278,17 @@ export default function ShareDialog() {
         setPathError(true);
         return;
       }
-      const newCaptainList = [
-        ...captainList,
-        { key: "captain-" + captainList.length + 1, label, canDelete: true },
+      const newchiefList = [
+        ...chiefList,
+        { key: "chief-" + chiefList.length + 1, label, canDelete: true },
       ];
-      setCaptainList(newCaptainList);
+      setChiefList(newchiefList);
     } else {
-      const capExists = captainList.some(checkForShip);
+      const capExists = chiefList.some(checkForShip);
       const adminExists = adminList.some(checkForShip);
       const viewerExists = viewerList.some(checkForShip);
       if (capExists) {
-        setPathErrorMessage("This captain already exists");
+        setPathErrorMessage("This chief already exists");
         setPathError(true);
         return;
       }
@@ -320,7 +323,7 @@ export default function ShareDialog() {
       adminList.forEach((item) => {
         newRoleList.push({ role: "admin", ship: item.label });
       });
-      captainList.forEach((item) => {
+      chiefList.forEach((item) => {
         newRoleList.push({ role: "spawn", ship: item.label });
       });
       viewerList.forEach((item) => {
@@ -349,15 +352,15 @@ export default function ShareDialog() {
     if (!shareDialogData) return;
 
     let adminList: string[] = [];
-    let captainList: string[] = [];
+    let chiefList: string[] = [];
     let viewerList: string[] = [];
     //contains at least the owner ship, we ignore it
     //we break down the map of role to ship into it's own list of ships
     shareDialogData.permList.forEach((perm: any) => {
       if (perm.role === "admin") {
         adminList.push(perm.ship);
-      } else if (perm.role === "captain") {
-        captainList.push(perm.ship);
+      } else if (perm.role === "spawn") {
+        chiefList.push(perm.ship);
       } else if (perm.role === null) {
         viewerList.push(perm.ship);
       }
@@ -369,14 +372,14 @@ export default function ShareDialog() {
     const viewerChips = viewerList.map((item: any, index: any) => {
       return { key: "viewer-" + index, label: item, canDelete: true };
     });
-    const captainChips = captainList.map((item: any, index: any) => {
-      return { key: "captain-" + index, label: item, canDelete: true };
+    const chiefChips = chiefList.map((item: any, index: any) => {
+      return { key: "chief-" + index, label: item, canDelete: true };
     });
     const adminChips = adminList.map((item: any, index: any) => {
       return { key: "admin-" + index, label: item, canDelete: canEditAdmins };
     });
     setViewerList(viewerChips);
-    setCaptainList(captainChips);
+    setChiefList(chiefChips);
     setAdminList(adminChips);
     setCanEditAdmins(canEditAdmins);
   }, [open, shareDialogData]);
@@ -408,9 +411,9 @@ export default function ShareDialog() {
           onDelete={handleDeleteAdmin}
         />
         <ChipsGroup
-          title={"Captains"}
-          data={captainList}
-          onDelete={handleDeleteCaptain}
+          title={"Chiefs"}
+          data={chiefList}
+          onDelete={handleDeleteChief}
         />
         <ChipsGroup
           title={"Viewers"}

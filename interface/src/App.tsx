@@ -31,12 +31,8 @@ declare const window: Window &
     poke: any;
     ship: any;
   };
-
-//TODO: add pals integration
 //TODO: handle sub kick/error
 //TODO: order the virtual children
-//TODO: optimise the share dialog performence
-//TODO: update filters to work (adding archive filter too)
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -67,7 +63,6 @@ function App() {
     //convert flat goals into nested goals for each pool
     //make our role map
     const roleMap = new Map();
-
     const newProjects = fetchedPools.map((poolItem: any, id: any) => {
       //update the perms here, in case they do change
       const { pin, pool } = poolItem;

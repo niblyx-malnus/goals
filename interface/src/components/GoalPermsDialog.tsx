@@ -26,6 +26,7 @@ import useStore from "../store";
 import api from "../api";
 const ob = require("urbit-ob");
 
+//TODO: add suggestion ship input includes all the viewers and relevant ships
 interface ChipData {
   key: string;
   label: string;
@@ -64,8 +65,9 @@ const Inputs = ({
   canEditChief: boolean;
   trying: boolean;
 }) => {
-  const pals = useStore((store) => store.pals);
   const [inputValue, setInputValue] = useState<string>("~");
+  const [value, setValue] = useState<string>("~");
+
   const [role, setRole] = useState("Spawn");
   const [pathErrorMessage, setPathErrorMessage] = useState<string>("");
   const [pathError, setPathError] = useState<boolean>(false);
@@ -110,10 +112,13 @@ const Inputs = ({
         freeSolo
         id="pals-autocomplete"
         disableClearable
-        options={pals}
-        value={inputValue}
+        options={[]}
+        value={value}
         onChange={(event, value) => {
-          //we handle this a little different from a standard input
+          setValue(value);
+        }}
+        inputValue={inputValue}
+        onInputChange={(event, value) => {
           setInputValue(value);
         }}
         renderInput={(params) => (
@@ -302,7 +307,6 @@ export default function GoalPermsDialog() {
   };
   useEffect(() => {
     if (!goalPermsDialogData) return;
-
     const roleInPool = roleMap.get(goalPermsDialogData.pin.birth);
     //if current ship exists in ranks, it can edit the chief
     const canEditChief =
@@ -310,7 +314,7 @@ export default function GoalPermsDialog() {
         (rankItem: any) => rankItem.ship === shipName()
       ).length > 0 ||
       roleInPool === "admin" ||
-      roleInPool === "chief";
+      roleInPool === "owner";
     const chief = [
       {
         key: "chief-0",
