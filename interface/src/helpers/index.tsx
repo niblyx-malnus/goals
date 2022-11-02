@@ -10,11 +10,21 @@ const isDev = () =>
   !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 const log = (...args: any) => {
   //console log, only displays results in dev mode
- // if (!isDev()) return;
+  // if (!isDev()) return;
   console.log(...args);
 };
 const shipName = memoize(() => {
   //returns the current ship's name
   return isDev() ? process.env.REACT_APP_SHIP_NAME : window.ship;
 });
-export { log, isDev, shipName };
+const getRoleTitle = (role: any): "owner" | "chief" | "viewer" => {
+  if (role === "owner") {
+    return "owner";
+  } else if (role === "spawn") {
+    return "chief";
+  } //if (role === null)
+  else {
+    return "viewer";
+  }
+};
+export { log, isDev, shipName, getRoleTitle };

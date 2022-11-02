@@ -17,7 +17,7 @@ import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Badge from "@mui/material/Badge";
 
-import { log, shipName } from "../helpers";
+import { log, shipName, getRoleTitle } from "../helpers";
 import { blue, orange, green, red, purple } from "@mui/material/colors";
 //TODO: make some components to simplify the logic of this component
 interface GoalItemProps {
@@ -66,18 +66,20 @@ const GoalItem = memo(
     const collapseAll = useStore((store) => store.collapseAll);
     const selectedGoals = useStore((store) => store.selectedGoals);
     const updateSelectedGoal = useStore((store) => store.updateSelectedGoal);
-    //TODO: remove the add/edit when isArchived
-    //TODO: check pool isArchived here
+    const [goalRole, setGoalRole] = useState<"spawn" | "chief" | null>(null);
+
     useEffect(() => {
       //we check at first render/everytime ranks changes(or just goal)
-      //does the current ship has chief/spawn/captain perms on this goal?
+      //does the current ship have chief/spawn perms on this goal?
       for (const rank of goal.nexus.ranks) {
         if (rank.ship === shipName()) {
           setIsChief(true);
+          setGoalRole("chief");
           return;
         }
       }
-    }, [goal.nexus.ranks]);
+      goal.nexus.spawn.includes(shipName()) && setGoalRole("spawn");
+    }, [goal.nexus.ranks, goal.nexus.spawn]);
     useEffect(() => {
       // || disabled; TODO: find a better way to do disabled (overlay?)
       const disableActions =
@@ -123,8 +125,8 @@ const GoalItem = memo(
       setAddingGoal(true);
     };
     const renderIconMenu = () => {
-      if (poolRole === "viewer") return;
-      if (poolRole === "captain" && !isChief) return;
+      if (poolRole === null) return;
+      if (poolRole === "spawn" && !isChief) return;
       if (trying) {
         return (
           <CircularProgress
@@ -224,8 +226,8 @@ const GoalItem = memo(
       </Box>
     );
     const renderTitle = () => {
-      if (poolRole === "viewer") return noEditPermTitle;
-      if (poolRole === "captain" && !isChief) return noEditPermTitle;
+      if (poolRole === null) return noEditPermTitle;
+      if (poolRole === "spawn" && !isChief) return noEditPermTitle;
       return !editingTitle ? (
         <Box
           sx={{
@@ -276,8 +278,8 @@ const GoalItem = memo(
       );
     };
     const renderAddButton = () => {
-      if (poolRole === "viewer") return;
-      if (poolRole === "captain" && !isChief) return;
+      if (poolRole === null) return;
+      if (poolRole === "spawn" && !isChief) return;
       //hide add goal in harvest panel
       if (harvestGoal) return;
       //hide add if is archived
@@ -356,15 +358,15 @@ const GoalItem = memo(
             {renderArchivedTag()}
             {renderVirtualTag()}
             {renderTimeline()}
-
             {renderIconMenu()}
             {renderAddButton()}
           </>
           {!editingTitle && !harvestGoal && (
             <Stack
-              flexDirection={"row"}
+              direction={"row"}
               alignItems="center"
               className="show-on-hover"
+              spacing={1}
               sx={{ opacity: 0 }}
             >
               <Chip
@@ -399,6 +401,17 @@ const GoalItem = memo(
                 color="primary"
                 variant="outlined"
               />
+              {/*current ship's role on goal*/}
+              {goalRole && (
+                <Chip
+                  size="small"
+                  label={
+                    <Typography fontWeight={"bold"}>{goalRole}</Typography>
+                  }
+                  color="secondary"
+                  variant="outlined"
+                />
+              )}
             </Stack>
           )}
         </StyledTreeItem>

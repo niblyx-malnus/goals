@@ -12,7 +12,7 @@ import NewGoalInput from "./components/NewGoalInput";
 import EditInput from "./components/EditInput";
 import IconMenu from "./components/IconMenu";
 import useStore from "./store";
-import { log, shipName } from "./helpers";
+import { log, shipName, getRoleTitle } from "./helpers";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import { Order, PinId } from "./types/types";
@@ -404,7 +404,7 @@ const Project = memo(
       );
     };
     const renderTitle = () => {
-      if (role === "viewer" || role === "captain") {
+      if (role === null || role === "spawn") {
         return (
           <Box
             sx={{
@@ -452,8 +452,9 @@ const Project = memo(
         />
       );
     };
+
     const renderAddButton = () => {
-      if (role === "viewer") return;
+      if (role === null) return;
       if (isArchived) return;
       return (
         !disableActions && (
@@ -550,7 +551,11 @@ const Project = memo(
               <Chip
                 sx={{ marginLeft: 1 }}
                 size="small"
-                label={<Typography fontWeight={"bold"}>{role}</Typography>}
+                label={
+                  <Typography fontWeight={"bold"}>
+                    {getRoleTitle(role)}
+                  </Typography>
+                }
                 color="secondary"
                 variant="outlined"
               />
