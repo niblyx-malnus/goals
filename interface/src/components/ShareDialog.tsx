@@ -171,7 +171,7 @@ export default function ShareDialog() {
   const shareDialogData = useStore((store: any) => store.shareDialogData);
   const toggleSnackBar = useStore((store) => store.toggleSnackBar);
   const roleMap = useStore((store: any) => store.roleMap);
-
+  log("roleMap", roleMap);
   const [viewerList, setViewerList] = useState<ChipData[]>([]);
   const [chiefList, setChiefList] = useState<ChipData[]>([]);
   const [adminList, setAdminList] = useState<ChipData[]>([]);
