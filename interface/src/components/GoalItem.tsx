@@ -127,6 +127,8 @@ const GoalItem = memo(
     const renderIconMenu = () => {
       if (poolRole === null) return;
       if (poolRole === "spawn" && !isChief) return;
+      if (poolRole !== "owner" && poolRole !== "admin" && goal.isArchived)
+        return;
       if (trying) {
         return (
           <CircularProgress

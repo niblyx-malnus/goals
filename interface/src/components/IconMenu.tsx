@@ -425,13 +425,14 @@ export default function IconMenu({
     }
   };
   const renderGoalMenu = () => {
-    if (isArchived)
+    if (isArchived)    
       return (
         <MenuItem onClick={renewGoal} disableRipple>
           <RestoreOutlinedIcon fontSize="small" />
           renew
         </MenuItem>
       );
+
     return (
       <div>
         {complete ? (
@@ -514,11 +515,12 @@ export default function IconMenu({
           <DeleteOutlineOutlinedIcon fontSize="small" />
           archive
         </MenuItem>
-
-        <MenuItem onClick={deleteGoal} disableRipple>
-          <DeleteOutlineOutlinedIcon fontSize="small" />
-          delete
-        </MenuItem>
+        {(role === "owner" || role === "admin") && (
+          <MenuItem onClick={deleteGoal} disableRipple>
+            <DeleteOutlineOutlinedIcon fontSize="small" />
+            delete
+          </MenuItem>
+        )}
       </div>
     );
   };
