@@ -1,5 +1,5 @@
 |%
-+$  id  @
++$  id  *
 +$  nid  [?(%k %d) id]
 +$  nod
   $:  moment=(unit @da)

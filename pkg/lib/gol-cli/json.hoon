@@ -263,22 +263,12 @@
             ==
         ==
         ::
-          ?(%goal-hitch %goal-nexus)
+          %goal-hitch
         %-  pairs
         :~  [%id (enjs-id id.upd)]
             :-  +>-.upd
-            ?-    -.upd
-              ::
-                %goal-hitch
-              ?-  +>-.upd
-                %desc  s+desc.upd
-              ==
-              ::
-                %goal-nexus
-              ?-  +>-.upd
-                %kickoff   ?~(moment.upd ~ (numb (unm:chrono:userlib u.moment.upd)))
-                %deadline  ?~(moment.upd ~ (numb (unm:chrono:userlib u.moment.upd)))
-              ==
+            ?-  +>-.upd
+              %desc  s+desc.upd
             ==
         ==
       ==
