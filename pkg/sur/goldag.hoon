@@ -1,20 +1,23 @@
 |%
 +$  id  @
 +$  nid  [?(%k %d) id]
-+$  node
++$  nod
   $:  moment=(unit @da)
-      incoming=(set nid)
-      outgoing=(set nid)
+      inflow=(set nid)
+      outflow=(set nid)
   ==
-+$  goal
-  $:  chief=ship
-      par=(unit id)
++$  node  ?(nod [nod *]) :: can inflate with additional data
++$  gol
+  $:  par=(unit id)
       kids=(set id)
       kickoff=node
       deadline=node
       complete=?(%.y %.n)
       actionable=?(%.y %.n)
+      chief=ship
+      spawn=(set ship)
   ==
++$  goal  ?(gol [gol *]) :: can inflate with additional data
 +$  goals  (map id goal)
 --
 |%

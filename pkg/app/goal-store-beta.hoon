@@ -70,7 +70,7 @@
           %-  ~(run by pools.store.old)
           |=  =pool:gol
           ^-  pool:gol
-          pool(trace ~(init-trace pl pool))
+          pool(trace (~(trace-update pl pool) [%init ~]))
       ==
     =/  now=@  (unique-time now.bowl log)
     :_  this(state old(log (put:log-orm *log:gol now [%init store.old])))
@@ -559,18 +559,18 @@
       ::
         [%anchor ~]
       =/  pool  (~(got by pools) pin)
-      ``goal-peek+!>(anchor+~(anchor pl pool))
+      ``goal-peek+!>(anchor+(~(anchor pl pool)))
       ::
         [%roots *]
       =/  pool  (~(got by pools) pin)
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
-        ``goal-peek+!>(roots+(hi-to-lo root-goals):~(. pl pool))
+        ``goal-peek+!>(roots+(hi-to-lo (root-goals)):~(. pl pool))
         ::
           [%uncompleted ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %roots-uncompleted
-        (hi-to-lo (incomplete root-goals)):~(. pl pool)
+        (hi-to-lo (incomplete (root-goals))):~(. pl pool)
       ==
     ==
   ==

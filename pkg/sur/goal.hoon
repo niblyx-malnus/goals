@@ -85,10 +85,13 @@
   +$  moment  (unit @da)
   +$  bound  [=moment hereditor=eid]
   ::
-  +$  edge  :: should change to +$node
-    $:  =moment
-        inflow=(set eid)  :: should change to incoming
-        outflow=(set eid) :: should change to outgoing
+  :: edge and goal-nexus are inflated; need to be distilled back down
+  :: in future iteration
+  +$  edge
+    $:  $:  =moment
+            inflow=(set eid)
+            outflow=(set eid)
+        ==
         ::
         =left=bound
         =ryte=bound
@@ -97,16 +100,15 @@
     ==
   ::
   +$  goal-nexus
-    $:  par=(unit id)
-        kids=(set id)
-        kickoff=edge  :: should change to kick-off
-        deadline=edge
-        ::
-        complete=?(%.y %.n)
-        actionable=?(%.y %.n)
-        ::
-        chief=ship
-        spawn=(set ship)
+    $:  $:  par=(unit id)
+            kids=(set id)
+            kickoff=edge
+            deadline=edge
+            complete=?(%.y %.n)
+            actionable=?(%.y %.n)
+            chief=ship
+            spawn=(set ship)
+        ==
         ::
         :: these are redundant, but simplify things on the frontend
         =stock
@@ -197,11 +199,6 @@
     $%  [%desc desc=@t]
     ==
   ::
-  +$  goal-nexus-update
-    $%  [%kickoff moment=(unit @da)]
-        [%deadline moment=(unit @da)]
-    ==
-  ::
   +$  goal-togls-update
     $%  [%complete complete=?(%.y %.n)]
         [%actionable actionable=?(%.y %.n)]
@@ -225,7 +222,6 @@
         [%goal-dates =nex]
         [%goal-perms =nex]
         [%goal-hitch =id goal-hitch-update]
-        [%goal-nexus =id goal-nexus-update]
         [%goal-togls =id goal-togls-update]
         [%poke-error =tang]
     ==  ==
