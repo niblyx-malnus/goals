@@ -631,3 +631,25 @@ Edit the title of an existing pool.
   }
 }
 ```
+
+## %subscribe
+### Description
+Subscribe to an existing pool.
+
+`pin` is the "pin" or pool id of the pool that you want to subscribe to.
+
+### Noun
+```
+[%subscribe =pin]                                             
+```
+
+### JSON
+```
+{
+  "subscribe": {
+    "pin": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    }
+}
+```
