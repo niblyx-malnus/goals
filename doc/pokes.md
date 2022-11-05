@@ -25,6 +25,7 @@ Available pokes for `%goal-store` as nouns and as JSON.
 %unmark-complete  
 %update-goal-perms
 %update-pool-perms
+%subscribe
 ```
 
 ## %spawn-pool
