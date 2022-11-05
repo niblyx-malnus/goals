@@ -333,7 +333,7 @@
       %ryte-bound
     %-  pairs
     :~  [%moment ?~(moment.pyk ~ s+(scot %da u.moment.pyk))]
-        [%hereditor (enjs-eid hereditor.pyk)]
+        [%hereditor (enjs-nid hereditor.pyk)]
     ==
     ::
       %plumb
@@ -500,8 +500,8 @@
   %-  pairs
   :~  [%par ?~(par.nexus ~ (enjs-id u.par.nexus))]
       [%kids a+(turn ~(tap in kids.nexus) enjs-id)]
-      [%kickoff (enjs-edge kickoff.nexus)]
-      [%deadline (enjs-edge deadline.nexus)]
+      [%kickoff (enjs-node kickoff.nexus)]
+      [%deadline (enjs-node deadline.nexus)]
       [%complete b+complete.nexus]
       [%actionable b+actionable.nexus]
       [%chief (ship chief.nexus)]
@@ -541,18 +541,18 @@
       ==
   ==
 ::
-++  enjs-edge
+++  enjs-node
    =,  enjs:format
-   |=  =edge:goal
+   |=  =node:goal
    ^-  json
    %-  pairs
-   :~  [%moment ?~(moment.edge ~ (numb (unm:chrono:userlib u.moment.edge)))]
-       [%inflow a+(turn ~(tap in inflow.edge) enjs-eid)]
-       [%outflow a+(turn ~(tap in outflow.edge) enjs-eid)]
-       [%left-bound (enjs-bound left-bound.edge)]
-       [%ryte-bound (enjs-bound ryte-bound.edge)]
-       [%left-plumb (numb left-plumb.edge)]
-       [%ryte-plumb (numb ryte-plumb.edge)]
+   :~  [%moment ?~(moment.node ~ (numb (unm:chrono:userlib u.moment.node)))]
+       [%inflow a+(turn ~(tap in inflow.node) enjs-nid)]
+       [%outflow a+(turn ~(tap in outflow.node) enjs-nid)]
+       [%left-bound (enjs-bound left-bound.node)]
+       [%ryte-bound (enjs-bound ryte-bound.node)]
+       [%left-plumb (numb left-plumb.node)]
+       [%ryte-plumb (numb ryte-plumb.node)]
    ==
 ::
 ++  enjs-bound
@@ -561,16 +561,17 @@
   ^-  json
   %-  pairs
   :~  [%moment ?~(moment.bound ~ (numb (unm:chrono:userlib u.moment.bound)))]
-      [%hereditor (enjs-eid hereditor.bound)]
+      [%hereditor (enjs-nid hereditor.bound)]
   ==
 ::
-++  enjs-eid
+++  enjs-nid
   =,  enjs:format
-  |=  =eid
+  |=  =nid
   ^-  json
   %-  pairs
-  :~  [%edge s+-.eid]
-      [%id (enjs-id +.eid)]
+  :: change %edge -> %node when confirmed no frontend effects
+  :~  [%edge s+-.nid]
+      [%id (enjs-id +.nid)]
   ==
 ::
 ++  enjs-pin

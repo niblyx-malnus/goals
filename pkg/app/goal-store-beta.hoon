@@ -387,9 +387,14 @@
         =/  pite  /[`@`+<.pin.pok]/[`@`+>.pin.pok]
         ?<  =(owner.pin.pok our.bowl)
         ?:  (~(has by wex.bowl) [pite owner.pin.pok dap.bowl])
-          =*  leave-other  ~(leave-other pass:hc [%leave pite])
+          =*  poke-other  ~(poke-other pass:hc [%kicker pite])
           :_  state
-          [(leave-other owner.pin.pok)]~
+          :~  %+  poke-other
+                owner.pin.pok
+              :: 
+              :: on kick, we'll resubscribe and get the initial update
+              goal-action+!>([vzn 0 %kicker our.bowl pin.pok])
+          ==
         =*  watch-other  ~(watch-other pass:hc pite)
         :_  state
         [(watch-other owner.pin.pok pite)]~
@@ -402,6 +407,14 @@
         %+  send-home-updates:hc
           [(leave-other owner.pin.pok)]~
         [pin.pok src.bowl pid [vzn %trash-pool ~]~]
+          ::
+          :: [%kicker =ship =pin]
+          %kicker
+        ?>  =(owner.pin.pok our.bowl) :: assert we own the pool
+        ?<  =(ship.pok our.bowl) :: assert not kicking ourself
+        ?>  =(ship.pok src.bowl) :: any ship can kick self, not others
+        :_  state
+        [%give %kick ~[/[`@`+<.pin.pok]/[`@`+>.pin.pok]] `ship.pok]~
       ==
     ==
   [cards this]
@@ -410,7 +423,7 @@
   |=  =path
   ^-  (quip card _this)
   ?+    path  (on-watch:def path)
-      [%goals ~]  ?>((team:title our.bowl src.bowl) `this)
+      [%goals ~]  ?>(=(our.bowl src.bowl) `this)
       ::
       [@ @ ~]
     =/  owner  `@p`i.path

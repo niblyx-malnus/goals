@@ -31,24 +31,24 @@
   ~|("non-equivalent-update" !!)
   (emit upd)
 ::
-:: get a node from a node id (edge = node ... woops, confusing)
-++  got-edge
-  |=  =eid:gol
-  ^-  edge:gol
-  =/  goal  (~(got by goals.p) id.eid)
-  ?-  -.eid
+:: get a node from a node id (node = node ... woops, confusing)
+++  got-node
+  |=  =nid:gol
+  ^-  node:gol
+  =/  goal  (~(got by goals.p) id.nid)
+  ?-  -.nid
     %k  kickoff.goal
     %d  deadline.goal
   ==
 ::
-:: Update the edge at eid with the given edge
-++  update-edge
-  |=  [=eid:gol =edge:gol]
+:: Update the node at nid with the given node
+++  update-node
+  |=  [=nid:gol =node:gol]
   ^-  goal:gol
-  =/  goal  (~(got by goals.p) id.eid)
-  ?-  -.eid
-    %k  goal(kickoff edge)
-    %d  goal(deadline edge)
+  =/  goal  (~(got by goals.p) id.nid)
+  ?-  -.nid
+    %k  goal(kickoff node)
+    %d  goal(deadline node)
   ==
 ::
 :: a is a map from ids to a goal nexus
@@ -117,9 +117,9 @@
   =.  chief.goal  chief
   =.  author.goal  author
   :: 
-  :: Initialize inflowing and outflowing edges
-  =.  outflow.kickoff.goal  (~(put in *(set eid:gol)) [%d id])
-  =.  inflow.deadline.goal  (~(put in *(set eid:gol)) [%k id])
+  :: Initialize inflowing and outflowing nodes
+  =.  outflow.kickoff.goal  (~(put in *(set nid:gol)) [%d id])
+  =.  inflow.deadline.goal  (~(put in *(set nid:gol)) [%k id])
   goal
 ::
 ++  spawn-goal
@@ -262,7 +262,7 @@
 ::
 :: nodes which have no outflows (must be deadlines)
 ++  root-nodes
-  |.  ^-  (list eid:gol)
+  |.  ^-  (list nid:gol)
   %+  turn
     %+  skim
       ~(tap by goals.p)
@@ -271,7 +271,7 @@
 ::
 :: nodes which have no inflows (must be kickoffs)
 ++  leaf-nodes
-  |.  ^-  (list eid:gol)
+  |.  ^-  (list nid:gol)
   %+  turn
     %+  skim
       ~(tap by goals.p)
@@ -310,23 +310,23 @@
 ::
 :: accepts a deadline; returns inflowing deadlines
 ++  yong
-  |=  =eid:gol
-  ^-  (set eid:gol)
-  ?>  =(%d -.eid)
-  %-  ~(gas in *(set eid:gol))
+  |=  =nid:gol
+  ^-  (set nid:gol)
+  ?>  =(%d -.nid)
+  %-  ~(gas in *(set nid:gol))
   %+  murn
-    ~(tap in (iflo eid))
-  |=  =eid:gol
-  ?-  -.eid
+    ~(tap in (iflo nid))
+  |=  =nid:gol
+  ?-  -.nid
     %k  ~
-    %d  (some eid)
+    %d  (some nid)
   ==
 ::
 :: gets the kids and "virtual children" of a goal
 ++  yung
   |=  =id:gol
   ^-  (list id:gol)
-  (turn ~(tap in (yong [%d id])) |=(=eid:gol id.eid))
+  (turn ~(tap in (yong [%d id])) |=(=nid:gol id.nid))
 ::
 :: gets the "virtual children" of a goal
 :: (non-kids inflowing deadlines to the deadline)
@@ -391,41 +391,41 @@
 :: get all nodes from a set of ids
 ++  nodify
   |=  ids=(set id:gol)
-  ^-  (set eid:gol)
-  =/  kix=(set eid:gol)  (~(run in ids) |=(=id:gol [%k id]))
-  =/  ded=(set eid:gol)  (~(run in ids) |=(=id:gol [%d id]))
+  ^-  (set nid:gol)
+  =/  kix=(set nid:gol)  (~(run in ids) |=(=id:gol [%k id]))
+  =/  ded=(set nid:gol)  (~(run in ids) |=(=id:gol [%d id]))
   (~(uni in kix) ded)
 ::
 :: get the nodes from a set of nodes which are
 :: contained in the inflow/outflow of a goal's kickoff/deadline
 ++  bond-overlap
-  |=  [=id:gol eids=(set eid:gol) dir=?(%l %r) src=?(%k %d)]
-  ^-  (set (pair eid:gol eid:gol))
+  |=  [=id:gol nids=(set nid:gol) dir=?(%l %r) src=?(%k %d)]
+  ^-  (set (pair nid:gol nid:gol))
   =/  flo  ?-(dir %l iflo, %r oflo)
-  %-  ~(run in (~(int in eids) (flo [src id])))
-  |=(=eid:gol ?-(dir %l [eid src id], %r [[src id] eid]))
+  %-  ~(run in (~(int in nids) (flo [src id])))
+  |=(=nid:gol ?-(dir %l [nid src id], %r [[src id] nid]))
 ::
 :: get the bonds which exist between a goal and a set of other goals
 ++  get-bonds
   |=  [=id:gol ids=(set id:gol)]
-  ^-  (list (pair eid:gol eid:gol))
+  ^-  (list (pair nid:gol nid:gol))
   ::
   :: get set of nodes of ids
-  =/  eids  (nodify ids)
+  =/  nids  (nodify ids)
   :: 
   %~  tap  in
   ::
-  :: get the edges flowing into id's kickoff
-  %-  ~(uni in (bond-overlap id eids %l %k))
+  :: get the nodes flowing into id's kickoff
+  %-  ~(uni in (bond-overlap id nids %l %k))
   ::
-  :: get the edges flowing out of id's kickoff
-  %-  ~(uni in (bond-overlap id eids %r %k))
+  :: get the nodes flowing out of id's kickoff
+  %-  ~(uni in (bond-overlap id nids %r %k))
   ::
-  :: get the edges flowing into id's deadline
-  %-  ~(uni in (bond-overlap id eids %l %d))
+  :: get the nodes flowing into id's deadline
+  %-  ~(uni in (bond-overlap id nids %l %d))
   ::
-  :: get the edges flowing out of id's deadline
-  (bond-overlap id eids %r %d)
+  :: get the nodes flowing out of id's deadline
+  (bond-overlap id nids %r %d)
 ::
 :: ============================================================================
 :: 
@@ -440,9 +440,10 @@
   :*  flow=|~(nod *(list nod))
       init=|~(nod *med)
       stop=|~([nod med] `?`%.n)
-      meld=|~([nod old=med new=med] new)
-      land=|~([nod =med] med)
+      meld=|~([nod neb=nod old=med new=med] new)
+      land=|~([nod =med ?] med)
       exit=|~([nod vis=(map nod med)] `fin`!!)
+      prnt=|~(nod *tape) :: for debugging cycles
   ==
 ::
 :: set defaults for gine where output mold is same
@@ -451,6 +452,10 @@
   |*  [nod=mold med=mold]
   =/  gine  (gine nod med med)
   gine(exit |~([=nod vis=(map nod med)] (~(got by vis) nod)))
+::
+:: print nodes for debugging cycles
+++  print-id  |=(=id:gol (trip desc:(~(got by goals.p) id)))
+++  print-nid  |=(=nid:gol `tape`(weld (trip `@t`-.nid) (print-id id.nid)))
 ::
 :: traverse the underlying DAG (directed acyclic graph)
 ++  traverse
@@ -472,8 +477,8 @@
   ::
   :: catch cycles
   =/  i  (find [nod]~ pat) 
-  =/  cyc=(list ^nod)  ?~(i ~ [nod (scag u.i pat)])
-  ?.  =(0 (lent cyc))  ~|(["cycle" cyc] !!)
+  =/  cyc=(list ^nod)  ?~(i ~ [nod (scag +(u.i) pat)])
+  ?.  =(0 (lent cyc))  ~|(["cycle" (turn cyc prnt)] !!)
   ::
   :: iterate through neighbors (flo)
   =/  idx  0
@@ -484,12 +489,13 @@
   |-
   :: 
   :: stop when neighbors exhausted or stop condition met
-  ?:  ?|  (stop nod med)
+  =/  cnd  (stop nod med)
+  ?:  ?|  cnd
           =(idx (lent flo))
       ==
     ::
     :: output according to land function
-    (~(put by vis) nod (land nod med))
+    (~(put by vis) nod (land nod med cnd))
   ::
   =/  neb  (snag idx flo)
   ::
@@ -510,7 +516,7 @@
     idx  +(idx)
     ::
     :: meld the running output with the new output
-    med  (meld nod med (~(got by vis) neb))
+    med  (meld nod neb med (~(got by vis) neb))
   ==
 ::
 :: chain multiple traversals together, sharing visited map
@@ -528,53 +534,124 @@
     vis  (trav i.nodes vis)
   ==
 ::
-++  iflo  |=(=eid:gol inflow:(got-edge eid))
-++  oflo  |=(=eid:gol outflow:(got-edge eid))
+++  iflo  |=(=nid:gol inflow:(got-node nid))
+++  oflo  |=(=nid:gol outflow:(got-node nid))
 ::
 :: check if there is a path from src to dst
 ++  check-path
-  |=  [src=eid:gol dst=eid:gol dir=?(%l %r)]
+  |=  [src=nid:gol dst=nid:gol dir=?(%l %r)]
   ^-  ?
   ?<  =(src dst)
   =/  flo  ?-(dir %l iflo, %r oflo)
-  =/  ginn  (ginn eid:gol ?)
+  =/  ginn  (ginn nid:gol ?)
   =.  ginn
     %=  ginn
-      flow  |=(=eid:gol ~(tap in (flo eid)))  :: inflow or outflow
-      init  |=(=eid:gol (~(has in (flo eid)) dst))  :: check for dst
-      stop  |=([eid:gol out=?] out)  :: stop on true
-      meld  |=([eid:gol a=? b=?] |(a b))
+      flow  |=(=nid:gol ~(tap in (flo nid)))  :: inflow or outflow
+      init  |=(=nid:gol (~(has in (flo nid)) dst))  :: check for dst
+      stop  |=([nid:gol out=?] out)  :: stop on true
+      meld  |=([nid:gol nid:gol a=? b=?] |(a b))
+      prnt  print-nid
     ==
-  (((traverse eid:gol ? ?) ginn ~) src)
-
-:: set of neighbors on path from src to dst
-++  step-stones
-  |=  [src=eid:gol dst=eid:gol dir=?(%l %r)]
-  ^-  (set eid:gol)
+  (((traverse nid:gol ? ?) ginn ~) src)
+::
+:: if output is ~, cannot reach dst from source in this direction
+:: if output is [~ ~], no legal cut exists between src and dst
+:: if output is [~ non-empty-set-of-ids], this is the legal cut between
+::   src and dst which is nearest to src
+++  first-legal-cut
+  |=  legal=$-(edge:gol ?)
+  |=  [src=nid:gol dst=nid:gol dir=?(%l %r)]
+  ^-  (unit edges:gol)
   ?<  =(src dst)
   =/  flo  ?-(dir %l iflo, %r oflo)
-  =/  gine  (gine eid:gol ? (set eid:gol))
+  :: 
+  :: swap order according to traversal direction
+  =/  pear  |*([a=* b=*] `(pair _a _a)`?-(dir %l [b a], %r [a b]))
+  :: might not exist
+  :: first get a full visited map of all the paths from src to dst
+  :: get all 
+  =/  ginn  (ginn nid:gol (unit edges:gol))
+  =.  ginn
+    %=  ginn
+      flow  |=(=nid:gol ~(tap in (flo nid)))  :: inflow or outflow
+      init
+        |=  =nid:gol
+        ?.  (~(has in (flo nid)) dst)
+          ::
+          :: if dst not in flo, initialize to ~
+          :: signifying no path found (yet) from nod to dst
+          ~
+        ?.  (legal (pear nid dst))
+          ::
+          :: if has dst in flo but can't legal cut, returns [~ ~]
+          :: which signifies a path to dst, but no legal cut
+          (some ~)
+        ::
+        :: if has dst in flo and can legally cut, return legal cut
+        :: as cut set
+        (some (~(put in *edges:gol) (pear nid dst)))
+      ::
+      stop  |=([nid:gol out=(unit edges:gol)] =([~ ~] out))
+      meld
+        |=  $:  nod=nid:gol  neb=nid:gol
+                a=(unit (set (pair nid:gol nid:gol)))
+                b=(unit (set (pair nid:gol nid:gol)))
+            ==
+        :: if neb returns ~, ignore it
+        ?~  b
+          a
+        :: if can make legal cut between nod and neb,
+        :: put nod / neb cut with existing cuts instead of u.b.
+        :: the nearest-to-nod legal cut between nod and dst
+        :: passing through neb is given by nod / neb
+        ?:  (legal (pear nod neb))
+          ?~  a
+            (some (~(put in *edges:gol) (pear nod neb)))
+          (some (~(put in u.a) (pear nod neb)))
+        :: if u.b is ~ and we cannot make a legal cut nod / neb,
+        :: return [~ ~]; there are no legal cuts between nod and dst
+        ?:  =(~ u.b)
+          (some ~)
+        :: if u.b is non-empty and we cannot make legal cut nod / neb,
+        :: add u.b to existing edges
+        :: the nearest-to-nod legal cut between nod and dst
+        :: passing through neb is given in u.b
+        ?~  a
+          (some (~(uni in *edges:gol) u.b))
+        (some (~(uni in u.a) u.b))
+      ::
+      prnt  print-nid
+    ==
+  (((traverse nid:gol (unit edges:gol) (unit edges:gol)) ginn ~) src)
+::
+:: set of neighbors on path from src to dst
+++  step-stones
+  |=  [src=nid:gol dst=nid:gol dir=?(%l %r)]
+  ^-  (set nid:gol)
+  ?<  =(src dst)
+  =/  flo  ?-(dir %l iflo, %r oflo)
+  =/  gine  (gine nid:gol ? (set nid:gol))
   =.  gine
     %=  gine
-      flow  |=(=eid:gol ~(tap in (flo eid)))  :: inflow
-      init  |=(=eid:gol (~(has in (flo eid)) dst))  :: check for e1
+      flow  |=(=nid:gol ~(tap in (flo nid)))
+      init  |=(=nid:gol (~(has in (flo nid)) dst)) :: check for dst
       ::
-      :: never stop for immediate neighbors
-      stop  |=([=eid:gol out=?] ?:(=(eid src) %.n out))
-      meld  |=([eid:gol a=? b=?] |(a b))
+      :: never stop for immediate neighbors of src
+      stop  |=([=nid:gol out=?] ?:(=(nid src) %.n out))
+      meld  |=([nid:gol nid:gol a=? b=?] |(a b))
       ::
       :: get neighbors which return true (have path to dst)
       exit
-        |=  [=eid:gol vis=(map eid:gol ?)]
-        %-  ~(gas in *(set eid:gol))
+        |=  [=nid:gol vis=(map nid:gol ?)]
+        %-  ~(gas in *(set nid:gol))
         %+  murn
-          ~(tap in (flo eid))
-        |=  =eid:gol
-        ?:  (~(got by vis) eid)
+          ~(tap in (flo nid))
+        |=  =nid:gol
+        ?:  (~(got by vis) nid)
           ~
-        (some eid)
+        (some nid)
     ==
-  (((traverse eid:gol ? (set eid:gol)) gine ~) src)
+  (((traverse nid:gol ? (set nid:gol)) gine ~) src)
 ::
 ++  done  |=(=id:gol complete:(~(got by goals.p) id))
 ++  nond  |=(=id:gol !complete:(~(got by goals.p) id))
@@ -588,17 +665,17 @@
   ^-  ?
   =/  flo  ?-(dir %l iflo, %r oflo)
   =/  pyt  ?-(dir %l nond, %r done)
-  =/  ginn  (ginn eid:gol ?)
+  =/  ginn  (ginn nid:gol ?)
   =.  ginn
     %=  ginn
-      flow  |=(=eid:gol ~(tap in (flo eid)))
+      flow  |=(=nid:gol ~(tap in (flo nid)))
       ::
       :: check deadline completion in the flo
-      init  |=(=eid:gol &(=(-.eid %d) !=(id id.eid) (pyt id.eid)))
-      stop  |=([eid:gol out=?] out)  :: stop on true
-      meld  |=([eid:gol a=? b=?] |(a b))
+      init  |=(=nid:gol &(=(-.nid %d) !=(id id.nid) (pyt id.nid)))
+      stop  |=([nid:gol out=?] out)  :: stop on true
+      meld  |=([nid:gol nid:gol a=? b=?] |(a b))
     ==
-  (((traverse eid:gol ? ?) ginn ~) [%d id]) :: start at deadline
+  (((traverse nid:gol ? ?) ginn ~) [%d id]) :: start at deadline
 ::
 ++  ryte-completed    (get-plete %r)
 ++  left-uncompleted  (get-plete %l)
@@ -609,72 +686,72 @@
   ^-  ?
   =/  flo  ?-(dir %l iflo, %r oflo)
   =/  pyt  ?-(dir %l nond, %r done)
-  =/  gine  (gine eid:gol (unit ?) ?)
+  =/  gine  (gine nid:gol (unit ?) ?)
   =.  gine
     %=  gine
-      flow  |=(=eid:gol ~(tap in (flo eid)))
-      init  |=(eid:gol (some %.n))
-      stop  |=([eid:gol out=(unit ?)] =(~ out))
+      flow  |=(=nid:gol ~(tap in (flo nid)))
+      init  |=(nid:gol (some %.n))
+      stop  |=([nid:gol out=(unit ?)] =(~ out))
       meld  
-        |=  [eid:gol a=(unit ?) b=(unit ?)]
+        |=  [nid:gol nid:gol a=(unit ?) b=(unit ?)]
         ?~  a  ~
         ?~  b  ~
         (some |(u.a u.b))
       land
-        |=  [=eid:gol out=(unit ?)]
+        |=  [=nid:gol out=(unit ?) ?]
         ?~  out  ~
-        ?:  =(%k -.eid)
+        ?:  =(%k -.nid)
           out
-        ?:  (pyt id.eid) :: %l: if I am incomplete
+        ?:  (pyt id.nid) :: %l: if I am incomplete
           (some %.y) :: %l: return that there is left-incomplete
         ?:  u.out :: %l: if I am complete and there is left-incomplete
           ~ :: fail
         (some %.n) :: %l: else return that there is no left-incomplete
       exit
-        |=  [=eid:gol vis=(map eid:gol (unit ?))]
-        =(~ (~(got by vis) eid)) :: if the output is null, yes, plete mismatch
+        |=  [=nid:gol vis=(map nid:gol (unit ?))]
+        =(~ (~(got by vis) nid)) :: if the output is null, yes, plete mismatch
     ==
-  (((traverse eid:gol (unit ?) ?) gine ~) [%d id]) :: start at deadline
+  (((traverse nid:gol (unit ?) ?) gine ~) [%d id]) :: start at deadline
 ::
 :: get uncompleted leaf goals left of id
 ++  harvest
   |=  =id:gol
   ^-  (set id:gol)
-  =/  ginn  (ginn eid:gol (set id:gol))
+  =/  ginn  (ginn nid:gol (set id:gol))
   =.  ginn
     %=  ginn
       ::
       :: incomplete inflow
       flow
-        |=  =eid:gol
+        |=  =nid:gol
         %+  murn
-          ~(tap in (iflo eid))
-        |=  =eid:gol
-        ?:  complete:(~(got by goals.p) id.eid)
+          ~(tap in (iflo nid))
+        |=  =nid:gol
+        ?:  complete:(~(got by goals.p) id.nid)
           ~
-        (some eid)
+        (some nid)
       ::
-      meld  |=([eid:gol a=(set id:gol) b=(set id:gol)] (~(uni in a) b))  :: union
+      meld  |=([nid:gol nid:gol a=(set id:gol) b=(set id:gol)] (~(uni in a) b))
       ::
       :: harvest
       land
-        |=  [=eid:gol out=(set id:gol)]
+        |=  [=nid:gol out=(set id:gol) ?]
         ::
         :: a completed goal has no harvest
-        ?:  complete:(~(got by goals.p) id.eid)
+        ?:  complete:(~(got by goals.p) id.nid)
           ~
         ::
         :: in general, the harvest of a node is the union of the
         ::   harvests of its immediate inflow
         :: a deadline with an otherwise empty harvest
         ::   returns itself as its own harvest
-        ?:  &(=(~ out) =(%d -.eid))
-          (~(put in *(set id:gol)) id.eid)
+        ?:  &(=(~ out) =(%d -.nid))
+          (~(put in *(set id:gol)) id.nid)
         out
     ==
   ::
   :: work backwards from deadline
-  (((traverse eid:gol (set id:gol) (set id:gol)) ginn ~) [%d id])
+  (((traverse nid:gol (set id:gol) (set id:gol)) ginn ~) [%d id])
 ::
 :: harvest with full goals
 ++  full-harvest
@@ -688,27 +765,27 @@
 ++  priority
   |=  =id:gol
   ^-  @
-  =/  gine  (gine eid:gol (set id:gol) @)
+  =/  gine  (gine nid:gol (set id:gol) @)
   =.  gine
     %=  gine
-      flow  |=(=eid:gol ~(tap in (iflo eid)))  :: inflow
+      flow  |=(=nid:gol ~(tap in (iflo nid)))  :: inflow
       ::
       :: all inflows
       init
-        |=  =eid:gol
+        |=  =nid:gol
         %-  ~(gas in *(set id:gol))
         %+  turn
-          ~(tap in (iflo eid))
-        |=(=eid:gol id.eid)
+          ~(tap in (iflo nid))
+        |=(=nid:gol id.nid)
       ::
-      meld  |=([eid:gol a=(set id:gol) b=(set id:gol)] (~(uni in a) b))  :: union
+      meld  |=([nid:gol nid:gol a=(set id:gol) b=(set id:gol)] (~(uni in a) b))
       exit
-        |=  [=eid:gol vis=(map eid:gol (set id:gol))]
-        ~(wyt in (~(got by vis) eid))  :: get count of priors
+        |=  [=nid:gol vis=(map nid:gol (set id:gol))]
+        ~(wyt in (~(got by vis) nid))  :: get count of priors
     ==
   ::
   :: work backwards from kickoff
-  (((traverse eid:gol (set id:gol) @) gine ~) [%k id])
+  (((traverse nid:gol (set id:gol) @) gine ~) [%k id])
 ::
 :: highest to lowest priority (highest being smallest number)
 ++  hi-to-lo
@@ -778,89 +855,89 @@
 ::
 ++  get-bounds
   |=  dir=?(%l %r)
-  |=  [=eid:gol vis=(map eid:gol bound:gol)]
-  ^-  (map eid:gol bound:gol)
+  |=  [=nid:gol vis=(map nid:gol bound:gol)]
+  ^-  (map nid:gol bound:gol)
   =/  flo  ?-(dir %l iflo, %r oflo)
   =/  cmp  ?-(dir %l goth, %r loth)
-  =/  gine  (gine eid:gol bound:gol (map eid:gol bound:gol))
+  =/  gine  (gine nid:gol bound:gol (map nid:gol bound:gol))
   =.  gine
     %=  gine
-      flow  |=(=eid:gol ~(tap in (flo eid)))
-      init  |=(=eid:gol [moment:(got-edge eid) eid])
-      meld  |=([eid:gol a=bound:gol b=bound:gol] ?:((cmp -.a -.b) a b))
-      exit  |=([=eid:gol vis=(map eid:gol bound:gol)] vis)
+      flow  |=(=nid:gol ~(tap in (flo nid)))
+      init  |=(=nid:gol [moment:(got-node nid) nid])
+      meld  |=([nid:gol nid:gol a=bound:gol b=bound:gol] ?:((cmp -.a -.b) a b))
+      exit  |=([=nid:gol vis=(map nid:gol bound:gol)] vis)
     ==
-  (((traverse eid:gol bound:gol (map eid:gol bound:gol)) gine vis) eid)
+  (((traverse nid:gol bound:gol (map nid:gol bound:gol)) gine vis) nid)
 ::
 :: get the left or right bound of a node (assumes correct moment order)
-++  ryte-bound  |=(=eid:gol `bound:gol`(~(got by ((get-bounds %r) eid ~)) eid))
-++  left-bound  |=(=eid:gol `bound:gol`(~(got by ((get-bounds %l) eid ~)) eid))
+++  ryte-bound  |=(=nid:gol `bound:gol`(~(got by ((get-bounds %r) nid ~)) nid))
+++  left-bound  |=(=nid:gol `bound:gol`(~(got by ((get-bounds %l) nid ~)) nid))
 ::
 :: check entire preceding graph for incorrect moment order
 ++  check-bound-mismatch
-  |=  [=eid:gol dir=?(%l %r)]
+  |=  [=nid:gol dir=?(%l %r)]
   ^-  ?
   =/  flo  ?-(dir %l iflo, %r oflo)
   =/  tem  ?-(dir %l omax, %r omin)  :: extremum
-  =/  gine  (gine eid:gol (unit moment:gol) ?)
+  =/  gine  (gine nid:gol (unit moment:gol) ?)
   =.  gine
     %=  gine
-      flow  |=(=eid:gol ~(tap in (flo eid)))
-      init  |=(=eid:gol (some ~))
-      stop  |=([eid:gol out=(unit moment:gol)] =(~ out))  :: stop if null
+      flow  |=(=nid:gol ~(tap in (flo nid)))
+      init  |=(=nid:gol (some ~))
+      stop  |=([nid:gol out=(unit moment:gol)] =(~ out))  :: stop if null
       meld
-        |=  [eid:gol out=(unit moment:gol) new=(unit moment:gol)]
+        |=  [nid:gol nid:gol out=(unit moment:gol) new=(unit moment:gol)]
         ?~  out  ~
         ?~  new  ~
         (some (tem u.out u.new))
       land
-        |=  [eid:gol out=(unit moment:gol)]
+        |=  [nid:gol out=(unit moment:gol) ?]
         ?~  out  ~
-        =/  mot  moment:(got-edge eid)
+        =/  mot  moment:(got-node nid)
         ?~  mot  out :: if moment is null, pass along bound
         =/  tem  (tem mot u.out)
         ?.  =(mot tem)
           ~ :: if moment is not extremum, fail (return null)
         (some tem) :: else return new bound
       exit
-        |=  [=eid:gol vis=(map eid:gol (unit moment:gol))]
-        =(~ (~(got by vis) eid)) :: if the output is null, yes, bound mismatch
+        |=  [=nid:gol vis=(map nid:gol (unit moment:gol))]
+        =(~ (~(got by vis) nid)) :: if the output is null, yes, bound mismatch
     ==
-  (((traverse eid:gol (unit moment:gol) ?) gine ~) eid) :: start at deadline
+  (((traverse nid:gol (unit moment:gol) ?) gine ~) nid) :: start at deadline
 ::
 :: length of longest path to root or leaf
 ++  plomb
   |=  dir=?(%l %r)
-  |=  [=eid:gol vis=(map eid:gol @)]
-  ^-  (map eid:gol @)
+  |=  [=nid:gol vis=(map nid:gol @)]
+  ^-  (map nid:gol @)
   =/  flo  ?-(dir %l iflo, %r oflo)
-  =/  gine  (gine eid:gol @ (map eid:gol @))
+  =/  gine  (gine nid:gol @ (map nid:gol @))
   =.  gine
     %=  gine
-      flow  |=(=eid:gol ~(tap in (flo eid)))
-      meld  |=([eid:gol a=@ b=@] (max a b))
-      land  |=([eid:gol out=@] +(out))
-      exit  |=([=eid:gol vis=(map eid:gol @)] vis)
+      flow  |=(=nid:gol ~(tap in (flo nid)))
+      meld  |=([nid:gol nid:gol a=@ b=@] (max a b))
+      land  |=([nid:gol out=@ ?] +(out))
+      exit  |=([=nid:gol vis=(map nid:gol @)] vis)
     ==
-  (((traverse eid:gol @ (map eid:gol @)) gine vis) eid)
+  (((traverse nid:gol @ (map nid:gol @)) gine vis) nid)
 ::
-++  ryte-plumb  |=(=eid:gol `@`(~(got by ((plomb %r) eid ~)) eid)) :: to root
-++  left-plumb  |=(=eid:gol `@`(~(got by ((plomb %l) eid ~)) eid)) :: to leaf
+++  ryte-plumb  |=(=nid:gol `@`(~(got by ((plomb %r) nid ~)) nid)) :: to root
+++  left-plumb  |=(=nid:gol `@`(~(got by ((plomb %l) nid ~)) nid)) :: to leaf
 ::
 :: get depth of a given goal (lowest level is depth of 1)
 :: this is mostly for printing accurate level information in the CLI
 ++  plumb
   |=  =id:gol
   ^-  @
-  =/  ginn  (ginn eid:gol @)
+  =/  ginn  (ginn nid:gol @)
   =.  ginn
     %=  ginn
-      flow  |=(=eid:gol ~(tap in (yong eid)))
-      init  |=(=eid:gol 1)
-      meld  |=([eid:gol a=@ b=@] (max a b))
-      land  |=([eid:gol out=@] +(out))
+      flow  |=(=nid:gol ~(tap in (yong nid)))
+      init  |=(=nid:gol 1)
+      meld  |=([nid:gol nid:gol a=@ b=@] (max a b))
+      land  |=([nid:gol out=@ ?] +(out))
     ==
-  (((traverse eid:gol @ @) ginn ~) [%d id])
+  (((traverse nid:gol @ @) ginn ~) [%d id])
 ::
 ++  get-stocks
   |=  [=id:gol vis=(map id:gol stock:gol)]
@@ -870,24 +947,25 @@
   =.  gine
     %=  gine
       flow  |=(=id:gol =/(par par:(~(got by goals.p) id) ?~(par ~ [u.par]~)))
-      land  |=([=id:gol =stock:gol] [[id chief:(~(got by goals.p) id)] stock])
+      land  |=([=id:gol =stock:gol ?] [[id chief:(~(got by goals.p) id)] stock])
       exit  |=([=id:gol vis=(map id:gol stock:gol)] vis)
+      prnt  print-id
     ==
   (((traverse gaso) gine vis) id)
 ::
 :: all nodes left or right of a given node including self
 ++  to-ends
-  |=  [=eid:gol dir=?(%l %r)]
-  ^-  (set eid:gol)
+  |=  [=nid:gol dir=?(%l %r)]
+  ^-  (set nid:gol)
   =/  flo  ?-(dir %l iflo, %r oflo)
-  =/  ginn  (ginn eid:gol (set eid:gol))
+  =/  ginn  (ginn nid:gol (set nid:gol))
   =.  ginn
     %=  ginn
-      flow  |=(=eid:gol ~(tap in (flo eid)))
-      init  |=(=eid:gol (~(put in *(set eid:gol)) eid))
-      meld  |=([eid:gol a=(set eid:gol) b=(set eid:gol)] (~(uni in a) b)) :: union
+      flow  |=(=nid:gol ~(tap in (flo nid)))
+      init  |=(=nid:gol (~(put in *(set nid:gol)) nid))
+      meld  |=([nid:gol nid:gol a=(set nid:gol) b=(set nid:gol)] (~(uni in a) b))
     ==
-  (((traverse eid:gol (set eid:gol) (set eid:gol)) ginn ~) eid)
+  (((traverse nid:gol (set nid:gol) (set nid:gol)) ginn ~) nid)
 ::
 :: all descendents including self
 ++  progeny
@@ -898,65 +976,25 @@
     %=  ginn
       flow  |=(=id:gol ~(tap in kids:(~(got by goals.p) id)))
       init  |=(=id:gol (~(put in *(set id:gol)) id))
-      meld  |=([id:gol a=(set id:gol) b=(set id:gol)] (~(uni in a) b)) :: union
+      meld  |=([id:gol id:gol a=(set id:gol) b=(set id:gol)] (~(uni in a) b))
     ==
   (((traverse id:gol (set id:gol) (set id:gol)) ginn ~) id)
 ::
-:: TODO: convert to gine
-:: replace each chief in a kick set with the nearest non-kick superior
-++  replace-chiefs
+++  replace-chief
   |=  kick=(set ship)
-  ^-  [ids=(set id:gol) pore=_this]
-  |^
-  =|  ids=(set id:gol)
-  =/  pore  this
-  :: 
-  ::  start with parentless goals
-  =/  waifs  (waif-goals)
-  |-
-  ?~  waifs
-    [ids pore]
-  =/  mup  (replace-chief i.waifs kick)
-  %=  $
-    waifs  t.waifs
-    ids  (~(uni in ids) ids.mup)
-    pore  pore(goals.p goals.mup)
-  ==
-  ++  replace-chief
-    |=  [=id:gol kick=(set ship)]
-    ^-  [ids=(set id:gol) =goals:gol]
-    =/  goal  (~(got by goals.p) id)
-    ::
-    :: if the goal's chief is in kick, replace it
-    :: if it has a par, replace with parent's chief
-    :: if it has no par, replace with owner
-    =.  goals.p
-      %+  ~(put by goals.p)
-        id
-      ?.  (~(has in kick) chief.goal)
-        goal
-      ?~  par.goal
-        goal(chief owner.p)
-      =/  poal  (~(got by goals.p) u.par.goal)
-      goal(chief chief.poal)
-    ::
-    :: return either self or null depending on if changed
-    =/  ids=(set id:gol)
-      ?:  (~(has in kick) chief.goal)
-        ~
-      (~(put in *(set id:gol)) id)
-    ::
-    =/  kids  ~(tap in kids.goal)
-    |-
-    ?~  kids
-      [ids goals.p]
-    =/  mup  (replace-chief i.kids kick)
-    %=  $
-      kids  t.kids
-      ids  (~(uni in ids) ids.mup)
-      goals.p  goals.mup
+  |=  [=id:gol vis=(map id:gol ship)]
+  ^-  (map id:gol ship)
+  =/  gaso  [id:gol ship (map id:gol ship)]
+  =/  gine  (gine gaso)
+  =.  gine
+    %=  gine
+      flow  |=(=id:gol =/(par par:(~(got by goals.p) id) ?~(par ~ [u.par]~)))
+      init  |=(=id:gol chief:(~(got by goals.p) id))
+      stop  |=([id:gol =ship] !(~(has in kick) ship)) :: stop if not in kick set
+      meld  |=([id:gol id:gol a=ship b=ship] b)
+      land  |=([=id:gol =ship cnd=?] ?:(cnd ship owner.p)) :: if not in kick set
     ==
-  --
+  (((traverse gaso) gine vis) id)
 ::
 :: ============================================================================
 :: 
@@ -965,14 +1003,14 @@
 :: ============================================================================
 ::
 ++  stocks  ((chain id:gol stock:gol) get-stocks (bare-goals) ~)
-++  left-bounds  ((chain eid:gol bound:gol) (get-bounds %l) (root-nodes) ~)
-++  ryte-bounds  ((chain eid:gol bound:gol) (get-bounds %r) (leaf-nodes) ~)
-++  ryte-plumbs  ((chain eid:gol @) (plomb %r) (leaf-nodes) ~)
-++  left-plumbs  ((chain eid:gol @) (plomb %l) (root-nodes) ~)
+++  left-bounds  ((chain nid:gol bound:gol) (get-bounds %l) (root-nodes) ~)
+++  ryte-bounds  ((chain nid:gol bound:gol) (get-bounds %r) (leaf-nodes) ~)
+++  ryte-plumbs  ((chain nid:gol @) (plomb %r) (leaf-nodes) ~)
+++  left-plumbs  ((chain nid:gol @) (plomb %l) (root-nodes) ~)
 ::
 +$  tracer
   $%  [%init ~]
-      [%yoke e1=eid:gol e2=eid:gol]
+      [%yoke n1=nid:gol n2=nid:gol]
       [%spawn =id:gol]
       [%chief =id:gol]
   ==
@@ -994,31 +1032,31 @@
     :*  stocks.trace.p  :: change stocks elsewhere
         ::
         :: left-bounds
-        %:  (chain eid:gol bound:gol)
+        %:  (chain nid:gol bound:gol)
           (get-bounds %l)
           (root-nodes)
-          (gus-by left-bounds.trace.p ~(tap in (to-ends e2 %r)))
+          (gus-by left-bounds.trace.p ~(tap in (to-ends n2 %r)))
         ==
         ::
         :: ryte-bounds
-        %:  (chain eid:gol bound:gol)
+        %:  (chain nid:gol bound:gol)
           (get-bounds %r)
           (leaf-nodes)
-          (gus-by ryte-bounds.trace.p ~(tap in (to-ends e1 %l)))
+          (gus-by ryte-bounds.trace.p ~(tap in (to-ends n1 %l)))
         ==
         ::
         :: left-plumbs
-        %:  (chain eid:gol @)
+        %:  (chain nid:gol @)
           (plomb %l)
           (root-nodes)
-          (gus-by left-plumbs.trace.p ~(tap in (to-ends e2 %r)))
+          (gus-by left-plumbs.trace.p ~(tap in (to-ends n2 %r)))
         ==
         ::
         :: ryte-plumbs
-        %:  (chain eid:gol @)
+        %:  (chain nid:gol @)
           (plomb %r)
           (leaf-nodes)
-          (gus-by ryte-plumbs.trace.p ~(tap in (to-ends e1 %l)))
+          (gus-by ryte-plumbs.trace.p ~(tap in (to-ends n1 %l)))
         ==
     == 
     ::
@@ -1056,13 +1094,13 @@
   %-  ~(gas in *(set id:gol))
   %+  murn
     ~(tap in flow)
-  |=  =eid:gol
-  ?.  ?&  =(dst -.eid) :: we keep when destination is as specified
-          |(kid !(~(has in kids.goal) id.eid)) :: if k false, must not be in kids
-          |(par !?~(par.goal %| =(id.eid u.par.goal))) :: if p is false, must not be par
+  |=  =nid:gol
+  ?.  ?&  =(dst -.nid) :: we keep when destination is as specified
+          |(kid !(~(has in kids.goal) id.nid)) :: if k false, must not be in kids
+          |(par !?~(par.goal %| =(id.nid u.par.goal))) :: if p is false, must not be par
       ==
     ~
-  (some id.eid)
+  (some id.nid)
 ::  
 ++  prio-left  |=(=id:gol (neighbors id %& %| %l %k %k))
 ++  prio-ryte  |=(=id:gol (neighbors id %| %& %r %k %k))
@@ -1114,14 +1152,14 @@
   |=(=id:gol [id (inflate-goal id)])
 ::
 :: ** jellyfish-like motion **
-:: update ryte-bounds/plumbs left of e1
-:: update left-bounds/plumbs right of e2
+:: update ryte-bounds/plumbs left of n1
+:: update left-bounds/plumbs right of n2
 ++  jellyfish
-  |=  [e1=eid:gol e2=eid:gol]
+  |=  [n1=nid:gol n2=nid:gol]
   ^-  [ids=(set id:gol) pore=_this]
-  =/  eids  (~(uni in (to-ends e1 %l)) (to-ends e2 %r))
-  =/  ids   (~(run in eids) |=(=eid:gol id.eid))
-  =.  trace.p  (trace-update [%yoke e1 e2])
+  =/  nids  (~(uni in (to-ends n1 %l)) (to-ends n2 %r))
+  =/  ids   (~(run in nids) |=(=nid:gol id.nid))
+  =.  trace.p  (trace-update [%yoke n1 n2])
   =.  goals.p  (inflate-goals ids)
   [ids this]
 ::
@@ -1211,10 +1249,14 @@
 ++  set-chief
   |=  [=id:gol chief=ship rec=?(%.y %.n)]
   ^-  [ids=(set id:gol) pore=_this]
+  ::
+  :: set chief on all progeny if rec is true; otherwise just stated goal
   =/  ids=(set id:gol)  
     ?.  rec
       (progeny id)
     (~(put in *(set id:gol)) id)
+  ::
+  :: return set of modified ids and _this with updated goals
   =/  lst  ~(tap in ids)
   :-  ids
   %=  this
@@ -1225,6 +1267,35 @@
       |=  =id:gol
       =/  goal  (~(got by goals.p) id)
       [id goal(chief chief)]
+  ==
+::
+:: replace all chiefs of goals whose chiefs have been kicked
+++  replace-chiefs
+   |=  kick=(set ship)
+   ^-  [ids=(set id:gol) pore=_this]
+   ::
+   :: list of all ids of goals with replacable chiefs
+   =/  kickable=(list id:gol)
+     %+  murn
+       ~(tap in goals.p)
+     |=  [=id:gol =goal:gol]
+     ?.  (~(has in kick) chief.goal)
+       ~
+     (some id)
+   ::
+   :: accurate updated chief information
+   =/  chiefs  ((chain id:gol ship) (replace-chief kick) kickable ~)
+   ::
+   :: update goals.p to reflect new chief information
+  :-  (~(gas by *(set id:gol)) kickable)
+  %=  this
+    goals.p
+      %-  ~(gas by goals.p)
+      %+  turn
+        kickable
+      |=  =id:gol
+      =/  goal  (~(got by goals.p) id)
+      [id goal(chief (~(got by chiefs) id))]
   ==
 ::
 :: remove a kick set from all goal spawn sets
@@ -1274,88 +1345,88 @@
 :: ============================================================================
 ::
 ++  dag-yoke
-  |=  [e1=eid:gol e2=eid:gol mod=ship]
+  |=  [n1=nid:gol n2=nid:gol mod=ship]
   ^-  [ids=(set id:gol) pore=_this]
   ::
   :: Check mod permissions
   :: Can yoke with permissions on *both* goals
-  ?.  ?&  (check-goal-perm id.e1 mod)
-          (check-goal-perm id.e2 mod)
+  ?.  ?&  (check-goal-perm id.n1 mod)
+          (check-goal-perm id.n2 mod)
       ==
     ~|("missing-goal-mod-perms" !!)
   ::
   :: Cannot relate goal to itself
-  ?:  =(id.e1 id.e2)  ~|("same-goal" !!)
-  =/  edge1  (got-edge e1)
-  =/  edge2  (got-edge e2)
+  ?:  =(id.n1 id.n2)  ~|("same-goal" !!)
+  =/  node1  (got-node n1)
+  =/  node2  (got-node n2)
   ::
   :: Cannot create relationship where either goal is complete
   :: and an uncompleted goal is to the left
-  ?:  ?|  complete:(~(got by goals.p) id.e1)
-          complete:(~(got by goals.p) id.e2)
+  ?:  ?|  complete:(~(got by goals.p) id.n1)
+          complete:(~(got by goals.p) id.n2)
       ==
     ~|("completed-goal" !!)
   ::
   :: Cannot create relationship with the deadline of the right id
   :: if the right id is an actionable goal
-  ?:  ?&  =(-.e2 %d)
-          actionable:(~(got by goals.p) id.e2)
+  ?:  ?&  =(-.n2 %d)
+          actionable:(~(got by goals.p) id.n2)
       ==
     ~|("right-actionable" !!)
   ::
-  :: e2 must not come before e1
-  ?:  (check-path e2 e1 %r)  ~|("before-e2-e1" !!)
+  :: n2 must not come before n1
+  ?:  (check-path n2 n1 %r)  ~|("before-n2-n1" !!)
   ::
-  :: there must be no bound mismatch between e1 and e2
-  ?:  (gath moment.edge1 -:(ryte-bound e2))
+  :: there must be no bound mismatch between n1 and n2
+  ?:  (gath moment.node1 -:(ryte-bound n2))
     ~|("bound-mismatch" !!)
-  ?:  (lath moment.edge2 -:(left-bound e1))
+  ?:  (lath moment.node2 -:(left-bound n1))
     ~|("bound-mismatch" !!)
   ::
   :: dag-yoke
-  =.  outflow.edge1  (~(put in outflow.edge1) e2)
-  =.  inflow.edge2  (~(put in inflow.edge2) e1)
-  =.  goals.p  (~(put by goals.p) id.e1 (update-edge e1 edge1))
-  =.  goals.p  (~(put by goals.p) id.e2 (update-edge e2 edge2))
+  =.  outflow.node1  (~(put in outflow.node1) n2)
+  =.  inflow.node2  (~(put in inflow.node2) n1)
+  =.  goals.p  (~(put by goals.p) id.n1 (update-node n1 node1))
+  =.  goals.p  (~(put by goals.p) id.n2 (update-node n2 node2))
   :: update bounds, plumbs, and other redundant/explicit information
-  (jellyfish e1 e2)
+  (jellyfish n1 n2)
 ::
 ++  dag-rend
-  |=  [e1=eid:gol e2=eid:gol mod=ship]
+  |=  [n1=nid:gol n2=nid:gol mod=ship]
   ^-  [ids=(set id:gol) pore=_this]
   ::
   :: Check mod permissions
   :: Can rend with permissions on *either* goal
-  ?.  ?|  (check-goal-perm id.e1 mod)
-          (check-goal-perm id.e2 mod)
+  ?.  ?|  (check-goal-perm id.n1 mod)
+          (check-goal-perm id.n2 mod)
       ==
     ~|("missing-goal-mod-perms" !!)
   :: ::
   :: Cannot unrelate goal from itself
-  ?:  =(id.e1 id.e2)  ~|("same-goal" !!)
+  ?:  =(id.n1 id.n2)  ~|("same-goal" !!)
   ::
   :: Cannot break relationship between completed goals
-  ?:  ?&  complete:(~(got by goals.p) id.e1)
-          complete:(~(got by goals.p) id.e2)
+  ?:  ?&  complete:(~(got by goals.p) id.n1)
+          complete:(~(got by goals.p) id.n2)
       ==
     ~|("completed-goals" !!)
   ::
   :: Cannot destroy containment of an owned goal
-  =/  l  (~(got by goals.p) id.e1)
-  =/  r  (~(got by goals.p) id.e2)
-  ?:  ?|  &(=(-.e1 %d) =(-.e2 %d) (~(has in kids.r) id.e1))
-          &(=(-.e1 %k) =(-.e2 %k) (~(has in kids.l) id.e2))
+  =/  l  (~(got by goals.p) id.n1)
+  =/  r  (~(got by goals.p) id.n2)
+  ?:  ?|  &(=(-.n1 %d) =(-.n2 %d) (~(has in kids.r) id.n1))
+          &(=(-.n1 %k) =(-.n2 %k) (~(has in kids.l) id.n2))
       ==
     ~|("owned-goal" !!)
   ::
   :: dag-rend
-  =/  edge1  (got-edge e1)
-  =/  edge2  (got-edge e2)
-  =.  outflow.edge1  (~(del in outflow.edge1) e2)
-  =.  inflow.edge2  (~(del in inflow.edge2) e1)
-  =.  goals.p  (~(put by goals.p) id.e1 (update-edge e1 edge1))
-  =.  goals.p  (~(put by goals.p) id.e2 (update-edge e2 edge2))
-  (jellyfish e1 e2)
+  =/  node1  (got-node n1)
+  =/  node2  (got-node n2)
+  =.  outflow.node1  (~(del in outflow.node1) n2)
+  =.  inflow.node2  (~(del in inflow.node2) n1)
+  =.  goals.p  (~(put by goals.p) id.n1 (update-node n1 node1))
+  =.  goals.p  (~(put by goals.p) id.n2 (update-node n2 node2))
+  (jellyfish n1 n2)
 ::
 ++  yoke
   |=  [yok=exposed-yoke:gol mod=ship]
@@ -1532,11 +1603,6 @@
   =.  l  (~(got by goals.p.pore) lid) :: l has changed
   =.  goals.p.pore  (~(put by goals.p.pore) lid l(par urid))
   ::
-  :: Update stock and ranks
-  =.  mup  (avalanche:pore lid)
-  =.  pore  pore.mup
-  =.  ids  (~(uni in ids) ids.mup) :: avalanche updates
-  ::
   :: If urid is non-null, put lid in u.urid's kids
   =.  mup
     ?~  urid  
@@ -1545,6 +1611,11 @@
     =.  goals.p.pore
       (~(put by goals.p.pore) u.urid r(kids (~(put in kids.r) lid)))
     (yoke:pore [%held-yoke lid u.urid] mod)
+  ::
+  :: Update stock and ranks
+  =.  mup  (avalanche:pore lid)
+  =.  pore  pore.mup
+  =.  ids  (~(uni in ids) ids.mup) :: avalanche updates
   ::
   [(~(uni in ids) ids.mup) pore.mup]
 ::
@@ -1570,7 +1641,7 @@
   ?.  .=  0
       %+  murn
       ~(tap in inflow.deadline.goal) 
-      |=(=eid:gol ?:(=(id id.eid) ~ (some eid)))
+      |=(=nid:gol ?:(=(id id.nid) ~ (some nid)))
     ~|("has-nested" !!)
   =.  goals.p  (~(put by goals.p) id goal(actionable %&))
   (emot old [vzn %goal-togls id %actionable %.y])
