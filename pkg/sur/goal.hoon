@@ -20,7 +20,6 @@
 +$  stock         stock:s4
 +$  ranks         ranks:s4
 +$  moment        moment:s4
-+$  bound         bound:s4
 ::
 +$  goal-froze    goal-froze:s4
 +$  goal-nexus    goal-nexus:s4
@@ -85,7 +84,6 @@
   +$  ranks  (map ship id) :: map of ship to highest ranking goal id
   ::
   +$  moment  (unit @da)
-  +$  bound  [=moment hereditor=nid]
   ::
   :: $node (previously $edge) and $goal-nexus are inflated;
   :: need to be distilled back down in future iteration
@@ -95,8 +93,8 @@
             outflow=(set nid)
         ==
         ::
-        =left=bound
-        =ryte=bound
+        left-bound=moment
+        ryte-bound=moment
         left-plumb=@ud
         ryte-plumb=@ud
     ==
@@ -144,8 +142,8 @@
   ::
   +$  trace
     $:  stocks=(map id stock)
-        left-bounds=(map nid bound)
-        ryte-bounds=(map nid bound)
+        left-bounds=(map nid moment)
+        ryte-bounds=(map nid moment)
         left-plumbs=(map nid @)
         ryte-plumbs=(map nid @)
     ==
@@ -253,7 +251,7 @@
         [%get-goal ugoal=(unit goal)]
         [%get-pin upin=(unit pin)]
         [%get-pool upool=(unit pool)]
-        [%ryte-bound moment=(unit @da) hereditor=nid]
+        [%ryte-bound moment=(unit @da)]
         [%plumb depth=@ud]
         [%anchor depth=@ud]
         [%priority priority=@ud]
