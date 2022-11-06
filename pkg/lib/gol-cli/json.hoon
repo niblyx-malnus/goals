@@ -330,11 +330,7 @@
       %pool
     ?~(upool.pyk ~ (enjs-pool u.upool.pyk))
     ::
-      %ryte-bound
-    %-  pairs
-    :~  [%moment ?~(moment.pyk ~ s+(scot %da u.moment.pyk))]
-        [%hereditor (enjs-nid hereditor.pyk)]
-    ==
+    %ryte-bound  (frond %moment ?~(moment.pyk ~ s+(scot %da u.moment.pyk)))
     ::
       %plumb
     %+  frond
@@ -549,20 +545,13 @@
    :~  [%moment ?~(moment.node ~ (numb (unm:chrono:userlib u.moment.node)))]
        [%inflow a+(turn ~(tap in inflow.node) enjs-nid)]
        [%outflow a+(turn ~(tap in outflow.node) enjs-nid)]
-       [%left-bound (enjs-bound left-bound.node)]
-       [%ryte-bound (enjs-bound ryte-bound.node)]
+       :-  %left-bound
+       (frond %moment ?~(left-bound.node ~ s+(scot %da u.left-bound.node)))
+       :-  %ryte-bound
+       (frond %moment ?~(ryte-bound.node ~ s+(scot %da u.ryte-bound.node)))
        [%left-plumb (numb left-plumb.node)]
        [%ryte-plumb (numb ryte-plumb.node)]
    ==
-::
-++  enjs-bound
-  =,  enjs:format
-  |=  =bound
-  ^-  json
-  %-  pairs
-  :~  [%moment ?~(moment.bound ~ (numb (unm:chrono:userlib u.moment.bound)))]
-      [%hereditor (enjs-nid hereditor.bound)]
-  ==
 ::
 ++  enjs-nid
   =,  enjs:format
