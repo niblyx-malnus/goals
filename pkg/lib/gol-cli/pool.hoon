@@ -87,7 +87,6 @@
   ^-  trace:gol
   %=  trace.p
     stock-map  (~(put by stock-map.trace.p) id stock.nus)
-    ranks-map  (~(put by ranks-map.trace.p) id ranks.nus)
     left-bounds  
       %-  ~(gas by left-bounds.trace.p)
       ~[[[%k id] left-bound.kickoff.nus] [[%d id] left-bound.deadline.nus]]
@@ -973,7 +972,6 @@
   ^-  trace:gol
   =/  stock-map  ((chain id:gol stock:gol) get-stock (bare-goals) ~)
   :*  stock-map
-      (~(run by stock-map) get-ranks)
       ((chain nid:gol moment:gol) (get-bounds %l) (root-nodes) ~)
       ((chain nid:gol moment:gol) (get-bounds %r) (leaf-nodes) ~)
       ((chain nid:gol @) (plomb %r) (leaf-nodes) ~)
@@ -1008,13 +1006,25 @@
 ++  nest-left  |=(=id:gol (neighbors id %| %& %l %d %d))
 ++  nest-ryte  |=(=id:gol (neighbors id %& %| %r %d %d))
 ::
+++  get-ranks
+  |=  =stock:gol
+  ^-  ranks:gol
+  =|  =ranks:gol
+  |-
+  ?~  stock
+    ranks
+  %=  $
+    stock  t.stock
+    ranks  (~(put by ranks) [chief id]:i.stock)
+  ==
+::
 ++  inflate-goal
   |=  =id:gol
   ^-  goal:gol
   =/  goal  (~(got by goals.p) id)
   %=  goal
     stock  (~(got by stock-map.trace.p) id)
-    ranks  (~(got by ranks-map.trace.p) id)
+    ranks  (get-ranks (~(got by stock-map.trace.p) id))
     prio-left  (prio-left id)
     prio-ryte  (prio-ryte id)
     prec-left  (prec-left id)
@@ -1078,18 +1088,6 @@
   =/  perm  (~(get by perms.p) mod)
   ?~  perm  %|       :: not viewer
   ?~  u.perm  %|  %& :: no %admin or %spawn privileges
-::
-++  get-ranks
-  |=  =stock:gol
-  ^-  ranks:gol
-  =|  =ranks:gol
-  |-
-  ?~  stock
-    ranks
-  %=  $
-    stock  t.stock
-    ranks  (~(put by ranks) [chief id]:i.stock)
-  ==
 ::
 ++  get-rank
   |=  [mod=ship =id:gol]
