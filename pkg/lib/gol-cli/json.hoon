@@ -546,9 +546,13 @@
        [%inflow a+(turn ~(tap in inflow.node) enjs-nid)]
        [%outflow a+(turn ~(tap in outflow.node) enjs-nid)]
        :-  %left-bound
-       (frond %moment ?~(left-bound.node ~ s+(scot %da u.left-bound.node)))
+       %+  frond 
+         %moment
+       ?~(left-bound.node ~ (numb (unm:chrono:userlib u.left-bound.node)))
        :-  %ryte-bound
-       (frond %moment ?~(ryte-bound.node ~ s+(scot %da u.ryte-bound.node)))
+       %+  frond 
+         %moment
+       ?~(ryte-bound.node ~ (numb (unm:chrono:userlib u.ryte-bound.node)))
        [%left-plumb (numb left-plumb.node)]
        [%ryte-plumb (numb ryte-plumb.node)]
    ==
