@@ -142,7 +142,6 @@
   ::
   +$  trace
     $:  stock-map=(map id stock)
-        ranks-map=(map id ranks)
         left-bounds=(map nid moment)
         ryte-bounds=(map nid moment)
         left-plumbs=(map nid @)
