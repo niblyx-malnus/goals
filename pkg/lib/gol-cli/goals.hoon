@@ -47,27 +47,6 @@
     outflow.kickoff  (new-set-nid outflow.kickoff.goal)
     inflow.deadline  (new-set-nid inflow.deadline.goal)
     outflow.deadline  (new-set-nid outflow.deadline.goal)
-    ::
-    hereditor.left-bound.kickoff
-      (new-nid hereditor.left-bound.kickoff.goal)
-    hereditor.ryte-bound.kickoff
-      (new-nid hereditor.ryte-bound.kickoff.goal)
-    hereditor.left-bound.deadline
-      (new-nid hereditor.left-bound.deadline.goal)
-    hereditor.ryte-bound.deadline
-      (new-nid hereditor.ryte-bound.deadline.goal)
-    ::
-    stock  (turn stock.goal |=([=id:gol =ship] [(new-id id) ship]))
-    ranks
-      %-  ~(gas by ranks.goal)
-      (turn ~(tap by ranks.goal) |=([=ship =id:gol] [ship (new-id id)]))
-    ::
-    prio-left  (new-set-id prio-left.goal)
-    prio-ryte  (new-set-id prio-ryte.goal)
-    prec-left  (new-set-id prec-left.goal)
-    prec-ryte  (new-set-id prec-ryte.goal)
-    nest-left  (new-set-id nest-left.goal)
-    nest-ryte  (new-set-id nest-ryte.goal)
   ==
   ++  new-id  |=(=id:gol (~(got by id-map) id))
   ++  new-nid  |=(=nid:gol [-.nid (new-id id.nid)])

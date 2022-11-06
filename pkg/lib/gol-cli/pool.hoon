@@ -855,30 +855,40 @@
 ::
 ++  get-bounds
   |=  dir=?(%l %r)
-  |=  [=nid:gol vis=(map nid:gol bound:gol)]
-  ^-  (map nid:gol bound:gol)
+  |=  [=nid:gol vis=(map nid:gol moment:gol)]
+  ^-  (map nid:gol moment:gol)
   =/  flo  ?-(dir %l iflo, %r oflo)
-  =/  cmp  ?-(dir %l goth, %r loth)
-  =/  gine  (gine nid:gol bound:gol (map nid:gol bound:gol))
+  =/  cmp  ?-(dir %l gth, %r lth)
+  =/  gine  (gine nid:gol moment:gol (map nid:gol moment:gol))
   =.  gine
     %=  gine
+      init  |=(=nid:gol ~)
       flow  |=(=nid:gol ~(tap in (flo nid)))
-      init  |=(=nid:gol [moment:(got-node nid) nid])
-      meld  |=([nid:gol nid:gol a=bound:gol b=bound:gol] ?:((cmp -.a -.b) a b))
-      exit  |=([=nid:gol vis=(map nid:gol bound:gol)] vis)
+      meld 
+        |=  [nid:gol neb=nid:gol a=moment:gol b=moment:gol]
+        =/  nem  moment:(got-node neb)
+        =/  n
+          ?~  b  nem
+          ?~  nem  b
+          ?.((cmp u.b u.nem) nem ~|("bound-mismatch" !!))
+        ?~  a  n
+        ?~  n  a
+        ?:((cmp u.a u.n) a n)
+      ::
+      exit  |=([=nid:gol vis=(map nid:gol moment:gol)] vis)
     ==
-  (((traverse nid:gol bound:gol (map nid:gol bound:gol)) gine vis) nid)
+  (((traverse nid:gol moment:gol (map nid:gol moment:gol)) gine vis) nid)
 ::
 :: get the left or right bound of a node (assumes correct moment order)
-++  ryte-bound  |=(=nid:gol `bound:gol`(~(got by ((get-bounds %r) nid ~)) nid))
-++  left-bound  |=(=nid:gol `bound:gol`(~(got by ((get-bounds %l) nid ~)) nid))
+++  ryte-bound  |=(=nid:gol (~(got by ((get-bounds %r) nid ~)) nid))
+++  left-bound  |=(=nid:gol (~(got by ((get-bounds %l) nid ~)) nid))
 ::
 :: check entire preceding graph for incorrect moment order
 ++  check-bound-mismatch
   |=  [=nid:gol dir=?(%l %r)]
   ^-  ?
   =/  flo  ?-(dir %l iflo, %r oflo)
-  =/  tem  ?-(dir %l omax, %r omin)  :: extremum
+  =/  tem  ?-(dir %l max, %r min)  :: extremum
   =/  gine  (gine nid:gol (unit moment:gol) ?)
   =.  gine
     %=  gine
@@ -887,18 +897,32 @@
       stop  |=([nid:gol out=(unit moment:gol)] =(~ out))  :: stop if null
       meld
         |=  [nid:gol nid:gol out=(unit moment:gol) new=(unit moment:gol)]
+        :: 
+        :: if out or new has failed, return failure
         ?~  out  ~
         ?~  new  ~
-        (some (tem u.out u.new))
+        ::
+        :: if either moment of out or new is null, return the other
+        ?~  u.out  new
+        ?~  u.new  out
+        ::
+        :: else return the extremum
+        (some (some (tem u.u.out u.u.new)))
+      ::
       land
         |=  [nid:gol out=(unit moment:gol) ?]
+        ::
+        :: if out has failed, return failure
         ?~  out  ~
+        ::
         =/  mot  moment:(got-node nid)
         ?~  mot  out :: if moment is null, pass along bound
-        =/  tem  (tem mot u.out)
-        ?.  =(mot tem)
+        ?~  u.out  (some mot)
+        =/  tem  (tem u.mot u.u.out)
+        ?.  =(u.mot tem)
           ~ :: if moment is not extremum, fail (return null)
-        (some tem) :: else return new bound
+        (some (some tem)) :: else return new bound
+      ::
       exit
         |=  [=nid:gol vis=(map nid:gol (unit moment:gol))]
         =(~ (~(got by vis) nid)) :: if the output is null, yes, bound mismatch
@@ -1003,8 +1027,8 @@
 :: ============================================================================
 ::
 ++  stocks  ((chain id:gol stock:gol) get-stocks (bare-goals) ~)
-++  left-bounds  ((chain nid:gol bound:gol) (get-bounds %l) (root-nodes) ~)
-++  ryte-bounds  ((chain nid:gol bound:gol) (get-bounds %r) (leaf-nodes) ~)
+++  left-bounds  ((chain nid:gol moment:gol) (get-bounds %l) (root-nodes) ~)
+++  ryte-bounds  ((chain nid:gol moment:gol) (get-bounds %r) (leaf-nodes) ~)
 ++  ryte-plumbs  ((chain nid:gol @) (plomb %r) (leaf-nodes) ~)
 ++  left-plumbs  ((chain nid:gol @) (plomb %l) (root-nodes) ~)
 ::
@@ -1032,14 +1056,14 @@
     :*  stocks.trace.p  :: change stocks elsewhere
         ::
         :: left-bounds
-        %:  (chain nid:gol bound:gol)
+        %:  (chain nid:gol moment:gol)
           (get-bounds %l)
           (root-nodes)
           (gus-by left-bounds.trace.p ~(tap in (to-ends n2 %r)))
         ==
         ::
         :: ryte-bounds
-        %:  (chain nid:gol bound:gol)
+        %:  (chain nid:gol moment:gol)
           (get-bounds %r)
           (leaf-nodes)
           (gus-by ryte-bounds.trace.p ~(tap in (to-ends n1 %l)))
@@ -1208,28 +1232,41 @@
   =/  goal  (~(got by goals.p) id)
   (~(has in spawn.goal) mod)
 ::
-:: checks if mod can move lid under urid
-++  check-move-perm
-  |=  [lid=id:gol urid=(unit id:gol) mod=ship]
+++  stock-root
+  |=  =id:gol
+  ^-  [=id:gol chief=ship]
+  (snag 0 (flop stock:(~(got by goals.p) id)))
+::
+:: owner, admin, or chief of stock-root
+++  check-goal-master
+  |=  [=id:gol mod=ship]
   ^-  ?
   ?:  (check-pool-perm mod)  %&
-  :: can only move to root with admin-level pool permissions
-  ?~  urid  %|
-  :: can move lid under u.urid if you have permissions on a goal
+  =(mod chief:(stock-root id))
+::
+++  check-move-to-root-perm
+  |=  [=id:gol mod=ship]
+  ^-  ?
+  &((check-goal-master id mod) (check-root-spawn-perm mod))
+::
+:: checks if mod can move kid under pid
+++  check-move-to-goal-perm
+  |=  [kid=id:gol pid=id:gol mod=ship]
+  ^-  ?
+  ?:  (check-pool-perm mod)  %&
+  :: can move kid under pid if you have permissions on a goal
   :: which contains them both
-  =/  l-goal  (~(got by goals.p) lid)
-  =/  r-goal  (~(got by goals.p) u.urid)
-  =/  l-rank  (~(get by ranks.l-goal) mod)
-  =/  r-rank  (~(get by ranks.r-goal) mod)
-  ?~  l-rank  %|
-  ?~  r-rank  %|
-  ?:  =(u.l-rank u.r-rank)  %&
+  =/  k  (~(got by goals.p) kid)
+  =/  q  (~(got by goals.p) pid)
+  =/  k-rank  (~(get by ranks.k) mod)
+  =/  q-rank  (~(get by ranks.q) mod)
+  ?~  k-rank  %|
+  ?~  q-rank  %|
+  ?:  =(u.k-rank u.q-rank)  %&
   ::
-  :: if chief of root of lid and permissions on u.urid
-  ?:  ?&  .=  mod
-              =<  chief
-              (snag 0 (flop `stock:gol`[[lid chief.l-goal] stock.l-goal]))
-          (check-goal-perm u.urid mod)
+  :: if chief of stock-root of kid and permissions on pid
+  ?:  ?&  =(mod chief:(stock-root kid))
+          (check-goal-perm pid mod)
       ==
     %&
   %|
@@ -1361,7 +1398,6 @@
   =/  node2  (got-node n2)
   ::
   :: Cannot create relationship where either goal is complete
-  :: and an uncompleted goal is to the left
   ?:  ?|  complete:(~(got by goals.p) id.n1)
           complete:(~(got by goals.p) id.n2)
       ==
@@ -1378,10 +1414,10 @@
   ?:  (check-path n2 n1 %r)  ~|("before-n2-n1" !!)
   ::
   :: there must be no bound mismatch between n1 and n2
-  ?:  (gath moment.node1 -:(ryte-bound n2))
-    ~|("bound-mismatch" !!)
-  ?:  (lath moment.node2 -:(left-bound n1))
-    ~|("bound-mismatch" !!)
+  =/  lb  ?~(moment.node1 (left-bound n1) moment.node1)
+  =/  rb  ?~(moment.node2 (ryte-bound n2) moment.node2)
+  =/  bound-mismatch  ?~(lb %| ?~(rb %| (gth u.lb u.rb)))
+  ?:  bound-mismatch  ~|("bound-mismatch" !!)
   ::
   :: dag-yoke
   =.  outflow.node1  (~(put in outflow.node1) n2)
@@ -1453,6 +1489,48 @@
       [(~(uni in ids.mup) ids.myp) pore.myp]
     ==
   [ids.mup pore.mup]
+::
+++  move-to-root
+  |=  [=id:gol mod=ship]
+  ^-  [ids=(set id:gol) pore=_this]
+  ?.  (check-move-to-root-perm id mod)
+    ~|("missing-move-to-root-perms" !!)
+  =/  k  (~(got by goals.p) id)  
+  ?~  par.k  `this
+  =/  q  (~(got by goals.p) u.par.k)
+  =.  goals.p  (~(put by goals.p) id k(par ~))
+  =.  goals.p  (~(put by goals.p) u.par.k q(kids (~(del in kids.q) id)))
+  (yoke [%held-rend id u.par.k] mod)
+::
+++  move-to-goal
+  |=  [kid=id:gol pid=id:gol mod=ship]
+  ^-  [ids=(set id:gol) pore=_this]
+  ?.  (check-move-to-goal-perm kid pid mod)
+    ~|("missing-move-to-goal-perms" !!)
+  ::
+  =/  mup  (move-to-root kid owner.p) :: divine intervention (owner)
+  =/  pore  pore.mup
+  =/  ids  ids.mup
+  =/  k  (~(got by goals.p.pore) kid)
+  =/  q  (~(got by goals.p.pore) pid)
+  =.  goals.p.pore  (~(put by goals.p.pore) kid k(par (some pid)))
+  =.  goals.p.pore  (~(put by goals.p.pore) pid q(kids (~(put in kids.q) kid)))
+  =.  mup  (yoke:pore [%held-yoke kid pid] mod)
+  [(~(uni in ids) ids.mup) pore.mup]
+::
+++  move
+  |=  [kid=id:gol upid=(unit id:gol) mod=ship]
+  ^-  [ids=(set id:gol) pore=_this]
+  =/  mup  ?~(upid (move-to-root kid mod) (move-to-goal kid u.upid mod))
+  =/  myp  (avalanche:pore.mup kid)
+  [(~(uni in ids.mup) ids.myp) pore.myp]
+::
+++  move-emot
+  |=  [lid=id:gol urid=(unit id:gol) mod=ship]
+  ^-  _this
+  =/  old  this
+  =/  mup  (move lid urid mod)
+  (emot old [vzn %pool-nexus %yoke (make-nex ids.mup)]):[pore.mup .]
 ::
 ++  yoke-sequence
   |=  [yoks=(list exposed-yoke:gol) mod=ship]
@@ -1569,63 +1647,6 @@
     pore  pore.mup
   ==
 ::
-++  move
-  |=  [lid=id:gol urid=(unit id:gol) mod=ship]
-  ^-  [ids=(set id:gol) pore=_this]
-  =/  old  this
-  ::
-  :: Check mod permissions
-  ?.  (check-move-perm lid urid mod)
-    ~|("missing-goal-move-perms" !!)
-  ::
-  :: Identify ids to be modified
-  =/  l  (~(got by goals.p) lid)
-  =/  ids=(set id:gol)
-    ?~  par.l
-      (~(put in *(set id:gol)) lid)
-    (~(gas in *(set id:gol)) ~[lid u.par.l])
-  =.  ids
-    ?~  urid
-      ids
-    (~(put in ids) u.urid)
-  ::
-  :: If par.l is non-null, remove lid from its kids
-  =/  mup=[ids=(set id:gol) pore=_this]
-    ?~  par.l
-      [~ this]
-    =/  q  (~(got by goals.p) u.par.l)
-    =.  goals.p  (~(put by goals.p) u.par.l q(kids (~(del in kids.q) lid)))
-    (yoke [%held-rend lid u.par.l] mod)
-  =/  pore  pore.mup
-  =.  ids  (~(uni in ids) ids.mup) :: cascading updates
-  ::
-  :: Replace lid's par with urid (null or unit of id)
-  =.  l  (~(got by goals.p.pore) lid) :: l has changed
-  =.  goals.p.pore  (~(put by goals.p.pore) lid l(par urid))
-  ::
-  :: If urid is non-null, put lid in u.urid's kids
-  =.  mup
-    ?~  urid  
-      [~ pore]
-    =/  r  (~(got by goals.p.pore) u.urid)
-    =.  goals.p.pore
-      (~(put by goals.p.pore) u.urid r(kids (~(put in kids.r) lid)))
-    (yoke:pore [%held-yoke lid u.urid] mod)
-  ::
-  :: Update stock and ranks
-  =.  mup  (avalanche:pore lid)
-  =.  pore  pore.mup
-  =.  ids  (~(uni in ids) ids.mup) :: avalanche updates
-  ::
-  [(~(uni in ids) ids.mup) pore.mup]
-::
-++  move-emot
-  |=  [lid=id:gol urid=(unit id:gol) mod=ship]
-  ^-  _this
-  =/  old  this
-  =/  mup  (move lid urid mod)
-  (emot old [vzn %pool-nexus %yoke (make-nex ids.mup)]):[pore.mup .]
-::
 :: ============================================================================
 :: 
 :: COMPLETE/ACTIONABLE/KICKOFF/DEADLINE/PERMS UPDATES
@@ -1675,29 +1696,37 @@
   =.  goals.p  (~(put by goals.p) id goal(complete %|))
   (emot old [vzn %goal-togls id %complete %.n])
 ::
+++  bounded
+  |=  [=nid:gol =moment:gol dir=?(%l %r)]
+  ^-  ?
+  ?-    dir
+      %l
+    =/  lb  (left-bound nid)
+    ?~(moment %| ?~(lb %| (gth u.lb u.moment)))
+      %r
+    =/  rb  (ryte-bound nid)
+    ?~(moment %| ?~(rb %| (lth u.rb u.moment)))
+  == 
+::
 ++  set-kickoff
-  |=  [=id:gol moment=(unit @da) mod=ship]
+  |=  [=id:gol =moment:gol mod=ship]
   ^-  _this
   =/  old  this
   ?>  (check-goal-perm id mod)
-  =/  rb  (ryte-bound [%k id])
-  =/  lb  (left-bound [%k id])
-  ?:  &(!=(+.lb [%k id]) (lath moment -:lb))  ~|("bound-left" !!)
-  ?:  &(!=(+.rb [%k id]) (gath moment -:rb))  ~|("bound-ryte" !!)
+  ?:  (bounded [%k id] moment %l)  ~|("bound-left" !!)
+  ?:  (bounded [%k id] moment %r)  ~|("bound-ryte" !!)
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(moment.kickoff moment))
   =/  mup  (jellyfish [%k id] [%k id])
   (emot old [vzn %goal-dates (make-nex ids.mup)]):[pore.mup .]
 ::
 ++  set-deadline
-  |=  [=id:gol moment=(unit @da) mod=ship]
+  |=  [=id:gol =moment:gol mod=ship]
   ^-  _this
   =/  old  this
   ?>  (check-goal-perm id mod)
-  =/  rb  (ryte-bound [%d id])
-  =/  lb  (left-bound [%d id])
-  ?:  &(!=(+.lb [%d id]) (lath moment -:lb))  ~|("bound-left" !!)
-  ?:  &(!=(+.rb [%d id]) (gath moment -:rb))  ~|("bound-ryte" !!)
+  ?:  (bounded [%d id] moment %l)  ~|("bound-left" !!)
+  ?:  (bounded [%d id] moment %r)  ~|("bound-ryte" !!)
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(moment.deadline moment))
   =/  mup  (jellyfish [%d id] [%d id])

@@ -362,7 +362,8 @@
       %normal
     ?-    -.grip
       %all  (turn ~(tap in pool-keys) |=(=pin [%pool pin]))
-      %pool  (turn (roots-uncompleted +.grip) |=(=id [%goal id]))
+        %pool  
+      (turn (roots-uncompleted +.grip) |=(=id [%goal id]))
         %goal
       =/  goal  (got-goal +.grip)
       (turn (yung-uncompleted +.grip) |=(=id [%goal id]))
