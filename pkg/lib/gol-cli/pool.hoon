@@ -86,7 +86,8 @@
   |=  [=id:gol nus=goal-nexus:gol]
   ^-  trace:gol
   %=  trace.p
-    stocks  (~(put by stocks.trace.p) id stock.nus)
+    stock-map  (~(put by stock-map.trace.p) id stock.nus)
+    ranks-map  (~(put by ranks-map.trace.p) id ranks.nus)
     left-bounds  
       %-  ~(gas by left-bounds.trace.p)
       ~[[[%k id] left-bound.kickoff.nus] [[%d id] left-bound.deadline.nus]]
@@ -141,10 +142,9 @@
   =.  goals.p  (~(put by goals.p) id goal)
   ::
   :: Update redundant information
-  =.  trace.p  (trace-update [%spawn id])
-  =.  goals.p  (~(put by goals.p) id (inflate-goal id))
+  =/  pore  (inflate-goals)
   ::
-  (move id upid owner.p) :: divine intervention (owner)
+  (move:pore id upid owner.p) :: divine intervention (owner)
 ::
 :: wit all da fixin's
 ++  spawn-goal-fixns
@@ -166,7 +166,7 @@
   =+  pore(efx efx) :: ignore accumulated updates
   =/  nex  (make-nex ids.mup)
   (emot old [vzn %spawn-goal nex id (~(got by goals.p) id)])
-::
+::::
 :: Permanently delete goal and subgoals directly
 ++  waste-goal
   |=  [=id:gol mod=ship]
@@ -794,65 +794,6 @@
   |=  [a=id:gol b=id:gol]
   (lth (priority a) (priority b))
 ::
-:: think of ~ as +inf
-:: +inf should only be a ryte-bound if there is no smaller number in between
-++  loth
-  |=  [a=(unit @) b=(unit @)]
-  ?~  a  %.n  :: ~ (+inf) is not less than any number (including itself)
-  ?~  b  %.y  :: any number is less than ~ (+inf)
-  (lth u.a u.b)
-::
-:: think of ~ as -inf
-:: -inf should only be a left-bound if there is no larger number in between
-++  goth
-  |=  [a=(unit @) b=(unit @)]
-  ?~  a  %.n  :: ~ (-inf) is not greater than any number (including itself)
-  ?~  b  %.y  :: any number is greater than ~ (-inf)
-  (gth u.a u.b)
-::
-:: a ~ bounded by a ~ causes no bound-mismatch
-:: a ~ bounded by a [~ @da] causes no bound-mismatch
-:: a [~ @da] bounded by a ~ causes no bound-mismatch
-:: only a [~ @da] bounded by a [~ @da] can cause a bound-mismatch
-:: comparing to ~ always returns %.n
-++  ath
-  |=  cmp=$-([@ @] ?)
-  |=  [a=(unit @) b=(unit @)]
-  ?~  a  %.n
-  ?~  b  %.n
-  (cmp u.a u.b)
-::
-++  lath  (ath lth)
-++  gath  (ath gth)
-::
-++  trem  :: (extremum)
-  |=  cmp=$-([(unit @) (unit @)] ?)
-  |=([a=(unit @) b=(unit @)] ?:((cmp a b) a b))
-::
-::  (goth ~ [~ @da]) returns %.n
-::  (omax ~ [~ @da]) returns [~ @da]
-::  (goth ~ ~) returns %.n
-::  (omax ~ ~) returns ~
-::  (goth [~ @da] ~) returns %.y
-::  (omax [~ @da] ~) returns [~ @da]
-::  (goth [~ a=@da] [~ b=@da]) returns (gth a b)
-::  (omax [~ a=@da] [~ b=@da]) returns (some (max a b))
-::
-::  omax returns null only if both inputs are null
-++  omax  (trem goth)
-::
-::  (loth ~ [~ @da]) returns %.n
-::  (omin ~ [~ @da]) returns [~ @da]
-::  (loth ~ ~) returns %.n
-::  (omin ~ ~) returns ~
-::  (loth [~ @da] ~) returns %.y
-::  (omin [~ @da] ~) returns [~ @da]
-::  (loth [~ a=@da] [~ b=@da]) returns (lth a b)
-::  (omin [~ a=@da] [~ b=@da]) returns (some (min a b))
-::
-::  omin returns null only if both inputs are null
-++  omin  (trem loth)
-::
 ++  get-bounds
   |=  dir=?(%l %r)
   |=  [=nid:gol vis=(map nid:gol moment:gol)]
@@ -963,7 +904,7 @@
     ==
   (((traverse nid:gol @ @) ginn ~) [%d id])
 ::
-++  get-stocks
+++  get-stock
   |=  [=id:gol vis=(map id:gol stock:gol)]
   ^-  (map id:gol stock:gol)
   =/  gaso  [id:gol stock:gol (map id:gol stock:gol)]
@@ -1026,83 +967,17 @@
 ::
 :: ============================================================================
 ::
-++  stocks  ((chain id:gol stock:gol) get-stocks (bare-goals) ~)
-++  left-bounds  ((chain nid:gol moment:gol) (get-bounds %l) (root-nodes) ~)
-++  ryte-bounds  ((chain nid:gol moment:gol) (get-bounds %r) (leaf-nodes) ~)
-++  ryte-plumbs  ((chain nid:gol @) (plomb %r) (leaf-nodes) ~)
-++  left-plumbs  ((chain nid:gol @) (plomb %l) (root-nodes) ~)
-::
-+$  tracer
-  $%  [%init ~]
-      [%yoke n1=nid:gol n2=nid:gol]
-      [%spawn =id:gol]
-      [%chief =id:gol]
-  ==
-::
+:: all of these should be O(nlogn) with size of the goals map
 ++  trace-update
-  |=  =tracer
+  |.
   ^-  trace:gol
-  =,  tracer
-  ?-    -.tracer
-      %init
-    :*  stocks
-        left-bounds
-        ryte-bounds
-        left-plumbs
-        ryte-plumbs
-    ==
-    ::
-      %yoke
-    :*  stocks.trace.p  :: change stocks elsewhere
-        ::
-        :: left-bounds
-        %:  (chain nid:gol moment:gol)
-          (get-bounds %l)
-          (root-nodes)
-          (gus-by left-bounds.trace.p ~(tap in (to-ends n2 %r)))
-        ==
-        ::
-        :: ryte-bounds
-        %:  (chain nid:gol moment:gol)
-          (get-bounds %r)
-          (leaf-nodes)
-          (gus-by ryte-bounds.trace.p ~(tap in (to-ends n1 %l)))
-        ==
-        ::
-        :: left-plumbs
-        %:  (chain nid:gol @)
-          (plomb %l)
-          (root-nodes)
-          (gus-by left-plumbs.trace.p ~(tap in (to-ends n2 %r)))
-        ==
-        ::
-        :: ryte-plumbs
-        %:  (chain nid:gol @)
-          (plomb %r)
-          (leaf-nodes)
-          (gus-by ryte-plumbs.trace.p ~(tap in (to-ends n1 %l)))
-        ==
-    == 
-    ::
-      %spawn
-    :*  (get-stocks id stocks.trace.p)
-        ((get-bounds %l) [%d id] left-bounds.trace.p)
-        ((get-bounds %r) [%k id] ryte-bounds.trace.p)
-        ((plomb %l) [%d id] ryte-plumbs.trace.p)
-        ((plomb %r) [%k id] ryte-plumbs.trace.p)
-    ==
-    ::
-      %chief
-    :*  %:  (chain id:gol stock:gol)
-          get-stocks
-          (bare-goals)
-          (gus-by stocks.trace.p ~(tap in (progeny id)))
-        ==
-        left-bounds
-        ryte-bounds
-        left-plumbs
-        ryte-plumbs
-    ==
+  =/  stock-map  ((chain id:gol stock:gol) get-stock (bare-goals) ~)
+  :*  stock-map
+      (~(run by stock-map) get-ranks)
+      ((chain nid:gol moment:gol) (get-bounds %l) (root-nodes) ~)
+      ((chain nid:gol moment:gol) (get-bounds %r) (leaf-nodes) ~)
+      ((chain nid:gol @) (plomb %r) (leaf-nodes) ~)
+      ((chain nid:gol @) (plomb %l) (root-nodes) ~)
   ==
 :: 
 :: kid - include if kid, yes or no?
@@ -1133,24 +1008,13 @@
 ++  nest-left  |=(=id:gol (neighbors id %| %& %l %d %d))
 ++  nest-ryte  |=(=id:gol (neighbors id %& %| %r %d %d))
 ::
-++  get-ranks
-  |=  =stock:gol
-  ^-  ranks:gol
-  =|  =ranks:gol
-  |-
-  ?~  stock
-    ranks
-  %=  $
-    stock  t.stock
-    ranks  (~(put by ranks) [chief id]:i.stock)
-  ==
-::
 ++  inflate-goal
   |=  =id:gol
+  ^-  goal:gol
   =/  goal  (~(got by goals.p) id)
   %=  goal
-    stock  (~(got by stocks.trace.p) id)
-    ranks  (get-ranks (~(got by stocks.trace.p) id))
+    stock  (~(got by stock-map.trace.p) id)
+    ranks  (~(got by ranks-map.trace.p) id)
     prio-left  (prio-left id)
     prio-ryte  (prio-ryte id)
     prec-left  (prec-left id)
@@ -1168,33 +1032,30 @@
   ==
 ::
 ++  inflate-goals
-  |=  ids=(set id:gol)
-  ^-  goals:gol
-  %-  ~(gas by goals.p)
-  %+  turn
-    ~(tap in ids)
-  |=(=id:gol [id (inflate-goal id)])
+  |.
+  ^-  _this
+  =.  trace.p  (trace-update)
+  %=  this
+    goals.p
+      %-  ~(gas by goals.p)
+      %+  turn
+        ~(tap in ~(key by goals.p))
+      |=(=id:gol [id (inflate-goal id)])
+  ==
 ::
 :: ** jellyfish-like motion **
-:: update ryte-bounds/plumbs left of n1
-:: update left-bounds/plumbs right of n2
 ++  jellyfish
   |=  [n1=nid:gol n2=nid:gol]
   ^-  [ids=(set id:gol) pore=_this]
   =/  nids  (~(uni in (to-ends n1 %l)) (to-ends n2 %r))
   =/  ids   (~(run in nids) |=(=nid:gol id.nid))
-  =.  trace.p  (trace-update [%yoke n1 n2])
-  =.  goals.p  (inflate-goals ids)
-  [ids this]
+  [ids (inflate-goals)]
 ::
 :: reset all the stocks of all goals below and including specified goal
 ++  avalanche
   |=  =id:gol
   ^-  [ids=(set id:gol) pore=_this]
-  =/  ids  (progeny id)
-  =.  trace.p  (trace-update [%chief id])
-  =.  goals.p  (inflate-goals ids)
-  [ids this]
+  [(progeny id) (inflate-goals)]
 ::
 :: ============================================================================
 :: 
@@ -1218,12 +1079,29 @@
   ?~  perm  %|       :: not viewer
   ?~  u.perm  %|  %& :: no %admin or %spawn privileges
 ::
+++  get-ranks
+  |=  =stock:gol
+  ^-  ranks:gol
+  =|  =ranks:gol
+  |-
+  ?~  stock
+    ranks
+  %=  $
+    stock  t.stock
+    ranks  (~(put by ranks) [chief id]:i.stock)
+  ==
+::
+++  get-rank
+  |=  [mod=ship =id:gol]
+  ^-  (unit id:gol)
+  (~(get by (get-ranks (~(got by stock-map.trace.p) id))) mod)
+::
 ++  check-goal-perm
   |=  [=id:gol mod=ship]
   ^-  ?
   ?:  (check-pool-perm mod)  %&
   =/  goal  (~(got by goals.p) id)
-  ?~  (~(get by ranks.goal) mod)  %|  %&
+  ?~  (get-rank mod id)  %|  %&
 ::
 ++  check-goal-spawn-perm
   |=  [=id:gol mod=ship]
@@ -1235,7 +1113,7 @@
 ++  stock-root
   |=  =id:gol
   ^-  [=id:gol chief=ship]
-  (snag 0 (flop stock:(~(got by goals.p) id)))
+  (snag 0 (flop (~(got by stock-map.trace.p) id)))
 ::
 :: owner, admin, or chief of stock-root
 ++  check-goal-master
@@ -1256,13 +1134,11 @@
   ?:  (check-pool-perm mod)  %&
   :: can move kid under pid if you have permissions on a goal
   :: which contains them both
-  =/  k  (~(got by goals.p) kid)
-  =/  q  (~(got by goals.p) pid)
-  =/  k-rank  (~(get by ranks.k) mod)
-  =/  q-rank  (~(get by ranks.q) mod)
-  ?~  k-rank  %|
-  ?~  q-rank  %|
-  ?:  =(u.k-rank u.q-rank)  %&
+  =/  krank  (get-rank mod kid)
+  =/  prank  (get-rank mod pid)
+  ?~  krank  %|
+  ?~  prank  %|
+  ?:  =(u.krank u.prank)  %&
   ::
   :: if chief of stock-root of kid and permissions on pid
   ?:  ?&  =(mod chief:(stock-root kid))
