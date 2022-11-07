@@ -885,8 +885,8 @@
     ==
   (((traverse nid:gol @ (map nid:gol @)) gine vis) nid)
 ::
-++  ryte-plumb  |=(=nid:gol `@`(~(got by ((plomb %r) nid ~)) nid)) :: to root
-++  left-plumb  |=(=nid:gol `@`(~(got by ((plomb %l) nid ~)) nid)) :: to leaf
+++  ryte-plumb  |=(=nid:gol (~(got by ((plomb %r) nid ~)) nid)) :: to root
+++  left-plumb  |=(=nid:gol (~(got by ((plomb %l) nid ~)) nid)) :: to leaf
 ::
 :: get depth of a given goal (lowest level is depth of 1)
 :: this is mostly for printing accurate level information in the CLI
@@ -897,7 +897,6 @@
   =.  ginn
     %=  ginn
       flow  |=(=nid:gol ~(tap in (yong nid)))
-      init  |=(=nid:gol 1)
       meld  |=([nid:gol nid:gol a=@ b=@] (max a b))
       land  |=([nid:gol out=@ ?] +(out))
     ==
@@ -971,12 +970,11 @@
 ++  trace-update
   |.
   ^-  trace:gol
-  =/  stock-map  ((chain id:gol stock:gol) get-stock (bare-goals) ~)
-  :*  stock-map
+  :*  ((chain id:gol stock:gol) get-stock (bare-goals) ~)
       ((chain nid:gol moment:gol) (get-bounds %l) (root-nodes) ~)
       ((chain nid:gol moment:gol) (get-bounds %r) (leaf-nodes) ~)
-      ((chain nid:gol @) (plomb %r) (leaf-nodes) ~)
       ((chain nid:gol @) (plomb %l) (root-nodes) ~)
+      ((chain nid:gol @) (plomb %r) (leaf-nodes) ~)
   ==
 :: 
 :: kid - include if kid, yes or no?
@@ -1046,13 +1044,12 @@
   |.
   ^-  _this
   =.  trace.p  (trace-update)
-  %=  this
-    goals.p
-      %-  ~(gas by goals.p)
-      %+  turn
-        ~(tap in ~(key by goals.p))
-      |=(=id:gol [id (inflate-goal id)])
-  ==
+  =.  goals.p
+        %-  ~(gas by goals.p)
+        %+  turn
+          ~(tap in ~(key by goals.p))
+        |=(=id:gol [id (inflate-goal id)])
+  this
 ::
 :: ** jellyfish-like motion **
 ++  jellyfish
@@ -1405,6 +1402,9 @@
   ^-  _this
   =/  old  this
   =/  mup  (move lid urid mod)
+  =/  nex  (make-nex ids.mup)
+  ~&  nex
+  ~&  goals.p
   (emot old [vzn %pool-nexus %yoke (make-nex ids.mup)]):[pore.mup .]
 ::
 ++  yoke-sequence
