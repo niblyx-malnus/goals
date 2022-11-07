@@ -70,7 +70,7 @@
           %-  ~(run by pools.store.old)
           |=  =pool:gol
           ^-  pool:gol
-          pool:abet:inflate-goals:(apex:pl pool)
+          pool:abet:(inflate-goals:(apex:pl pool))
       ==
     =/  now=@  (unique-time now.bowl log)
     :_  this(state old(log (put:log-orm *log:gol now [%init store.old])))
