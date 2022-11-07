@@ -28,7 +28,9 @@
   =/  old-pool  (~(got by pools) old-pin)
   =+  [pin pool]=(spawn-pool title own now)
   =.  pool  pool(creator owner.old-pin)
-  [pin pool(goals goals:(clone-goals:gols goals.old-pool own now))]
+  =.  pool  pool(goals goals:(clone-goals:gols goals.old-pool own now))
+  [pin pool:abet:inflate-goals:(apex:pl pool)]
+  
 ::
 ++  clone-goal
   |=  $:  =old=id:gol

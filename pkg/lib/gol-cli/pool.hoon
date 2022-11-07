@@ -967,6 +967,7 @@
 :: ============================================================================
 ::
 :: all of these should be O(nlogn) with size of the goals map
+:: if it starts taking real performance hits we can revisit this...
 ++  trace-update
   |.
   ^-  trace:gol
