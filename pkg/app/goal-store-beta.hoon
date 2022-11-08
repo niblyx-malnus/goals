@@ -1,6 +1,7 @@
 /-  gol=goal, group-store, metadata-store
 /+  dbug, default-agent, verb, agentio,
     pl=gol-cli-pool, gol-cli-goals, gol-cli-pools,
+    em=gol-cli-emot, gol-cli-node, gol-cli-traverse,
     gol-cli-etch, group-update
 |%
 +$  state-0  state-0:gol
@@ -25,7 +26,7 @@
   |-
   ?.  (has:log-orm log unix-ms)
     unix-ms
-  $(time (add unix-ms 1))
+  $(unix-ms (add unix-ms 1))
 --
 =|  state-4
 =*  state  -
@@ -70,7 +71,7 @@
           %-  ~(run by pools.store.old)
           |=  =pool:gol
           ^-  pool:gol
-          pool:abet:(inflate-goals:(apex:pl pool))
+          pool:abet:(inflate-goals:(apex:em pool))
       ==
     =/  now=@  (unique-time now.bowl log)
     :_  this(state old(log (put:log-orm *log:gol now [%init store.old])))
@@ -252,7 +253,7 @@
         ?.  =(our.bowl owner.cid.pok)
           :_  state
           [(poke-other owner.cid.pok goal-action+!>(action))]~
-        =/  pore  (move-emot:(apex-pl:hc pin) cid.pok upid.pok src.bowl)
+        =/  pore  (move:(apex-pl:hc pin) cid.pok upid.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           :: [%set-kickoff =id kickoff=(unit @da)]
@@ -500,12 +501,14 @@
         [%harvest ~]
       =/  pin  (got:idx-orm:gol index id)
       =/  pool  (~(got by pools) pin)
-      ``goal-peek+!>(harvest+~(tap in (~(harvest pl pool) id)))
+      =/  tv  ~(. gol-cli-traverse goals.pool)
+      ``goal-peek+!>(harvest+~(tap in (harvest:tv id)))
       ::
         [%full-harvest ~]
       =/  pin  (got:idx-orm:gol index id)
       =/  pool  (~(got by pools) pin)
-      ``goal-peek+!>(full-harvest+(~(full-harvest pl pool) id))
+      =/  tv  ~(. gol-cli-traverse goals.pool)
+      ``goal-peek+!>(full-harvest+(full-harvest:tv id))
       ::
         [%get-goal ~]
       =/  upin  (get:idx-orm:gol index id)
@@ -521,41 +524,40 @@
         [%yung *]
       =/  pin  (got:idx-orm:gol index id)
       =/  pool  (~(got by pools) pin)
+      =/  tv  ~(. gol-cli-traverse goals.pool)
+      =/  nd  ~(. gol-cli-node goals.pool)
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
-        ``goal-peek+!>(yung+(hi-to-lo (yung id)):[~(. pl pool) .])
+        ``goal-peek+!>(yung+(hi-to-lo:tv (yung:nd id)))
         ::
           [%uncompleted ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %yung-uncompleted
-            (hi-to-lo (incomplete (yung id))):[~(. pl pool) .]
+            (hi-to-lo:tv (incomplete:nd (yung:nd id)))
         ::
           [%virtual ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %yung-virtual
-            (hi-to-lo (virt id)):[~(. pl pool) .]
+            (hi-to-lo:tv (virt:nd id))
       ==
       ::
         [%ryte-bound ~]
       =/  pin  (got:idx-orm:gol index id)
       =/  pool  (~(got by pools) pin)
-      ``goal-peek+!>(ryte-bound+(~(ryte-bound pl pool) [%d id]))
+      =/  tv  ~(. gol-cli-traverse goals.pool)
+      ``goal-peek+!>(ryte-bound+(ryte-bound:tv [%d id]))
       ::
         [%plumb ~]
       =/  pin  (got:idx-orm:gol index id)
       =/  pool  (~(got by pools) pin)
-      ``goal-peek+!>(plumb+(~(plumb pl pool) id))
+      =/  tv  ~(. gol-cli-traverse goals.pool)
+      ``goal-peek+!>(plumb+(plumb:tv id))
       ::
         [%priority ~]
       =/  pin  (got:idx-orm:gol index id)
       =/  pool  (~(got by pools) pin)
-      ``goal-peek+!>(priority+(~(priority pl pool) id))
-      ::
-      ::   [%seniority @ @ ~]
-      :: =/  mod  (slav %p i.t.t.t.t.t.path)
-      :: =/  cp  i.t.t.t.t.t.t.path
-      :: ?>  ?=(?(%c %p) cp)
-      :: ``goal-peek+!>(seniority+(~(seniority pl pool) mod id cp))
+      =/  tv  ~(. gol-cli-traverse goals.pool)
+      ``goal-peek+!>(priority+(priority:tv id))
     ==
       [%x %pool @ @ *]
     =/  owner  (slav %p i.t.t.path)
@@ -572,18 +574,21 @@
       ::
         [%anchor ~]
       =/  pool  (~(got by pools) pin)
-      ``goal-peek+!>(anchor+(~(anchor pl pool)))
+      =/  tv  ~(. gol-cli-traverse goals.pool)
+      ``goal-peek+!>(anchor+(anchor:tv))
       ::
         [%roots *]
       =/  pool  (~(got by pools) pin)
+      =/  tv  ~(. gol-cli-traverse goals.pool)
+      =/  nd  ~(. gol-cli-node goals.pool)
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
-        ``goal-peek+!>(roots+(hi-to-lo (root-goals)):~(. pl pool))
+        ``goal-peek+!>(roots+(hi-to-lo:tv (root-goals:nd)))
         ::
           [%uncompleted ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %roots-uncompleted
-        (hi-to-lo (incomplete (root-goals))):~(. pl pool)
+        (hi-to-lo:tv (incomplete:nd (root-goals:nd)))
       ==
     ==
   ==
@@ -708,7 +713,7 @@
     (~(leave pass:io wire) other dap.bowl)
   --
 ::
-++  apex-pl  |=(=pin:gol (apex:pl (~(got by pools.store) pin)))
+++  apex-pl  |=(=pin:gol (apex:em (~(got by pools.store) pin)))
 ::
 ++  send-home-updates
   |=  [cards=(list card) =pin:gol mod=ship pid=@ upds=(list update:gol)]
@@ -731,7 +736,7 @@
   ==
 ::
 ++  send-away-updates
-  |=  [cards=(list card) =pin:gol mod=ship pid=@ pore=_pl]
+  |=  [cards=(list card) =pin:gol mod=ship pid=@ pore=_em]
   ^-  (quip card _state)
   =+  abet:pore  :: exposes efx and pool
   ::
