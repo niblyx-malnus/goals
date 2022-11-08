@@ -1,5 +1,5 @@
 /-  gol=goal
-/+  gol-cli-goals, pl=gol-cli-pool
+/+  gol-cli-goals, pl=gol-cli-pool, em=gol-cli-emot
 |_  store:gol
 +*  gols  ~(. gol-cli-goals +<)
 ::
@@ -29,8 +29,7 @@
   =+  [pin pool]=(spawn-pool title own now)
   =.  pool  pool(creator owner.old-pin)
   =.  pool  pool(goals goals:(clone-goals:gols goals.old-pool own now))
-  [pin pool:abet:(inflate-goals:(apex:pl pool))]
-  
+  [pin pool:abet:(inflate-goals:(apex:em pool))]
 ::
 ++  clone-goal
   |=  $:  =old=id:gol
@@ -48,7 +47,7 @@
   =/  old-pool  (~(got by pools) old-pin)
   ::
   :: Get goal and goal descendents
-  =/  waz  waz:(waste-goal:(apex:pl old-pool) old-id owner.old-pool)
+  =/  waz  trac:(wrest-goal:~(. pl old-pool) old-id owner.old-pool)
   =/  old-goal  (~(got by waz) old-id)
   =/  new-desc  ?~(udesc desc.old-goal u.udesc)
   ::

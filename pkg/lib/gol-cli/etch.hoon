@@ -1,5 +1,5 @@
 /-  gol=goal
-/+  pl=gol-cli-pool
+/+  pl=gol-cli-pool, em=gol-cli-emot
 :: apply (etch) updates received from foreign pools
 ::
 |_  =store:gol
@@ -25,7 +25,7 @@
         ::
         %spawn-goal
       =/  pool  (~(got by pools.store) pin)
-      =/  pore  (apex:pl pool)
+      =/  pore  (apex:em pool)
       %=  store
         index  (put:idx-orm:gol index.store id.upd pin)
         pools  (~(put by pools.store) pin pool:abet:(etch:pore upd))
@@ -33,7 +33,7 @@
       ::
         %waste-goal
       =/  pool  (~(got by pools.store) pin)
-      =/  pore  (apex:pl pool)
+      =/  pore  (apex:em pool)
       %=  store
         index  (gus-idx-orm ~(tap in waz.upd))
         pools  (~(put by pools.store) pin pool:abet:(etch:pore upd))
@@ -41,7 +41,7 @@
       ::
         %trash-goal
       =/  pool  (~(got by pools.store) pin)
-      =/  pore  (apex:pl pool)
+      =/  pore  (apex:em pool)
       %=  store
         index  (gus-idx-orm ~(tap in ~(key by (~(got by cache.pool) id.upd))))
         pools  (~(put by pools.store) pin pool:abet:(etch:pore upd))
@@ -52,7 +52,7 @@
             %goal-perms  %goal-hitch  %goal-togls  %goal-dates
         ==
       =/  pool  (~(got by pools.store) pin)
-      =/  pore  (apex:pl pool)
+      =/  pore  (apex:em pool)
       store(pools (~(put by pools.store) pin pool:abet:(etch:pore upd)))
     ==
   ::
