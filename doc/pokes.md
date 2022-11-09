@@ -25,6 +25,7 @@ Available pokes for `%goal-store` as nouns and as JSON.
 %unmark-complete  
 %update-goal-perms
 %update-pool-perms
+%subscribe
 ```
 
 ## %spawn-pool
@@ -629,5 +630,27 @@ Edit the title of an existing pool.
     },
     "title": "new title of pool"
   }
+}
+```
+
+## %subscribe
+### Description
+Subscribe to an existing pool.
+
+`pin` is the "pin" or pool id of the pool that you want to subscribe to.
+
+### Noun
+```
+[%subscribe =pin]                                             
+```
+
+### JSON
+```
+{
+  "subscribe": {
+    "pin": {
+      "owner": "zod",
+      "birth": "~2000.1.1"
+    }
 }
 ```
