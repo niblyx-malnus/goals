@@ -127,6 +127,18 @@ const api = {
       json: poolToArchive,
     });
   },
+  subscribePool: async (pin) => {
+    const poolToJoin = {
+      subscribe: {
+        pin,
+      },
+    };
+    return api.poke({
+      app: "goal-store-beta",
+      mark: "goal-action",
+      json: poolToJoin,
+    });
+  },
   addGoal: async (desc, pin, parentId) => {
     //parent id => add under
     const newGoal = {

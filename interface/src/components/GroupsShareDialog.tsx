@@ -66,7 +66,7 @@ export default function GroupsShareDialog() {
         .map((ship: string) => {
           if (role === "Admin") {
             return { role: "admin", ship };
-          } else if (role === "Chef") {
+          } else if (role === "Chief") {
             return { role: "spawn", ship };
           } else if (role === "Viewer") {
             return { role: null, ship };
@@ -163,7 +163,7 @@ export default function GroupsShareDialog() {
               onChange={handleRoleChange}
             >
               <MenuItem value={"Viewer"}>Viewer</MenuItem>
-              <MenuItem value={"Chef"}>Chef</MenuItem>
+              <MenuItem value={"Chief"}>Chief</MenuItem>
               <MenuItem value={"Admin"}>Admin</MenuItem>
             </Select>
           </FormControl>

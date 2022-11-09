@@ -5,7 +5,7 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
-
+import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
 import useStore from "../store";
 import { log } from "../helpers";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -30,7 +30,9 @@ import {
   HarvestPanel,
   ArchiveDialog,
   GoalPermsDialog,
+  JoinPoolDialog
 } from "./";
+import Tooltip from "@mui/material/Tooltip";
 
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -54,7 +56,12 @@ export default function Header() {
   const toggleSnackBar = useStore((store) => store.toggleSnackBar);
 
   const toggleShowArchived = useStore((store) => store.toggleShowArchived);
+
   const showArchived = useStore((store) => store.showArchived);
+
+  const toggleJoinPoolDialogOpen = useStore(
+    (store: any) => store.toggleJoinPoolDialogOpen
+  );
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewProjectTitle(event.target.value);
@@ -130,6 +137,7 @@ export default function Header() {
       <ArchiveDialog />
       <GoalPermsDialog />
       <GroupsShareDialog />
+      <JoinPoolDialog />
       <Snackie />
       <Stack direction="row" alignItems="center" spacing={1}>
         <OutlinedInput
@@ -158,6 +166,7 @@ export default function Header() {
             </InputAdornment>
           }
         />
+
         <Box sx={{ width: 160 }}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Sorting</InputLabel>
@@ -171,7 +180,7 @@ export default function Header() {
             >
               <MenuItem value={"dsc"}>Newest First </MenuItem>
               <MenuItem value={"asc"}>Oldest First</MenuItem>
-              <MenuItem value={"prio"}>By Priortiy</MenuItem>
+              {/* <MenuItem value={"prio"}>By Priority</MenuItem> */}
             </Select>
           </FormControl>
         </Box>
@@ -209,8 +218,18 @@ export default function Header() {
             <KeyboardDoubleArrowUpIcon />
           </IconButton>
         </Stack>
+        <Tooltip title="Join a pool using a link" placement="right" arrow>
+          <IconButton
+            aria-label="toggle password visibility"
+            onClick={() => {
+              toggleJoinPoolDialogOpen(true);
+            }}
+            edge="end"
+          >
+            <LoginOutlinedIcon />
+          </IconButton>
+        </Tooltip>
       </Stack>
-
       <Divider sx={{ paddingTop: 2 }} />
     </Box>
   );
