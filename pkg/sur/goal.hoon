@@ -11,14 +11,15 @@
 +$  state-0  [%0 =store:s0]
 ::
 +$  id            id:s4
-+$  eid           eid:s4
++$  nid           nid:s4
 +$  pin           pin:s4
++$  node          node:s4
 +$  edge          edge:s4
++$  edges         edges:s4
 +$  pool-role     pool-role:s4
 +$  stock         stock:s4
 +$  ranks         ranks:s4
 +$  moment        moment:s4
-+$  bound         bound:s4
 ::
 +$  goal-froze    goal-froze:s4
 +$  goal-nexus    goal-nexus:s4
@@ -64,7 +65,7 @@
 ++  s4
   |%
   +$  id  id:s3
-  +$  eid  eid:s3
+  +$  nid  eid:s3
   +$  pin  pin:s3
   +$  goal-froze  goal-froze:s3
       :: +$  togl
@@ -83,30 +84,34 @@
   +$  ranks  (map ship id) :: map of ship to highest ranking goal id
   ::
   +$  moment  (unit @da)
-  +$  bound  [=moment hereditor=eid]
   ::
-  +$  edge  :: should change to +$node
-    $:  =moment
-        inflow=(set eid)  :: should change to incoming
-        outflow=(set eid) :: should change to outgoing
+  :: $node (previously $edge) and $goal-nexus are inflated;
+  :: need to be distilled back down in future iteration
+  +$  node
+    $:  $:  =moment
+            inflow=(set nid)
+            outflow=(set nid)
+        ==
         ::
-        =left=bound
-        =ryte=bound
+        left-bound=moment
+        ryte-bound=moment
         left-plumb=@ud
         ryte-plumb=@ud
     ==
   ::
+  +$  edge  (pair nid nid)
+  +$  edges  (set edge)
+  ::
   +$  goal-nexus
-    $:  par=(unit id)
-        kids=(set id)
-        kickoff=edge  :: should change to kick-off
-        deadline=edge
-        ::
-        complete=?(%.y %.n)
-        actionable=?(%.y %.n)
-        ::
-        chief=ship
-        spawn=(set ship)
+    $:  $:  par=(unit id)
+            kids=(set id)
+            kickoff=node
+            deadline=node
+            complete=?(%.y %.n)
+            actionable=?(%.y %.n)
+            chief=ship
+            spawn=(set ship)
+        ==
         ::
         :: these are redundant, but simplify things on the frontend
         =stock
@@ -136,11 +141,11 @@
   +$  goals  (map id goal)
   ::
   +$  trace
-    $:  stocks=(map id stock)
-        left-bounds=(map eid bound)
-        ryte-bounds=(map eid bound)
-        left-plumbs=(map eid @)
-        ryte-plumbs=(map eid @)
+    $:  stock-map=(map id stock)
+        left-bounds=(map nid moment)
+        ryte-bounds=(map nid moment)
+        left-plumbs=(map nid @)
+        ryte-plumbs=(map nid @)
     ==
   ::
   +$  pool-role  ?(%admin %spawn)
@@ -197,11 +202,6 @@
     $%  [%desc desc=@t]
     ==
   ::
-  +$  goal-nexus-update
-    $%  [%kickoff moment=(unit @da)]
-        [%deadline moment=(unit @da)]
-    ==
-  ::
   +$  goal-togls-update
     $%  [%complete complete=?(%.y %.n)]
         [%actionable actionable=?(%.y %.n)]
@@ -225,7 +225,6 @@
         [%goal-dates =nex]
         [%goal-perms =nex]
         [%goal-hitch =id goal-hitch-update]
-        [%goal-nexus =id goal-nexus-update]
         [%goal-togls =id goal-togls-update]
         [%poke-error =tang]
     ==  ==
@@ -252,7 +251,7 @@
         [%get-goal ugoal=(unit goal)]
         [%get-pin upin=(unit pin)]
         [%get-pool upool=(unit pool)]
-        [%ryte-bound moment=(unit @da) hereditor=eid]
+        [%ryte-bound moment=(unit @da)]
         [%plumb depth=@ud]
         [%anchor depth=@ud]
         [%priority priority=@ud]
@@ -264,8 +263,8 @@
     ==
   ::
   +$  core-yoke
-    $%  [%dag-yoke e1=eid e2=eid]
-        [%dag-rend e1=eid e2=eid]
+    $%  [%dag-yoke n1=nid n2=nid]
+        [%dag-rend n1=nid n2=nid]
     ==
   ::
   ++  yoke-tags
@@ -330,6 +329,7 @@
         [%edit-pool-title =pin title=@t]
         [%subscribe =pin]
         [%unsubscribe =pin]
+        [%kicker =ship =pin]
     ==  ==  ==
   --
 ::
@@ -430,21 +430,21 @@
   =|  nexus=goal-nexus:s4
   =.  par.nexus  par.goal
   =.  kids.nexus  kids.goal
-  =.  kickoff.nexus  (edge-3-to-4 kickoff.goal)
-  =.  deadline.nexus  (edge-3-to-4 deadline.goal)
+  =.  kickoff.nexus  (node-3-to-4 kickoff.goal)
+  =.  deadline.nexus  (node-3-to-4 deadline.goal)
   =.  complete.nexus  complete.goal
   =.  actionable.nexus  actionable.goal
   =.  chief.nexus  owner.goal
   nexus
 ::
-++  edge-3-to-4
+++  node-3-to-4
   |=  =edge:s3
-  ^-  edge:s4
-  =|  =edge:s4
-  =.  moment.edge  moment.^edge
-  =.  inflow.edge  inflow.^edge
-  =.  outflow.edge  outflow.^edge
-  edge
+  ^-  node:s4
+  =|  =node:s4
+  =.  moment.node  moment.edge
+  =.  inflow.node  inflow.edge
+  =.  outflow.node  outflow.edge
+  node
 ::
 ++  s3
   |%

@@ -43,35 +43,14 @@
     par  ?~(par.goal ~ (some (new-id u.par.goal)))
     kids  (new-set-id kids.goal)
     ::
-    inflow.kickoff  (new-set-eid inflow.kickoff.goal)
-    outflow.kickoff  (new-set-eid outflow.kickoff.goal)
-    inflow.deadline  (new-set-eid inflow.deadline.goal)
-    outflow.deadline  (new-set-eid outflow.deadline.goal)
-    ::
-    hereditor.left-bound.kickoff
-      (new-eid hereditor.left-bound.kickoff.goal)
-    hereditor.ryte-bound.kickoff
-      (new-eid hereditor.ryte-bound.kickoff.goal)
-    hereditor.left-bound.deadline
-      (new-eid hereditor.left-bound.deadline.goal)
-    hereditor.ryte-bound.deadline
-      (new-eid hereditor.ryte-bound.deadline.goal)
-    ::
-    stock  (turn stock.goal |=([=id:gol =ship] [(new-id id) ship]))
-    ranks
-      %-  ~(gas by ranks.goal)
-      (turn ~(tap by ranks.goal) |=([=ship =id:gol] [ship (new-id id)]))
-    ::
-    prio-left  (new-set-id prio-left.goal)
-    prio-ryte  (new-set-id prio-ryte.goal)
-    prec-left  (new-set-id prec-left.goal)
-    prec-ryte  (new-set-id prec-ryte.goal)
-    nest-left  (new-set-id nest-left.goal)
-    nest-ryte  (new-set-id nest-ryte.goal)
+    inflow.kickoff  (new-set-nid inflow.kickoff.goal)
+    outflow.kickoff  (new-set-nid outflow.kickoff.goal)
+    inflow.deadline  (new-set-nid inflow.deadline.goal)
+    outflow.deadline  (new-set-nid outflow.deadline.goal)
   ==
   ++  new-id  |=(=id:gol (~(got by id-map) id))
-  ++  new-eid  |=(=eid:gol [-.eid (new-id id.eid)])
+  ++  new-nid  |=(=nid:gol [-.nid (new-id id.nid)])
   ++  new-set-id  |=(=(set id:gol) (~(run in set) new-id))
-  ++  new-set-eid  |=(=(set eid:gol) (~(run in set) new-eid))
+  ++  new-set-nid  |=(=(set nid:gol) (~(run in set) new-nid))
   --
 --

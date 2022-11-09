@@ -170,7 +170,8 @@
         (print-cards:prtr ~["%gol-cli-beta: CLI timed out. Hit ENTER at the %gol-cli-beta prompt for updates."])
       :: 
       :: ignore stack trace; only print error message
-      %-  (slog `tang`[(snag 1 u.p.sign) ~])
+      %-  (slog u.p.sign)
+      :: %-  (slog `tang`[(snag 1 u.p.sign) ~])
       `this
     ==
     ::
