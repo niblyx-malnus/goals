@@ -674,6 +674,10 @@
               %pool-perms  %pool-hitch  %pool-nexus
               %goal-perms  %goal-hitch  %goal-nexus  %goal-togls  %goal-dates
           ==
+        ::
+        :: quick fix for some duplicates
+        ?:  &(=(%spawn-pool +<.update) (~(has by pools) pin))
+          `this
         =^  cards  state
           (send-home-updates:hc ~ pin mod 0 [update]~)
         [cards this]
