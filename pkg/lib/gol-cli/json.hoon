@@ -441,18 +441,7 @@
       :-  %nexus
       %-  pairs
       :~  [%goals (enjs-goals goals.pool)]
-          =/  cache
-            =/  cache  *goals
-            =/  idx  0
-            =/  list
-              %+  turn  ~(val by cache.pool)
-              |=  =goals
-              ~(tap by goals)
-            |-
-            ?:  =(idx (lent list))
-              cache
-            $(idx +(idx), cache (~(gas by cache) (snag idx list)))
-          [%cache (enjs-goals cache)]
+          [%cache (enjs-goals cache.pool)]
       ==
       :-  %hitch
       %-  pairs
