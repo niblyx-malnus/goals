@@ -213,6 +213,8 @@
     ~|("Must be owner or self to modify admin perms." !!)
   %&
 ::
+++  check-in-pool  |=(=ship |(=(ship owner.p) (~(has by perms.p) ship)))
+::
 :: replace all chiefs of goals whose chiefs have been kicked
 ++  replace-chiefs
    |=  kick=(set ship)
@@ -580,7 +582,7 @@
   |=  [=id:gol chief=ship rec=?(%.y %.n) mod=ship]
   ^-  _this
   ?.  (check-goal-edit-perm id mod)  ~|("missing goal perms" !!)
-  ?.  (~(has by perms.p) chief)  ~|("chief is a non-viewer" !!)
+  ?.  (check-in-pool chief)  ~|("chief not in pool" !!)
   =/  ids  ?.(rec ~[id] ~(tap in (progeny:tv id)))
   %=  this
     goals.p
@@ -597,8 +599,8 @@
   |=  [=id:gol spawn=(set ship) mod=ship]
   ^-  _this
   ?.  (check-goal-edit-perm id mod)  ~|("missing goal perms" !!)
-  ?.  =(0 ~(wyt in (~(dif in spawn) ~(key by perms.p))))
-    ~|("ships in spawn set are non-viewers" !!)
+  ?.  (~(all in spawn) check-in-pool)
+    ~|("some ships in spawn set are not in pool" !!)
   =/  goal  (~(got by goals.p) id)
   this(goals.p (~(put by goals.p) id goal(spawn spawn)))
 --
