@@ -68,7 +68,7 @@ const Inputs = ({
   const [inputValue, setInputValue] = useState<string>("~");
   const [value, setValue] = useState<string>("~");
 
-  const [role, setRole] = useState("Spawn");
+  const [role, setRole] = useState("Chief");
   const [pathErrorMessage, setPathErrorMessage] = useState<string>("");
   const [pathError, setPathError] = useState<boolean>(false);
   const handleRoleChange = (event: SelectChangeEvent) => {

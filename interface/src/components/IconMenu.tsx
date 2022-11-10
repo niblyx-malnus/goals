@@ -17,6 +17,7 @@ import AgricultureOutlinedIcon from "@mui/icons-material/AgricultureOutlined";
 import OpenWithOutlinedIcon from "@mui/icons-material/OpenWithOutlined";
 import LinkOutlinedIcon from "@mui/icons-material/LinkOutlined";
 import RestoreOutlinedIcon from "@mui/icons-material/RestoreOutlined";
+import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
@@ -425,7 +426,7 @@ export default function IconMenu({
     }
   };
   const renderGoalMenu = () => {
-    if (isArchived)    
+    if (isArchived)
       return (
         <MenuItem onClick={renewGoal} disableRipple>
           <RestoreOutlinedIcon fontSize="small" />
@@ -496,14 +497,14 @@ export default function IconMenu({
               move to root
             </MenuItem>
             <Divider />
-            <MenuItem onClick={handlePriortize} disableRipple>
+            {/* <MenuItem onClick={handlePriortize} disableRipple>
               <LinkOutlinedIcon fontSize="small" />
               prioritize
             </MenuItem>
             <MenuItem onClick={handlePrecede} disableRipple>
               <LinkOutlinedIcon fontSize="small" />
               precede
-            </MenuItem>
+        </MenuItem>*/}
             <MenuItem onClick={handleNest} disableRipple>
               <LinkOutlinedIcon fontSize="small" />
               virtually nest
@@ -594,7 +595,24 @@ export default function IconMenu({
           disableRipple
         >
           <FolderCopyOutlinedIcon fontSize="small" />
-          make a copy
+          duplicate pool
+        </MenuItem>
+        <MenuItem
+          onClick={async () => {
+            handleClose();
+            try {
+              await navigator.clipboard.writeText(
+                `/${pin?.owner}/${pin?.birth}`
+              );
+              log("copied link to clipboard");
+            } catch (err) {
+              log("failed  to copy link to clipboard");
+            }
+          }}
+          disableRipple
+        >
+          <ContentCopyOutlinedIcon fontSize="small" />
+          link
         </MenuItem>
         {role === "owner" && (
           <>

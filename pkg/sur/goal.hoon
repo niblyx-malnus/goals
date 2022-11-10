@@ -21,18 +21,19 @@
 +$  ranks         ranks:s4
 +$  moment        moment:s4
 ::
-+$  goal-froze    goal-froze:s4
 +$  goal-nexus    goal-nexus:s4
++$  goal-froze    goal-froze:s4
++$  goal-trace    goal-trace:s4
 +$  goal-hitch    goal-hitch:s4
 ::
 +$  goal          goal:s4
 +$  ngoal         ngoal:s4
 +$  goals         goals:s4
-+$  trace         trace:s4
 ::
-+$  pool-froze    pool-froze:s4
-+$  pool-perms    pool-perms:s4
 +$  pool-nexus    pool-nexus:s4
++$  pool-perms    pool-perms:s4
++$  pool-froze    pool-froze:s4
++$  pool-trace    pool-trace:s4
 +$  pool-hitch    pool-hitch:s4
 ::
 +$  pool          pool:s4
@@ -44,6 +45,7 @@
 ::
 +$  store         store:s4
 ::
++$  nux           nux:s4
 +$  nex           nex:s4
 +$  update        update:s4
 +$  home-update   home-update:s4
@@ -68,16 +70,7 @@
   +$  nid  eid:s3
   +$  pin  pin:s3
   +$  goal-froze  goal-froze:s3
-      :: +$  togl
-      ::   $:  mod=ship
-      ::       timestamp=@da
-      ::   ==
   +$  goal-hitch  goal-hitch:s3
-      :: meta=(map @tas (unit @tas))
-      :: tags=(set @tas)
-      ::
-  +$  pool-froze  pool-froze:s3
-  +$  pool-togls  pool-togls:s3
   +$  pool-hitch  pool-hitch:s3
   ::
   +$  stock  (list [=id chief=ship]) :: lineage; youngest to oldest
@@ -85,68 +78,59 @@
   ::
   +$  moment  (unit @da)
   ::
-  :: $node (previously $edge) and $goal-nexus are inflated;
-  :: need to be distilled back down in future iteration
-  +$  node
-    $:  $:  =moment
-            inflow=(set nid)
-            outflow=(set nid)
-        ==
-        ::
-        left-bound=moment
+  +$  node-nexus
+    $:  =moment
+        inflow=(set nid)
+        outflow=(set nid)
+    ==
+  ::
+  :: values implied by the data structure
+  +$  node-trace
+    $:  left-bound=moment
         ryte-bound=moment
         left-plumb=@ud
         ryte-plumb=@ud
     ==
   ::
+  +$  node  [node-nexus node-trace]
+  ::
   +$  edge  (pair nid nid)
   +$  edges  (set edge)
   ::
   +$  goal-nexus
-    $:  $:  par=(unit id)
-            kids=(set id)
-            kickoff=node
-            deadline=node
-            complete=?(%.y %.n)
-            actionable=?(%.y %.n)
-            chief=ship
-            spawn=(set ship)
-        ==
-        ::
-        :: these are redundant, but simplify things on the frontend
-        =stock
-        =ranks
-        ::
-        prio-left=(set id) :: excludes par
-        prio-ryte=(set id) :: excludes kids
-        prec-left=(set id)
-        prec-ryte=(set id)
-        nest-left=(set id) :: excludes kids
-        nest-ryte=(set id) :: excludes par
+    $:  par=(unit id)
+        kids=(set id)
+        kickoff=node
+        deadline=node
+        complete=?(%.y %.n)
+        actionable=?(%.y %.n)
+        chief=ship
+        spawn=(set ship)
     ==
   ::
-  +$  goal
-    $:  goal-froze
-        goal-nexus
-        goal-hitch
+  :: values implied by the data structure
+  +$  goal-trace
+    $:  =stock
+        =ranks
+        prio-left=(set id)
+        prio-ryte=(set id)
+        prec-left=(set id)
+        prec-ryte=(set id)
+        nest-left=(set id)
+        nest-ryte=(set id)
     ==
+  ::
+  +$  goal  [goal-nexus goal-froze goal-trace goal-hitch]
   ::
   :: named goal (modules are named)
   +$  ngoal
-    $:  froze=goal-froze
-        nexus=goal-nexus
+    $:  nexus=goal-nexus
+        froze=goal-froze
+        trace=goal-trace
         hitch=goal-hitch
     ==
   ::
   +$  goals  (map id goal)
-  ::
-  +$  trace
-    $:  stock-map=(map id stock)
-        left-bounds=(map nid moment)
-        ryte-bounds=(map nid moment)
-        left-plumbs=(map nid @)
-        ryte-plumbs=(map nid @)
-    ==
   ::
   +$  pool-role  ?(%admin %spawn)
   ::
@@ -154,22 +138,28 @@
   ::
   +$  pool-nexus
     $:  =goals
-        =trace
         cache=(map id goals)
+        owner=ship
+        perms=pool-perms
     ==
   ::
-  +$  pool
-    $:  pool-froze
-        perms=pool-perms
-        pool-nexus
-        pool-hitch
+  +$  pool-froze  [birth=@da creator=ship] :: owner moved to nexus
+  ::
+  +$  pool-trace
+    $:  stock-map=(map id stock)
+        left-bounds=(map nid moment)
+        ryte-bounds=(map nid moment)
+        left-plumbs=(map nid @)
+        ryte-plumbs=(map nid @)
     ==
+  ::
+  +$  pool  [pool-nexus pool-froze trace=pool-trace pool-hitch]
   ::
   :: named pool (modules are named)
   +$  npool
-    $:  froze=pool-froze
-        perms=pool-perms
-        nexus=pool-nexus
+    $:  nexus=pool-nexus
+        froze=pool-froze
+        trace=pool-trace
         hitch=pool-hitch
     ==
   ::
@@ -188,7 +178,8 @@
         cache=pools
     ==
   ::
-  +$  nex  (map id goal-nexus)
+  +$  nux  [goal-nexus goal-trace]
+  +$  nex  (map id nux)
   ::
   +$  pool-hitch-update
     $%  [%title title=@t]
@@ -370,14 +361,15 @@
   |=  =npool:s3
   ^-  pool:s4
   =|  =npool:s4
-  =.  froze.npool  froze.^npool
-  =.  perms.npool  (pool-perms-3-to-4 owner.froze.^npool perms.^npool)
+  =.  froze.npool  [birth creator]:froze.^npool
+  =.  owner.nexus.npool  owner.froze.^npool
+  =.  perms.nexus.npool  (pool-perms-3-to-4 perms.^npool)
   =.  goals.nexus.npool  (goals-3-to-4 goals.nexus.^npool)
   =.  hitch.npool  hitch.^npool
   npool
 ::
 ++  pool-perms-3-to-4
-  |=  [owner=ship pool-perms:s3]
+  |=  pool-perms:s3
   =|  =pool-perms:s4
   =.  pool-perms
     %-  ~(gas by pool-perms)

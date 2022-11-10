@@ -67,7 +67,7 @@ export default function GoalTimeline({ kickoff, deadline }: any) {
         anchorEl={anchorEl}
         anchorOrigin={{
           vertical: "bottom",
-          horizontal: "left",
+          horizontal: "right",
         }}
         transformOrigin={{
           vertical: "top",

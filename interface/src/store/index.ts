@@ -114,6 +114,8 @@ interface Store {
     newStatus: boolean,
     newGoalPermsDialogData: any
   ) => void;
+  joinPoolDialogOpen: boolean;
+  toggleJoinPoolDialogOpen: (newStatus: boolean) => void;
 }
 /**
  * 
@@ -374,6 +376,9 @@ const useStore = create<Store>((set, get) => ({
     })),
   pals: [],
   setPals: (newPals: any) => set(() => ({ pals: newPals })),
+  joinPoolDialogOpen: false,
+  toggleJoinPoolDialogOpen: (newStatus: boolean) =>
+    set(() => ({ joinPoolDialogOpen: newStatus })),
 }));
 
 export default useStore;

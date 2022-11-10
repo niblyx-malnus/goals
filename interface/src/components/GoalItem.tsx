@@ -125,7 +125,6 @@ const GoalItem = memo(
       setAddingGoal(true);
     };
     const renderIconMenu = () => {
-      if (poolRole === null) return;
       if (poolRole === "spawn" && !isChief) return;
       if (poolRole !== "owner" && poolRole !== "admin" && goal.isArchived)
         return;
@@ -228,7 +227,6 @@ const GoalItem = memo(
       </Box>
     );
     const renderTitle = () => {
-      if (poolRole === null) return noEditPermTitle;
       if (poolRole === "spawn" && !isChief) return noEditPermTitle;
       return !editingTitle ? (
         <Box
@@ -280,7 +278,6 @@ const GoalItem = memo(
       );
     };
     const renderAddButton = () => {
-      if (poolRole === null) return;
       if (poolRole === "spawn" && !isChief) return;
       //hide add goal in harvest panel
       if (harvestGoal) return;

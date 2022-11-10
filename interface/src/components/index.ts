@@ -16,6 +16,7 @@ import GoalItem from "./GoalItem";
 import ArchiveDialog from "./ArchiveDialog";
 import GoalPermsDialog from "./GoalPermsDialog";
 import GoalTimeline from "./GoalTimeline";
+import JoinPoolDialog from "./JoinPoolDialog";
 
 
 export {
@@ -36,5 +37,6 @@ export {
   GoalItem,
   ArchiveDialog,
   GoalPermsDialog,
-  GoalTimeline
+  GoalTimeline,
+  JoinPoolDialog
 };

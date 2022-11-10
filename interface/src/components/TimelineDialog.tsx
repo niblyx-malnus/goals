@@ -59,10 +59,11 @@ export default function TimelineDialog() {
   const updateTimeline = async () => {
     setTrying(true);
     try {
-      const kickoffResult = await api.setKickoff(
+      //disabled for now
+      /*const kickoffResult = await api.setKickoff(
         timelineDialogData.goalId,
         kickoffValue?.valueOf() || null
-      );
+      );*/
       const deadlineResult = await api.setDeadline(
         timelineDialogData.goalId,
         deadlineValue?.valueOf() || null
@@ -72,7 +73,7 @@ export default function TimelineDialog() {
         severity: "success",
       });
       log("setDeadline result =>", deadlineResult);
-      log("setKickoff result =>", kickoffResult);
+      //log("setKickoff result =>", kickoffResult);
       handleClose();
     } catch (e) {
       log("updateTimeline error =>", e);
@@ -105,30 +106,6 @@ export default function TimelineDialog() {
             spacing={2}
             paddingTop={1}
           >
-            <Stack
-              //TODO: updated stacks across the app to use direction
-              direction={"row"}
-              spacing={1}
-              alignItems="center"
-              justifyContent="center"
-            >
-              <DesktopDatePicker
-                label="Kickoff"
-                value={kickoffValue}
-                inputFormat="MM/DD/YYYY"
-                onChange={handleKickoffChange}
-                renderInput={(params) => <TextField {...params} fullWidth />}
-              />
-              <IconButton
-                aria-label="clear kickoff input"
-                size="small"
-                onClick={() => {
-                  setKickoffValue(null);
-                }}
-              >
-                <ClearIcon />
-              </IconButton>
-            </Stack>
             <Stack
               //TODO: updated stacks across the app to use direction
               direction={"row"}
