@@ -17,9 +17,11 @@ const shipName = memoize(() => {
   //returns the current ship's name
   return isDev() ? process.env.REACT_APP_SHIP_NAME : window.ship;
 });
-const getRoleTitle = (role: any): "owner" | "chief" | "viewer" => {
+const getRoleTitle = (role: any): "owner" | "admin" | "chief" | "viewer" => {
   if (role === "owner") {
     return "owner";
+  } else if (role === "admin") {
+    return "admin";
   } else if (role === "spawn") {
     return "chief";
   } //if (role === null)
