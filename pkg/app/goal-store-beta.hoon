@@ -445,8 +445,8 @@
       %+  send-away-updates:hc
         cards
       =/  new  (~(put by perms.pool) src.bowl ~)
-      =/  pore  (update-pool-perms:(apex-pl:hc pin) new src.bowl)
-      [pin src.bowl 0 pore]
+      =/  pore  (update-pool-perms:(apex-pl:hc pin) new our.bowl)
+      [pin our.bowl 0 pore]
     [cards this]
   ==
 ::
