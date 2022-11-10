@@ -145,4 +145,32 @@
   ::
   :: get the nodes flowing out of id's deadline
   (bond-overlap id nids %r %d)
+:: 
+:: kid - include if kid, yes or no?
+:: par - include if par, yes or no?
+:: dir - leftward or rightward
+:: src - starting in kickoff or deadline
+:: dst - ending in kickoff or deadline
+++  neighbors
+  |=  [=id:gol kid=? par=? dir=?(%l %r) src=?(%k %d) dst=?(%k %d)]
+  ^-  (set id:gol)
+  =/  flow  ?-(dir %l (iflo [src id]), %r (oflo [src id]))
+  =/  goal  (~(got by goals) id)
+  %-  ~(gas in *(set id:gol))
+  %+  murn
+    ~(tap in flow)
+  |=  =nid:gol
+  ?.  ?&  =(dst -.nid) :: we keep when destination is as specified
+          |(kid !(~(has in kids.goal) id.nid)) :: if k false, must not be in kids
+          |(par !?~(par.goal %| =(id.nid u.par.goal))) :: if p is false, must not be par
+      ==
+    ~
+  (some id.nid)
+::  
+++  prio-left  |=(=id:gol (neighbors id %& %| %l %k %k))
+++  prio-ryte  |=(=id:gol (neighbors id %| %& %r %k %k))
+++  prec-left  |=(=id:gol (neighbors id %& %& %l %k %d))
+++  prec-ryte  |=(=id:gol (neighbors id %& %& %r %d %k))
+++  nest-left  |=(=id:gol (neighbors id %| %& %l %d %d))
+++  nest-ryte  |=(=id:gol (neighbors id %& %| %r %d %d))
 --

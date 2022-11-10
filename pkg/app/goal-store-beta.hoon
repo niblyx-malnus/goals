@@ -71,7 +71,7 @@
           %-  ~(run by pools.store.old)
           |=  =pool:gol
           ^-  pool:gol
-          pool:abet:(inflate-goals:(apex:em pool))
+          pool:abet:(inflater:(apex:em pool))
       ==
     =/  now=@  (unique-time now.bowl log)
     :_  this(state old(log (put:log-orm *log:gol now [%init store.old])))
@@ -368,7 +368,7 @@
           :_  state
           [(poke-other owner.pin.pok goal-action+!>(action))]~
         =/  pool  (~(got by pools) pin.pok)
-        =/  diff  (~(pool-diff pl pool) new.pok)
+        =/  diff  (~(pool-diff em pool) new.pok)
         ~&  diff
         %+  send-away-updates:hc
           ;:  welp
@@ -384,18 +384,20 @@
         [pin.pok src.bowl pid pore]
           ::
           :: [%subscribe =pin]
+          :: for some reason this is always called twice in a row ?!?
           %subscribe
         =/  pite  /[`@`+<.pin.pok]/[`@`+>.pin.pok]
         ?<  =(owner.pin.pok our.bowl)
-        ?:  (~(has by wex.bowl) [pite owner.pin.pok dap.bowl])
-          =*  poke-other  ~(poke-other pass:hc [%kicker pite])
-          :_  state
-          :~  %+  poke-other
-                owner.pin.pok
-              :: 
-              :: on kick, we'll resubscribe and get the initial update
-              goal-action+!>([vzn 0 %kicker our.bowl pin.pok])
-          ==
+        :: ?:  (~(has by wex.bowl) [pite owner.pin.pok dap.bowl])
+        ::   =*  poke-other  ~(poke-other pass:hc [%kicker pite])
+        ::   ~&  "%goal-store-beta: kicking myself..."
+        ::   :_  state
+        ::   :~  %+  poke-other
+        ::         owner.pin.pok
+        ::       :: 
+        ::       :: on kick, we'll resubscribe and get the initial update
+        ::       goal-action+!>([vzn 0 %kicker our.bowl pin.pok])
+        ::   ==
         =*  watch-other  ~(watch-other pass:hc pite)
         :_  state
         [(watch-other owner.pin.pok pite)]~

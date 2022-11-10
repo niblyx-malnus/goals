@@ -34,18 +34,6 @@
     ~|("non-equivalent-update" !!)
   (emit upd)
 ::
-:: emit a list of effects after checking at each step that
-:: apply the update yields an equivalent state
-++  emol
-  |=  [ets=_this upz=(list update:gol)]
-  ^+  this
-  ?~  upz
-    =.  ets  ets(trace.p trace.p)
-    ?:  =(p.this p.ets)
-      this
-    ~|("non-equivalent-update" !!)
-  $(upz t.upz, ets (etch:ets i.upz), this (emit i.upz))
-::
 :: ============================================================================
 :: 
 :: MANAGE UPDATES WITH NEX/NEXUS
@@ -97,7 +85,7 @@
   %-  ~(gas by nex)
   %+  turn  ~(tap in ids)
   |=  =id:gol
-  [id nexus:`ngoal:gol`(~(got by goals) id)]
+  [id [nexus trace]:`ngoal:gol`(~(got by goals) id)]
 ::
 ++  apply-nex
   |=  =nex:gol
@@ -106,23 +94,26 @@
       goals.p
         %-  ~(gas by goals.p)
         %+  turn  ~(tap by nex)
-        |=  [=id:gol =goal-nexus:gol]
+        |=  [=id:gol =nux:gol]
         ^-  [id:gol goal:gol]
         =/  =ngoal:gol  (~(got by goals.p) id)
-        [id ngoal(nexus goal-nexus)]
+        [id ngoal(nexus -.nux, trace +.nux)]
       trace.p
         =/  nex  ~(tap by nex)
         |-
         ?~  nex
           trace.p
-        $(nex t.nex, trace.p (nexus-to-trace -.i.nex +.i.nex))
+        %=  $
+          nex  t.nex
+          trace.p  (nex-trace-update -.i.nex +.i.nex)
+        ==
     ==
 ::
-++  nexus-to-trace
-  |=  [=id:gol nus=goal-nexus:gol]
-  ^-  trace:gol
+++  nex-trace-update
+  |=  [=id:gol nus=goal-nexus:gol tar=goal-trace:gol]
+  ^-  pool-trace:gol
   %=  trace.p
-    stock-map  (~(put by stock-map.trace.p) id stock.nus)
+    stock-map  (~(put by stock-map.trace.p) id stock.tar)
     left-bounds  
       %-  ~(gas by left-bounds.trace.p)
       ~[[[%k id] left-bound.kickoff.nus] [[%d id] left-bound.deadline.nus]]
@@ -147,7 +138,8 @@
 :: if it starts taking real performance hits we can revisit this...
 ++  trace-update
   |.
-  ^-  trace:gol
+  =.  goals.p  (~(uni by goals.p) (collapse-cache cache.p)) 
+  ^-  pool-trace:gol
   :*  stock-map=((chain:tv id:gol stock:gol) get-stocks:tv (bare-goals:nd) ~)
       ^=  left-bounds
         ((chain:tv nid:gol moment:gol) (get-bounds:tv %l) (root-nodes:nd) ~)
@@ -156,74 +148,82 @@
       left-plumbs=((chain:tv nid:gol @) (plomb:tv %l) (root-nodes:nd) ~)
       ryte-plumbs=((chain:tv nid:gol @) (plomb:tv %r) (leaf-nodes:nd) ~)
   ==
-:: 
-:: kid - include if kid, yes or no?
-:: par - include if par, yes or no?
-:: dir - leftward or rightward
-:: src - starting in kickoff or deadline
-:: dst - ending in kickoff or deadline
-++  neighbors
-  |=  [=id:gol kid=? par=? dir=?(%l %r) src=?(%k %d) dst=?(%k %d)]
-  ^-  (set id:gol)
-  =/  flow  ?-(dir %l (iflo:nd [src id]), %r (oflo:nd [src id]))
-  =/  goal  (~(got by goals.p) id)
-  %-  ~(gas in *(set id:gol))
-  %+  murn
-    ~(tap in flow)
-  |=  =nid:gol
-  ?.  ?&  =(dst -.nid) :: we keep when destination is as specified
-          |(kid !(~(has in kids.goal) id.nid)) :: if k false, must not be in kids
-          |(par !?~(par.goal %| =(id.nid u.par.goal))) :: if p is false, must not be par
-      ==
-    ~
-  (some id.nid)
-::  
-++  prio-left  |=(=id:gol (neighbors id %& %| %l %k %k))
-++  prio-ryte  |=(=id:gol (neighbors id %| %& %r %k %k))
-++  prec-left  |=(=id:gol (neighbors id %& %& %l %k %d))
-++  prec-ryte  |=(=id:gol (neighbors id %& %& %r %d %k))
-++  nest-left  |=(=id:gol (neighbors id %| %& %l %d %d))
-++  nest-ryte  |=(=id:gol (neighbors id %& %| %r %d %d))
 ::
 ++  inflate-goal
   |=  =id:gol
   ^-  goal:gol
+  =.  goals.p  (~(uni by goals.p) (collapse-cache cache.p)) 
   =/  goal  (~(got by goals.p) id)
   %=  goal
     stock  (~(got by stock-map.trace.p) id)
     ranks  (get-ranks:tv (~(got by stock-map.trace.p) id))
-    prio-left  (prio-left id)
-    prio-ryte  (prio-ryte id)
-    prec-left  (prec-left id)
-    prec-ryte  (prec-ryte id)
-    nest-left  (nest-left id)
-    nest-ryte  (nest-ryte id)
-    left-bound.kickoff  (left-bound:tv [%k id]) 
-    ryte-bound.kickoff  (ryte-bound:tv [%k id]) 
-    left-plumb.kickoff  (left-plumb:tv [%k id]) 
-    ryte-plumb.kickoff  (ryte-plumb:tv [%k id]) 
-    left-bound.deadline  (left-bound:tv [%d id]) 
-    ryte-bound.deadline  (ryte-bound:tv [%d id]) 
-    left-plumb.deadline  (left-plumb:tv [%d id]) 
-    ryte-plumb.deadline  (ryte-plumb:tv [%d id]) 
+    prio-left  (prio-left:nd id)
+    prio-ryte  (prio-ryte:nd id)
+    prec-left  (prec-left:nd id)
+    prec-ryte  (prec-ryte:nd id)
+    nest-left  (nest-left:nd id)
+    nest-ryte  (nest-ryte:nd id)
+    left-bound.kickoff  (~(got by left-bounds.trace.p) [%k id])
+    ryte-bound.kickoff  (~(got by ryte-bounds.trace.p) [%k id]) 
+    left-plumb.kickoff  (~(got by left-plumbs.trace.p) [%k id]) 
+    ryte-plumb.kickoff  (~(got by ryte-plumbs.trace.p) [%k id]) 
+    left-bound.deadline  (~(got by left-bounds.trace.p) [%d id]) 
+    ryte-bound.deadline  (~(got by ryte-bounds.trace.p) [%d id]) 
+    left-plumb.deadline  (~(got by left-plumbs.trace.p) [%d id]) 
+    ryte-plumb.deadline  (~(got by ryte-plumbs.trace.p) [%d id]) 
   ==
 ::
 ++  inflate-goals
+  |=  =goals:gol
+  ^-  goals:gol
+  %-  ~(gas by goals)
+  %+  turn
+    ~(tap in ~(key by goals))
+  |=(=id:gol [id (inflate-goal id)])
+::
+++  inflater
   |.
   ^-  _this
   =.  trace.p  (trace-update)
-  =.  goals.p
-        %-  ~(gas by goals.p)
-        %+  turn
-          ~(tap in ~(key by goals.p))
-        |=(=id:gol [id (inflate-goal id)])
+  =.  goals.p  (inflate-goals goals.p)
+  =.  cache.p  (~(run by cache.p) inflate-goals)
   this
 ::
 ++  apply
   |*  [func=$-(* _(pore)) parm=*]
   ^-  _this
   =.  p  p:(func parm)
-  (inflate-goals)
+  (inflater)
+::
+:: ============================================================================
+:: 
+:: HELPERS
+::
+:: ============================================================================
+::
+:: convert a new pool perms map to a list of updates
+++  perms-to-upds
+  |=  new=pool-perms:gol
+  ^-  (list [=ship role=(unit (unit pool-role:gol))])
+  =/  upds  
+    %+  turn
+      ~(tap by new)
+    |=  [=ship role=(unit pool-role:gol)]
+    [ship (some role)]
+  %+  weld
+    upds
+  ^-  (list [=ship role=(unit (unit pool-role:gol))])
+  %+  turn
+    ~(tap in (~(dif in ~(key by perms.p)) ~(key by new)))
+  |=(=ship [ship ~])
+::
+:: convert a new pool perms map to a list of ships to remove or invite
+++  pool-diff
+  |=  new=pool-perms:gol
+  ^-  [remove=(list ship) invite=(list ship)]
+  =/  remove  ~(tap in (~(dif in ~(key by perms.p)) ~(key by new)))
+  =/  invite  ~(tap in (~(dif in ~(key by new)) ~(key by perms.p)))
+  [remove invite]
 ::
 :: ============================================================================
 :: 
@@ -322,14 +322,22 @@
 ++  update-pool-perms
   |=  [new=pool-perms:gol mod=ship]
   ^-  _this
-  =/  tore  (apply update-pool-perms:(pore) new mod)
-  =/  fd  (full-diff goals.p goals.p.tore)
-  (emot:tore this [vzn %pool-perms nex.fd perms.p.tore])
+  =/  tore  this
+  =/  upds  (perms-to-upds new)
+  |-
+  ?~  upds
+    =/  fd  (full-diff goals.p goals.p.tore)
+    (emot:tore this [vzn %pool-perms nex.fd perms.p.tore])
+  %=  $
+    upds  t.upds
+    tore  (apply set-pool-role:(pore.tore) ship.i.upds role.i.upds mod)
+  ==
 ::
 ++  update-goal-perms
   |=  [=id:gol chief=ship rec=?(%.y %.n) spawn=(set ship) mod=ship]
   ^-  _this
-  =/  tore  (apply update-goal-perms:(pore) id chief rec spawn mod)
+  =/  tore  (apply set-chief:(pore) id chief rec mod)
+  =.  tore  (apply replace-spawn-set:(pore.tore) id spawn mod)
   =/  fd  (full-diff goals.p goals.p.tore)
   (emot:tore this [vzn %goal-perms nex.fd])
 ::
