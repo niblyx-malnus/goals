@@ -483,15 +483,15 @@
   =,  enjs:format
   |=  =nex
   :-  %a  %+  turn  ~(tap by nex) 
-  |=  [=id nexus=goal-nexus] 
+  |=  [=id nexus=goal-nexus trace=goal-trace] 
   %-  pairs
   :~  [%id (enjs-id id)]
-      [%goal (enjs-goal-nexus nexus)]
+      [%goal (enjs-goal-nexus-trace nexus trace)]
   ==
 ::
-++  enjs-goal-nexus
+++  enjs-goal-nexus-trace
   =,  enjs:format
-  |=  nexus=goal-nexus
+  |=  nexus=[goal-nexus goal-trace]
   ^-  json
   %-  pairs
   :~  [%par ?~(par.nexus ~ (enjs-id u.par.nexus))]
@@ -530,7 +530,7 @@
           [%birth (numb (unm:chrono:userlib birth.goal))]
           [%author (ship author.goal)]
       ==
-      [%nexus (enjs-goal-nexus nexus:`ngoal`goal)]
+      [%nexus (enjs-goal-nexus-trace [nexus trace]:`ngoal`goal)]
       :-  %hitch
       %-  pairs
       :~  [%desc s+desc.goal]

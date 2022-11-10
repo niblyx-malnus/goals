@@ -250,13 +250,13 @@
 ++  ryte-completed    (get-plete %r)
 ++  left-uncompleted  (get-plete %l)
 ::
-:: check entire preceding graph for incorrect completion order
-++  check-plete-mismatch
-  |=  [=id:gol dir=?(%l %r)]
-  ^-  ?
+++  plete-visit
+  |=  dir=?(%l %r)
+  |=  [=nid:gol vis=(map nid:gol (unit ?))]
+  ^-  (map nid:gol (unit ?))
   =/  flo  ?-(dir %l iflo, %r oflo)
   =/  pyt  ?-(dir %l nond, %r done)
-  =/  gine  (gine nid:gol (unit ?) ?)
+  =/  gine  (gine nid:gol (unit ?) (map nid:gol (unit ?)))
   =.  gine
     %=  gine
       flow  |=(=nid:gol ~(tap in (flo nid)))
@@ -277,11 +277,9 @@
         ?:  u.out :: %l: if I am complete and there is left-incomplete
           ~ :: fail
         (some %.n) :: %l: else return that there is no left-incomplete
-      exit
-        |=  [=nid:gol vis=(map nid:gol (unit ?))]
-        =(~ (~(got by vis) nid)) :: if the output is null, yes, plete mismatch
+      exit  |=([=nid:gol vis=(map nid:gol (unit ?))] vis)
     ==
-  (((traverse nid:gol (unit ?) ?) gine ~) [%d id]) :: start at deadline
+  (((traverse nid:gol (unit ?) (map nid:gol (unit ?))) gine vis) nid)
 ::
 :: get uncompleted leaf goals left of id
 ++  harvest
@@ -390,13 +388,13 @@
     ==
   (((traverse nid:gol moment:gol (map nid:gol moment:gol)) gine vis) nid)
 ::
-:: check entire preceding graph for incorrect moment order
-++  check-bound-mismatch
-  |=  [=nid:gol dir=?(%l %r)]
-  ^-  ?
+++  bound-visit
+  |=  dir=?(%l %r)
+  |=  [=nid:gol vis=(map nid:gol (unit moment:gol))]
+  ^-  (map nid:gol (unit moment:gol))
   =/  flo  ?-(dir %l iflo, %r oflo)
   =/  tem  ?-(dir %l max, %r min)  :: extremum
-  =/  gine  (gine nid:gol (unit moment:gol) ?)
+  =/  gine  (gine nid:gol (unit moment:gol) (map nid:gol (unit moment:gol)))
   =.  gine
     %=  gine
       flow  |=(=nid:gol ~(tap in (flo nid)))
@@ -430,11 +428,10 @@
           ~ :: if moment is not extremum, fail (return null)
         (some (some tem)) :: else return new bound
       ::
-      exit
-        |=  [=nid:gol vis=(map nid:gol (unit moment:gol))]
-        =(~ (~(got by vis) nid)) :: if the output is null, yes, bound mismatch
+      exit  |=([=nid:gol vis=(map nid:gol (unit moment:gol))] vis)
     ==
-  (((traverse nid:gol (unit moment:gol) ?) gine ~) nid) :: start at deadline
+  %.  nid  %.  [gine vis]
+  (traverse nid:gol (unit moment:gol) (map nid:gol (unit moment:gol)))
 ::
 :: length of longest path to root or leaf
 ++  plomb
