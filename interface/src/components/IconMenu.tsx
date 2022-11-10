@@ -17,7 +17,7 @@ import AgricultureOutlinedIcon from "@mui/icons-material/AgricultureOutlined";
 import OpenWithOutlinedIcon from "@mui/icons-material/OpenWithOutlined";
 import LinkOutlinedIcon from "@mui/icons-material/LinkOutlined";
 import RestoreOutlinedIcon from "@mui/icons-material/RestoreOutlined";
-import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
+import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
@@ -600,13 +600,17 @@ export default function IconMenu({
         <MenuItem
           onClick={async () => {
             handleClose();
-            try {
-              await navigator.clipboard.writeText(
-                `/${pin?.owner}/${pin?.birth}`
-              );
-              log("copied link to clipboard");
-            } catch (err) {
-              log("failed  to copy link to clipboard", err);
+            const link = `/${pin?.owner}/${pin?.birth}`;
+
+            if (navigator.clipboard) {
+              try {
+                await navigator.clipboard.writeText(link);
+                log("copied link to clipboard");
+              } catch (err) {
+                log("failed  to copy link to clipboard", err);
+              }
+            } else {
+              alert(link);
             }
           }}
           disableRipple
