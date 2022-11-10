@@ -456,24 +456,24 @@
     [cards this]
   ==
 ::
-++  on-leave  on-leave:def
-  :: |=  =path
-  :: ^-  (quip card _this)
-  :: ?+    path  (on-watch:def path)
-  ::     [@ @ ~]
-  ::   =*  poke-self  ~(poke-self pass:io /viewer-leave)
-  ::   =/  owner  `@p`i.path
-  ::   =/  birth  `@da`i.t.path
-  ::   =/  pin  `pin:gol`[%pin owner birth]
-  ::   =/  pool  (~(got by pools) pin)
-  ::   ::
-  ::   :: 0 is reserved for endogenous updates
-  ::   :_  this
-  ::   :_  ~
-  ::   %-  poke-self
-  ::   :-  %goal-action
-  ::   !>([vzn 0 %update-pool-perms pin (~(del by perms.pool) src.bowl)])
-  :: ==
+++  on-leave
+  |=  =path
+  ^-  (quip card _this)
+  ?+    path  (on-watch:def path)
+      [@ @ ~]
+    =*  poke-self  ~(poke-self pass:io /viewer-leave)
+    =/  owner  `@p`i.path
+    =/  birth  `@da`i.t.path
+    =/  pin  `pin:gol`[%pin owner birth]
+    =/  pool  (~(got by pools) pin)
+    ::
+    :: 0 is reserved for endogenous updates
+    :_  this
+    :_  ~
+    %-  poke-self
+    :-  %goal-action
+    !>([vzn 0 %update-pool-perms pin (~(del by perms.pool) src.bowl)])
+  ==
 ::
 ++  on-peek
   |=  =path
