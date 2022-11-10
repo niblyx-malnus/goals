@@ -1,6 +1,6 @@
 :~  title+'Goals Beta'
     info+'Urbit task manager.'
-    color+0xd9.b06d
+    color+0xee.dfc9
     version+[0 0 0]
     website+'https://github.com/niblyx-malnus/nested-goals'
     license+'MIT'
