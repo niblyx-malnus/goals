@@ -158,7 +158,7 @@ const updateHandler = (update: any) => {
   }
 };
 const updates = {
-  app: "goal-store-beta",
+  app: "goal-store",
   path: "/goals",
   event: updateHandler,
   //TODO: handle sub death/kick/err
