@@ -6,7 +6,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %initial
           %goal-peek
@@ -22,7 +22,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %pool-keys
           %goal-peek
@@ -38,7 +38,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %all-goal-keys
           %goal-peek
@@ -55,7 +55,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %goal
           (scot %p owner.id)
@@ -77,7 +77,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %goal
           (scot %p owner.id)
@@ -97,7 +97,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %pool
           (scot %p owner.pin)
@@ -120,7 +120,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %goal
           (scot %p owner.id)
@@ -140,7 +140,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %goal
           (scot %p owner.id)
@@ -160,7 +160,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %pool
           (scot %p owner.pin)
@@ -180,7 +180,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %goal
           (scot %p owner.id)
@@ -200,7 +200,7 @@
      .^  peek
        %gx
        :~  (scot %p our.bowl)
-           %goal-store-beta
+           %goal-store
            (scot %da now.bowl)
            %goal
            (scot %p owner.id)
@@ -220,7 +220,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %goal
           (scot %p owner.id)
@@ -241,7 +241,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %goal
           (scot %p owner.id)
@@ -262,7 +262,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %pool
           (scot %p owner.pin)
@@ -282,7 +282,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %pool
           (scot %p owner.pin)
@@ -303,7 +303,7 @@
 ::     .^  peek
 ::       %gx
 ::       :~  (scot %p our.bowl)
-::           %goal-store-beta
+::           %goal-store
 ::           (scot %da now.bowl)
 ::           %goal
 ::           (scot %p owner.id)
@@ -325,7 +325,7 @@
     .^  peek
       %gx
       :~  (scot %p our.bowl)
-          %goal-store-beta
+          %goal-store
           (scot %da now.bowl)
           %goal
           (scot %p owner.id)

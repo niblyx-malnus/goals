@@ -390,7 +390,7 @@
         ?<  =(owner.pin.pok our.bowl)
         :: ?:  (~(has by wex.bowl) [pite owner.pin.pok dap.bowl])
         ::   =*  poke-other  ~(poke-other pass:hc [%kicker pite])
-        ::   ~&  "%goal-store-beta: kicking myself..."
+        ::   ~&  "%goal-store: kicking myself..."
         ::   :_  state
         ::   :~  %+  poke-other
         ::         owner.pin.pok
@@ -657,9 +657,9 @@
       [cards this]
       ::
         %kick
-      %-  (slog '%goal-store-beta: Got kick, resubscribing...' ~)
+      %-  (slog '%goal-store: Got kick, resubscribing...' ~)
       :_  this
-      [%pass wire %agent [src.bowl %goal-store-beta] %watch wire]~
+      [%pass wire %agent [src.bowl %goal-store] %watch wire]~
       ::
         %fact
       ?>  =(p.cage.sign %goal-away-update)
@@ -688,11 +688,11 @@
     ?+    -.sign  (on-agent:def wire sign)
         %watch-ack
       ?~  p.sign
-        ((slog '%goal-store-beta: Watch /groups succeeded.' ~) `this)
-      ((slog '%goal-store-beta: Watch /groups failed.' ~) `this)
+        ((slog '%goal-store: Watch /groups succeeded.' ~) `this)
+      ((slog '%goal-store: Watch /groups failed.' ~) `this)
       ::
         %kick
-      %-  (slog '%goal-store-beta: Got kick from %group-store, resubscribing...' ~)
+      %-  (slog '%goal-store: Got kick from %group-store, resubscribing...' ~)
       :_  this
       [%pass wire %agent [our.bowl %group-store] %watch wire]~
       ::

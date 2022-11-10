@@ -1,9 +1,9 @@
-:~  title+'Goals Beta'
+:~  title+'Goals'
     info+'Urbit task manager.'
     color+0xd9.b06d
     version+[0 0 0]
     website+'https://github.com/niblyx-malnus/nested-goals'
     license+'MIT'
-    base+'goals-beta'
+    base+'gol-cli'
     glob-ames+[~dister-dozzod-niblyx-malnus 0v0]
 ==
