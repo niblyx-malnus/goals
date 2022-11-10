@@ -606,7 +606,7 @@ export default function IconMenu({
               );
               log("copied link to clipboard");
             } catch (err) {
-              log("failed  to copy link to clipboard");
+              log("failed  to copy link to clipboard", err);
             }
           }}
           disableRipple
