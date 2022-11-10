@@ -409,7 +409,13 @@
         =*  leave-other  ~(leave-other pass:hc wire)
         %+  send-home-updates:hc
           [(leave-other owner.pin.pok)]~
-        [pin.pok src.bowl pid [vzn %trash-pool ~]~]
+        =/  upds
+          ?:  (~(has by cache) pin.pok)
+            [vzn %trash-pool ~]~
+          ?:  (~(has by pools) pin.pok)
+            [vzn %waste-pool ~]~
+          ~
+        [pin.pok src.bowl pid upds]
           ::
           :: [%kicker =ship =pin]
           %kicker
