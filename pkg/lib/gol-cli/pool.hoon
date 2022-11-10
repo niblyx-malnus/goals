@@ -69,17 +69,20 @@
   =/  wrest  (wrest-goal id mod) :: mod has the correct perms for this
   %=  this
     goals.p  main.wrest
-    cache.p  (~(put by cache.p) id trac.wrest)
+    cache.p  (~(uni by cache.p) trac.wrest)
   ==
 ::
 :: Restore goal from cache to main goals
 ++  renew-goal
   |=  [=id:gol mod=ship]
   ^-  _this
-  ?>  (check-pool-edit-perm mod)
+  ?>  (check-pool-edit-perm mod) :: only owner/admins can renew
+  ::
+  :: mod has the correct perms for this
+  =/  wrest  (wrest-goal:this(goals.p cache.p) id mod) 
   %=  this
-    goals.p  (~(uni by goals.p) (validate-goals:vd (~(got by cache.p) id)))
-    cache.p  (~(del by cache.p) id)
+    goals.p  (~(uni by goals.p) (validate-goals:vd trac.wrest))
+    cache.p  main.wrest
   ==
 ::
 :: Permanently delete goal and subgoals from cache
@@ -87,7 +90,7 @@
   |=  [=id:gol mod=ship]
   ^-  _this
   ?>  (check-pool-edit-perm mod)
-  this(cache.p (~(del by cache.p) id))
+  this(cache.p main:(wrest-goal:this(goals.p cache.p) id mod))
 ::
 :: Partition the set of goals q from its complement q- in goals.p
 ++  partition
@@ -223,7 +226,7 @@
    :: list of all ids of goals with replacable chiefs
    =/  kickable=(list id:gol)
      %+  murn
-       ~(tap in goals.p)
+       ~(tap by goals.p)
      |=  [=id:gol =goal:gol]
      ?.  (~(has in kick) chief.goal)
        ~

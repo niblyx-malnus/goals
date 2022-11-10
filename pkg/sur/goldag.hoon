@@ -23,7 +23,7 @@
 ++  pool-role  ?(%admin %spawn)
 ++  pool-nexus
   $:  =goals
-      cache=(map id goals)
+      cache=goals
       owner=ship
       perms=(map ship (unit pool-role))
   ==

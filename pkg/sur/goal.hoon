@@ -138,7 +138,7 @@
   ::
   +$  pool-nexus
     $:  =goals
-        cache=(map id goals)
+        cache=goals
         owner=ship
         perms=pool-perms
     ==

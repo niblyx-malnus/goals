@@ -156,7 +156,7 @@
           [(poke-other owner.pin.pok goal-action+!>(action))]~
         =/  =id:gol  (unique-id:gols [our.bowl now.bowl])
         =/  pore
-          %:  spawn-goal-fixns:(apex-pl:hc pin.pok)
+          %:  spawn-goal-fixns:(apex-em:hc pin.pok)
             id
             upid.pok
             desc.pok
@@ -175,7 +175,7 @@
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore  (cache-goal:(apex-pl:hc pin) id.pok src.bowl)
+        =/  pore  (cache-goal:(apex-em:hc pin) id.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           :: [%renew-goal =id]
@@ -188,7 +188,7 @@
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore  (renew-goal:(apex-pl:hc pin) id.pok src.bowl)
+        =/  pore  (renew-goal:(apex-em:hc pin) id.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           :: [%trash-goal =id]
@@ -201,7 +201,7 @@
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore  (trash-goal:(apex-pl:hc pin) id.pok src.bowl)
+        =/  pore  (trash-goal:(apex-em:hc pin) id.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           :: [%edit-goal-desc =id desc=@t]
@@ -215,7 +215,7 @@
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
         =/  pore
-          (edit-goal-desc:(apex-pl:hc pin) id.pok desc.pok src.bowl)
+          (edit-goal-desc:(apex-em:hc pin) id.pok desc.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           :: [%edit-pool-title =pin title=@t]
@@ -228,7 +228,7 @@
           :_  state
           [(poke-other owner.pin.pok goal-action+!>(action))]~
         =/  pore
-          (edit-pool-title:(apex-pl:hc pin.pok) title.pok src.bowl)
+          (edit-pool-title:(apex-em:hc pin.pok) title.pok src.bowl)
         (send-away-updates:hc ~ pin.pok src.bowl pid pore)
           ::
           :: [%yoke =pin yoks=(list plex)]
@@ -240,7 +240,7 @@
         ?.  =(our.bowl owner.pin.pok)
           :_  state
           [(poke-other owner.pin.pok goal-action+!>(action))]~
-        =/  pore  (plex-sequence:(apex-pl:hc pin.pok) yoks.pok src.bowl)
+        =/  pore  (plex-sequence:(apex-em:hc pin.pok) yoks.pok src.bowl)
         (send-away-updates:hc ~ pin.pok src.bowl pid pore)
           ::
           :: [%move cid=id upid=(unit id)]
@@ -253,7 +253,7 @@
         ?.  =(our.bowl owner.cid.pok)
           :_  state
           [(poke-other owner.cid.pok goal-action+!>(action))]~
-        =/  pore  (move:(apex-pl:hc pin) cid.pok upid.pok src.bowl)
+        =/  pore  (move:(apex-em:hc pin) cid.pok upid.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           :: [%set-kickoff =id kickoff=(unit @da)]
@@ -267,7 +267,7 @@
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
         =/  pore
-          (set-kickoff:(apex-pl:hc pin) id.pok kickoff.pok src.bowl)
+          (set-kickoff:(apex-em:hc pin) id.pok kickoff.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           :: [%set-deadline =id deadline=(unit @da)]
@@ -281,7 +281,7 @@
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
         =/  pore
-          (set-deadline:(apex-pl:hc pin) id.pok deadline.pok src.bowl)
+          (set-deadline:(apex-em:hc pin) id.pok deadline.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           ::
@@ -295,7 +295,7 @@
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore  (mark-actionable:(apex-pl:hc pin) id.pok src.bowl)
+        =/  pore  (mark-actionable:(apex-em:hc pin) id.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           :: [%unmark-actionable =id]
@@ -308,7 +308,7 @@
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore  (unmark-actionable:(apex-pl:hc pin) id.pok src.bowl)
+        =/  pore  (unmark-actionable:(apex-em:hc pin) id.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           :: [%mark-complete =id]
@@ -321,7 +321,7 @@
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore  (mark-complete:(apex-pl:hc pin) id.pok src.bowl)
+        =/  pore  (mark-complete:(apex-em:hc pin) id.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           :: [%unmark-complete =id]
@@ -334,7 +334,7 @@
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore  (unmark-complete:(apex-pl:hc pin) id.pok src.bowl)
+        =/  pore  (unmark-complete:(apex-em:hc pin) id.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           :: [%update-goal-perms =id chief=ship rec=?(%.y %.n) spawn=(set ship)]
@@ -348,7 +348,7 @@
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
         =/  pore
-          %:  update-goal-perms:(apex-pl:hc pin)
+          %:  update-goal-perms:(apex-em:hc pin)
             id.pok
             chief.pok
             rec.pok
@@ -380,7 +380,7 @@
             [%give %kick ~[/[`@`+<.pin.pok]/[`@`+>.pin.pok]] `ship]
           ==
         =/  pore
-          (update-pool-perms:(apex-pl:hc pin.pok) new.pok src.bowl)
+          (update-pool-perms:(apex-em:hc pin.pok) new.pok src.bowl)
         [pin.pok src.bowl pid pore]
           ::
           :: [%subscribe =pin]
@@ -451,7 +451,7 @@
       %+  send-away-updates:hc
         cards
       =/  new  (~(put by perms.pool) src.bowl ~)
-      =/  pore  (update-pool-perms:(apex-pl:hc pin) new our.bowl)
+      =/  pore  (update-pool-perms:(apex-em:hc pin) new our.bowl)
       [pin our.bowl 0 pore]
     [cards this]
   ==
@@ -736,7 +736,7 @@
     (~(leave pass:io wire) other dap.bowl)
   --
 ::
-++  apex-pl  |=(=pin:gol (apex:em (~(got by pools.store) pin)))
+++  apex-em  |=(=pin:gol (apex:em (~(got by pools.store) pin)))
 ::
 ++  send-home-updates
   |=  [cards=(list card) =pin:gol mod=ship pid=@ upds=(list update:gol)]

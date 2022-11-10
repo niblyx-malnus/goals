@@ -60,20 +60,10 @@
   |=  [a=goals:gol b=goals:gol]
   ^-  [pon=goals:gol waz=goals:gol =nex:gol]
   =+  (diff a b)
-  =/  pon  (gat-by b ~(tap in lus))
-  =/  waz  (gat-by a ~(tap in hep))
-  =/  nex  (make-nex b sig)
+  =/  pon  (gat-by b ~(tap in lus)) :: spawned
+  =/  waz  (gat-by a ~(tap in hep)) :: wasted
+  =/  nex  (make-nex b sig) :: changed
   [pon waz nex]
-::
-++  collapse-cache
-  |=  cache=(map id:gol goals:gol)
-  ^-  goals:gol
-  =|  =goals:gol
-  =/  ids  ~(tap in ~(key by cache))
-  |-
-  ?~  ids
-    goals
-  $(ids t.ids, goals (~(uni by goals) (~(got by cache) i.ids)))
 ::
 :: a is a map from ids to a goal nexus
 :: it contains crucial information regarding graph structure
@@ -138,7 +128,10 @@
 :: if it starts taking real performance hits we can revisit this...
 ++  trace-update
   |.
-  =.  goals.p  (~(uni by goals.p) (collapse-cache cache.p)) 
+  ::
+  :: make sure tracing both goals and cache
+  =.  goals.p  (~(uni by goals.p) cache.p)
+  ::
   ^-  pool-trace:gol
   :*  stock-map=((chain:tv id:gol stock:gol) get-stocks:tv (bare-goals:nd) ~)
       ^=  left-bounds
@@ -152,7 +145,10 @@
 ++  inflate-goal
   |=  =id:gol
   ^-  goal:gol
-  =.  goals.p  (~(uni by goals.p) (collapse-cache cache.p)) 
+  ::
+  :: make sure inflating both goals and cache
+  =.  goals.p  (~(uni by goals.p) cache.p)
+  ::
   =/  goal  (~(got by goals.p) id)
   %=  goal
     stock  (~(got by stock-map.trace.p) id)
@@ -186,7 +182,7 @@
   ^-  _this
   =.  trace.p  (trace-update)
   =.  goals.p  (inflate-goals goals.p)
-  =.  cache.p  (~(run by cache.p) inflate-goals)
+  =.  cache.p  (inflate-goals cache.p)
   this
 ::
 ++  apply
@@ -236,12 +232,9 @@
   |=  [=id:gol mod=ship]
   ^-  _this
   =/  tore  (apply cache-goal:(pore) id mod)
-  ::
-  =/  coals  (collapse-cache cache.p.tore)
   =/  gdiff  (full-diff goals.p goals.p.tore)
-  =/  cdiff  (full-diff goals.p coals)
+  =/  cdiff  (full-diff goals.p cache.p.tore)
   =/  nex  (~(uni by nex.gdiff) nex.cdiff)
-  ::
   (emot:tore this [vzn %cache-goal nex id ~(key by waz.gdiff)])
 ::
 :: Restore goal from cache to main goals
@@ -261,9 +254,7 @@
     =/  fd  (full-diff goals.p goals.p.tore)
     (emot:tore this [vzn %waste-goal nex.fd id ~(key by waz.fd)])
   =/  tore  (apply trash-goal:(pore) id mod)
-  =/  old-coals  (collapse-cache cache.p)
-  =/  new-coals  (collapse-cache cache.p.tore)
-  =/  diff  (diff old-coals new-coals)
+  =/  diff  (diff cache.p cache.p.tore)
   (emot:tore this [vzn %trash-goal id hep.diff])
 ::
 ++  move
@@ -461,25 +452,26 @@
       ^-  _this
       =/  pore  (apply-nex nex)
       %=  pore
-        cache.p
-          %+  ~(put by cache.p.pore)
-            id
-          (gat-by goals.p.pore ~(tap in cas))
         goals.p  (gus-by goals.p.pore ~(tap in cas))
+        cache.p
+          %-  ~(uni by cache.p.pore)
+          `goals:gol`(gat-by goals.p.pore ~(tap in cas))
       ==
     ::
     ++  renew-goal
       |=  =id:gol
       ^-  _this
+      =/  prog  ~(tap in (~(progeny gol-cli-traverse cache.p) id))
       %=  this
-        goals.p  (~(uni by goals.p) (~(got by cache.p) id))
-        cache.p  (~(del by cache.p) id)
+        cache.p  (gus-by cache.p prog)
+        goals.p  (~(uni by goals.p) `goals:gol`(gat-by cache.p prog))
       ==
     ::
     ++  trash-goal
       |=  =id:gol
       ^-  _this
-      this(cache.p (~(del by cache.p) id))
+      =/  prog  ~(tap in (~(progeny gol-cli-traverse cache.p) id))
+      this(cache.p (gus-by cache.p prog))
     --
   ::
   ++  pool-perms  |=(perms=pool-perms:gol `_this`this(perms.p perms))

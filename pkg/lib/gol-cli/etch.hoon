@@ -1,5 +1,5 @@
 /-  gol=goal
-/+  pl=gol-cli-pool, em=gol-cli-emot
+/+  pl=gol-cli-pool, em=gol-cli-emot, gol-cli-traverse
 :: apply (etch) updates received from foreign pools
 ::
 |_  =store:gol
@@ -42,8 +42,9 @@
         %trash-goal
       =/  pool  (~(got by pools.store) pin)
       =/  pore  (apex:em pool)
+      =/  prog  ~(tap in (~(progeny gol-cli-traverse cache.pool) id.upd))
       %=  store
-        index  (gus-idx-orm ~(tap in ~(key by (~(got by cache.pool) id.upd))))
+        index  (gus-idx-orm prog)
         pools  (~(put by pools.store) pin pool:abet:(etch:pore upd))
       ==
       ::
