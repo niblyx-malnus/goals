@@ -428,10 +428,16 @@ export default function IconMenu({
   const renderGoalMenu = () => {
     if (isArchived)
       return (
-        <MenuItem onClick={renewGoal} disableRipple>
-          <RestoreOutlinedIcon fontSize="small" />
-          renew
-        </MenuItem>
+        <div>
+          <MenuItem onClick={renewGoal} disableRipple>
+            <RestoreOutlinedIcon fontSize="small" />
+            renew
+          </MenuItem>
+          <MenuItem onClick={deleteGoal} disableRipple>
+            <DeleteOutlineOutlinedIcon fontSize="small" />
+            delete
+          </MenuItem>
+        </div>
       );
 
     return (
@@ -532,6 +538,19 @@ export default function IconMenu({
           <MenuItem onClick={renewPool} disableRipple>
             <RestoreOutlinedIcon fontSize="small" />
             renew
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              toggleDeleteDialog(true, {
+                title: poolData.title,
+                callback: deletePool,
+              });
+            }}
+            disableRipple
+          >
+            <DeleteOutlineOutlinedIcon fontSize="small" />
+            delete
           </MenuItem>
         </div>
       );
