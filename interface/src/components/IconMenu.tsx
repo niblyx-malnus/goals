@@ -598,7 +598,7 @@ export default function IconMenu({
             disableRipple
           >
             <LogoutIcon fontSize="small" />
-            leave project
+            leave pool
           </MenuItem>
         )}
         <Divider />
