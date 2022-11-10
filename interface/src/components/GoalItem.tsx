@@ -279,7 +279,12 @@ const GoalItem = memo(
       );
     };
     const renderAddButton = () => {
-      if ((poolRole === "spawn" || poolRole === null) && !isChief) return;
+      if (
+        (poolRole === "spawn" || poolRole === null) &&
+        !isChief &&
+        goalRole !== "spawn"
+      )
+        return;
       //hide add goal in harvest panel
       if (harvestGoal) return;
       //hide add if is archived
