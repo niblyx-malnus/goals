@@ -437,8 +437,17 @@
     :: just let everyone in for now;
     :: we gonna fix sharing soon; hasn't been a priority
     :: ?>  (~(has by perms.pool) src.bowl)
-    :_  this
-    [%give %fact ~ %goal-away-update !>([[our.bowl 0] vzn spawn-pool+pool])]~
+    =^  cards  state
+      =/  cards
+        [%give %fact ~ %goal-away-update !>([[our.bowl 0] vzn spawn-pool+pool])]~
+      ?:  (~(has by perms.pool) src.bowl)
+        [cards state]
+      %+  send-away-updates:hc
+        cards
+      =/  new  (~(put by perms.pool) src.bowl ~)
+      =/  pore  (update-pool-perms:(apex-pl:hc pin) new src.bowl)
+      [pin src.bowl 0 pore]
+    [cards this]
   ==
 ::
 ++  on-leave  on-leave:def
