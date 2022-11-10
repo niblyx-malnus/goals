@@ -433,8 +433,10 @@
     =/  birth  `@da`i.t.path
     =/  pin  `pin:gol`[%pin owner birth]
     =/  pool  (~(got by pools) pin)
-    ~&  (~(has by perms.pool) src.bowl)
-    ?>  (~(has by perms.pool) src.bowl)
+    :: 
+    :: just let everyone in for now;
+    :: we gonna fix sharing soon; hasn't been a priority
+    :: ?>  (~(has by perms.pool) src.bowl)
     :_  this
     [%give %fact ~ %goal-away-update !>([[our.bowl 0] vzn spawn-pool+pool])]~
   ==
