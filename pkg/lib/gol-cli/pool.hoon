@@ -51,6 +51,7 @@
   :: Partition subgoals of goal from rest of goals
   =.  pore  (partition:pore prog mod)
   ::
+  :: both of these should get validated here (validate-goals:vd goals)
   :: return extracted goals and remaining goals
   [(gat-by goals.p.pore ~(tap in prog)) (gus-by goals.p.pore ~(tap in prog))]
 ::
