@@ -409,7 +409,13 @@
         =*  leave-other  ~(leave-other pass:hc wire)
         %+  send-home-updates:hc
           [(leave-other owner.pin.pok)]~
-        [pin.pok src.bowl pid [vzn %trash-pool ~]~]
+        =/  upds
+          ?:  (~(has by cache) pin.pok)
+            [vzn %trash-pool ~]~
+          ?:  (~(has by pools) pin.pok)
+            [vzn %waste-pool ~]~
+          ~
+        [pin.pok src.bowl pid upds]
           ::
           :: [%kicker =ship =pin]
           %kicker
@@ -433,10 +439,21 @@
     =/  birth  `@da`i.t.path
     =/  pin  `pin:gol`[%pin owner birth]
     =/  pool  (~(got by pools) pin)
-    ~&  (~(has by perms.pool) src.bowl)
-    ?>  (~(has by perms.pool) src.bowl)
-    :_  this
-    [%give %fact ~ %goal-away-update !>([[our.bowl 0] vzn spawn-pool+pool])]~
+    :: 
+    :: just let everyone in for now;
+    :: we gonna fix sharing soon; hasn't been a priority
+    :: ?>  (~(has by perms.pool) src.bowl)
+    =^  cards  state
+      =/  cards
+        [%give %fact ~ %goal-away-update !>([[our.bowl 0] vzn spawn-pool+pool])]~
+      ?:  (~(has by perms.pool) src.bowl)
+        [cards state]
+      %+  send-away-updates:hc
+        cards
+      =/  new  (~(put by perms.pool) src.bowl ~)
+      =/  pore  (update-pool-perms:(apex-pl:hc pin) new our.bowl)
+      [pin our.bowl 0 pore]
+    [cards this]
   ==
 ::
 ++  on-leave  on-leave:def
