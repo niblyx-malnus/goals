@@ -140,10 +140,7 @@
         ?>  =(src.bowl owner.pin.pok)
         %+  send-home-updates:hc
           [%give %kick ~[/[`@`+<.pin.pok]/[`@`+>.pin.pok]] ~]~
-        ?:  (~(has by pools) pin.pok)
-          [pin.pok src.bowl pid [vzn %waste-pool ~]~]
-        ?>  (~(has by cache) pin.pok)
-        [pin.pok src.bowl pid [vzn %trash-pool ~]~]
+        [pin.pok src.bowl pid (wrash-pool:hc pin.pok)]
           ::
           :: [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
           %spawn-goal
@@ -409,13 +406,7 @@
         =*  leave-other  ~(leave-other pass:hc wire)
         %+  send-home-updates:hc
           [(leave-other owner.pin.pok)]~
-        =/  upds
-          ?:  (~(has by cache) pin.pok)
-            [vzn %trash-pool ~]~
-          ?:  (~(has by pools) pin.pok)
-            [vzn %waste-pool ~]~
-          ~
-        [pin.pok src.bowl pid upds]
+        [pin.pok src.bowl pid (wrash-pool:hc pin.pok)]
           ::
           :: [%kicker =ship =pin]
           %kicker
@@ -642,24 +633,19 @@
       ?~  p.sign
         =*  poke-our  ~(poke-our pass:io /invite)
         ((slog 'You\'ve been invited to view a goal!' ~) `this)
-      =/  upd
-        ?:  (~(has by pools) pin)
-          (some [vzn %waste-pool ~])
-        ?:  (~(has by cache) pin)
-          (some [vzn %trash-pool ~])
-        ~
       %-  (slog 'Invite failure.' ~)
       %-  (slog u.p.sign)
-      ?~  upd
-        `this
       =^  cards  state
-        (send-home-updates:hc ~ pin our.bowl 0 [u.upd]~)
+        (send-home-updates:hc ~ pin our.bowl 0 (wrash-pool:hc pin))
       [cards this]
       ::
         %kick
       %-  (slog '%goal-store: Got kick, resubscribing...' ~)
-      :_  this
-      [%pass wire %agent [src.bowl %goal-store] %watch wire]~
+      =^  cards  state
+      %+  send-home-updates:hc
+        [%pass wire %agent [src.bowl %goal-store] %watch wire]~
+      [pin our.bowl 0 (wrash-pool:hc pin)]
+      [cards this]
       ::
         %fact
       ?>  =(p.cage.sign %goal-away-update)
@@ -670,7 +656,7 @@
       ~|  "crashing on update"
       ?+    +<.update  (on-agent:def wire sign)
           $?  %spawn-pool
-              %spawn-goal  %trash-goal
+              %spawn-goal  %trash-goal  %waste-goal
               %pool-perms  %pool-hitch  %pool-nexus
               %goal-perms  %goal-hitch  %goal-nexus  %goal-togls  %goal-dates
           ==
@@ -738,22 +724,30 @@
 ::
 ++  apex-em  |=(=pin:gol (apex:em (~(got by pools.store) pin)))
 ::
+++  wrash-pool
+  |=  =pin:gol
+  ^-  (list update:gol)
+  ?:  (~(has by pools.store) pin)
+    [vzn %waste-pool ~]~
+  ?:  (~(has by cache.store) pin)
+    [vzn %trash-pool ~]~
+  ~
+::
 ++  send-home-updates
   |=  [cards=(list card) =pin:gol mod=ship pid=@ upds=(list update:gol)]
   ^-  (quip card _state)
-  =/  idx  0
   =|  home-cards=(list card)
   |-
-  ?:  =(idx (lent upds))
+  ?~  upds
     ::
     :: this approach using etch duplicates work updating the store
     :: (but quickest and easiest way to concordantly update index;
     ::  maybe should update eventually)
     [(weld cards home-cards) state(store (etch:etch pin upds))]
   =/  now=@  (unique-time now.bowl log)
-  =/  hom=home-update:gol  [[pin mod pid] (snag idx upds)]
+  =/  hom=home-update:gol  [[pin mod pid] i.upds]
   %=  $
-    idx  +(idx)
+    upds  t.upds
     log  (put:log-orm log now [%updt hom])
     home-cards  [(fact:io goal-home-update+!>(hom) ~[/goals]) home-cards]
   ==
