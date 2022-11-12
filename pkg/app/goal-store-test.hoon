@@ -387,7 +387,7 @@
         ?<  =(owner.pin.pok our.bowl)
         :: ?:  (~(has by wex.bowl) [pite owner.pin.pok dap.bowl])
         ::   =*  poke-other  ~(poke-other pass:hc [%kicker pite])
-        ::   ~&  "%goal-store: kicking myself..."
+        ::   ~&  "%goal-store-test: kicking myself..."
         ::   :_  state
         ::   :~  %+  poke-other
         ::         owner.pin.pok
@@ -640,10 +640,10 @@
       [cards this]
       ::
         %kick
-      %-  (slog '%goal-store: Got kick, resubscribing...' ~)
+      %-  (slog '%goal-store-test: Got kick, resubscribing...' ~)
       =^  cards  state
       %+  send-home-updates:hc
-        [%pass wire %agent [src.bowl %goal-store] %watch wire]~
+        [%pass wire %agent [src.bowl %goal-store-test] %watch wire]~
       [pin our.bowl 0 (wrash-pool:hc pin)]
       [cards this]
       ::
@@ -674,11 +674,11 @@
     ?+    -.sign  (on-agent:def wire sign)
         %watch-ack
       ?~  p.sign
-        ((slog '%goal-store: Watch /groups succeeded.' ~) `this)
-      ((slog '%goal-store: Watch /groups failed.' ~) `this)
+        ((slog '%goal-store-test: Watch /groups succeeded.' ~) `this)
+      ((slog '%goal-store-test: Watch /groups failed.' ~) `this)
       ::
         %kick
-      %-  (slog '%goal-store: Got kick from %group-store, resubscribing...' ~)
+      %-  (slog '%goal-store-test: Got kick from %group-store, resubscribing...' ~)
       :_  this
       [%pass wire %agent [our.bowl %group-store] %watch wire]~
       ::
