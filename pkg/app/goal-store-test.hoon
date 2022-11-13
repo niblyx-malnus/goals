@@ -230,14 +230,16 @@
           ::
           :: [%yoke =pin yoks=(list plex)]
           %yoke
+        ~&  [%pok yoks.pok]
         =*  poke-other
           %~  poke-other
             pass:hc
           (en-away-path pid pin.pok %yoke)
         ?.  =(our.bowl owner.pin.pok)
-          :_  state
-          [(poke-other owner.pin.pok goal-action+!>(action))]~
+          =/  cards  [(poke-other owner.pin.pok goal-action+!>(action))]~
+          [cards state]
         =/  pore  (plex-sequence:(apex-em:hc pin.pok) yoks.pok src.bowl)
+        ~&  action
         (send-away-updates:hc ~ pin.pok src.bowl pid pore)
           ::
           :: [%move cid=id upid=(unit id)]
@@ -356,7 +358,6 @@
           ::
           :: [%update-pool-perms =pin new=pool-perms]
           %update-pool-perms
-        ~&  "update-pool-perms"
         =*  poke-other
           %~  poke-other
             pass:hc
@@ -366,7 +367,6 @@
           [(poke-other owner.pin.pok goal-action+!>(action))]~
         =/  pool  (~(got by pools) pin.pok)
         =/  diff  (~(pool-diff em pool) new.pok)
-        ~&  diff
         %+  send-away-updates:hc
           ;:  welp
             %+  turn  invite.diff
@@ -606,7 +606,6 @@
 ++  on-agent
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
-  ~&  wire
   ?+    wire  (on-agent:def wire sign)
       [%away @ @ @ *]
     =/  pid  i.t.wire
@@ -656,7 +655,7 @@
       ~|  "crashing on update"
       ?+    +<.update  (on-agent:def wire sign)
           $?  %spawn-pool
-              %spawn-goal  %trash-goal  %waste-goal
+              %spawn-goal  %trash-goal  %cache-goal  %renew-goal  %waste-goal
               %pool-perms  %pool-hitch  %pool-nexus
               %goal-perms  %goal-hitch  %goal-nexus  %goal-togls  %goal-dates
           ==
@@ -737,13 +736,14 @@
   |=  [cards=(list card) =pin:gol mod=ship pid=@ upds=(list update:gol)]
   ^-  (quip card _state)
   =|  home-cards=(list card)
+  :_  state(store (etch:etch pin upds))
   |-
   ?~  upds
     ::
     :: this approach using etch duplicates work updating the store
     :: (but quickest and easiest way to concordantly update index;
     ::  maybe should update eventually)
-    [(weld cards home-cards) state(store (etch:etch pin upds))]
+    (welp cards home-cards)
   =/  now=@  (unique-time now.bowl log)
   =/  hom=home-update:gol  [[pin mod pid] i.upds]
   %=  $

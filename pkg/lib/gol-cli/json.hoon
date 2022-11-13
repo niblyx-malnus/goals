@@ -71,19 +71,40 @@
 ++  dejs-ship  (su:dejs:format fed:ag)
 ++  dejs-date  (su:dejs:format (cook |*(a=* (year +.a)) ;~(plug (just '~') when:so)))
 ++  dejs-yoke-seq  (ar:dejs:format dejs-yoke)
-++  dejs-yoke  (ot:dejs:format ~[yoke+dejs-yoke-tag lid+dejs-id rid+dejs-id])
-++  parse-yoke-tag
-  ;~  pose
-    (cold %prio-rend (jest 'prio-rend'))
-    (cold %prio-yoke (jest 'prio-yoke'))
-    (cold %prec-rend (jest 'prec-rend'))
-    (cold %prec-yoke (jest 'prec-yoke'))
-    (cold %nest-rend (jest 'nest-rend'))
-    (cold %nest-yoke (jest 'nest-yoke'))
-    (cold %held-rend (jest 'held-rend'))
-    (cold %held-yoke (jest 'held-yoke'))
+++  dejs-yoke  
+  |=  jon=json
+  =/  out
+    %.  jon
+    (ot:dejs:format ~[yoke+dejs-yoke-tag lid+dejs-id rid+dejs-id])
+  ^-  exposed-yoke
+  ?-  -.out
+    %prio-rend   [%prio-rend +<.out +>.out]
+    %prio-yoke   [%prio-yoke +<.out +>.out]
+    %prec-rend   [%prec-rend +<.out +>.out]
+    %prec-yoke   [%prec-yoke +<.out +>.out]
+    %nest-rend   [%nest-rend +<.out +>.out]
+    %nest-yoke   [%nest-yoke +<.out +>.out]
+    %hook-rend   [%hook-rend +<.out +>.out]
+    %hook-yoke   [%hook-yoke +<.out +>.out]
+    %held-rend   [%held-rend +<.out +>.out]
+    %held-yoke   [%held-yoke +<.out +>.out]
   ==
-++  dejs-yoke-tag  (su:dejs:format parse-yoke-tag)
+::
+++  dejs-yoke-tag
+  |=  jon=json
+  =/  tag=term  (so:dejs:format jon)
+  ?+  tag  !!
+    %prio-rend   %prio-rend
+    %prio-yoke   %prio-yoke
+    %prec-rend   %prec-rend
+    %prec-yoke   %prec-yoke
+    %nest-rend   %nest-rend
+    %nest-yoke   %nest-yoke
+    %hook-rend   %hook-rend
+    %hook-yoke   %hook-yoke
+    %held-rend   %held-rend
+    %held-yoke   %held-yoke
+  ==
 ::
 ++  dejs-tests
   |%

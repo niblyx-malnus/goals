@@ -57,8 +57,6 @@
 +$  peek          peek:s4
 ::
 +$  core-yoke     core-yoke:s4
-++  yoke-tags     yoke-tags:s4
-+$  yoke-tag      yoke-tag:s4
 +$  exposed-yoke  exposed-yoke:s4
 +$  nuke          nuke:s4
 +$  plex          plex:s4
@@ -258,22 +256,18 @@
         [%dag-rend n1=nid n2=nid]
     ==
   ::
-  ++  yoke-tags
-    :~  %prio-rend
-        %prio-yoke
-        %prec-rend
-        %prec-yoke
-        %nest-rend
-        %nest-yoke
-        %hook-rend
-        %hook-yoke
-        %held-rend
-        %held-yoke
+  +$  exposed-yoke  
+    $%  [%prio-rend lid=id rid=id]
+        [%prio-yoke lid=id rid=id]
+        [%prec-rend lid=id rid=id]
+        [%prec-yoke lid=id rid=id]
+        [%nest-rend lid=id rid=id]
+        [%nest-yoke lid=id rid=id]
+        [%hook-rend lid=id rid=id]
+        [%hook-yoke lid=id rid=id]
+        [%held-rend lid=id rid=id]
+        [%held-yoke lid=id rid=id]
     ==
-  ::
-  +$  yoke-tag  (union-from-list yoke-tags)
-  ::
-  +$  exposed-yoke  $%([yoke-tag lid=id rid=id])
   ::
   +$  nuke
     $%  [%nuke-prio-left =id]
