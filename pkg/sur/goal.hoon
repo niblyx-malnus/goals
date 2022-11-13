@@ -3,6 +3,10 @@
 |%
 ::
 ++  vzn  %4
+++  store-agent  %goal-store-test
+++  store-sub    /goals
+++  cli-agent    %gol-cli-test
+++  desk-name    %goals-test
 ::
 +$  state-4  [%4 =store:s4 =groups =log:s4]
 +$  state-3  [%3 =store:s3]

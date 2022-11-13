@@ -145,9 +145,7 @@
           :: [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
           %spawn-goal
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin.pok %spawn-goal)
+          ~(poke-other pass:hc (en-away-path pid pin.pok %spawn-goal))
         ?.  =(our.bowl owner.pin.pok)
           :_  state
           [(poke-other owner.pin.pok goal-action+!>(action))]~
@@ -166,9 +164,7 @@
           %cache-goal
         =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %cache-goal)
+          ~(poke-other pass:hc (en-away-path pid pin %cache-goal))
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
@@ -179,9 +175,7 @@
           %renew-goal
         =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %renew-goal)
+          ~(poke-other pass:hc (en-away-path pid pin %renew-goal))
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
@@ -192,9 +186,7 @@
           %trash-goal
         =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %trash-goal)
+          ~(poke-other pass:hc (en-away-path pid pin %trash-goal))
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
@@ -205,9 +197,7 @@
           %edit-goal-desc
         =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %edit-goal-desc)
+          ~(poke-other pass:hc (en-away-path pid pin %edit-goal-desc))
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
@@ -218,9 +208,7 @@
           :: [%edit-pool-title =pin title=@t]
           %edit-pool-title
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin.pok %edit-pool-title)
+          ~(poke-other pass:hc (en-away-path pid pin.pok %edit-pool-title))
         ?.  =(our.bowl owner.pin.pok)
           :_  state
           [(poke-other owner.pin.pok goal-action+!>(action))]~
@@ -232,9 +220,7 @@
           %yoke
         ~&  [%pok yoks.pok]
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin.pok %yoke)
+          ~(poke-other pass:hc (en-away-path pid pin.pok %yoke))
         ?.  =(our.bowl owner.pin.pok)
           =/  cards  [(poke-other owner.pin.pok goal-action+!>(action))]~
           [cards state]
@@ -246,9 +232,7 @@
           %move
         =/  pin  (got:idx-orm:gol index.store cid.pok)
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %move)
+          ~(poke-other pass:hc (en-away-path pid pin %move))
         ?.  =(our.bowl owner.cid.pok)
           :_  state
           [(poke-other owner.cid.pok goal-action+!>(action))]~
@@ -259,9 +243,7 @@
           %set-kickoff
         =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %set-kickoff)
+          ~(poke-other pass:hc (en-away-path pid pin %set-kickoff))
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
@@ -273,9 +255,7 @@
           %set-deadline
         =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %set-deadline)
+          ~(poke-other pass:hc (en-away-path pid pin %set-deadline))
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
@@ -288,9 +268,7 @@
           %mark-actionable
         =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %mark-actionable)
+          ~(poke-other pass:hc (en-away-path pid pin %mark-actionable))
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
@@ -301,9 +279,7 @@
           %unmark-actionable
         =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %unmark-actionable)
+          ~(poke-other pass:hc (en-away-path pid pin %unmark-actionable))
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
@@ -314,9 +290,7 @@
           %mark-complete
         =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %mark-complete)
+          ~(poke-other pass:hc (en-away-path pid pin %mark-complete))
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
@@ -327,9 +301,7 @@
           %unmark-complete
         =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %unmark-complete)
+          ~(poke-other pass:hc (en-away-path pid pin %unmark-complete))
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
@@ -340,9 +312,7 @@
           %update-goal-perms
         =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %update-goal-perms)
+          ~(poke-other pass:hc (en-away-path pid pin %update-goal-perms))
         ?.  =(our.bowl owner.id.pok)
           :_  state
           [(poke-other owner.id.pok goal-action+!>(action))]~
@@ -359,9 +329,7 @@
           :: [%update-pool-perms =pin new=pool-perms]
           %update-pool-perms
         =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin.pok %update-pool-perms)
+          ~(poke-other pass:hc (en-away-path pid pin.pok %update-pool-perms))
         ?.  =(our.bowl owner.pin.pok)
           :_  state
           [(poke-other owner.pin.pok goal-action+!>(action))]~
@@ -387,7 +355,7 @@
         ?<  =(owner.pin.pok our.bowl)
         :: ?:  (~(has by wex.bowl) [pite owner.pin.pok dap.bowl])
         ::   =*  poke-other  ~(poke-other pass:hc [%kicker pite])
-        ::   ~&  "%goal-store-test: kicking myself..."
+        ::   ~&  "store-agent:gol: kicking myself..."
         ::   :_  state
         ::   :~  %+  poke-other
         ::         owner.pin.pok
@@ -423,7 +391,7 @@
   |=  =path
   ^-  (quip card _this)
   ?+    path  (on-watch:def path)
-      [%goals ~]  ?>(=(our.bowl src.bowl) `this)
+      _store-sub:gol  ?>(=(our.bowl src.bowl) `this)
       ::
       [@ @ ~]
     =/  owner  `@p`i.path
@@ -639,10 +607,12 @@
       [cards this]
       ::
         %kick
-      %-  (slog '%goal-store-test: Got kick, resubscribing...' ~)
+      =/  msg  (crip "{(trip store-agent:gol)}: Got kick, resubscribing...")
+      %-  (slog msg ~)
       =^  cards  state
       %+  send-home-updates:hc
-        [%pass wire %agent [src.bowl %goal-store-test] %watch wire]~
+        =*  watch-other  ~(watch-other pass:hc wire)
+        [(watch-other src.bowl wire)]~
       [pin our.bowl 0 (wrash-pool:hc pin)]
       [cards this]
       ::
@@ -673,11 +643,12 @@
     ?+    -.sign  (on-agent:def wire sign)
         %watch-ack
       ?~  p.sign
-        ((slog '%goal-store-test: Watch /groups succeeded.' ~) `this)
-      ((slog '%goal-store-test: Watch /groups failed.' ~) `this)
+        ((slog (crip "{(trip store-agent:gol)}: Watch /groups succeeded.") ~) `this)
+      ((slog (crip "{(trip store-agent:gol)}: Watch /groups failed.") ~) `this)
       ::
         %kick
-      %-  (slog '%goal-store-test: Got kick from %group-store, resubscribing...' ~)
+      %-  %-  slog
+          [(crip "{(trip store-agent:gol)}: Got kick from %group-store, resubscribing...") ~]
       :_  this
       [%pass wire %agent [our.bowl %group-store] %watch wire]~
       ::
@@ -749,7 +720,7 @@
   %=  $
     upds  t.upds
     log  (put:log-orm log now [%updt hom])
-    home-cards  [(fact:io goal-home-update+!>(hom) ~[/goals]) home-cards]
+    home-cards  [(fact:io goal-home-update+!>(hom) ~[store-sub:gol]) home-cards]
   ==
 ::
 ++  send-away-updates

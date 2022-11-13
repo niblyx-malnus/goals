@@ -39,10 +39,8 @@
 ::
 ++  on-init
   ^-  (quip card _this)
-  :_  this(views (~(put by *views:vyu) [%all ~] *view:vyu))
-  ?:  (~(has by wex.bowl) [/goals our.bowl %goal-store-test])
-    ~
-  [(~(watch-our pass:io /goals) %goal-store-test /goals)]~
+  :-  (drop (~(watch-store pass:hc /watch-store)))
+  this(views (~(put by *views:vyu) [%all ~] *view:vyu))
 ::
 ++  on-save  !>(state)
 ::
@@ -53,12 +51,9 @@
   |-
   ?-    -.old
       %3
-    :-  %+  weld
-          (print-cards:prtr ~["%gol-cli-test: Hit ENTER at the %gol-cli-test prompt to re-initialize."])
-        ^-  (list card)
-        ?:  (~(has by wex.bowl) [/goals our.bowl %goal-store-test])
-          ~
-        [(~(watch-our pass:io /goals) %goal-store-test /goals)]~
+    :-  %+  welp
+          (print-cards:prtr ~["{(trip cli-agent:gol)}: Hit ENTER at the {(trip cli-agent:gol)} prompt to re-initialize."])
+        (drop (~(watch-store pass:hc /watch-store)))
     %=  this
       cli        %|
       tix        0
@@ -113,7 +108,7 @@
             ==
           =*  poke-self  ~(poke-self pass:io /view-command/change-context)
           [(poke-self view-action+!>([%change-context [%all ~]]))]~
-        %+  weld
+        %+  welp
           [%pass /timers %arvo %b %wait (add now.bowl ~m1)]~
         (print-context:prtr context def-cols:hc mode)
         ::
@@ -167,7 +162,7 @@
         ?:  cli
           `this
         :_  this
-        (print-cards:prtr ~["%gol-cli-test: CLI timed out. Hit ENTER at the %gol-cli-test prompt for updates."])
+        (print-cards:prtr ~["{(trip cli-agent:gol)}: CLI timed out. Hit ENTER at the {(trip cli-agent:gol)} prompt for updates."])
       :: 
       :: ignore stack trace; only print error message
       %-  (slog u.p.sign)
@@ -175,24 +170,30 @@
       `this
     ==
     ::
-      [%goals ~]
+      _store-sub:gol :: this is the wire
     ?>  =(src.bowl our.bowl)
     ?+    -.sign  (on-agent:def wire sign)
         %watch-ack
       ?~  p.sign
-        %-  (slog '%gol-cli-test: Watch /goals succeeded.' ~)
+        %-  %-  slog
+            [(crip "{(trip cli-agent:gol)}: Watch {(spud store-sub:gol)} succeeded.") ~]
         :-  ~
         %=  this
           handles  initial:hdls
           views    initial:vyuz
         ==
-      %-  (slog '%gol-cli-test: Watch /goals failed.' ~)
-      `this
+      =/  msg  (crip "{(trip cli-agent:gol)}: Watch {(spud store-sub:gol)} failed.")
+      ((slog msg ~) `this)
       ::
         %kick
-      %-  (slog '%gol-cli-test: Got kick from %goal-store-test, resubscribing...' ~)
+      =/  msg
+        %-  crip
+        %+  weld
+          "{(trip cli-agent:gol)}: "
+        "Got kick from {(trip store-agent:gol)}, resubscribing..."
+      %-  (slog msg ~)
       :_  this
-      [%pass wire %agent [src.bowl %goal-store-test] %watch wire]~
+      (drop (~(watch-store pass:hc /watch-store)))
       ::
         %fact
       ?+    p.cage.sign  (on-agent:def wire sign)
@@ -264,11 +265,11 @@
       ::
       ::  [%invite =pin ship]
       %invite
-    =*  poke-our  ~(poke-our pass:io /mod-command/invite)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/invite)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
     =/  pool  (got-pool:scry pin.res)
     =.  perms.pool  (~(put by perms.pool) ship.command ~) 
-    ~[(poke-our %goal-store-test goal-action+!>([vzn now.bowl %update-pool-perms pin.res perms.pool]))]
+    ~[(poke-store goal-action+!>([vzn now.bowl %update-pool-perms pin.res perms.pool]))]
       ::
       %hide-completed
     =*  poke-self  ~(poke-self pass:io /view-command/hide-completed)
@@ -279,20 +280,20 @@
     ~[(poke-self view-action+!>([%unhide-completed ~]))]
       ::
       %held-yoke
-    =*  poke-our  ~(poke-our pass:io /mod-command/move)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/move)
     =+  [msg l]=(invalid-goal-error:prtr l.command)  ?.  =(~ msg)  msg
     =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
     ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
     =/  pin  (got-pin:scry id.l)
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %move id.l (some id.r)]))]~
+    [(poke-store goal-action+!>([vzn now.bowl %move id.l (some id.r)]))]~
       ::
       %held-rend
-    =*  poke-our  ~(poke-our pass:io /mod-command/move)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/move)
     =+  [msg l]=(invalid-goal-error:prtr l.command)  ?.  =(~ msg)  msg
     =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
     ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
     =/  pin  (got-pin:scry id.l)
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %move id.l ~]))]~
+    [(poke-store goal-action+!>([vzn now.bowl %move id.l ~]))]~
       ::
       $?  %nest-yoke  %nest-rend
           %prec-yoke  %prec-rend
@@ -302,87 +303,86 @@
       ::
       :: [%spawn-pool title=@t]
       %spawn-pool
-    =*  poke-our  ~(poke-our pass:io /mod-command/spawn-pool)
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %spawn-pool title.command]))]~
+    =*  poke-store  ~(poke-store pass:hc /mod-command/spawn-pool)
+    [(poke-store goal-action+!>([vzn now.bowl %spawn-pool title.command]))]~
       ::
       :: [%clone-pool h=@t title=@t]
       %clone-pool
-    =*  poke-our  ~(poke-our pass:io /mod-command/clone-pool)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/clone-pool)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %clone-pool pin.res title.command]))]~
+    [(poke-store goal-action+!>([vzn now.bowl %clone-pool pin.res title.command]))]~
       ::
       :: [%cache-pool h=@t]
       %cache-pool
-    =*  poke-our  ~(poke-our pass:io /mod-command/cache-pool)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/cache-pool)
     =*  poke-self  ~(poke-self pass:io /view-command/change-context)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    ;:  weld
-      [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %cache-pool pin.res]))]~
+    ;:  welp
+      [(poke-store goal-action+!>([vzn now.bowl %cache-pool pin.res]))]~
       [(poke-self view-action+!>([%change-context [%all ~]]))]~
     ==
       ::
       :: [%renew-pool h=@t]
       %renew-pool
-    =*  poke-our  ~(poke-our pass:io /mod-command/renew-pool)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/renew-pool)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %renew-pool pin.res]))]~
+    [(poke-store goal-action+!>([vzn now.bowl %renew-pool pin.res]))]~
       ::
       :: [%trash-pool h=@t]
       %trash-pool
-    =*  poke-our  ~(poke-our pass:io /mod-command/trash-pool)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/trash-pool)
     =*  poke-self  ~(poke-self pass:io /view-command/change-context)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    ;:  weld
-      [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %trash-pool pin.res]))]~
-      [(poke-self view-action+!>([%change-context [%all ~]]))]~
-    ==
+    %+  welp
+      [(poke-store goal-action+!>([vzn now.bowl %trash-pool pin.res]))]~
+    [(poke-self view-action+!>([%change-context [%all ~]]))]~
       ::
       ::  [%spawn-goal desc=@t]                
       %spawn-goal
-    =*  poke-our  ~(poke-our pass:io /mod-command/spawn-goal)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/spawn-goal)
     ?-    -.context
         %all
       (print-cards:prtr ~["ERROR: Cannot add goal outside of a pool."])
         %pool
-      :~  %+  poke-our  %goal-store-test
+      :~  %-  poke-store
           goal-action+!>([vzn now.bowl %spawn-goal pin.context ~ desc.command %|])
       ==
         %goal
       =/  pin  (got-pin:scry id.context)
-      :~  %+  poke-our  %goal-store-test
+      :~  %-  poke-store
           goal-action+!>([vzn now.bowl %spawn-goal pin (some id.context) desc.command %|])
       ==
     ==
       ::
       :: [%cache-goal h=@t]
       %cache-goal
-    =*  poke-our  ~(poke-our pass:io /mod-command/cache-goal)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/cache-goal)
     =+  [msg res]=(invalid-goal-id-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %cache-goal id.res]))]~
+    [(poke-store goal-action+!>([vzn now.bowl %cache-goal id.res]))]~
       ::
       :: [%renew-goal h=@t]
       %renew-goal
-    =*  poke-our  ~(poke-our pass:io /mod-command/renew-goal)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/renew-goal)
     =+  [msg res]=(invalid-goal-id-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %renew-goal id.res]))]~
+    [(poke-store goal-action+!>([vzn now.bowl %renew-goal id.res]))]~
       ::
       :: [%trash-goal h=@t]
       %trash-goal
-    =*  poke-our  ~(poke-our pass:io /mod-command/trash-goal)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/trash-goal)
     =+  [msg res]=(invalid-goal-id-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %trash-goal id.res]))]~
+    [(poke-store goal-action+!>([vzn now.bowl %trash-goal id.res]))]~
       ::
       ::  [%set-kickoff h=@t k=(unit @da)]
       %set-kickoff
-    =*  poke-our  ~(poke-our pass:io /mod-command/set-kickoff)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/set-kickoff)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    ~[(poke-our %goal-store-test goal-action+!>([vzn now.bowl %set-kickoff id.res k.command]))]
+    ~[(poke-store goal-action+!>([vzn now.bowl %set-kickoff id.res k.command]))]
       ::
       ::  [%set-deadline h=@t d=(unit @da)]
       %set-deadline
-    =*  poke-our  ~(poke-our pass:io /mod-command/set-deadline)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/set-deadline)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    ~[(poke-our %goal-store-test goal-action+!>([vzn now.bowl %set-deadline id.res d.command]))]
+    ~[(poke-store goal-action+!>([vzn now.bowl %set-deadline id.res d.command]))]
       ::
       :: [%set-utc-offset hours=@dr ahead=?]
       %set-utc-offset
@@ -391,15 +391,15 @@
       ::
       ::  [%edit-goal-desc h=@t desc=@t]                
       %edit-goal-desc
-    =*  poke-our  ~(poke-our pass:io /mod-command/edit-goal-desc)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/edit-goal-desc)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %edit-goal-desc id.res desc.command]))]~
+    [(poke-store goal-action+!>([vzn now.bowl %edit-goal-desc id.res desc.command]))]~
       ::
       ::  [%edit-pool-title h=@t title=@t]
       %edit-pool-title
-    =*  poke-our  ~(poke-our pass:io /mod-command/edit-pool-title)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/edit-pool-title)
     =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %edit-pool-title pin.res title.command]))]~
+    [(poke-store goal-action+!>([vzn now.bowl %edit-pool-title pin.res title.command]))]~
       ::
       :: [%print-context ~]
       %print-context
@@ -440,27 +440,27 @@
       ::
       :: [%mark-actionable h=@t]
       %mark-actionable
-    =*  poke-our  ~(poke-our pass:io /mod-command/mark-actionable)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/mark-actionable)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %mark-actionable id.res]))]~
+    [(poke-store goal-action+!>([vzn now.bowl %mark-actionable id.res]))]~
       ::
       :: [%unmark-actionable h=@t]
       %unmark-actionable
-    =*  poke-our  ~(poke-our pass:io /mod-command/unmark-actionable)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/unmark-actionable)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %unmark-actionable id.res]))]~
+    [(poke-store goal-action+!>([vzn now.bowl %unmark-actionable id.res]))]~
       ::
       :: [%mark-complete h=@t]
       %mark-complete
-    =*  poke-our  ~(poke-our pass:io /mod-command/mark-complete)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/mark-complete)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %mark-complete id.res]))]~
+    [(poke-store goal-action+!>([vzn now.bowl %mark-complete id.res]))]~
       ::
       :: [%unmark-complete h=@t]
       %unmark-complete
-    =*  poke-our  ~(poke-our pass:io /mod-command/unmark-complete)
+    =*  poke-store  ~(poke-store pass:hc /mod-command/unmark-complete)
     =+  [msg res]=(invalid-goal-error:prtr h.command)  ?.  =(~ msg)  msg
-    [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %unmark-complete id.res]))]~
+    [(poke-store goal-action+!>([vzn now.bowl %unmark-complete id.res]))]~
   ==
 ::
 ++  can-connect
@@ -494,6 +494,22 @@
     |=  other=@p
     ^-  card
     (~(leave pass:io wire) other dap.bowl)
+  ::
+  ++  poke-store
+    |=  =cage
+    ^-  card
+    (~(poke-our pass:io wire) store-agent:gol cage)
+  ::
+  ++  watch-store
+    |.
+    ^-  (unit card)
+    ?:  (~(has by wex.bowl) [store-sub:gol our.bowl store-agent:gol])  ~
+    (some (~(watch-our pass:io wire) store-agent:gol store-sub:gol))
+  ::
+  ++  leave-store
+    |.
+    ^-  card
+    (~(leave-our pass:io wire) store-agent:gol)
   --
 ::
 ++  def-cols  ~[%handle %level %deadline %priority]
@@ -501,7 +517,7 @@
 ++  yoke-command
   |*  [hed=term l=@t r=@t]
   ^-  (list card)
-  =*  poke-our  ~(poke-our pass:io /mod-command/[hed])
+  =*  poke-store  ~(poke-store pass /mod-command/[hed])
   =+  [msg l]=(invalid-goal-error:prtr l)  ?.  =(~ msg)  msg
   =+  [msg r]=(invalid-goal-error:prtr r)  ?.  =(~ msg)  msg
   ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
@@ -519,5 +535,5 @@
       %held-rend  [%held-rend id.l id.r]
       %held-yoke  [%held-yoke id.l id.r]
     ==
-  [(poke-our %goal-store-test goal-action+!>([vzn now.bowl %yoke pin ~[yok]]))]~
+  [(poke-store goal-action+!>([vzn now.bowl %yoke pin ~[yok]]))]~
 --
