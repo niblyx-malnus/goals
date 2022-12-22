@@ -13,8 +13,8 @@
       kids=(set id)
       kickoff=node
       deadline=node
-      complete=?(%.y %.n)
-      actionable=?(%.y %.n)
+      complete=_|
+      actionable=_|
       chief=ship
       spawn=(set ship)
   ==

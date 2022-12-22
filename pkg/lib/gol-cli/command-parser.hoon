@@ -12,6 +12,8 @@
     parse-prec-rend                       
     parse-prio-yoke                       
     parse-prio-rend                       
+    parse-slot-above
+    parse-slot-below
     parse-spawn-pool                        
     parse-clone-pool                       
     parse-cache-pool
@@ -26,6 +28,8 @@
     parse-change-context                  
     parse-hide-completed
     parse-unhide-completed
+    parse-set-loc
+    parse-set-win
     parse-set-utc-offset                  
     parse-collapse                        
     parse-uncollapse                      
@@ -133,6 +137,20 @@
     (cook crip parse-handle)
   ==
 ::
+++  parse-slot-above
+  ;~  (glue ace)
+    (cold %slot-above (jest '^'))
+    (cook crip parse-handle)
+    (cook crip parse-handle)
+  ==
+::
+++  parse-slot-below
+  ;~  (glue ace)
+    (cold %slot-below (jest '_'))
+    (cook crip parse-handle)
+    (cook crip parse-handle)
+  ==
+::
 ++  parse-invite
   ;~  (glue ace)
     (cold %invite (jest 'invite'))
@@ -210,6 +228,18 @@
   ;~  (glue ace)
     (cold %set-utc-offset (jest 'tz'))    :: command 'tz'
     parse-utc-offsets:dates   :: parse utc-offset cord to cell of [@dr ?]
+  ==
+::
+++  parse-set-loc
+  ;~  (glue ace)
+    (cold %set-loc (jest 'sl'))
+    dem
+  ==
+::
+++  parse-set-win
+  ;~  (glue ace)
+    (cold %set-win (jest 'sw'))
+    dem
   ==
 ::
 :: collapse subgoals of a goal in a given context

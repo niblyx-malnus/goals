@@ -282,12 +282,13 @@
   (((traverse nid:gol (unit ?) (map nid:gol (unit ?))) gine vis) nid)
 ::
 :: get uncompleted leaf goals left of id
-++  harvest
-  |=  =id:gol
-  ^-  (set id:gol)
-  =/  ginn  (ginn nid:gol (set id:gol))
-  =.  ginn
-    %=  ginn
+++  raw-harvest
+  |=  [=nid:gol vis=(map nid:gol (set id:gol))]
+  ^-  (map nid:gol (set id:gol))
+  =/  gaso  [nid:gol (set id:gol) (map nid:gol (set id:gol))]
+  =/  gine  (gine gaso)
+  =.  gine
+    %=  gine
       ::
       :: incomplete inflow
       flow
@@ -316,10 +317,30 @@
         ?:  &(=(~ out) =(%d -.nid))
           (~(put in *(set id:gol)) id.nid)
         out
+      exit  |=([=nid:gol vis=(map nid:gol (set id:gol))] vis)
     ==
   ::
   :: work backwards from deadline
-  (((traverse nid:gol (set id:gol) (set id:gol)) ginn ~) [%d id])
+  (((traverse gaso) gine vis) nid)
+::
+++  harvest  |=(=id:gol `(set id:gol)`(~(got by (raw-harvest [%d id] ~)) [%d id]))
+::
+++  root-harvest
+  |.
+  ^-  (set id:gol)
+  =/  root-nodes  (root-nodes:nd)
+  =/  vis  
+    %:  (chain nid:gol (set id:gol))
+      raw-harvest  root-nodes  ~
+    ==
+  =|  out=(set id:gol)
+  |-
+  ?~  root-nodes
+    out
+  %=  $
+    root-nodes  t.root-nodes
+    out  (~(uni in out) (~(got by vis) i.root-nodes))
+  ==
 ::
 :: harvest with full goals
 ++  full-harvest

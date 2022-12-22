@@ -107,6 +107,12 @@
   ^-  (list id:gol)
   (skip ids |=(=id:gol complete:(~(got by goals) id)))
 ::
+:: extracts ids of actionable goals from a list of ids
+++  actionable
+  |=  ids=(list id:gol)
+  ^-  (list id:gol)
+  (skip ids |=(=id:gol !actionable:(~(got by goals) id)))
+::
 :: get all nodes from a set of ids
 ++  nodify
   |=  ids=(set id:gol)

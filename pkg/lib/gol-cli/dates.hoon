@@ -1,8 +1,6 @@
 /-  *dates
 /+  *gol-cli-util
 |%
-::
-::
 ++  utc-offsets
   %-  ~(gas by *(map [@dr ?] @t))
   :~  [[~h12 %.n] '-12']
@@ -139,14 +137,6 @@
     "-"
     "{(slag 3 (trip (scot %ud y.d)))}"
   ==
-::
-:: pad leftward with zeros
-++  zfill
-  |=  [a=@ text=tape]
-  ^-  tape
-  ?:  (gte (lent text) a)
-    text
-  $(text ['0' text])
 ::
 :: format real datetime as local datetime
 ++  simple-format-local

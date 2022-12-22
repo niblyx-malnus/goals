@@ -1,5 +1,5 @@
 /-  gol=goal
-/+  gol-cli-goals, pl=gol-cli-pool, em=gol-cli-emot
+/+  gol-cli-goals, pl=gol-cli-pool, em=gol-cli-emot, *gol-cli-util
 |_  store:gol
 +*  gols  ~(. gol-cli-goals +<)
 ::
@@ -30,6 +30,17 @@
   =.  pool  pool(creator owner.old-pin)
   =.  pool  pool(goals goals:(clone-goals:gols goals.old-pool own now))
   [pin pool:abet:(inflater:(apex:em pool))]
+::
+++  sort-by-order
+  |=  input=(list id:gol)
+  ^-  (list id:gol)
+  =/  ord  ?~  order  *(map id:gol @)
+           %-  ~(gas by *(map id:gol @))
+           (fuse order (gulf 1 (lent order)))
+  %+  sort
+    input
+  |=  [a=id:gol b=id:gol]
+  (lth (~(got by ord) a) (~(got by ord) b))
 ::
 ++  clone-goal
   |=  $:  =old=id:gol

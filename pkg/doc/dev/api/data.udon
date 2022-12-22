@@ -1,0 +1,177 @@
+;>
+# Data Structures
+
+The following are not the exact data structures that we use but it should give
+you a clear understanding of what is going on.
+
+## Goal ID
+
+A goal id can conceivably be anything. (For historical reasons and to allow
+for the future possibility that goals might be moved between pools owned
+by the same ship without breaking any links we identify them independently of
+the pools they are contained in.) We use a pair of the ship which
+(permanently) owns the goal and the datetime at which it was spawned.
+
+```
+++  id  [ship @da]
+```
+
+## Nodes
+
+Nodes in the DAG consist of instantaneous moments in time which can
+optionally have an actual time specified. The only two kinds of nodes that
+exist are "kickoffs" and "deadlines" which are associated with a specific
+goal and represent their start and end respectively. These nodes can be
+related to one another by creating an edge between them where the left node
+is understood to come before the right node in time.
+
+We use [%k id] to represent the kickoff of the goal identified by id and
+we use [%d id] to represent the deadline of the goal identified by id.
+
+```
+++  nid  [?(%k %d) =id]
+```
+
+The most important aspects of a node (an instantaneous moment in time) are
+captured in the node nexus, which is stored in the node head. Additional
+information, like redundant or implicit information about the node which
+is stored explicitly for convenience is stored in the tail.
+
+The "moment" of a node-nexus is the specific time in UTC-0 at which it 
+occurs. This can optionally be left empty.
+
+The "inflow" of a node-nexus is the set of other nodes which immediately
+precede this node in time.
+
+The "outflow" of a node-nexus is the set of other nodes which immediately
+succeed this node in time.
+
+For every goal, there is unbreakable edge between it's kickoff and deadline.
+A goal's beginning must always come before it's end.
+
+```
+++  node-nexus
+  $:  moment=(unit @da)
+      inflow=(set nid)
+      outflow=(set nid)
+  ==
+++  node  [node-nexus *]
+```
+
+## Goals
+
+The most important aspects of a pool are located in the goal nexus, which
+is located in the head of the goal. Additional information including the
+goal description, tags and fields, and redundant or implicit information
+stored explicitly for convenience can is stored in the tail.
+
+### `.par`
+
+A goal has an optional parent goal, which is a goal which it is both
+abstractly and temporally contained within. A goal's parent's kickoff will be
+stored in that goal's kickoff's inflow. A goal's parent's deadline will be
+stored in that goal's deadline's outflow. (And vice versa, as the data
+structure is doubly linked; each node is aware of all of its edges.)
+
+### `.kids`
+
+A goal has a set of kids, which are goals which are both abstractly and
+temporally contained within it in this same manner.
+
+### `.kickoff`
+
+A goal has a kickoff, which is a node representing its beginning.
+
+### `.deadline`
+
+A goal has a deadline, which is a node representing its end.
+
+### `.complete`
+
+A goal has a complete flag, marking whether or not it is complete.  Completed
+goals cannot come after incomplete goals. Incomplete goals cannot come before
+complete goals. By extension goals with children can only be completed if all
+of their children have been completed.
+
+### `.actionable`
+
+A goal has an actionable flag, marking whether or not it is actionable. An
+actionable goal is a goal which can be tackled immediately. Conceptually, it is
+an atomic goal which requires no further differentiation. It is a goal which
+can be probably be accomplished on the order of an hour.
+
+### `.chief`
+
+A goal has exactly one chief, which is the person who is considered to be
+responsible for that goal. A chief has full permissions on a a goal and all its
+descendents. He can do anything to a goal on which he has these permissions
+except permanently delete it, a privilege reserved for owners and admins.
+
+### `.spawn`
+
+A goal has a spawn set, which is the set of ships who do not have permissions
+on that goal, but can add new goals underneath it on which they become chief.
+
+```
+++  goal-nexus
+  $:  par=(unit id)
+      kids=(set id)
+      kickoff=node
+      deadline=node
+      complete=_|
+      actionable=_|
+      chief=ship
+      spawn=(set ship)
+  ==
+++  goal  [goal-nexus *]
+```
+
+Goals are simply contained in a map from their id to their actual contents,
+which is ultimately stored as part of a pool.
+
+```
+++  goals  (map id goal)
+```
+
+## Pools
+
+
+There are two types of pool permissions: %admin and %spawn. 
+
+### %admin
+
+A ship with %admin permissions on a pool has full permissions on that pool.
+The only restrictions on someone with %admin permissions is that they
+cannot demote other %admins and they cannot delete the pool.
+
+### %spawn
+
+A ship with %spawn permissions on a pool only has the special power to
+spawn new goals at the root of the pool. When they spawn a new goal, they
+become chief on this goal.
+
+```
+++  pool-role  ?(%admin %spawn)
+```
+
+### pool-nexus
+
+The most important aspects of a pool are located in the pool nexus, which
+is located in the head of the pool. Additional information including the
+pool title, a pool description, and redundant or implicit data which is
+stored for convenience can be stored in the tail of the pool.
+
+The pool nexus consists of a container for it's associated goals (the goals
+structure described above), a cache for archived goals (which has the same
+structure as goals), an owner, and a description of its permission structure
+which consists of a mapping from ships to an optional role.
+
+```
+++  pool-nexus
+  $:  =goals
+      cache=goals
+      owner=ship
+      perms=(map ship (unit pool-role))
+  ==
+++  pool  [pool-nexus *]
+```

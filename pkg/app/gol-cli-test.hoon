@@ -4,19 +4,24 @@
     compar=gol-cli-command-parser
 |%
 +$  versioned-state
-  $%  state-0
-      state-1
-      state-2
-      state-3
+  $%  state-4
   ==
-+$  state-0  state-0:vyu
-+$  state-1  state-1:vyu
-+$  state-2  state-2:vyu
-+$  state-3  state-3:vyu
++$  state-4 
+  $:  %4
+      win=$~(10 @)
+      cli=_|          :: is CLI active
+      tix=@           :: active timers
+      reboot=?        :: do we need to reboot handles/views
+      =handles:vyu
+      =views:vyu
+      context=grip:vyu
+      hide-completed=?
+      =utc-offset:vyu
+  ==
 +$  command  command:commands
 +$  card  card:shoe
 --
-=|  state-3
+=|  state-4
 =*  state  -
 =*  vzn  vzn:gol
 ::
@@ -47,28 +52,17 @@
 ++  on-load
   |=  old-state=vase
   ^-  (quip card _this)
-  =/  old  !<(versioned-state old-state)
-  |-
-  ?-    -.old
-      %3
-    :-  %+  welp
-          (print-cards:prtr ~["{(trip cli-agent:gol)}: Hit ENTER at the {(trip cli-agent:gol)} prompt to re-initialize."])
-        (drop (~(watch-store pass:hc /watch-store)))
-    %=  this
-      cli        %|
-      tix        0
-      reboot     %&
-      context    [%all ~]
-      handles    *handles:vyu
-      views      (~(put by *views:vyu) [%all ~] *view:vyu)
+  :: don't care; no real persistent state for now
+  :: =/  old  !<(versioned-state old-state)
+  :_  this(views (~(put by *views:vyu) [%all ~] *view:vyu))
+  %+  welp
+    %-  print-cards:prtr
+    :_  ~
+    ;:  weld  
+      "{(trip cli-agent:gol)}: "
+      "Hit ENTER at the {(trip cli-agent:gol)} prompt to re-initialize."
     ==
-      %2
-    $(old (convert-2-to-3:vyu old))
-      %1
-    $(old (convert-1-to-2:vyu old))
-      %0
-    $(old (convert-0-to-1:vyu old))
-  ==
+  (drop (~(watch-store pass:hc /watch-store)))
 ::
 ++  on-poke
   |=  [=mark =vase]
@@ -110,7 +104,7 @@
           [(poke-self view-action+!>([%change-context [%all ~]]))]~
         %+  welp
           [%pass /timers %arvo %b %wait (add now.bowl ~m1)]~
-        (print-context:prtr context def-cols:hc mode)
+        (print-context:prtr context def-cols:hc dow:hc mode)
         ::
         :: [%change-context c=grip]
         %change-context
@@ -133,6 +127,13 @@
         :: [%set-utc-offset utc-offset=[hour=@dr ahead=?]]
         %set-utc-offset
       `this(utc-offset utc-offset.action)
+        :: [%set-loc a=@]
+        %set-loc
+      =/  view  (~(got by views) context)
+      `this(views (~(put by views) context view(loc a.action)))
+        :: [%set-win a=@]
+        %set-win
+      `this(win a.action)
     ==
   ==
 ++  on-watch  on-watch:def
@@ -158,15 +159,22 @@
       [%mod-command *]
     ?+    -.sign  (on-agent:def wire sign)
         %poke-ack
+      =/  cards
+        ?.  ?|  =(wire /mod-command/slot-above)
+                =(wire /mod-command/slot-below)
+            ==
+          ~
+        [(~(poke-self pass:io /print-context) view-action+!>(print+~))]~
       ?~  p.sign
         ?:  cli
-          `this
+          [cards this]
         :_  this
+        %+  welp
+          cards
         (print-cards:prtr ~["{(trip cli-agent:gol)}: CLI timed out. Hit ENTER at the {(trip cli-agent:gol)} prompt for updates."])
       :: 
       :: ignore stack trace; only print error message
-      %-  (slog u.p.sign)
-      :: %-  (slog `tang`[(snag 1 u.p.sign) ~])
+      %-  (slog `tang`[(snag 1 u.p.sign) ~])
       `this
     ==
     ::
@@ -279,6 +287,18 @@
     =*  poke-self  ~(poke-self pass:io /view-command/unhide-completed)
     ~[(poke-self view-action+!>([%unhide-completed ~]))]
       ::
+      %slot-above
+    =*  poke-store  ~(poke-store pass:hc /mod-command/slot-above)
+    =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
+    =+  [msg l]=(invalid-goal-error:prtr l.command)  ?.  =(~ msg)  msg
+    [(poke-store goal-action+!>([vzn now.bowl %slot-above id.r id.l]))]~
+      ::
+      %slot-below
+    =*  poke-store  ~(poke-store pass:hc /mod-command/slot-below)
+    =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
+    =+  [msg l]=(invalid-goal-error:prtr l.command)  ?.  =(~ msg)  msg
+    [(poke-store goal-action+!>([vzn now.bowl %slot-below id.r id.l]))]~
+      ::
       %held-yoke
     =*  poke-store  ~(poke-store pass:hc /mod-command/move)
     =+  [msg l]=(invalid-goal-error:prtr l.command)  ?.  =(~ msg)  msg
@@ -388,6 +408,16 @@
       %set-utc-offset
     =*  poke-self  ~(poke-self pass:io /view-command/set-utc-offset)
     ~[(poke-self view-action+!>([%set-utc-offset hours.command ahead.command]))]
+      ::
+      :: [%set-loc a=@]
+      %set-loc
+    =*  poke-self  ~(poke-self pass:io /view-command/set-loc)
+    ~[(poke-self view-action+!>([%set-loc a.command]))]
+      ::
+      :: [%set-win a=@]
+      %set-win
+    =*  poke-self  ~(poke-self pass:io /view-command/set-win)
+    ~[(poke-self view-action+!>([%set-win a.command]))]
       ::
       ::  [%edit-goal-desc h=@t desc=@t]                
       %edit-goal-desc
@@ -513,6 +543,7 @@
   --
 ::
 ++  def-cols  ~[%handle %level %deadline %priority]
+++  dow  [loc:(~(got by views) context) win]
 ::
 ++  yoke-command
   |*  [hed=term l=@t r=@t]

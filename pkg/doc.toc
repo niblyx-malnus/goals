@@ -1,0 +1,9 @@
+/usr            User
+  /info/udon    General Info
+  /clog/udon    Changelog
+/dev            Developer
+  /api          API Reference
+    /scry/udon  Scry endpoints
+    /poke/udon  Pokes
+    /subs/udon  Subscriptions
+    /data/udon  Data types

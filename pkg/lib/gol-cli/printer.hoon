@@ -1,5 +1,5 @@
 /-  gol=goal, vyu=view
-/+  shoe, dates=gol-cli-dates, gol-cli-handles, gol-cli-scries
+/+  shoe, dates=gol-cli-dates, gol-cli-handles, gol-cli-scries, *gol-cli-util
 |_  $:  =handles:vyu
         =views:vyu
         context=grip:vyu
@@ -14,7 +14,7 @@
 ::
 :: get cards to print goal substructure
 ++  print-context
-  |=  [ctxt=grip:vyu col-names=(list col-name) =mode:vyu]
+  |=  [ctxt=grip:vyu col-names=(list col-name) dow=[@ @] =mode:vyu]
   ^-  (list card)
   %-  print-cards 
   =/  lvl :: initial level; printing from context
@@ -25,12 +25,27 @@
   ::
   :: Get the actual row information (projects and goals)
   =/  tapes  tapes:(print-family first-block ~)
+  =/  ctxt-line  ?~(tapes ~ [(weld (reap idxwit ' ') i.tapes)]~)
+  =.  tapes  ?~(tapes ~ t.tapes)
+  =.  tapes
+    =|  tupes=(list tape)
+    |-
+    ?~  tapes
+      (flop tupes)
+    %=  $
+      tapes  t.tapes
+      tupes  
+        [(weld (filz idxwit ' ' (scow %ud (lent tupes))) i.tapes) tupes]
+    ==
+  =/  dots=tape  ;:(weld (reap 38 ' ') (reap 4 '.') (reap 38 ' '))
+  =/  dats  ?:(=(0 -.dow) ~ ~[dots])
+  =/  duts  ?.((lth (add -.dow +.dow) (lent tapes)) ~ ~[dots])
   :: 
   :: prettify with boundaries, column headers, and additional info
   ;:  weld
     ~[hrz]
-    ~[(weld (reap toggle-len ' ') (headers col-names))]
-    `(list tape)`tapes
+    ~[(weld (reap (add idxwit toggle-len) ' ') (headers col-names))]
+    ctxt-line  dats  `(list tape)`(swag dow tapes)  duts
     ~[hrz]
     (info ctxt)
   ==
@@ -68,6 +83,7 @@
   ==
 :: this needs to output prtd-set
 :: to avoid printing duplicates
+:: WHY IS THIS SO SLOW?
 ++  print-family
   |=  [=block:vyu =prtd=(set grip:vyu)]
   ^-  [tapes=(list tape) =prtd=(set grip:vyu)]
@@ -92,8 +108,9 @@
   |=  col-names=(list col-name)
   (reap :(add toggle-len (cols-lent col-names) spacer) ' ')
 ::
-::
-++  spacer  3
+++  spacer  2
+++  toggle-len  5
+++  idxwit  3
 ::
 :: space between prefix and branches
 ++  buffer  (reap spacer ' ')
@@ -108,10 +125,6 @@
     buffer
     (brancher block prtd)
   ==
-::
-::
-++  toggle-len  5
-::
 ::
 ++  toggles
   |=  =grip.vyu
@@ -165,15 +178,16 @@
       %prec-left  '-'
     ==
   ++  forearm
+    =/  arm  (dec spacer)
     ?-    -.grip.block
-      %all  "--"
-      %pool  `tape`(reap 2 branch-char)
+      %all  (reap arm '-')
+      %pool  `tape`(reap arm branch-char)
         %goal
       ?+  mode.block  !!
         %nest-ryte  (reap (dec (shift block)) branch-char)
         normal-mode:vyu  (reap (dec (shift block)) branch-char)
-        %prec-ryte  (weld (reap (sub (shift block) 2) branch-char) ">")
-        %prec-left  (weld "<" (reap (sub (shift block) 2) branch-char))
+        %prec-ryte  (weld (reap (sub (shift block) arm) branch-char) ">")
+        %prec-left  (weld "<" (reap (sub (shift block) arm) branch-char))
       ==
     ==
   --
@@ -373,11 +387,10 @@
 ++  cols-lent
   |=  names=(list col-name)
   =/  len  +((lent names))
-  =/  idx  0
   |-
-  ?:  =(idx (lent names))
+  ?~  names
     len
-  $(idx +(idx), len (add len (col-lent (snag idx names))))
+  $(names t.names, len (add len (col-lent i.names)))
 ::
 :: columns output for specific id on specific columns
 ++  columns

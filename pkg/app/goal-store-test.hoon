@@ -2,19 +2,26 @@
 /+  dbug, default-agent, verb, agentio,
     pl=gol-cli-pool, gol-cli-goals, gol-cli-pools,
     em=gol-cli-emot, gol-cli-node, gol-cli-traverse,
-    gol-cli-etch, group-update
+    gol-cli-etch, group-update, *gol-cli-util,
+    rudder, gol-cli-pages
 |%
 +$  state-0  state-0:gol
 +$  state-1  state-1:gol  
 +$  state-2  state-2:gol
 +$  state-3  state-3:gol
 +$  state-4  state-4:gol
++$  state-5  state-5:gol
++$  state-5-1  state-5-1:gol
++$  state-5-2  state-5-2:gol
 +$  versioned-state
   $%  state-0
       state-1
       state-2
       state-3
       state-4
+      state-5
+      state-5-1
+      state-5-2
   ==
 +$  card  card:agent:gall
 ++  log-orm  ((on @ log-update:gol) lth)
@@ -28,7 +35,7 @@
     unix-ms
   $(unix-ms (add unix-ms 1))
 --
-=|  state-4
+=|  state-5-2
 =*  state  -
 =*  vzn  vzn:gol
 ::
@@ -44,17 +51,19 @@
     gols  ~(. gol-cli-goals store)
     puls  ~(. gol-cli-pools store)
     etch  ~(. gol-cli-etch store)
+    pages  (gol-cli-pages bowl store)
     index   index.store
     pools   pools.store
     cache   cache.store
+    order   order.store
 ::
 ++  on-init   
   ^-  (quip card _this)
   =/  now=@  (unique-time now.bowl log)
   :_  this(log (put:log-orm *log:gol now [%init store]))
-  ?:  (~(has by wex.bowl) [/groups our.bowl %group-store])
-    ~
-  [(~(watch-our pass:io /groups) %group-store /groups)]~
+  %+  welp
+    [%pass /eyre/connect %arvo %e %connect `/[dap.bowl] dap.bowl]~
+  (drop (~(watchif-our pass:hc /groups) %group-store /groups))
 ::
 ++  on-save   !>(state)
 ::
@@ -64,7 +73,7 @@
   =/  old  !<(versioned-state old-vase)
   |-
   ?-    -.old
-      %4
+      %5.101
     =.  old
       %=  old
         pools.store
@@ -75,9 +84,15 @@
       ==
     =/  now=@  (unique-time now.bowl log)
     :_  this(state old(log (put:log-orm *log:gol now [%init store.old])))
-    ?:  (~(has by wex.bowl) [/groups our.bowl %group-store])
-      ~
-    [(~(watch-our pass:io /groups) %group-store /groups)]~
+    %+  welp
+      [%pass /eyre/connect %arvo %e %connect `/[dap.bowl] dap.bowl]~
+    (drop (~(watchif-our pass:hc /groups) %group-store /groups))
+      %5.100
+    $(old (convert-5-1-to-5-2:gol old))
+      %5
+    $(old (convert-5-to-5-1:gol old))
+      %4
+    $(old (convert-4-to-5:gol old))
       %3
     $(old (convert-3-to-4:gol old))
       %2
@@ -99,6 +114,44 @@
       =/  pid  pid.action
       =/  pok  pok.action
       ?-    -.pok
+          %hide-completed
+        `state(hide-completed.store !hide-completed.store)
+          ::
+          :: [%edit-goal-note =id note=@t]
+          %edit-goal-note
+        =/  pin  (got:idx-orm:gol index.store id.pok)
+        =*  poke-other
+          ~(poke-other pass:hc (en-away-path pid pin %edit-goal-note))
+        ?.  =(our.bowl owner.id.pok)
+          :_  state
+          [(poke-other owner.id.pok goal-action+!>(action))]~
+        =/  pore
+          (edit-goal-note:(apex-em:hc pin) id.pok note.pok src.bowl)
+        (send-away-updates:hc ~ pin src.bowl pid pore)
+          ::
+          :: [%edit-pool-note =pin note=@t]
+          %edit-pool-note
+        =*  poke-other
+          ~(poke-other pass:hc (en-away-path pid pin.pok %edit-pool-note))
+        ?.  =(our.bowl owner.pin.pok)
+          :_  state
+          [(poke-other owner.pin.pok goal-action+!>(action))]~
+        =/  pore
+          (edit-pool-note:(apex-em:hc pin.pok) note.pok src.bowl)
+        (send-away-updates:hc ~ pin.pok src.bowl pid pore)
+          %slot-above
+        =.  order  
+          ?~  idx=(find [stir.pok]~ order.store)
+            order
+          (oust [u.idx 1] order)
+        `state(order.store (slod order stil.pok stir.pok))
+          ::
+          %slot-below
+        =.  order  
+          ?~  idx=(find [stir.pok]~ order.store)
+            order
+          (oust [u.idx 1] order)
+        `state(order.store (sloq order stil.pok stir.pok))
           ::
           %spawn-pool
         ?>  =(src.bowl our.bowl)
@@ -218,14 +271,12 @@
           ::
           :: [%yoke =pin yoks=(list plex)]
           %yoke
-        ~&  [%pok yoks.pok]
         =*  poke-other
           ~(poke-other pass:hc (en-away-path pid pin.pok %yoke))
         ?.  =(our.bowl owner.pin.pok)
           =/  cards  [(poke-other owner.pin.pok goal-action+!>(action))]~
           [cards state]
         =/  pore  (plex-sequence:(apex-em:hc pin.pok) yoks.pok src.bowl)
-        ~&  action
         (send-away-updates:hc ~ pin.pok src.bowl pid pore)
           ::
           :: [%move cid=id upid=(unit id)]
@@ -308,7 +359,7 @@
         =/  pore  (unmark-complete:(apex-em:hc pin) id.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
-          :: [%update-goal-perms =id chief=ship rec=?(%.y %.n) spawn=(set ship)]
+          :: [%update-goal-perms =id chief=ship rec=_| spawn=(set ship)]
           %update-goal-perms
         =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other
@@ -384,6 +435,22 @@
         :_  state
         [%give %kick ~[/[`@`+<.pin.pok]/[`@`+>.pin.pok]] `ship.pok]~
       ==
+        ::
+        %handle-http-request
+      =;  out=(quip card store:gol)
+        [-.out state(store +.out)]
+      %.  [bowl !<(order:rudder vase) store]
+      %:  (steer:rudder store:gol unver-action:gol)
+        pages
+        (point:rudder /[dap.bowl] & ~(key by pages))
+        (fours:rudder store)
+        |=  cmd=unver-action:gol
+        ^-  $@  brief:rudder
+            [brief:rudder (list card) store:gol]
+        =^  caz  this
+          (on-poke %goal-action !>([vzn 0 cmd]))
+        ['Processed successfully.' caz store]
+      ==
     ==
   [cards this]
 ::
@@ -391,6 +458,7 @@
   |=  =path
   ^-  (quip card _this)
   ?+    path  (on-watch:def path)
+      [%http-response *]  `this
       _store-sub:gol  ?>(=(our.bowl src.bowl) `this)
       ::
       [@ @ ~]
@@ -404,7 +472,7 @@
     :: ?>  (~(has by perms.pool) src.bowl)
     =^  cards  state
       =/  cards
-        [%give %fact ~ %goal-away-update !>([[our.bowl 0] vzn spawn-pool+pool])]~
+        ~[(fact:io goal-away-update+!>([[our.bowl 0] vzn spawn-pool+pool]) ~)]
       ?:  (~(has by perms.pool) src.bowl)
         [cards state]
       %+  send-away-updates:hc
@@ -506,17 +574,17 @@
       =/  nd  ~(. gol-cli-node goals.pool)
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
-        ``goal-peek+!>(yung+(hi-to-lo:tv (yung:nd id)))
+        ``goal-peek+!>(yung+(sort-by-order:puls (yung:nd id)))
         ::
           [%uncompleted ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %yung-uncompleted
-            (hi-to-lo:tv (incomplete:nd (yung:nd id)))
+            (sort-by-order:puls (incomplete:nd (yung:nd id)))
         ::
           [%virtual ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %yung-virtual
-            (hi-to-lo:tv (virt:nd id))
+            (sort-by-order:puls (virt:nd id))
       ==
       ::
         [%ryte-bound ~]
@@ -561,12 +629,12 @@
       =/  nd  ~(. gol-cli-node goals.pool)
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
-        ``goal-peek+!>(roots+(hi-to-lo:tv (root-goals:nd)))
+        ``goal-peek+!>(roots+(sort-by-order:puls (root-goals:nd)))
         ::
           [%uncompleted ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %roots-uncompleted
-        (hi-to-lo:tv (incomplete:nd (root-goals:nd)))
+        (sort-by-order:puls (incomplete:nd (root-goals:nd)))
       ==
     ==
   ==
@@ -662,7 +730,17 @@
     ==
   ==
 ::
-++  on-arvo   on-arvo:def
+++  on-arvo
+  |=  [=wire =sign-arvo]
+  ^-  (quip card _this)
+  ?.  ?=([%eyre %connect ~] wire)  (on-arvo:def wire sign-arvo)
+  ?+    sign-arvo  (on-arvo:def wire sign-arvo)
+      [%eyre %bound *]
+    ~?  !accepted.sign-arvo
+      [dap.bowl 'eyre bind rejected!' binding.sign-arvo]
+    `this
+  ==
+::
 ++  on-fail   on-fail:def
 --
 |_  =bowl:gall
@@ -690,6 +768,12 @@
     |=  other=@p
     ^-  card
     (~(leave pass:io wire) other dap.bowl)
+  ::
+  ++  watchif-our
+    |=  [app=term =path]
+    ^-  (unit card)
+    ?:  (~(has by wex.bowl) [path our.bowl app])  ~
+    (some (~(watch-our pass:io wire) app path))
   --
 ::
 ++  apex-em  |=(=pin:gol (apex:em (~(got by pools.store) pin)))

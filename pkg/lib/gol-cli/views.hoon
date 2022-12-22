@@ -61,8 +61,8 @@
   =/  fam  (get-fam:scry clp mode)
   =.  views
     ?:  inv
-      (~(put by views) ctx [(~(del in collapse.view) clp) hidden.view])
-    (~(put by views) ctx [(~(put in collapse.view) clp) hidden.view])
+      (~(put by views) ctx view(collapse (~(del in collapse.view) clp)))
+    (~(put by views) ctx view(collapse (~(put in collapse.view) clp)))
   ?.  rec  views
   ?:  =(0 (lent fam))  views
   =/  idx=@  0

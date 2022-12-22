@@ -34,8 +34,54 @@
         (check-root-spawn-perm mod)
       (check-goal-spawn-perm u.upid mod)
   =/  goal  (init-goal id mod mod)
+  :: 
+  :: spawn the goal
   =.  goals.p  (~(put by goals.p) id goal)
+  :: 
+  :: automatically unmark parent actionable
+  =.  goals.p  
+    ?~  upid
+      goals.p
+    =/  poal  (~(got by goals.p) u.upid)
+    (~(put by goals.p) u.upid poal(actionable %|))
+  ::
+  :: move under parent if exists
   (move id upid owner.p) :: divine intervention (owner)
+::
+:: Break bonds between a goal and a set of other goals
+++  break-bonds
+  |=  [=id:gol exes=(set id:gol) mod=ship]
+  ^-  _this
+  ::
+  :: get the existing bonds between id and its (future) exes
+  =/  pairs  (get-bonds:nd id exes)
+  ::
+  :: iterate through and rend each of these bonds
+  =/  pore  this
+  |-
+  ?~  pairs
+    pore
+  %=  $
+    pairs  t.pairs
+    pore  (dag-rend:pore p.i.pairs q.i.pairs mod)
+  ==
+::
+:: Partition the set of goals q from its complement q- in goals.p
+++  partition
+  |=  [q=(set id:gol) mod=ship]
+  ^-  _this
+  ::
+  :: get complement of q
+  =/  q-  (~(dif in ~(key by goals.p)) q)
+  ::
+  :: iterate through and break bonds between each id in q
+  :: and all ids in q's complement
+  =/  q  ~(tap in q)
+  =/  pore  this
+  |-
+  ?~  q
+    pore
+  $(q t.q, pore (break-bonds:pore i.q q- mod))
 ::
 :: Extract goal from goals
 ++  wrest-goal
@@ -53,7 +99,9 @@
   ::
   :: both of these should get validated here (validate-goals:vd goals)
   :: return extracted goals and remaining goals
-  [(gat-by goals.p.pore ~(tap in prog)) (gus-by goals.p.pore ~(tap in prog))]
+  =/  trac  (gat-by goals.p.pore ~(tap in prog))
+  =/  main  (gus-by goals.p.pore ~(tap in prog))
+  [(validate-goals:vd trac) (validate-goals:vd main)]
 ::
 :: Permanently delete goal and subgoals directly
 ++  waste-goal
@@ -82,7 +130,7 @@
   :: mod has the correct perms for this
   =/  wrest  (wrest-goal:this(goals.p cache.p) id mod) 
   %=  this
-    goals.p  (~(uni by goals.p) (validate-goals:vd trac.wrest))
+    goals.p  (~(uni by goals.p) trac.wrest)
     cache.p  main.wrest
   ==
 ::
@@ -92,41 +140,6 @@
   ^-  _this
   ?>  (check-pool-edit-perm mod)
   this(cache.p main:(wrest-goal:this(goals.p cache.p) id mod))
-::
-:: Partition the set of goals q from its complement q- in goals.p
-++  partition
-  |=  [q=(set id:gol) mod=ship]
-  ^-  _this
-  ::
-  :: get complement of q
-  =/  q-  (~(dif in ~(key by goals.p)) q)
-  ::
-  :: iterate through and break bonds between each id in q
-  :: and all ids in q's complement
-  =/  q  ~(tap in q)
-  =/  pore  this
-  |-
-  ?~  q
-    pore
-  $(q t.q, pore (break-bonds:pore i.q q- mod))
-::
-:: Break bonds between a goal and a set of other goals
-++  break-bonds
-  |=  [=id:gol exes=(set id:gol) mod=ship]
-  ^-  _this
-  ::
-  :: get the existing bonds between id and its (future) exes
-  =/  pairs  (get-bonds:nd id exes)
-  ::
-  :: iterate through and rend each of these bonds
-  =/  pore  this
-  |-
-  ?~  pairs
-    pore
-  %=  $
-    pairs  t.pairs
-    pore  (dag-rend:pore p.i.pairs q.i.pairs mod)
-  ==
 ::
 :: ============================================================================
 :: 
@@ -583,7 +596,7 @@
 ::
 :: set the chief of a goal or optionally all its subgoals
 ++  set-chief
-  |=  [=id:gol chief=ship rec=?(%.y %.n) mod=ship]
+  |=  [=id:gol chief=ship rec=_| mod=ship]
   ^-  _this
   ?.  (check-goal-edit-perm id mod)  ~|("missing goal perms" !!)
   ?.  (check-in-pool chief)  ~|("chief not in pool" !!)

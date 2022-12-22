@@ -80,4 +80,32 @@
     keys  t.keys
     map  (~(del by map) i.keys)
   ==
+::
+:: pad leftward with zeros
+++  zfill
+  |=  [a=@ =tape]
+  ^-  ^tape
+  (filz a '0' tape)
+::
+:: pad leftward with @t
+++  filz
+  |=  [a=@ z=@t =tape]
+  ^-  ^tape
+  ?:  (gte (lent tape) a)
+    tape
+  $(tape [z tape])
+::
+:: slot above
+++  slod
+  |*  [=(list) dat=* dis=*]
+  ^+  list
+  ?~  idx=(find [dat]~ list)  !!
+  (into list u.idx dis)
+::
+:: slot below
+++  sloq
+  |*  [=(list) dat=* dis=*]
+  ^+  list
+  ?~  idx=(find [dat]~ list)  !!
+  (into list +(u.idx) dis)
 --

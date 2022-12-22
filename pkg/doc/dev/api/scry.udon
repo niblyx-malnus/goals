@@ -1,0 +1,92 @@
+;>
+# Scry Endpoints
+
+## `/x/initial`
+
+Get the entire data structure (store).
+
+## `/x/updates/all`
+
+Get a list of all the updates.
+
+## `/x/updates/since/[@]`
+
+Get a list of all the updates since a certain datetime.
+
+## `/x/groups`
+
+Return all this ship's groups.
+
+## `/x/groups-metadata`
+
+Return all this ship's groups metadata.
+
+## `/x/pool-keys`
+
+Get all the pins for all the pools.
+
+## `/x/all-goal-keys`
+
+Get the ids for all the goals.
+
+## `/x/goal/[owner.id]/[birth.id]/get-goal`
+
+Get the goal associated with the given id.
+
+## `/x/goal/[owner.id]/[birth.id]/get-pin`
+
+Get the pin of the pool which contains the given goal.
+
+## `/x/goal/[owner.id]/[birth.id]/yung`
+
+Get the goals whose deadlines immediately precede the given goal's deadline.
+
+## `/x/goal/[owner.id]/[birth.id]/yung/uncompleted`
+
+Get the goals whose deadlines immediately precede the given goal's deadline, as
+long as they are uncompleted.
+
+## `/x/goal/[owner.id]/[birth.id]/yung/virtual`
+
+Get the goals whose deadlines immediately precede the given goal's deadline,
+but are not in the given goal's kids (ie are not "owned" by the given goal, and
+are thus "virtually nested").
+
+## `/x/goal/[owner.id]/[birth.id]/ryte-bound`
+
+Get the date which bounds the given goal's deadline. Inherited from goals which
+the given goal precedes.
+
+## `/x/goal/[owner.id]/[birth.id]/plumb`
+
+Get the "depth" of the given goal; the number of layers of goals "nested"
+beneath it (plus 1).
+
+## `/x/goal/[owner.id]/[birth.id]/priority`
+
+Get the "priority" of the given goal; the number of goals which must be started
+before the given goal can started.
+
+## `/x/goal/[owner.id]/[birth.id]/harvest`
+
+"Harvest" the leaf goals; get goals whose deadlines precede this goal's
+deadline.
+
+## `/x/pool/[owner.pin]/[birth.pin]/get-pool`
+
+Get the pool associated with the given pin.
+
+## `/x/pool/[owner.pin]/[birth.pin]/anchor`
+
+Get the "depth" of the deepest goal in the pool; see "plumb".
+
+## `/x/pool/[owner.pin]/[birth.pin]/roots`
+
+Get the goals in a pool whose deadlines don't immediately precede any other
+deadlines.
+
+## `/x/pool/[owner.pin]/[birth.pin]/roots/uncompleted`
+
+Get the goals in a pool whose deadlines don't immediately precede any other
+deadlines, as long as they are uncompleted.
+

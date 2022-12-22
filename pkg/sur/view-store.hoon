@@ -9,6 +9,8 @@
       [%collapse ctx=grip clp=grip rec=?]
       [%uncollapse ctx=grip clp=grip rec=?]
       [%set-utc-offset =utc-offset]
+      [%set-loc a=@]
+      [%set-win a=@]
   ==
 ::
 +$  update
