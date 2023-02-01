@@ -15,6 +15,7 @@
 +$  state-3  state-3:vyu
 +$  command  command:commands
 +$  card  card:shoe
++$  sole-id  sole-id:shoe
 --
 =|  state-3
 =*  state  -
@@ -245,18 +246,18 @@
 ++  on-fail   on-fail:def
 ::
 ++  command-parser
-  |=  sole-id=@ta
+  |=  =sole-id
   ^+  |~(nail *(like [? command]))  
   %+  stag  |
   (command-parser:compar now.bowl utc-offset)
 ::
 ++  tab-list
-  |=  sole-id=@ta
+  |=  =sole-id
   ^-  (list [@t tank])
   tab-list:commands
 ::
 ++  on-command
-  |=  [sole-id=@ta =command]
+  |=  [=sole-id =command]
   ^-  (quip card _this)
   =;  cards=(list card)
     [cards this]
@@ -463,10 +464,7 @@
     [(poke-our %goal-store goal-action+!>([vzn now.bowl %unmark-complete id.res]))]~
   ==
 ::
-++  can-connect
-  |=  sole-id=@ta
-  ^-  ?
-  =(our.bowl src.bowl)
+++  can-connect  |=(=sole-id `?`=(our.bowl src.bowl))
 ::
 ++  on-connect      on-connect:des
 ++  on-disconnect   on-disconnect:des
