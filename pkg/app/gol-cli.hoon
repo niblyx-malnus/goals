@@ -50,30 +50,15 @@
 ++  on-load
   |=  old-state=vase
   ^-  (quip card _this)
-  =/  old  !<(versioned-state old-state)
-  |-
-  ?-    -.old
-      %3
-    :-  %+  weld
-          (print-cards:prtr ~["%gol-cli: Hit ENTER at the %gol-cli prompt to re-initialize."])
-        ^-  (list card)
-        ?:  (~(has by wex.bowl) [/goals our.bowl %goal-store])
-          ~
-        [(~(watch-our pass:io /goals) %goal-store /goals)]~
-    %=  this
-      cli        %|
-      tix        0
-      reboot     %&
-      context    [%all ~]
-      handles    *handles:vyu
-      views      (~(put by *views:vyu) [%all ~] *view:vyu)
-    ==
-      %2
-    $(old (convert-2-to-3:vyu old))
-      %1
-    $(old (convert-1-to-2:vyu old))
-      %0
-    $(old (convert-0-to-1:vyu old))
+  :-  ?:  (~(has by wex.bowl) [/goals our.bowl %goal-store])  ~
+      [(~(watch-our pass:io /goals) %goal-store /goals)]~
+  %=  this
+    cli        %|
+    tix        0
+    reboot     %&
+    context    [%all ~]
+    handles    *handles:vyu
+    views      (~(put by *views:vyu) [%all ~] *view:vyu)
   ==
 ::
 ++  on-poke
