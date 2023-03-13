@@ -3,6 +3,11 @@
 |%
 ::
 ++  vzn  %5
+::
+:: before final update, change:
+::   app/goal-store-test/hoon -> app/goal-store/hoon
+::   app/gol-cli-test/hoon -> app/gol-cli/hoon
+::   desk name -> %gol-cli
 ++  store-agent  %goal-store-test
 ++  store-sub    /goals
 ++  cli-agent    %gol-cli-test
