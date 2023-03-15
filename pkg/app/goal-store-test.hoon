@@ -139,6 +139,7 @@
         =/  pore
           (edit-pool-note:(apex-em:hc pin.pok) note.pok src.bowl)
         (send-away-updates:hc ~ pin.pok src.bowl pid pore)
+          ::
           %slot-above
         =.  order  
           ?~  idx=(find [stir.pok]~ order.store)
@@ -152,6 +153,20 @@
             order
           (oust [u.idx 1] order)
         `state(order.store (sloq order stil.pok stir.pok))
+          ::
+          %update-roots
+        `state
+          ::
+          %update-young
+        =/  pin  (got:idx-orm:gol index.store id.pok)
+        =*  poke-other
+          ~(poke-other pass:hc (en-away-path pid pin %update-young))
+        ?.  =(our.bowl owner.id.pok)
+          :_  state
+          [(poke-other owner.id.pok goal-action+!>(action))]~
+        =/  pore
+          (update-young:(apex-em:hc pin) id.pok young.pok src.bowl)
+        (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           %spawn-pool
         ?>  =(src.bowl our.bowl)
@@ -574,12 +589,13 @@
       =/  nd  ~(. gol-cli-node goals.pool)
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
-        ``goal-peek+!>(yung+(sort-by-order:puls (yung:nd id)))
+        ``goal-peek+!>(yung+young:(~(got by goals.pool) id))
+        :: ``goal-peek+!>(yung+(sort-by-order:puls (yung:nd id)))
         ::
           [%uncompleted ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %yung-uncompleted
-            (sort-by-order:puls (incomplete:nd (yung:nd id)))
+            (incomplete:nd young:(~(got by goals.pool) id))
         ::
           [%virtual ~]
         :-  ~  :-  ~  :-  %goal-peek
@@ -627,14 +643,15 @@
       =/  pool  (~(got by pools) pin)
       =/  tv  ~(. gol-cli-traverse goals.pool)
       =/  nd  ~(. gol-cli-node goals.pool)
+      =/  roots  roots:trace:pool:abet:(inflater:(apex-em:hc pin))
       ?+    t.t.t.t.t.path  (on-peek:def path)
           ~
-        ``goal-peek+!>(roots+(sort-by-order:puls (root-goals:nd)))
+        ``goal-peek+!>(roots+roots)
         ::
           [%uncompleted ~]
         :-  ~  :-  ~  :-  %goal-peek
         !>  :-  %roots-uncompleted
-        (sort-by-order:puls (incomplete:nd (root-goals:nd)))
+        (incomplete:nd roots)
       ==
     ==
   ==

@@ -5,6 +5,8 @@
 ::
 ++  iflo  iflo:nd
 ++  oflo  oflo:nd
+++  prec-left  prec-left:nd
+++  prec-ryte  prec-ryte:nd
 ::
 :: "engine" used to perform different kinds
 :: of graph traversals using the traverse function
@@ -511,6 +513,22 @@
       meld  |=([nid:gol nid:gol a=(set nid:gol) b=(set nid:gol)] (~(uni in a) b))
     ==
   (((traverse nid:gol (set nid:gol) (set nid:gol)) ginn ~) nid)
+::
+:: all nodes prec-left or -ryte of a given node including self
+++  precs
+  |=  dir=?(%l %r)
+  |=  [=id:gol vis=(map id:gol (set id:gol))]
+  ^-  (map id:gol (set id:gol))
+  =/  flo  ?-(dir %l prec-left, %r prec-ryte)
+  =/  gine  (gine id:gol (set id:gol) (map id:gol (set id:gol)))
+  =.  gine
+    %=  gine
+      flow  |=(=id:gol ~(tap in (flo id)))
+      init  |=(=id:gol (~(put in *(set id:gol)) id))
+      meld  |=([id:gol id:gol a=(set id:gol) b=(set id:gol)] (~(uni in a) b))
+      exit  |=([=id:gol vis=(map id:gol (set id:gol))] vis)
+    ==
+  (((traverse id:gol (set id:gol) (map id:gol (set id:gol))) gine vis) id)
 ::
 :: all descendents including self
 ++  progeny

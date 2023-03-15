@@ -44,13 +44,19 @@
     |=([id:gol =goal:gol] =(~ inflow.kickoff.goal))
   |=([=id:gol =goal:gol] [%k id])
 ::
-:: goals whose deadlines have no outflows
+:: goals whose deadlines have no deadline outflows
 ++  root-goals
   |.  ^-  (list id:gol)
   %+  turn
     %+  skim
       ~(tap by goals)
-    |=([id:gol =goal:gol] =(~ outflow.deadline.goal))
+    |=  [id:gol =goal:gol]
+    ?!  %.  %d
+    %~  has  in
+    %-  ~(gas in *(set ?(%k %d)))
+    %+  turn
+      ~(tap in outflow.deadline.goal)
+    head
   |=([=id:gol =goal:gol] id)
 ::
 :: parentless goals

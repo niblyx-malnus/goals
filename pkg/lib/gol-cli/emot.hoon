@@ -95,7 +95,7 @@
           trace.p
         %=  $
           nex  t.nex
-          trace.p  (nex-trace-update -.i.nex +.i.nex)
+          trace.p  (nex-trace-update i.nex)
         ==
     ==
 ::
@@ -104,6 +104,7 @@
   ^-  pool-trace:gol
   %=  trace.p
     stock-map  (~(put by stock-map.trace.p) id stock.tar)
+    roots      (order-young roots.trace.p (sy (root-goals:nd)))
     left-bounds  
       %-  ~(gas by left-bounds.trace.p)
       ~[[[%k id] left-bound.kickoff.nus] [[%d id] left-bound.deadline.nus]]
@@ -134,6 +135,7 @@
   ::
   ^-  pool-trace:gol
   :*  stock-map=((chain:tv id:gol stock:gol) get-stocks:tv (bare-goals:nd) ~)
+      roots=(order-young roots.trace.p (sy (root-goals:nd)))
       ^=  left-bounds
         ((chain:tv nid:gol moment:gol) (get-bounds:tv %l) (root-nodes:nd) ~)
       ^=  ryte-bounds
@@ -153,6 +155,7 @@
   %=  goal
     stock  (~(got by stock-map.trace.p) id)
     ranks  (get-ranks:tv (~(got by stock-map.trace.p) id))
+    young  (order-young young.goal (~(uni in (nest-left:nd id)) kids.goal))
     prio-left  (prio-left:nd id)
     prio-ryte  (prio-ryte:nd id)
     prec-left  (prec-left:nd id)
@@ -366,6 +369,22 @@
   =.  p  p(note note)
   (emot old [vzn %pool-hitch %note note])
 ::
+++  update-young
+  |=  [=id:gol young=(list id:gol) mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-goal-edit-perm:(pore) id mod)
+  =/  goal  (~(got by goals.p) id)
+  ?>  =((sy young) (sy young.goal))
+  =.  goals.p
+    %+  ~(put by goals.p)
+      id
+    %=    goal
+        young
+      (order-young young (~(uni in (nest-left:nd id)) kids.goal))
+    ==
+  (emot old [vzn %updt-young id young])
+::
 :: wit all da fixin's
 ++  spawn-goal-fixns
   |=  [=id:gol upid=(unit id:gol) desc=@t actionable=_| mod=ship]
@@ -380,6 +399,100 @@
   =/  fd  (full-diff goals.p goals.p.tore)
   =/  goal  (~(got by goals.p.tore) id)
   (emot:tore(efx efx) old [vzn %spawn-goal nex.fd id goal])
+::
+++  order-young
+  |=  [young=(list id:gol) current=(set id:gol)]
+  ^-  (list id:gol)
+  |^
+  =.  young  (purge-young young current)
+  =.  young  (weld ~(tap in (~(dif in current) (sy young))) young)
+  =/  ranks=(map id:gol @)  (young-to-ranks young)
+  =/  precs=(map id:gol (set id:gol))  (get-precs young)
+  |-
+  ?:  =(0 ~(wyt by ranks))  ~
+  =/  =id:gol  (extremum ranks precs)
+  :-  id
+  %=  $
+    ranks  (~(del by ranks) id)
+    precs  (purge-precs id precs)
+  ==
+  ::
+  ++  purge-young
+    |=  [young=(list id:gol) current=(set id:gol)]
+    ^-  (list id:gol)
+    ?~  young  ~
+    ?.  (~(has in current) i.young)
+      $(young t.young)
+    [i.young $(young t.young)]
+  ::
+  ++  young-to-ranks
+    |=  young=(list id:gol)
+    ^-  (map id:gol @)
+    %-  ~(gas by *(map id:gol @))
+    =|  idx=@
+    =|  ranks=(list [id:gol @])
+    |-
+    ?~  young
+      ranks
+    %=  $
+      idx    +(idx)
+      young   t.young
+      ranks  [[i.young idx] ranks]
+    ==
+  ::
+  ++  get-precs
+    |=  young=(list id:gol)
+    ^-  (map id:gol (set id:gol))
+    =/  precs=(map id:gol (set id:gol))
+      ((chain:tv id:gol (set id:gol)) (precs:tv %l) young ~)
+    :: purge non-kids
+    ::
+    %-  ~(gas by *(map id:gol (set id:gol)))
+    %+  murn
+      ~(tap by precs)
+    |=  [=id:gol ids=(set id:gol)]
+    ?.  (~(has in (sy young)) id)  ~
+    =.  ids  (~(del in ids) id) :: remove self from precs
+    =.  ids  (~(int in ids) (sy young))
+    (some [id ids])
+  ::
+  ++  purge-precs
+    |=  [=id:gol precs=(map id:gol (set id:gol))]
+    ^-  (map id:gol (set id:gol))
+    %-  ~(gas by *(map id:gol (set id:gol)))
+    %+  murn
+      ~(tap by precs)
+    |=  [=id:gol ids=(set id:gol)]
+    ?:  =(id ^id)  ~
+    (some [id (~(del in ids) ^id)])
+  ::
+  ++  extremum
+    |=  $:  ranks=(map id:gol @)
+            precs=(map id:gol (set id:gol))
+        ==
+    ^-  id:gol
+    :: purge preceded
+    ::
+    =/  young
+      %+  murn  ~(tap in ~(key by ranks))
+      |=  =id:gol
+      ^-  (unit id:gol)
+      ?:  ?=(^ (~(got by precs) id))
+        ~
+      (some id)
+    :: get id with lowest numerical rank
+    ::
+    ?>  ?=(^ young)
+    =/  =id:gol  i.young
+    =/  r=@  (~(got by ranks) id)
+    =/  young  t.young
+    |-
+    ?~  young  id
+    =/  s=@  (~(got by ranks) i.young)
+    ?:  (gte s r)
+      $(young t.young)
+    $(r s, id i.young, young t.young)
+  --
 ::
 :: ============================================================================
 :: 
@@ -454,7 +567,21 @@
     ::
       [%goal-togls id:gol %actionable *]
     (actionable:goal-togls [id actionable]:upd)
+    ::
+    :: ------------------------------------------------------------------------
+    ::
+      [%updt-young *]
+    (updt-young [id young]:upd)
   ==
+  ::
+  ++  updt-young
+    |=  [=id:gol young=(list id:gol)]
+    ^-  _this
+    =/  goal  (~(got by goals.p) id)
+    ?>  =((sy young) (sy young.goal))
+    =.  young.goal
+      (order-young young (~(uni in (nest-left:nd id)) kids.goal))
+    this(goals.p (~(put by goals.p) id goal))
   ::
   ++  life-cycle
     |%

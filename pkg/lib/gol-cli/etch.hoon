@@ -56,6 +56,7 @@
         $?  %cache-goal  %renew-goal
             %pool-perms  %pool-hitch  %pool-nexus
             %goal-perms  %goal-hitch  %goal-togls  %goal-dates
+            %updt-young
         ==
       =/  pool  (~(got by pools.store) pin)
       =/  pore  (apex:em pool)

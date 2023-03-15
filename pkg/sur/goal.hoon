@@ -91,7 +91,19 @@
   ::
   +$  goal-nexus    goal-nexus:s4
   +$  goal-froze    goal-froze:s4
-  +$  goal-trace    goal-trace:s4
+  ::
+  :: values implied by the data structure
+  +$  goal-trace
+    $:  =stock
+        =ranks
+        young=(list id)
+        prio-left=(set id)
+        prio-ryte=(set id)
+        prec-left=(set id)
+        prec-ryte=(set id)
+        nest-left=(set id)
+        nest-ryte=(set id)
+    ==
   +$  goal-hitch
     $:  desc=@t
         note=@t
@@ -117,7 +129,14 @@
     ==
   +$  pool-perms    pool-perms:s4
   +$  pool-froze    pool-froze:s4
-  +$  pool-trace    pool-trace:s4
+  +$  pool-trace
+    $:  stock-map=(map id stock)
+        roots=(list id)
+        left-bounds=(map nid moment)
+        ryte-bounds=(map nid moment)
+        left-plumbs=(map nid @)
+        ryte-plumbs=(map nid @)
+    ==
   +$  pool-hitch    
     $:  title=@t
         note=@t
@@ -146,60 +165,169 @@
         hide-completed=?
     ==
   ::
-  +$  nux           nux:s4
-  +$  nex           nex:s4
-  +$  unver-update  :: underlying data structures have changed
-                    $%  [%spawn-pool =pool]
-                        [%renew-pool =pin =pool]
-                        [%spawn-goal =nex =id =goal]
-                        [%renew-goal =id ren=goals]
-                        $<  %spawn-pool  $<  %renew-pool
-                        $<  %spawn-goal  $<  %renew-goal
-                        unver-update:s4
-                    ==
-  +$  update        [%5 unver-update]
-  +$  away-update   [[mod=ship pid=@] update]
-  +$  home-update   [[=pin mod=ship pid=@] update]
-  +$  log-update    $%([%updt upd=home-update] [%init =store])
-  +$  log           ((mop @ log-update) lth)
-  +$  logged        (pair @ log-update)
-  ::  ::
-  +$  peek          :: underlying data structures have changed
-                    $%  [%initial =store] 
-                        [%updates =(list logged)]
-                        [%full-harvest harvest=goals]
-                        [%get-goal ugoal=(unit goal)]
-                        [%get-pool upool=(unit pool)]
-                        $<  %initial       $<  %updates
-                        $<  %full-harvest  $<  %get-goal
-                        $<(%get-pool peek:s4)
-                    ==
+  +$  nux  [goal-nexus goal-trace]
+  +$  nex  (map id nux)
   ::
-  +$  core-yoke     core-yoke:s4
-  +$  exposed-yoke  exposed-yoke:s4
-  +$  nuke          nuke:s4
-  +$  plex          plex:s4
+  +$  pool-hitch-update
+    $%  [%title title=@t]
+        [%note note=@t]
+    ==
+  ::
+  +$  pool-nexus-update
+    $%  [%yoke =nex]
+    ==
+  ::
+  +$  goal-hitch-update
+    $%  [%desc desc=@t]
+        [%note note=@t]
+    ==
+  ::
+  +$  goal-togls-update
+    $%  [%complete complete=_|]
+        [%actionable actionable=_|]
+    ==
+  ::
+  +$  unver-update
+    $%  [%spawn-pool =pool]
+        [%cache-pool =pin]
+        [%renew-pool =pin =pool]
+        [%waste-pool ~]
+        [%trash-pool ~]
+        [%spawn-goal =nex =id =goal]
+        [%waste-goal =nex =id waz=(set id)]
+        [%cache-goal =nex =id cas=(set id)]
+        [%renew-goal =id ren=goals]
+        [%trash-goal =id tas=(set id)]
+        [%pool-perms =nex new=pool-perms]
+        [%pool-hitch pool-hitch-update]
+        [%pool-nexus pool-nexus-update]
+        [%goal-dates =nex]
+        [%goal-perms =nex]
+        [%goal-hitch =id goal-hitch-update]
+        [%goal-togls =id goal-togls-update]
+        [%poke-error =tang]
+        [%updt-young =id young=(list id)]
+    ==
+  ::
+  +$  update  [%5 unver-update]
+  ::
+  +$  away-update  [[mod=ship pid=@] update]
+  +$  home-update  [[=pin mod=ship pid=@] update]
+  ::
+  +$  log-update
+    $%  [%updt upd=home-update]
+        [%init =store]
+    ==
+  +$  log  ((mop @ log-update) lth)
+  +$  logged  (pair @ log-update)
+  ::
+  +$  peek
+    $%  [%initial =store]
+        [%updates =(list logged)]
+        [%groups =groups]
+        [%groups-metadata metadata=associations:ms]
+        [%pool-keys keys=(set pin)]
+        [%all-goal-keys keys=(set id)]
+        [%harvest harvest=(list id)]
+        [%full-harvest harvest=goals]
+        [%get-goal ugoal=(unit goal)]
+        [%get-pin upin=(unit pin)]
+        [%get-pool upool=(unit pool)]
+        [%ryte-bound moment=(unit @da)]
+        [%plumb depth=@ud]
+        [%anchor depth=@ud]
+        [%priority priority=@ud]
+        [%yung yung=(list id)]
+        [%yung-uncompleted yung-uc=(list id)]
+        [%yung-virtual yung-vr=(list id)]
+        [%roots roots=(list id)]
+        [%roots-uncompleted roots-uc=(list id)]
+    ==
+  ::
+  +$  core-yoke
+    $%  [%dag-yoke n1=nid n2=nid]
+        [%dag-rend n1=nid n2=nid]
+    ==
+  ::
+  +$  exposed-yoke  
+    $%  [%prio-rend lid=id rid=id]
+        [%prio-yoke lid=id rid=id]
+        [%prec-rend lid=id rid=id]
+        [%prec-yoke lid=id rid=id]
+        [%nest-rend lid=id rid=id]
+        [%nest-yoke lid=id rid=id]
+        [%hook-rend lid=id rid=id]
+        [%hook-yoke lid=id rid=id]
+        [%held-rend lid=id rid=id]
+        [%held-yoke lid=id rid=id]
+    ==
+  ::
+  +$  nuke
+    $%  [%nuke-prio-left =id]
+        [%nuke-prio-ryte =id]
+        [%nuke-prio =id]
+        [%nuke-prec-left =id]
+        [%nuke-prec-ryte =id]
+        [%nuke-prec =id]
+        [%nuke-prio-prec =id]
+        [%nuke-nest-left =id]
+        [%nuke-nest-ryte =id]
+        [%nuke-nest =id]
+    ==
+  ::
+  +$  plex
+    $%  exposed-yoke
+        nuke
+    ==
+  ::
   +$  unver-action
     $%  [%hide-completed ~]
+        [%spawn-pool title=@t]
+        [%clone-pool =pin title=@t]
+        [%cache-pool =pin]
+        [%renew-pool =pin]
+        [%trash-pool =pin]
+        [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
+        [%cache-goal =id]
+        [%renew-goal =id]
+        [%trash-goal =id]
+        [%yoke =pin yoks=(list plex)]
+        [%move cid=id upid=(unit id)]
+        [%set-kickoff =id kickoff=(unit @da)]
+        [%set-deadline =id deadline=(unit @da)]
+        [%mark-actionable =id]
+        [%unmark-actionable =id]
+        [%mark-complete =id]
+        [%unmark-complete =id]
+        [%update-goal-perms =id chief=ship rec=_| spawn=(set ship)]
+        [%update-pool-perms =pin new=pool-perms]
+        [%edit-goal-desc =id desc=@t]
         [%edit-goal-note =id note=@t]
+        [%edit-pool-title =pin title=@t]
         [%edit-pool-note =pin note=@t]
         [%slot-above stir=id stil=id]
         [%slot-below stir=id stil=id]
-        unver-action:s4
+        [%update-roots roots=(list id)]
+        [%update-young =id young=(list id)]
+        [%subscribe =pin]
+        [%unsubscribe =pin]
+        [%kicker =ship =pin]
     ==
+  ::
   +$  action  [%5 pid=@ pok=unver-action]
   --
 ::
 ++  convert-5-1-to-5-2
   |=  =state-5-1
   ^-  state-5-2
-  =|  =store:s5-2
-  =:  index.store  index.store.state-5-1
-      pools.store  pools.store.state-5-1
-      cache.store  cache.store.state-5-1
-      order.store  order.store.state-5-1
-  ==
-  [%5.101 store *groups *log:s5-2]
+  *state-5-2
+  :: =|  =store:s5-2
+  :: =:  index.store  index.store.state-5-1
+  ::     pools.store  pools.store.state-5-1
+  ::     cache.store  cache.store.state-5-1
+  ::     order.store  order.store.state-5-1
+  :: ==
+  :: [%5.101 store *groups *log:s5-2]
 ::
 ++  s5-1
   |%
@@ -321,7 +449,7 @@
 ++  convert-5-to-5-1
   |=  =state-5
   ^-  state-5-1
-  [%5.100 store.state-5 *views:s5-1 groups.state-5 log.state-5]
+  *state-5-1 :: [%5.100 store.state-5 *views:s5-1 groups.state-5 log.state-5]
 ::
 ++  s5
   |%
