@@ -3,7 +3,12 @@
     pl=gol-cli-pool, gol-cli-goals, gol-cli-pools,
     em=gol-cli-emot, gol-cli-node, gol-cli-traverse,
     gol-cli-etch, group-update, *gol-cli-util,
-    rudder, gol-cli-pages
+    rudder, gol-cli-pages,
+:: import to force compilation during testing
+    gol-cli-json
+/=  a-  /mar/realm-goals/action
+/=  r-  /mar/realm-goals/reaction
+/=  p-  /mar/pins
 |%
 +$  state-0  state-0:gol
 +$  state-1  state-1:gol  

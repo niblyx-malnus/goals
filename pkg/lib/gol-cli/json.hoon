@@ -194,7 +194,7 @@
       ==
       :-  %tel
       %+  frond  -.upd
-      ?-    -.upd
+      ?+    -.upd  !!
         %poke-error  (frond %tang (enjs-tang tang.upd))
           %spawn-goal
         %-  pairs
