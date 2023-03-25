@@ -9,6 +9,11 @@
 /=  a-  /mar/realm-goals/action
 /=  r-  /mar/realm-goals/reaction
 /=  p-  /mar/pins
+/=  g1  /mar/goal/action
+/=  g2  /mar/goal/update
+/=  g3  /mar/goal/away-update
+/=  g4  /mar/goal/home-update
+/=  g5  /mar/goal/peek
 |%
 +$  state-0  state-0:gol
 +$  state-1  state-1:gol  
