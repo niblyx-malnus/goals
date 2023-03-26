@@ -83,6 +83,7 @@ export default function IconMenu({
   currentGoal,
   isArchived = false,
   harvestGoal = false,
+  onEditPoolNote,
 }: {
   actionable?: any;
   complete?: boolean;
@@ -98,6 +99,8 @@ export default function IconMenu({
   poolData?: any;
   currentGoal?: any;
   harvestGoal?: boolean;
+
+  onEditPoolNote?: Function;
 }) {
   const id = isVirtual ? virtualId : goalId;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -641,6 +644,16 @@ export default function IconMenu({
           <>
             <Divider />
 
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                onEditPoolNote && onEditPoolNote();
+              }}
+              disableRipple
+            >
+              <DeleteOutlineOutlinedIcon fontSize="small" />
+              Note
+            </MenuItem>
             <MenuItem
               onClick={() => {
                 handleClose();

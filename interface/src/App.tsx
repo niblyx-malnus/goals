@@ -24,6 +24,7 @@ import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
 import { Header } from "./components";
 import { v4 as uuidv4 } from "uuid";
+import TextField from "@mui/material/TextField";
 
 declare const window: Window &
   typeof globalThis & {
@@ -276,6 +277,7 @@ function App() {
           const goalList = pool.pool.nexus.goals;
           const permList = pool.pool.perms;
           const role = roleMap?.get(poolId);
+          log(pool);
           let inSelectionMode = false;
           let disabled = false;
           //we toggle into selection mode or disable the pool (disabling is a TODO)
@@ -358,7 +360,26 @@ const Project = memo(
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [trying, setTrying] = useState<boolean>(false);
+    const [noteValue, setNoteValue] = useState<string>("");
+    const [editingNote, setEditingNote] = useState<boolean>(false);
+    const onNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setNoteValue(event.target.value);
+    };
+    const handleNoteKeyDown = (
+      event: React.KeyboardEvent<HTMLInputElement>
+    ) => {
+      //call api
+      if (event.key === "Enter") {
+        api.editPoolNote(pin, noteValue);
+        setEditingNote(false);
+      }
+      //close the input
+      if (event.key === "Escape") {
+        setEditingNote(false);
+      }
+    };
     const disableActions = trying || editingTitle || addingGoal;
+
     const handleAdd = () => {
       toggleItemOpen(true);
       setAddingGoal(true);
@@ -384,6 +405,7 @@ const Project = memo(
             pin={pin}
             setParentTrying={setTrying}
             isArchived={isArchived}
+            onEditPoolNote={() => setEditingNote(!editingNote)}
           />
         );
       }
@@ -562,7 +584,23 @@ const Project = memo(
             </Stack>
           )}
         </StyledTreeItem>
-
+        {editingNote && (
+          <TextField
+            sx={{ marginTop: 1 }}
+            spellCheck="true"
+            error={false}
+            size="small"
+            id="note"
+            label="note"
+            type="text"
+            multiline
+            value={noteValue}
+            onChange={onNoteChange}
+            onKeyDown={handleNoteKeyDown}
+            autoFocus
+            fullWidth
+          />
+        )}
         <Box
           sx={{ paddingLeft: 4 }}
           style={{

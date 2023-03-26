@@ -2,7 +2,8 @@ import memoize from "lodash/memoize";
 import Urbit from "@urbit/http-api";
 import { isDev, log } from "./helpers";
 import updates from "./subscriptions/updates";
-
+const apiApp = process.env.REACT_APP_APP;
+const apiMark = process.env.REACT_APP_MARK;
 const api = {
   createApi: memoize(() => {
     /*
@@ -56,11 +57,11 @@ const api = {
     }
   },
   getGroupData: async () => {
-    return api.createApi().scry({ app: "goal-store-test", path: "/groups" });
+    return api.createApi().scry({ app: apiApp, path: "/groups" });
   },
   getData: async () => {
     //gets our main data we display (pools/goals)
-    return api.createApi().scry({ app: "goal-store-test", path: "/initial" });
+    return api.createApi().scry({ app: apiApp, path: "/initial" });
   },
   addPool: async (title) => {
     const newPool = {
@@ -72,7 +73,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
+      app: apiApp,
       mark: "goal-action",
       json: newPool,
     });
@@ -86,8 +87,22 @@ const api = {
     };
 
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
+      json: poolToEdit,
+    });
+  },
+  editPoolNote: async (pin, newNote) => {
+    const poolToEdit = {
+      "edit-pool-note": {
+        pin,
+        note: newNote,
+      },
+    };
+
+    return api.poke({
+      app: apiApp,
+      mark: apiMark,
       json: poolToEdit,
     });
   },
@@ -98,8 +113,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: poolToDelete,
     });
   },
@@ -110,8 +125,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: poolToRenew,
     });
   },
@@ -122,8 +137,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: poolToArchive,
     });
   },
@@ -134,8 +149,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: poolToJoin,
     });
   },
@@ -153,8 +168,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: newGoal,
     });
   },
@@ -165,8 +180,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToDelete,
     });
   },
@@ -177,8 +192,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToRenew,
     });
   },
@@ -189,8 +204,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToArchive,
     });
   },
@@ -202,8 +217,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToEdit,
     });
   },
@@ -215,8 +230,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToMark,
     });
   },
@@ -227,8 +242,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToMark,
     });
   },
@@ -240,8 +255,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: newPoolPerms,
     });
   },
@@ -255,8 +270,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: newGoalPerms,
     });
   },
@@ -267,8 +282,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: poolToLeave,
     });
   },
@@ -279,8 +294,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToMark,
     });
   },
@@ -291,8 +306,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToMark,
     });
   },
@@ -304,8 +319,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: newKickoff,
     });
   },
@@ -317,8 +332,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: newDeadline,
     });
   },
@@ -330,8 +345,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: poolToCopy,
     });
   },
@@ -344,8 +359,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalMove,
     });
   },
@@ -357,14 +372,14 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store-test",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: yokeSequence,
     });
   },
   harvest: async (owner, birth) => {
     return api.createApi().scry({
-      app: "goal-store-test",
+      app: apiApp,
       path: `/goal/~${owner}/${birth}/full-harvest`,
     });
   },
