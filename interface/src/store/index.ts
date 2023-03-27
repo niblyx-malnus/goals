@@ -27,6 +27,9 @@ interface Store {
   pools: any;
   setPools: (state: any) => void;
 
+  space: null | string;
+  setSpace: (space: null | string) => void;
+
   archivedPools: any;
   setArchivedPools: (state: any) => void;
 
@@ -126,6 +129,9 @@ interface Store {
 const useStore = create<Store>((set, get) => ({
   pools: [],
   setPools: (newPools: any) => set(() => ({ pools: newPools })),
+  
+  space: null,
+  setSpace: (space: any) => set(() => ({ space })),
 
   archivedPools: [],
   setArchivedPools: (newArchivedPools: any) =>

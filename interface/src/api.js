@@ -63,6 +63,13 @@ const api = {
     //gets our main data we display (pools/goals)
     return api.createApi().scry({ app: apiApp, path: "/initial" });
   },
+  getSpaceData: async (space) => {
+    //gets our main data we display (pools/goals)
+    //
+    return api
+      .createApi()
+      .scry({ app: "realm-goals", path: "/space-pool/" + space });
+  },
   addPool: async (title) => {
     const newPool = {
       "spawn-pool": {

@@ -556,6 +556,7 @@ const orderPools = (pools: any, order: Order) => {
     return birthB - birthA;
   }
   const compareFoo = order === "prio" ? prioCompare : birthCompare;
+  log('pools',pools)
   const orderedPoolsAndGoals = pools.map((poolItem: any) => {
     const reorderedGoal = poolItem.pool.nexus.goals.sort(compareFoo);
     return {
