@@ -4,11 +4,8 @@
     em=gol-cli-emot, gol-cli-node, gol-cli-traverse,
     gol-cli-etch, group-update, *gol-cli-util,
     rudder, gol-cli-pages,
-:: import to force compilation during testing
+:: import to force compilation during development
     gol-cli-json
-/=  a-  /mar/realm-goals/action
-/=  r-  /mar/realm-goals/reaction
-/=  p-  /mar/pins
 /=  g1  /mar/goal/action
 /=  g2  /mar/goal/update
 /=  g3  /mar/goal/away-update

@@ -1,5 +1,10 @@
 /-  *realm-goals, m=membership, s=spaces-store, v=visas
-/+  dbug, default-agent, verb
+/+  gol-cli-scries, dbug, default-agent, verb
+:: import to force compilation during development
+/=  a-   /mar/realm-goals/action
+/=  r-   /mar/realm-goals/reaction
+/=  sp-  /mar/space-pools
+/=  p-   /mar/pool
 |%
 +$  versioned-state  $%(state-0)
 +$  state-0  [%0 pins=(map space pin:gol)]
@@ -15,6 +20,7 @@
 |_  =bowl:gall
 +*  this  .
     def   ~(. (default-agent this %|) bowl)
+    scy   ~(. gol-cli-scries bowl)
     hc    ~(. +> [bowl ~])
     cc    |=(cards=(list card) ~(. +> [bowl cards]))
 ::
@@ -58,7 +64,16 @@
   |=  =path
   ^-  (unit (unit cage))
   ?+    path  (on-peek:def path)
-    [%x %pins ~]  ``pins+!>(pins)
+      [%x %space-pools ~]
+    :-  ~  :-  ~  :-  %space-pools  !>
+    %-  ~(gas by *(map space pool:gol))
+    %+  turn  ~(tap by pins)
+    |=  [=space =pin:gol]
+    [space (need (get-pool:scy pin))]
+    ::
+      [%x %space-pool @t @t ~]
+    =/  =space  [(slav %p i.t.t.path) i.t.t.t.path]
+    ``pool+!>((need (get-pool:scy (~(got by pins) space))))
   ==
 ::
 ++  on-agent
