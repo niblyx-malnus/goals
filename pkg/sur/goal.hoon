@@ -11,7 +11,7 @@
 ++  store-agent  %goal-store-test
 ++  store-sub    /goals
 ++  cli-agent    %gol-cli-test
-++  desk-name    %goals-test
+++  desk-name    %gol-cli
 ::
 +$  state-5-2  [%5.101 =store:s5-2 =groups =log:s5-2]
 +$  state-5-1  [%5.100 =store:s5-1 =views:s5-1 =groups =log:s5-1]
