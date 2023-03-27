@@ -185,9 +185,7 @@ function Home() {
       });
       const orderedPools = orderPools(preOrderedPools, order);
       //save the cached pools also in a seperate list
-      setArchivedPools(
-       []
-      );
+      setArchivedPools([]);
       setFetchedPools(orderedPools);
       if (result) {
         setLoading({ trying: false, success: true, error: false });
@@ -244,7 +242,9 @@ function Home() {
     return dataTree;
   };
   useEffect(() => {
-    fetchInitial();
+    if (space) {
+      fetchInitial();
+    }
     fetchGroups();
     fetchPals();
     window["scry"] = api.scry;
