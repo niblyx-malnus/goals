@@ -98,6 +98,7 @@ const updateHandler = (update: any) => {
       }
       case "pool-hitch": {
         const hed: any = update.hed;
+        //TODO: get this working with note
         let { title }: any = update.tel[actionName];
 
         updatePoolTitleAction(hed.pin, title);
@@ -144,7 +145,7 @@ const updateHandler = (update: any) => {
       case "goal-dates": {
         const hed: any = update.hed;
         let { nex }: any = update.tel[actionName];
-        
+
         nexusListAction(hed.pin, nex);
         break;
       }
