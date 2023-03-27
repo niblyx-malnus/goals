@@ -471,6 +471,7 @@
       :-  %hitch
       %-  pairs
       :~  [%title s+title.pool]
+          [%note s+note.pool]
       ==
   ==
 ::
