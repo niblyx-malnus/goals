@@ -549,6 +549,7 @@
       :-  %hitch
       %-  pairs
       :~  [%desc s+desc.goal]
+          [%note s+note.goal]
       ==
   ==
 ::
