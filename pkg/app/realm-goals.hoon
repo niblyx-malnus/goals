@@ -4,7 +4,7 @@
 /=  a-   /mar/realm-goals/action
 /=  r-   /mar/realm-goals/reaction
 /=  sp-  /mar/space-pools
-/=  p-   /mar/pool
+/=  p-   /mar/pools
 |%
 +$  versioned-state  $%(state-0)
 +$  state-0  [%0 pins=(map space pin:gol)]
@@ -73,7 +73,9 @@
     ::
       [%x %space-pool @t @t ~]
     =/  =space  [(slav %p i.t.t.path) i.t.t.t.path]
-    ``pool+!>((need (get-pool:scy (~(got by pins) space))))
+    :-  ~  :-  ~  :-  %pools  !>
+    =/  =pin:gol  (~(got by pins) space)
+    (~(put by *pools:gol) pin (need (get-pool:scy pin)))
   ==
 ::
 ++  on-agent

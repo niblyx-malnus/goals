@@ -1,14 +1,14 @@
 /-  *goal
 /+  *gol-cli-json
-|_  =pool
+|_  =pools
 ++  grow
   |%
-  ++  noun  pool
-  ++  json  (enjs-pool pool)
+  ++  noun  pools
+  ++  json  (enjs-pools pools)
   --
 ++  grab
   |%
-  ++  noun  pool
+  ++  noun  pools
   --
 ++  grad  %noun
 --
