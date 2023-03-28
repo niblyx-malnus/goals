@@ -222,6 +222,19 @@ const api = {
       json: goalToEdit,
     });
   },
+  editGoalNote: async (id, newNote) => {
+    const goalToEdit = {
+      "edit-goal-note": {
+        id,
+        note: newNote,
+      },
+    };
+    return api.poke({
+      app: apiApp,
+      mark: apiMark,
+      json: goalToEdit,
+    });
+  },
 
   markComplete: async (id) => {
     const goalToMark = {

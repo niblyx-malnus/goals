@@ -1,3 +1,4 @@
+import { cloneDeep } from "lodash";
 import { log } from "../helpers";
 import useStore from "../store";
 import {
@@ -99,16 +100,18 @@ const updateHandler = (update: any) => {
       case "pool-hitch": {
         const hed: any = update.hed;
         //TODO: get this working with note
-        let { title }: any = update.tel[actionName];
 
-        updatePoolTitleAction(hed.pin, title);
+        updatePoolTitleAction(hed.pin, update.tel[actionName]);
         break;
       }
       case "goal-hitch": {
         const hed: any = update.hed;
-        let { desc, id }: any = update.tel[actionName];
+        let { id }: any = update.tel[actionName];
+        
+        let newHitch = cloneDeep(update.tel[actionName]);
+        delete newHitch.id;
 
-        updateGoalDescAction(id, hed.pin, desc);
+        updateGoalDescAction(id, hed.pin, update.tel[actionName]);
         break;
       }
       case "goal-togls": {

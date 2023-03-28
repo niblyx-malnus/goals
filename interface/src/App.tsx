@@ -272,6 +272,7 @@ function App() {
       ) : (
         pools.map((pool: any, index: any) => {
           const poolTitle = pool.pool.hitch.title;
+          const poolNote = pool.pool.hitch.note;
           const poolId = pool.pin.birth;
           const poolOwner = pool.pin.owner;
           const goalList = pool.pool.nexus.goals;
@@ -292,6 +293,7 @@ function App() {
           return (
             <Project
               title={poolTitle}
+              note={poolNote}
               poolOwner={poolOwner}
               key={poolId}
               pin={pool.pin}
@@ -344,6 +346,7 @@ const Project = memo(
     poolOwner,
     role,
     isArchived = false,
+    note,
   }: {
     title: string;
     pin: PinId;
@@ -353,6 +356,7 @@ const Project = memo(
     poolOwner: string;
     role: string;
     isArchived?: boolean;
+    note: string;
   }) => {
     //TODO: add the store type
     const collapseAll = useStore((store: any) => store.collapseAll);
@@ -360,6 +364,7 @@ const Project = memo(
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [trying, setTrying] = useState<boolean>(false);
+
     const [noteValue, setNoteValue] = useState<string>("");
     const [editingNote, setEditingNote] = useState<boolean>(false);
     const onNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -370,13 +375,23 @@ const Project = memo(
     ) => {
       //call api
       if (event.key === "Enter") {
-        api.editPoolNote(pin, noteValue);
-        setEditingNote(false);
+        editPoolNote();
       }
       //close the input
       if (event.key === "Escape") {
         setEditingNote(false);
       }
+    };
+    const editPoolNote = async () => {
+      setTrying(true);
+      try {
+        const result = await api.editPoolNote(pin, noteValue);
+        log("editPoolNote result => ", result);
+      } catch (e) {
+        log("editPoolNote error => ", e);
+      }
+      setEditingNote(false);
+      setTrying(false);
     };
     const disableActions = trying || editingTitle || addingGoal;
 
@@ -388,6 +403,7 @@ const Project = memo(
       //everytime collapse all changes, we force isOpen value to comply
       toggleItemOpen(collapseAll.status);
     }, [collapseAll.count]);
+
     const renderIconMenu = () => {
       if (trying) {
         return (
@@ -405,7 +421,10 @@ const Project = memo(
             pin={pin}
             setParentTrying={setTrying}
             isArchived={isArchived}
-            onEditPoolNote={() => setEditingNote(!editingNote)}
+            onEditPoolNote={() => {
+              setEditingNote(!editingNote);
+              setNoteValue(note);
+            }}
           />
         );
       }
@@ -599,7 +618,20 @@ const Project = memo(
             onKeyDown={handleNoteKeyDown}
             autoFocus
             fullWidth
+            disabled={trying}
           />
+        )}
+        {!editingNote && note && (
+          <Stack direction={"row"}>
+            <Typography
+              variant="subtitle2"
+              fontWeight={"bold"}
+              color={"text.secondary"}
+              marginLeft={1.2}
+            >
+              Note: {note}
+            </Typography>
+          </Stack>
         )}
         <Box
           sx={{ paddingLeft: 4 }}

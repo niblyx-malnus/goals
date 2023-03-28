@@ -16,9 +16,10 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Badge from "@mui/material/Badge";
-
+import TextField from "@mui/material/TextField";
 import { log, shipName, getRoleTitle } from "../helpers";
 import { blue, orange, green, red, purple } from "@mui/material/colors";
+import api from "../api";
 //TODO: make some components to simplify the logic of this component
 interface GoalItemProps {
   readonly id: number;
@@ -35,6 +36,7 @@ interface GoalItemProps {
   yokingGoalId: string;
   harvestGoal?: boolean;
   poolArchived?: boolean;
+  note: string;
 }
 
 const GoalItem = memo(
@@ -53,6 +55,7 @@ const GoalItem = memo(
     yokingGoalId,
     harvestGoal = false,
     poolArchived = false,
+    note = "this is a note",
   }: //inSelectMode
   GoalItemProps) => {
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
@@ -68,6 +71,34 @@ const GoalItem = memo(
     const updateSelectedGoal = useStore((store) => store.updateSelectedGoal);
     const [goalRole, setGoalRole] = useState<"spawn" | "chief" | null>(null);
 
+    const [noteValue, setNoteValue] = useState<string>("");
+    const [editingNote, setEditingNote] = useState<boolean>(false);
+    const onNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setNoteValue(event.target.value);
+    };
+    const handleNoteKeyDown = (
+      event: React.KeyboardEvent<HTMLInputElement>
+    ) => {
+      //call api
+      if (event.key === "Enter") {
+        editGoalNote();
+      }
+      //close the input
+      if (event.key === "Escape") {
+        setEditingNote(false);
+      }
+    };
+    const editGoalNote = async () => {
+      setTrying(true);
+      try {
+        const result = await api.editGoalNote(idObject, noteValue);
+        log("editGoalNote result => ", result);
+      } catch (e) {
+        log("editGoalNote error => ", e);
+      }
+      setEditingNote(false);
+      setTrying(false);
+    };
     useEffect(() => {
       //we check at first render/everytime ranks changes(or just goal)
       //does the current ship have chief/spawn perms on this goal?
@@ -155,6 +186,10 @@ const GoalItem = memo(
             virtualId={goal.virtualId} //refers to the original goal(none-virtualised counterpart of this one)
             isArchived={goal.isArchived}
             harvestGoal={harvestGoal}
+            onEditGoalNote={() => {
+              setEditingNote(!editingNote);
+              setNoteValue("note");
+            }}
           />
         );
       }
@@ -420,7 +455,36 @@ const GoalItem = memo(
             </Stack>
           )}
         </StyledTreeItem>
-
+        {editingNote && (
+          <TextField
+            sx={{ marginTop: 1 }}
+            spellCheck="true"
+            error={false}
+            size="small"
+            id="note"
+            label="note"
+            type="text"
+            multiline
+            value={noteValue}
+            onChange={onNoteChange}
+            onKeyDown={handleNoteKeyDown}
+            autoFocus
+            fullWidth
+            disabled={trying}
+          />
+        )}
+        {!editingNote && note && (
+          <Stack direction={"row"}>
+            <Typography
+              variant="subtitle2"
+              fontWeight={"bold"}
+              color={"text.secondary"}
+              marginLeft={1.2}
+            >
+              Note: {note}
+            </Typography>
+          </Stack>
+        )}
         <Box
           sx={{ paddingLeft: "24px" }}
           style={{

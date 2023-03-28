@@ -161,6 +161,7 @@ export default function HarvestPanel() {
                 pin={harvestData.pin}
                 harvestGoal={true}
                 yokingGoalId={"not in selection mode, so I wont use this"}
+                note='placeholder note in harvest panel'
               />
             );
           })}

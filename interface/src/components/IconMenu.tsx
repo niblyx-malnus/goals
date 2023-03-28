@@ -84,6 +84,7 @@ export default function IconMenu({
   isArchived = false,
   harvestGoal = false,
   onEditPoolNote,
+  onEditGoalNote,
 }: {
   actionable?: any;
   complete?: boolean;
@@ -101,6 +102,7 @@ export default function IconMenu({
   harvestGoal?: boolean;
 
   onEditPoolNote?: Function;
+  onEditGoalNote?: Function;
 }) {
   const id = isVirtual ? virtualId : goalId;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -445,6 +447,15 @@ export default function IconMenu({
 
     return (
       <div>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            onEditGoalNote && onEditGoalNote();
+          }}
+          disableRipple
+        >
+          note
+        </MenuItem>
         {complete ? (
           <MenuItem onClick={unmarkComplete} disableRipple>
             <ClearIcon fontSize="small" />
@@ -493,6 +504,7 @@ export default function IconMenu({
           <AgricultureOutlinedIcon fontSize="small" />
           harvest
         </MenuItem>
+
         {/* We hide these from harvest panel */}
         {!harvestGoal && (
           <>
@@ -651,7 +663,6 @@ export default function IconMenu({
               }}
               disableRipple
             >
-              <DeleteOutlineOutlinedIcon fontSize="small" />
               Note
             </MenuItem>
             <MenuItem

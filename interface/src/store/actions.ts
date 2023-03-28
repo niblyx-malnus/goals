@@ -46,7 +46,7 @@ function archivePoolAction(toCachePin: PinId) {
   setArchivedPools([...archivedPools, ...newArchivedPool]);
   setPools(newPools);
 }
-function updatePoolTitleAction(toUpdatePin: PinId, newTitle: string) {
+function updatePoolTitleAction(toUpdatePin: PinId, newHitch: any) {
   const state = useStore.getState();
   const pools = state.pools;
   const setPools = state.setPools;
@@ -56,7 +56,7 @@ function updatePoolTitleAction(toUpdatePin: PinId, newTitle: string) {
     if (pin.birth === toUpdatePin.birth) {
       return {
         ...poolItem,
-        pool: { ...pool, hitch: { ...pool.hitch, title: newTitle } },
+        pool: { ...pool, hitch: { ...pool.hitch, ...newHitch } },
       };
     }
     return poolItem;
@@ -311,11 +311,7 @@ function archiveGoalAction(
   });
   setPools(newPools);
 }
-function updateGoalDescAction(
-  toUpdateId: GoalId,
-  pinId: PinId,
-  newDesc: string
-) {
+function updateGoalDescAction(toUpdateId: GoalId, pinId: PinId, newHitch: any) {
   const state = useStore.getState();
   const pools = state.pools;
   const setPools = state.setPools;
@@ -331,7 +327,7 @@ function updateGoalDescAction(
                 ...goalItem.goal,
                 hitch: {
                   ...goalItem.goal.hitch,
-                  desc: newDesc,
+                  ...newHitch,
                 },
               },
               id: goalItem.id,
