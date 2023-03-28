@@ -20,7 +20,7 @@ const Navigation = () => {
   useEffect(() => {
     const spaceId = searchParams.get("spaceId");
     if (spaceId) {
-      navigate("/apps/goals-test" + spaceId);
+      navigate("/apps/gol-cli" + spaceId);
     }
   }, [searchParams.get("spaceId")]);
 

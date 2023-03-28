@@ -2,7 +2,7 @@
   "name": "nested-goals",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/apps/goals-test/",
+  "homepage": "/apps/gol-cli/",
   "dependencies": {
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",

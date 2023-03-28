@@ -7,9 +7,9 @@ function App() {
     <Router>
       <Routes>
         <Route element={<Navigation />}>
-          <Route path="/apps/goals-test/:ship/:group" element={<Home />} />
+          <Route path="/apps/gol-cli/:ship/:group" element={<Home />} />
           <Route
-            path="/apps/goals-test/"
+            path="/apps/gol-cli/"
             element={
               <>Enter a space in the url example: ...apps/trove/~zod/our</>
             }
