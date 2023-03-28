@@ -17,7 +17,8 @@ import ArchiveDialog from "./ArchiveDialog";
 import GoalPermsDialog from "./GoalPermsDialog";
 import GoalTimeline from "./GoalTimeline";
 import JoinPoolDialog from "./JoinPoolDialog";
-
+import Main from "./Main";
+import Project from "./Project";
 
 export {
   EditInput,
@@ -38,5 +39,7 @@ export {
   ArchiveDialog,
   GoalPermsDialog,
   GoalTimeline,
-  JoinPoolDialog
+  JoinPoolDialog,
+  Main,
+  Project,
 };

@@ -17,6 +17,7 @@ type SelectionYokeData = null | {
   startingConnections: any;
 };
 
+type ColorTheme = "light" | "dark";
 interface Store {
   /*
    * Pools is a list of projects(projects contain goals)
@@ -116,6 +117,9 @@ interface Store {
   ) => void;
   joinPoolDialogOpen: boolean;
   toggleJoinPoolDialogOpen: (newStatus: boolean) => void;
+
+  colorMode: ColorTheme;
+  setColorMode: (colorMode: ColorTheme) => void;
 }
 /**
  * 
@@ -379,6 +383,9 @@ const useStore = create<Store>((set, get) => ({
   joinPoolDialogOpen: false,
   toggleJoinPoolDialogOpen: (newStatus: boolean) =>
     set(() => ({ joinPoolDialogOpen: newStatus })),
+
+  colorMode: "light",
+  setColorMode: (colorMode: ColorTheme) => set(() => ({ colorMode })),
 }));
 
 export default useStore;
