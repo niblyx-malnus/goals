@@ -6,5 +6,10 @@
   website+'https://github.com/niblyx-malnus/nested-goals'
   license+'MIT'
   base+'gol-cli'
+<<<<<<< HEAD
   glob-ames+[~picfus-hinseg-niblyx-malnus 0v0]
 ==
+=======
+  glob-ames+[~master-niblyx-malnus 0v7.6b1te.mkeuj.us7nb.04hrv.47gos]
+==
+>>>>>>> 1a517499760ce2c8e76f6a22dbfddb65a9247e9b
