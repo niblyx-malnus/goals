@@ -5,6 +5,6 @@
   version+[1 0 0]
   website+'https://github.com/niblyx-malnus/nested-goals'
   license+'MIT'
-  base+'goals-test'
-  glob-ames+[~master-niblyx-malnus 0v7.6b1te.mkeuj.us7nb.04hrv.47gos]
+  base+'gol-cli'
+  glob-ames+[~picfus-hinseg-niblyx-malnus 0v0]
 ==
