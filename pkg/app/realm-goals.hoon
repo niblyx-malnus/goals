@@ -1,10 +1,11 @@
 /-  *realm-goals, m=membership, s=spaces-store, v=visas
-/+  gol-cli-scries, dbug, default-agent, verb
+/+  gol-cli-scries, gol-cli-pools, dbug, default-agent, verb
 :: import to force compilation during development
 /=  a-   /mar/realm-goals/action
 /=  r-   /mar/realm-goals/reaction
 /=  sp-  /mar/space-pools
-/=  p-   /mar/pools
+/=  pl-  /mar/pools
+/=  pn-  /mar/pins
 |%
 +$  versioned-state  $%(state-0)
 +$  state-0  [%0 pins=(map space pin:gol)]
@@ -38,14 +39,12 @@
   ^-  (quip card _this)
   =/  old=state-0  !<(state-0 ole)
   =.  state  old
-  =/  remote-spaces
-    %+  murn
-      ~(tap in ~(key by pins))
-    |=(=space ?:(=(-.space our.bowl) ~ (some space)))
+  ~&  goals-store+goals-store:hc
+  =/  remote-spaces  remote-spaces:hc
   =^  cards  state
     abet:(leave-and-refollow:hc remote-spaces)
   [cards this]
-::
+:: ::
 ++  on-poke
   |=  [=mark =vase]
   ^-  (quip card _this)
@@ -64,11 +63,14 @@
   |=  =path
   ^-  (unit (unit cage))
   ?+    path  (on-peek:def path)
+    [%x %pins ~]  ``pins+!>(pins)
+    ::
       [%x %space-pools ~]
     :-  ~  :-  ~  :-  %space-pools  !>
     %-  ~(gas by *(map space pool:gol))
     %+  turn  ~(tap by pins)
     |=  [=space =pin:gol]
+    ~&  [pin (get-pool:scy pin)]
     [space (need (get-pool:scy pin))]
     ::
       [%x %space-pool @t @t ~]
@@ -186,6 +188,7 @@
 |_  [=bowl:gall cards=(list card)]
 +*  core  .
     io    ~(. agentio bowl)
+    puls  ~(. gol-cli-pools goals-store)
 ++  abet  [(flop cards) state]
 ++  emit  |=(=card core(cards [card cards]))
 ++  emil  |=(cadz=(list card) core(cards (weld cadz cards)))
@@ -196,17 +199,40 @@
   ^-  space
   [(slav %p i.path) i.t.path]
 ::
+++  remote-spaces
+  %+  murn
+    ~(tap in ~(key by pins))
+  |=(=space ?:(=(-.space our.bowl) ~ (some space)))
+::
 ++  create-space
   |=  =space
   ^-  _core
   ?>  =(-.space our.bowl)
   ?:  (~(has by pins) space)  core
-  =/  pok  [vzn:gol now.bowl [%spawn-pool +.space]]
-  =/  pin  pin+[our now]:bowl
+  =/  all-pins  (~(gas in *(set pin:gol)) ~(val by pins))
+  :: consider a more reliable way to create unique pins...
+  =/  pin
+    |-
+    ?.  (~(has in all-pins) pin+[our now]:bowl)
+      pin+[our now]:bowl
+    $(now.bowl (add now.bowl ~s0..0001))
+  =/  spawn-pok  [vzn:gol now.bowl [%spawn-pool +.space]]
+  =/  perms-pok
+    [vzn:gol now.bowl [%update-pool-perms pin (pool-perms space)]]
   =.  pins  (~(put by pins) space pin)
   =/  dock  [our.bowl store-agent:gol]
-  =.  core  (emit [%pass / %agent dock %poke goal-action+!>(pok)])
+  =.  core  (emit [%pass / %agent dock %poke goal-action+!>(spawn-pok)])
+  =.  core  (emit [%pass / %agent dock %poke goal-action+!>(perms-pok)])
   (emit:core %give %fact ~[/updates] realm-goals-reaction+!>(pin+pin))
+:: ::
+++  pool-perms
+  |=  =space
+  ^-  pool-perms:gol
+  =/  admins   ~(tap in (~(del in (all-admins space)) -.space))
+  =/  members  ~(tap in (~(del in (all-members space)) -.space))
+  =|  =pool-perms:gol
+  =.  pool-perms  (~(gas by pool-perms) (turn members |=(=ship [ship ~])))
+  (~(gas by pool-perms) (turn admins |=(=ship [ship [~ %admin]])))
 ::
 ++  follow-space
   |=  =space
@@ -276,6 +302,11 @@
 ++  sour  (scot %p our.bowl)
 ++  snow  (scot %da now.bowl)
 ::
+++  goals-store
+  =/  =peek:gol
+    .^(peek:gol %gx /[sour]/[store-agent:gol]/[snow]/initial/goal-peek)
+  ?>(?=(%initial -.peek) store.peek)
+::
 ++  has-spaces  .^(? %gu /[sour]/spaces/[snow])
 ::
 ++  is-member
@@ -295,6 +326,27 @@
   =/  view 
     .^(view:m %gx /[sour]/spaces/[snow]/[host]/[+.space]/members/[ship]/membership-view)
   ?>(?=(%member -.view) member.view)
+::
+++  all-members
+  |=  =space
+  ^-  (set ship)
+  =/  host  (scot %p -.space)
+  =/  =view:m
+    .^(view:m %gx /[sour]/spaces/[snow]/[host]/[+.space]/members/membership-view)
+  ?>  ?=(%members -.view)
+  ~(key by members.view)
+::
+++  all-admins
+  |=  =space
+  ^-  (set ship)
+  =/  host  (scot %p -.space)
+  =/  =view:m
+    .^(view:m %gx /[sour]/spaces/[snow]/[host]/[+.space]/members/membership-view)
+  ?>  ?=(%members -.view)
+  %-  ~(gas in *(set ship))
+  %+  murn  ~(tap by members.view)
+  |=  [=ship =member:m]
+  ?.((~(has in roles.member) %admin) ~ (some ship))
 ::
 ++  is-admin
   |=  [=space =ship]
