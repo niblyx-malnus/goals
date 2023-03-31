@@ -8,7 +8,7 @@
   :-  vzn
   %.  jon
   %-  ot
-  :~  pid+ni
+  :~  pid+so
       :-  %pok
       %-  of
       :~  [%spawn-pool (ot ~[title+so])]
@@ -190,7 +190,7 @@
       %-  pairs
       :~  [%pin (enjs-pin pin.hom)]
           [%mod (ship mod.hom)]
-          [%pid (numb pid.hom)]
+          [%pid s+`@t`pid.hom]
       ==
       :-  %tel
       %+  frond  -.upd
