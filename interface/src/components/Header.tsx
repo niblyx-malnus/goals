@@ -83,6 +83,7 @@ export default function Header() {
     if (newProjectTitle?.length > 0) {
       setTrying(true);
       try {
+
         const result = await api.addPool(newProjectTitle);
         log("addNewPool result => ", result);
         toggleSnackBar(true, {

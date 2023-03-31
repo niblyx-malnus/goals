@@ -46,7 +46,10 @@ const Project = memo(
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
-    const [trying, setTrying] = useState<boolean>(false);
+
+    const getTrying: any = useStore((store) => store.getTrying);
+    const trying: any = getTrying(pin.birth);
+    const setTrying = useStore((store) => store.setTrying);
 
     const [noteValue, setNoteValue] = useState<string>("");
     const [editingNote, setEditingNote] = useState<boolean>(false);
@@ -66,7 +69,7 @@ const Project = memo(
       }
     };
     const editPoolNote = async () => {
-      setTrying(true);
+      setTrying(pin.birth, true);
       try {
         const result = await api.editPoolNote(pin, noteValue);
         log("editPoolNote result => ", result);
@@ -74,7 +77,6 @@ const Project = memo(
         log("editPoolNote error => ", e);
       }
       setEditingNote(false);
-      setTrying(false);
     };
     const disableActions = trying || editingTitle || addingGoal;
 
@@ -102,7 +104,7 @@ const Project = memo(
             poolData={{ title, permList, pin }}
             type="pool"
             pin={pin}
-            setParentTrying={setTrying}
+            setParentTrying={(value: boolean) => setTrying(pin.birth, value)}
             isArchived={isArchived}
             onEditPoolNote={() => {
               setEditingNote(!editingNote);
@@ -171,7 +173,7 @@ const Project = memo(
           onDone={() => {
             setEditingTitle(false);
           }}
-          setParentTrying={setTrying}
+          setParentTrying={(value: boolean) => setTrying(pin.birth, value)}
           pin={pin}
         />
       );

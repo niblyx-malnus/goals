@@ -38,9 +38,7 @@ const RecursiveTree = ({
         idObject={goal.id}
         id={currentGoalId}
         key={currentGoalId}
-        onSelectCallback={(id: number) => {
-          onSelectCallback(id);
-        }}
+   
         isSelected={currentGoal.selected}
         label={currentGoal.hitch.desc}
         goal={currentGoal}

@@ -1,4 +1,5 @@
 import memoize from "lodash/memoize";
+import { v4 as uuidv4 } from "uuid";
 
 declare const window: Window &
   typeof globalThis & {
@@ -29,4 +30,7 @@ const getRoleTitle = (role: any): "owner" | "admin" | "chief" | "viewer" => {
     return "viewer";
   }
 };
-export { log, isDev, shipName, getRoleTitle };
+const uuid = (): string => {
+  return uuidv4();
+};
+export { log, isDev, shipName, getRoleTitle, uuid };

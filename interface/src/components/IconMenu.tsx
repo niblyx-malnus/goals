@@ -22,7 +22,7 @@ import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import { GoalId, PinId } from "../types/types";
-import { log } from "../helpers";
+import { log, uuid } from "../helpers";
 import api from "../api";
 
 import useStore from "../store";
@@ -155,7 +155,6 @@ export default function IconMenu({
       });
       log("markComplete error => ", e);
     }
-    setParentTrying(false);
   };
   const unmarkComplete = async () => {
     handleClose();
@@ -170,7 +169,6 @@ export default function IconMenu({
       });
       log("unmarkComplete error => ", e);
     }
-    setParentTrying(false);
   };
   const deletePool = async () => {
     handleClose();
@@ -190,7 +188,6 @@ export default function IconMenu({
       });
       log("deletePool error => ", e);
     }
-    setParentTrying(false);
   };
   const archivePool = async () => {
     handleClose();
@@ -210,7 +207,6 @@ export default function IconMenu({
       });
       log("archivePool error => ", e);
     }
-    setParentTrying(false);
   };
   const renewPool = async () => {
     handleClose();
@@ -230,7 +226,6 @@ export default function IconMenu({
       });
       log("renewPool error => ", e);
     }
-    setParentTrying(false);
   };
   const leavePool = async () => {
     handleClose();
@@ -250,7 +245,6 @@ export default function IconMenu({
       });
       log("leavePool error => ", e);
     }
-    setParentTrying(false);
   };
   const deleteGoal = async () => {
     handleClose();
@@ -266,7 +260,6 @@ export default function IconMenu({
       });
       log("deleteGoal error => ", e);
     }
-    setParentTrying(false);
   };
   const archiveGoal = async () => {
     handleClose();
@@ -282,7 +275,6 @@ export default function IconMenu({
       });
       log("archiveGoal error => ", e);
     }
-    setParentTrying(false);
   };
   const renewGoal = async () => {
     handleClose();
@@ -302,7 +294,6 @@ export default function IconMenu({
       });
       log("archiveGoal error => ", e);
     }
-    setParentTrying(false);
   };
   const markActionable = async () => {
     handleClose();
@@ -317,7 +308,6 @@ export default function IconMenu({
       });
       log("markActionable error => ", e);
     }
-    setParentTrying(false);
   };
   const unmarkActionable = async () => {
     handleClose();
@@ -332,7 +322,6 @@ export default function IconMenu({
       });
       log("unmarkActionable error => ", e);
     }
-    setParentTrying(false);
   };
   const handleTimeline = () => {
     handleClose();

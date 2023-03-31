@@ -22,8 +22,7 @@ import { blue, orange, green, red, purple } from "@mui/material/colors";
 import api from "../api";
 //TODO: make some components to simplify the logic of this component
 interface GoalItemProps {
-  readonly id: number;
-  readonly onSelectCallback: (id: number) => void;
+  readonly id: string;
   readonly label: string;
   readonly isSelected: boolean | undefined;
   readonly children: ReadonlyArray<JSX.Element>;
@@ -41,7 +40,6 @@ interface GoalItemProps {
 
 const GoalItem = memo(
   ({
-    onSelectCallback,
     label,
     isSelected,
     children,
@@ -63,10 +61,14 @@ const GoalItem = memo(
     const [yoking, setYoking] = useState<boolean>(false);
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
-    const [trying, setTrying] = useState<boolean>(false);
+    const setTrying = useStore((store) => store.setTrying);
+
+    const getTrying: any = useStore((store) => store.getTrying);
+    const trying: any = getTrying(id);
     const [isChief, setIsChief] = useState<boolean>(false);
     const [disableActions, setDisableActions] = useState<boolean>(false);
     const collapseAll = useStore((store) => store.collapseAll);
+
     const selectedGoals = useStore((store) => store.selectedGoals);
     const updateSelectedGoal = useStore((store) => store.updateSelectedGoal);
     const [goalRole, setGoalRole] = useState<"spawn" | "chief" | null>(null);
@@ -89,7 +91,7 @@ const GoalItem = memo(
       }
     };
     const editGoalNote = async () => {
-      setTrying(true);
+      setTrying(id, true);
       try {
         const result = await api.editGoalNote(idObject, noteValue);
         log("editGoalNote result => ", result);
@@ -97,7 +99,7 @@ const GoalItem = memo(
         log("editGoalNote error => ", e);
       }
       setEditingNote(false);
-      setTrying(false);
+      setTrying(id, false);
     };
     useEffect(() => {
       //we check at first render/everytime ranks changes(or just goal)
@@ -181,7 +183,7 @@ const GoalItem = memo(
             goalId={idObject}
             pin={pin}
             currentGoal={goal}
-            setParentTrying={setTrying}
+            setParentTrying={(value: boolean) => setTrying(id, value)}
             isVirtual={goal.isVirtual}
             virtualId={goal.virtualId} //refers to the original goal(none-virtualised counterpart of this one)
             isArchived={goal.isArchived}
@@ -306,7 +308,7 @@ const GoalItem = memo(
             }}
             pin={pin}
             id={idObject}
-            setParentTrying={setTrying}
+            setParentTrying={(value: boolean) => setTrying(id, value)}
             isVirtual={goal.isVirtual}
             virtualGoalId={goal.virtualId} //refers to the original goal(none-virtualised counterpart of this one)
           />

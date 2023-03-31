@@ -1,4 +1,5 @@
 import { CreateCssVarsProviderResult } from "@mui/system";
+import cloneDeep from "lodash/cloneDeep";
 import create from "zustand";
 import { log } from "../helpers";
 import {
@@ -16,7 +17,6 @@ type SelectionYokeData = null | {
   yokeName: string;
   startingConnections: any;
 };
-
 type ColorTheme = "light" | "dark";
 interface Store {
   /*
@@ -120,6 +120,11 @@ interface Store {
 
   colorMode: ColorTheme;
   setColorMode: (colorMode: ColorTheme) => void;
+
+  tryingMap: Map<string, object>;
+  setTryingMap: (tryingMap: Map<string, object>) => void;
+  setTrying: (id: string, value: boolean) => void;
+  getTrying: (id: any) => any;
 }
 /**
  * 
@@ -386,6 +391,26 @@ const useStore = create<Store>((set, get) => ({
 
   colorMode: "light",
   setColorMode: (colorMode: ColorTheme) => set(() => ({ colorMode })),
+
+  tryingMap: new Map(),
+  setTryingMap: (tryingMap: Map<string, object>) => set(() => ({ tryingMap })),
+  setTrying: (id: string, value: boolean) => {
+
+    //we set the value at the given location (id) if any
+    let newTryingMap: any = new Map(get().tryingMap);
+
+    newTryingMap.set(id, {
+      trying: value,
+    });
+    set(() => ({
+      tryingMap: newTryingMap,
+    }));
+  },
+  getTrying: (id: string) => {
+    const ha: any = get().tryingMap;
+    if (ha.has(id)) return ha.get(id).trying;
+    return false;
+  },
 }));
 
 export default useStore;

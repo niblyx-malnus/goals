@@ -22,6 +22,15 @@ const setLogList = useStore.getState().setLogList;
 
 const updateHandler = (update: any) => {
   log("update", update);
+  //check if the given update contains a id we can use to toggle loading state false (poke relay)
+  if (update.hed.pid) {
+    const tryingMap = useStore.getState().tryingMap;
+    const setTrying = useStore.getState().setTrying;
+
+    if (tryingMap.has(update.hed.pid)) {
+      setTrying(update.hed.pid, false);
+    }
+  }
   const actionName: any = Object.keys(update.tel)[0];
 
   //add this update to our logList
@@ -107,7 +116,7 @@ const updateHandler = (update: any) => {
       case "goal-hitch": {
         const hed: any = update.hed;
         let { id }: any = update.tel[actionName];
-        
+
         let newHitch = cloneDeep(update.tel[actionName]);
         delete newHitch.id;
 

@@ -20,6 +20,7 @@ declare const window: Window &
   };
 //TODO: handle sub kick/error
 //TODO: order the virtual children
+//TODO: add relay to edit inputs also and test the other pokes
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -32,6 +33,9 @@ function Main() {
   const setFetchedPools = useStore((store) => store.setPools);
   const setGroupsData = useStore((store) => store.setGroupsData);
   const setPals = useStore((store) => store.setPals);
+
+  const tryingMap: any = useStore((store) => store.tryingMap);
+  const setTryingMap = useStore((store) => store.setTryingMap);
 
   const setArchivedPools = useStore((store) => store.setArchivedPools);
   const [pools, setPools] = useState([]);
@@ -50,6 +54,7 @@ function Main() {
     //convert flat goals into nested goals for each pool
     //make our role map
     const roleMap = new Map();
+    const newTryingMap: any = new Map();
     const newProjects = fetchedPools.map((poolItem: any, id: any) => {
       //update the perms here, in case they do change
       const { pin, pool } = poolItem;
@@ -64,10 +69,22 @@ function Main() {
           break;
         }
       }
+      //add this pool to the trying map
+      newTryingMap.set(pin.birth, {
+        trying: tryingMap.has(pin.birth) //make sure to check the previous tryingMap for this value
+          ? tryingMap.get(pin.birth).trying
+          : false,
+      });
       //create a map of goal to id(birth)
       const goalsMap = new Map();
       pool.nexus.goals.forEach((item: any) => {
         goalsMap.set(item.id.birth, item);
+
+        newTryingMap.set(item.id.birth, {
+          trying: tryingMap.has(item.id.birth) //make sure to check the previous tryingMap for this value
+            ? tryingMap.get(item.id.birth).trying
+            : false,
+        });
       });
       const virtualChildren: any = [];
 
@@ -151,6 +168,7 @@ function Main() {
         pool: { ...pool, nexus: { goals: newNestedGoals } },
       };
     });
+    setTryingMap(newTryingMap);
     setPools(newProjects);
     setRoleMap(roleMap);
   }, [fetchedPools]);
@@ -264,7 +282,6 @@ function Main() {
           const goalList = pool.pool.nexus.goals;
           const permList = pool.pool.perms;
           const role = roleMap?.get(poolId);
-          log(pool);
           let inSelectionMode = false;
           let disabled = false;
           //we toggle into selection mode or disable the pool (disabling is a TODO)

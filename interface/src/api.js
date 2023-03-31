@@ -41,12 +41,11 @@ const api = {
     app = "cell",
     mark = "sheet",
     json = JSON.stringify([["test"]]),
+    pokeId = "",
   }) => {
     try {
-      const relay = { pid: 1, pok: json };
-      log("relay", relay);
-      log("app", app);
-      log("mark", mark);
+      const relay = { pid: pokeId, pok: json };
+      
       return api.createApi().poke({
         app,
         mark,
@@ -90,6 +89,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: poolToEdit,
+      pokeId: pin.birth,
     });
   },
   editPoolNote: async (pin, newNote) => {
@@ -104,6 +104,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: poolToEdit,
+      pokeId: pin.birth,
     });
   },
   deletePool: async (pin) => {
@@ -116,6 +117,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: poolToDelete,
+      pokeId: pin.birth,
     });
   },
   renewPool: async (pin) => {
@@ -128,6 +130,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: poolToRenew,
+      pokeId: pin.birth,
     });
   },
   archivePool: async (pin) => {
@@ -140,6 +143,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: poolToArchive,
+      pokeId: pin.birth,
     });
   },
   subscribePool: async (pin) => {
@@ -183,6 +187,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: goalToDelete,
+      pokeId: id.birth,
     });
   },
   renewGoal: async (id) => {
@@ -195,9 +200,10 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: goalToRenew,
+      pokeId: id.birth,
     });
   },
-  archiveGoal: async (id) => {
+  archiveGoal: async (id, pokeId) => {
     const goalToArchive = {
       "cache-goal": {
         id,
@@ -207,6 +213,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: goalToArchive,
+      pokeId: id.birth,
     });
   },
   editGoalDesc: async (id, newDesc) => {
@@ -220,6 +227,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: goalToEdit,
+      pokeId: id.birth,
     });
   },
   editGoalNote: async (id, newNote) => {
@@ -233,6 +241,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: goalToEdit,
+      pokeId: id.birth,
     });
   },
 
@@ -246,6 +255,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: goalToMark,
+      pokeId: id.birth,
     });
   },
   unmarkComplete: async (id) => {
@@ -258,6 +268,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: goalToMark,
+      pokeId: id.birth,
     });
   },
   updatePoolPermissions: async (pin, newRoleList) => {
@@ -271,6 +282,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: newPoolPerms,
+      pokeId: pin.birth,
     });
   },
   updateGoalPermissions: async (id, chief, spawnList, rec) => {
@@ -286,6 +298,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: newGoalPerms,
+      pokeId: id.birth,
     });
   },
   leavePool: async (pin) => {
@@ -298,6 +311,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: poolToLeave,
+      pokeId: pin.birth,
     });
   },
   markActionable: async (id) => {
@@ -310,6 +324,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: goalToMark,
+      pokeId: id.birth,
     });
   },
   unmarkActionable: async (id) => {
@@ -322,6 +337,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: goalToMark,
+      pokeId: id.birth,
     });
   },
   setKickoff: async (id, date) => {
@@ -335,6 +351,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: newKickoff,
+      pokeId: id.birth,
     });
   },
   setDeadline: async (id, date) => {
@@ -348,6 +365,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: newDeadline,
+      pokeId: id.birth,
     });
   },
   copyPool: async (oldPin, title) => {
@@ -361,6 +379,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: poolToCopy,
+      pokeId: oldPin.birth,
     });
   },
   moveGoal: async (pin, goalId, targetGoalId) => {
@@ -375,6 +394,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: goalMove,
+      pokeId: goalId.birth,
     });
   },
   yoke: async (pin, yokeList) => {
@@ -388,6 +408,7 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: yokeSequence,
+      pokeId: pin.birth,
     });
   },
   harvest: async (owner, birth) => {
