@@ -30,7 +30,7 @@ import {
   HarvestPanel,
   ArchiveDialog,
   GoalPermsDialog,
-  JoinPoolDialog
+  JoinPoolDialog,
 } from "./";
 import Tooltip from "@mui/material/Tooltip";
 
@@ -40,8 +40,16 @@ import InputLabel from "@mui/material/InputLabel";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import { useTheme, ThemeProvider, createTheme } from "@mui/material/styles";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+
 const filterOptions = () => ["Complete", "Incomplete", "Actionable"];
+
 export default function Header() {
+  const theme = useTheme();
+  const setColorMode = useStore((store) => store.setColorMode);
+
   const [newProjectTitle, setNewProjectTitle] = useState<string>("");
   const [trying, setTrying] = useState<boolean>(false);
   const [filterValue, setFilterValue] = React.useState<string | null>(null);
@@ -75,6 +83,7 @@ export default function Header() {
     if (newProjectTitle?.length > 0) {
       setTrying(true);
       try {
+
         const result = await api.addPool(newProjectTitle);
         log("addNewPool result => ", result);
         toggleSnackBar(true, {
@@ -100,7 +109,6 @@ export default function Header() {
     toggleShowArchived(!showArchived);
   };
   const handleFilterUpdate = (newValue: string | null) => {
-    log("newValue", newValue);
     setFilterValue(newValue);
     if (newValue === null) {
       //clear filter
@@ -122,7 +130,6 @@ export default function Header() {
         position: "sticky",
         top: 0,
         paddingTop: 2,
-        backgroundColor: "#eedfc9",
         marginBottom: 2,
       }}
       zIndex={1}
@@ -166,7 +173,6 @@ export default function Header() {
             </InputAdornment>
           }
         />
-
         <Box sx={{ width: 160 }}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Sorting</InputLabel>
@@ -229,6 +235,26 @@ export default function Header() {
             <LoginOutlinedIcon />
           </IconButton>
         </Tooltip>
+        <Box
+          sx={{
+            bgcolor: "background.default",
+            color: "text.primary",
+          }}
+        >
+          <IconButton
+            onClick={() => {
+              setColorMode(theme.palette.mode === "dark" ? "light" : "dark");
+              log("hehehehe");
+            }}
+            color="inherit"
+          >
+            {theme.palette.mode === "dark" ? (
+              <Brightness7Icon />
+            ) : (
+              <Brightness4Icon />
+            )}
+          </IconButton>
+        </Box>
       </Stack>
       <Divider sx={{ paddingTop: 2 }} />
     </Box>

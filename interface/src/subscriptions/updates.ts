@@ -1,3 +1,4 @@
+import { cloneDeep } from "lodash";
 import { log } from "../helpers";
 import useStore from "../store";
 import {
@@ -21,6 +22,15 @@ const setLogList = useStore.getState().setLogList;
 
 const updateHandler = (update: any) => {
   log("update", update);
+  //check if the given update contains a id we can use to toggle loading state false (poke relay)
+  if (update.hed.pid) {
+    const tryingMap = useStore.getState().tryingMap;
+    const setTrying = useStore.getState().setTrying;
+
+    if (tryingMap.has(update.hed.pid)) {
+      setTrying(update.hed.pid, false);
+    }
+  }
   const actionName: any = Object.keys(update.tel)[0];
 
   //add this update to our logList
@@ -98,16 +108,19 @@ const updateHandler = (update: any) => {
       }
       case "pool-hitch": {
         const hed: any = update.hed;
-        let { title }: any = update.tel[actionName];
+        //TODO: get this working with note
 
-        updatePoolTitleAction(hed.pin, title);
+        updatePoolTitleAction(hed.pin, update.tel[actionName]);
         break;
       }
       case "goal-hitch": {
         const hed: any = update.hed;
-        let { desc, id }: any = update.tel[actionName];
+        let { id }: any = update.tel[actionName];
 
-        updateGoalDescAction(id, hed.pin, desc);
+        let newHitch = cloneDeep(update.tel[actionName]);
+        delete newHitch.id;
+
+        updateGoalDescAction(id, hed.pin, update.tel[actionName]);
         break;
       }
       case "goal-togls": {
@@ -144,7 +157,7 @@ const updateHandler = (update: any) => {
       case "goal-dates": {
         const hed: any = update.hed;
         let { nex }: any = update.tel[actionName];
-        
+
         nexusListAction(hed.pin, nex);
         break;
       }
@@ -158,7 +171,7 @@ const updateHandler = (update: any) => {
   }
 };
 const updates = {
-  app: "goal-store",
+  app: "goal-store-test",
   path: "/goals",
   event: updateHandler,
   //TODO: handle sub death/kick/err

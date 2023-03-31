@@ -149,9 +149,6 @@ export default function HarvestPanel() {
                 goal={currentGoal}
                 poolRole={harvestData.role}
                 id={currentGoalId}
-                onSelectCallback={(id: number) => {
-                  log("onSelectCallback", id);
-                }}
                 isSelected={currentGoal.selected}
                 key={"harvest-" + currentGoalId}
                 idObject={goal.id}
@@ -161,6 +158,7 @@ export default function HarvestPanel() {
                 pin={harvestData.pin}
                 harvestGoal={true}
                 yokingGoalId={"not in selection mode, so I wont use this"}
+                note="placeholder note in harvest panel"
               />
             );
           })}

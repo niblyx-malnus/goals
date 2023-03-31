@@ -18,7 +18,7 @@ const RecursiveTree = ({
   inSelectionMode,
   disabled,
   yokingGoalId,
-  poolArchived, 
+  poolArchived,
 }: any) => {
   const filterGoals = useStore((store) => store.filterGoals);
   const createTree = (goal: any) => {
@@ -38,9 +38,7 @@ const RecursiveTree = ({
         idObject={goal.id}
         id={currentGoalId}
         key={currentGoalId}
-        onSelectCallback={(id: number) => {
-          onSelectCallback(id);
-        }}
+   
         isSelected={currentGoal.selected}
         label={currentGoal.hitch.desc}
         goal={currentGoal}
@@ -50,6 +48,7 @@ const RecursiveTree = ({
         disabled={disabled}
         yokingGoalId={yokingGoalId}
         poolArchived={poolArchived}
+        note={currentGoal.hitch.note}
       >
         {childGoals.map((goal: any) => {
           const currentChildGoalId = goal.id.birth;

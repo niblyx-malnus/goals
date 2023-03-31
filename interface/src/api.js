@@ -2,7 +2,8 @@ import memoize from "lodash/memoize";
 import Urbit from "@urbit/http-api";
 import { isDev, log } from "./helpers";
 import updates from "./subscriptions/updates";
-
+const apiApp = process.env.REACT_APP_APP;
+const apiMark = process.env.REACT_APP_MARK;
 const api = {
   createApi: memoize(() => {
     /*
@@ -40,12 +41,11 @@ const api = {
     app = "cell",
     mark = "sheet",
     json = JSON.stringify([["test"]]),
+    pokeId = "",
   }) => {
     try {
-      const relay = { pid: 1, pok: json };
-      log("relay", relay);
-      log("app", app);
-      log("mark", mark);
+      const relay = { pid: pokeId, pok: json };
+      
       return api.createApi().poke({
         app,
         mark,
@@ -56,11 +56,11 @@ const api = {
     }
   },
   getGroupData: async () => {
-    return api.createApi().scry({ app: "goal-store", path: "/groups" });
+    return api.createApi().scry({ app: apiApp, path: "/groups" });
   },
   getData: async () => {
     //gets our main data we display (pools/goals)
-    return api.createApi().scry({ app: "goal-store", path: "/initial" });
+    return api.createApi().scry({ app: apiApp, path: "/initial" });
   },
   addPool: async (title) => {
     const newPool = {
@@ -72,7 +72,7 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
+      app: apiApp,
       mark: "goal-action",
       json: newPool,
     });
@@ -86,9 +86,25 @@ const api = {
     };
 
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: poolToEdit,
+      pokeId: pin.birth,
+    });
+  },
+  editPoolNote: async (pin, newNote) => {
+    const poolToEdit = {
+      "edit-pool-note": {
+        pin,
+        note: newNote,
+      },
+    };
+
+    return api.poke({
+      app: apiApp,
+      mark: apiMark,
+      json: poolToEdit,
+      pokeId: pin.birth,
     });
   },
   deletePool: async (pin) => {
@@ -98,9 +114,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: poolToDelete,
+      pokeId: pin.birth,
     });
   },
   renewPool: async (pin) => {
@@ -110,9 +127,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: poolToRenew,
+      pokeId: pin.birth,
     });
   },
   archivePool: async (pin) => {
@@ -122,9 +140,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: poolToArchive,
+      pokeId: pin.birth,
     });
   },
   subscribePool: async (pin) => {
@@ -134,8 +153,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: poolToJoin,
     });
   },
@@ -153,8 +172,8 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: newGoal,
     });
   },
@@ -165,9 +184,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToDelete,
+      pokeId: id.birth,
     });
   },
   renewGoal: async (id) => {
@@ -177,21 +197,23 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToRenew,
+      pokeId: id.birth,
     });
   },
-  archiveGoal: async (id) => {
+  archiveGoal: async (id, pokeId) => {
     const goalToArchive = {
       "cache-goal": {
         id,
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToArchive,
+      pokeId: id.birth,
     });
   },
   editGoalDesc: async (id, newDesc) => {
@@ -202,9 +224,24 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToEdit,
+      pokeId: id.birth,
+    });
+  },
+  editGoalNote: async (id, newNote) => {
+    const goalToEdit = {
+      "edit-goal-note": {
+        id,
+        note: newNote,
+      },
+    };
+    return api.poke({
+      app: apiApp,
+      mark: apiMark,
+      json: goalToEdit,
+      pokeId: id.birth,
     });
   },
 
@@ -215,9 +252,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToMark,
+      pokeId: id.birth,
     });
   },
   unmarkComplete: async (id) => {
@@ -227,9 +265,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToMark,
+      pokeId: id.birth,
     });
   },
   updatePoolPermissions: async (pin, newRoleList) => {
@@ -240,9 +279,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: newPoolPerms,
+      pokeId: pin.birth,
     });
   },
   updateGoalPermissions: async (id, chief, spawnList, rec) => {
@@ -255,9 +295,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: newGoalPerms,
+      pokeId: id.birth,
     });
   },
   leavePool: async (pin) => {
@@ -267,9 +308,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: poolToLeave,
+      pokeId: pin.birth,
     });
   },
   markActionable: async (id) => {
@@ -279,9 +321,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToMark,
+      pokeId: id.birth,
     });
   },
   unmarkActionable: async (id) => {
@@ -291,9 +334,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalToMark,
+      pokeId: id.birth,
     });
   },
   setKickoff: async (id, date) => {
@@ -304,9 +348,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: newKickoff,
+      pokeId: id.birth,
     });
   },
   setDeadline: async (id, date) => {
@@ -317,9 +362,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: newDeadline,
+      pokeId: id.birth,
     });
   },
   copyPool: async (oldPin, title) => {
@@ -330,9 +376,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: poolToCopy,
+      pokeId: oldPin.birth,
     });
   },
   moveGoal: async (pin, goalId, targetGoalId) => {
@@ -344,9 +391,10 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: goalMove,
+      pokeId: goalId.birth,
     });
   },
   yoke: async (pin, yokeList) => {
@@ -357,14 +405,15 @@ const api = {
       },
     };
     return api.poke({
-      app: "goal-store",
-      mark: "goal-action",
+      app: apiApp,
+      mark: apiMark,
       json: yokeSequence,
+      pokeId: pin.birth,
     });
   },
   harvest: async (owner, birth) => {
     return api.createApi().scry({
-      app: "goal-store",
+      app: apiApp,
       path: `/goal/~${owner}/${birth}/full-harvest`,
     });
   },
