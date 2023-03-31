@@ -20,6 +20,8 @@ import TextField from "@mui/material/TextField";
 import { log, shipName, getRoleTitle } from "../helpers";
 import { blue, orange, green, red, purple } from "@mui/material/colors";
 import api from "../api";
+import { useDrag, useDrop } from "react-dnd";
+
 //TODO: make some components to simplify the logic of this component
 interface GoalItemProps {
   readonly id: string;
@@ -56,6 +58,14 @@ const GoalItem = memo(
     note = "this is a note",
   }: //inSelectMode
   GoalItemProps) => {
+    const [{ isDragging }, drag] = useDrag(() => ({
+      type: "goal",
+      item: { some: "data" },
+      collect: (monitor: any) => ({
+        isDragging: !!monitor.isDragging(),
+      }),
+    }));
+
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
     const [selected, setSelected] = useState(isSelected);
     const [yoking, setYoking] = useState<boolean>(false);
@@ -396,7 +406,7 @@ const GoalItem = memo(
                 )}
               </Box>
             )}
-            {renderTitle()}
+            <Box ref={drag}>{renderTitle()}</Box>
             {renderArchivedTag()}
             {renderVirtualTag()}
             {renderTimeline()}

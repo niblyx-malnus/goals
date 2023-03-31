@@ -12,6 +12,8 @@ import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import { Header, Project } from "./";
 import { v4 as uuidv4 } from "uuid";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 declare const window: Window &
   typeof globalThis & {
     scry: any;
@@ -21,6 +23,9 @@ declare const window: Window &
 //TODO: handle sub kick/error
 //TODO: order the virtual children
 //TODO: add relay to edit inputs also and test the other pokes
+//TODO: Don't allow to drop goal over itself
+//TODO: add API to ordering goals among themselves and related frontend logic
+//TODO: make the highlighting grey?(drag and drop)
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -269,56 +274,59 @@ function Main() {
           </Typography>
         </Stack>
       )}
-      {loading.success && pools.length === 0 ? (
-        <Typography variant="h6" fontWeight={"bold"}>
-          Add a pool to get started
-        </Typography>
-      ) : (
-        pools.map((pool: any, index: any) => {
-          const poolTitle = pool.pool.hitch.title;
-          const poolNote = pool.pool.hitch.note;
-          const poolId = pool.pin.birth;
-          const poolOwner = pool.pin.owner;
-          const goalList = pool.pool.nexus.goals;
-          const permList = pool.pool.perms;
-          const role = roleMap?.get(poolId);
-          let inSelectionMode = false;
-          let disabled = false;
-          //we toggle into selection mode or disable the pool (disabling is a TODO)
-          if (selectionMode) {
-            //does the yoke selection stem from one of my goals?
-            if (selectionModeYokeData?.poolId.birth === poolId) {
-              inSelectionMode = true;
-            } else {
-              disabled = true;
+      <DndProvider backend={HTML5Backend}>
+        {loading.success && pools.length === 0 ? (
+          <Typography variant="h6" fontWeight={"bold"}>
+            Add a pool to get started
+          </Typography>
+        ) : (
+          pools.map((pool: any, index: any) => {
+            const poolTitle = pool.pool.hitch.title;
+            const poolNote = pool.pool.hitch.note;
+            const poolId = pool.pin.birth;
+            const poolOwner = pool.pin.owner;
+            const goalList = pool.pool.nexus.goals;
+            const permList = pool.pool.perms;
+            const role = roleMap?.get(poolId);
+            let inSelectionMode = false;
+            let disabled = false;
+            //we toggle into selection mode or disable the pool (disabling is a TODO)
+            if (selectionMode) {
+              //does the yoke selection stem from one of my goals?
+              if (selectionModeYokeData?.poolId.birth === poolId) {
+                inSelectionMode = true;
+              } else {
+                disabled = true;
+              }
             }
-          }
-          return (
-            <Project
-              title={poolTitle}
-              note={poolNote}
-              poolOwner={poolOwner}
-              key={poolId}
-              pin={pool.pin}
-              goalsLength={goalList?.length}
-              permList={permList}
-              role={role}
-              isArchived={pool.pool.isArchived}
-            >
-              <RecursiveTree
-                goalList={goalList}
-                onSelectCallback={onSelect}
+            return (
+              <Project
+                title={poolTitle}
+                note={poolNote}
+                poolOwner={poolOwner}
+                key={poolId}
                 pin={pool.pin}
-                poolRole={role}
-                inSelectionMode={inSelectionMode}
-                disabled={disabled}
-                yokingGoalId={selectionModeYokeData?.goalId.birth}
-                poolArchived={pool.pool.isArchived}
-              />
-            </Project>
-          );
-        })
-      )}
+                goalsLength={goalList?.length}
+                permList={permList}
+                role={role}
+                isArchived={pool.pool.isArchived}
+              >
+                <RecursiveTree
+                  goalList={goalList}
+                  onSelectCallback={onSelect}
+                  pin={pool.pin}
+                  poolRole={role}
+                  inSelectionMode={inSelectionMode}
+                  disabled={disabled}
+                  yokingGoalId={selectionModeYokeData?.goalId.birth}
+                  poolArchived={pool.pool.isArchived}
+                />
+              </Project>
+            );
+          })
+        )}
+      </DndProvider>
+
       {loading.error && <ErrorAlert onRetry={fetchInitial} />}
     </Container>
   );
