@@ -125,6 +125,9 @@ interface Store {
   setTryingMap: (tryingMap: Map<string, object>) => void;
   setTrying: (id: string, value: boolean) => void;
   getTrying: (id: any) => any;
+
+  ctrlPressed: boolean;
+  setCtrlPressed: (state: boolean) => void;
 }
 /**
  * 
@@ -395,7 +398,6 @@ const useStore = create<Store>((set, get) => ({
   tryingMap: new Map(),
   setTryingMap: (tryingMap: Map<string, object>) => set(() => ({ tryingMap })),
   setTrying: (id: string, value: boolean) => {
-
     //we set the value at the given location (id) if any
     let newTryingMap: any = new Map(get().tryingMap);
 
@@ -411,6 +413,9 @@ const useStore = create<Store>((set, get) => ({
     if (ha.has(id)) return ha.get(id).trying;
     return false;
   },
+
+  ctrlPressed: false,
+  setCtrlPressed: (state: boolean) => set(() => ({ ctrlPressed: state })),
 }));
 
 export default useStore;
