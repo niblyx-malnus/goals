@@ -1,0 +1,708 @@
+import * as React from "react";
+
+import IconButton from "@mui/material/IconButton";
+import CheckIcon from "@mui/icons-material/Check";
+import Stack from "@mui/material/Stack";
+
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import ClearIcon from "@mui/icons-material/Clear";
+import LogoutIcon from "@mui/icons-material/Logout";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import PlayForWorkIcon from "@mui/icons-material/PlayForWork";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import FolderCopyOutlinedIcon from "@mui/icons-material/FolderCopyOutlined";
+import AgricultureOutlinedIcon from "@mui/icons-material/AgricultureOutlined";
+import OpenWithOutlinedIcon from "@mui/icons-material/OpenWithOutlined";
+import LinkOutlinedIcon from "@mui/icons-material/LinkOutlined";
+import RestoreOutlinedIcon from "@mui/icons-material/RestoreOutlined";
+import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
+
+import Divider from "@mui/material/Divider";
+import Box from "@mui/material/Box";
+import { GoalId, PinId } from "../types/types";
+import { log, uuid } from "../helpers";
+import api from "../api";
+
+import useStore from "../store";
+
+export default function QuickActions({
+  complete = false,
+  goalId,
+  pin,
+  type,
+  setParentTrying,
+  poolData,
+  actionable,
+  isVirtual = false,
+  virtualId,
+  currentGoal,
+  isArchived = false,
+  harvestGoal = false,
+  onEditPoolNote,
+  onEditGoalNote,
+}: {
+  actionable?: any;
+  complete?: boolean;
+  goalId?: GoalId;
+  virtualId?: GoalId;
+  isVirtual?: boolean;
+
+  isArchived?: boolean;
+
+  pin?: PinId;
+  type: "pool" | "goal";
+  setParentTrying: Function;
+  poolData?: any;
+  currentGoal?: any;
+  harvestGoal?: boolean;
+
+  onEditPoolNote?: Function;
+  onEditGoalNote?: Function;
+}) {
+  const id = isVirtual ? virtualId : goalId;
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const toggleShareDialog = useStore((store: any) => store.toggleShareDialog);
+  const toggleDeleteDialog = useStore((store: any) => store.toggleDeleteDialog);
+  const toggleLeaveDialog = useStore((store: any) => store.toggleLeaveDialog);
+  const toggleGroupsShareDialog = useStore(
+    (store: any) => store.toggleGroupsShareDialog
+  );
+  const toggleSnackBar = useStore((store) => store.toggleSnackBar);
+  const toggleTimelineDialog = useStore(
+    (store: any) => store.toggleTimelineDialog
+  );
+  const toggleCopyPoolDialog = useStore(
+    (store: any) => store.toggleCopyPoolDialog
+  );
+
+  const toggleArchiveDialog = useStore(
+    (store: any) => store.toggleArchiveDialog
+  );
+  const toggleSelectionMode = useStore(
+    (store: any) => store.toggleSelectionMode
+  );
+  const toggleGoalPermsDialog = useStore(
+    (store: any) => store.toggleGoalPermsDialog
+  );
+  const setSelectedGoals = useStore((store: any) => store.setSelectedGoals);
+  const roleMap = useStore((store: any) => store.roleMap);
+  const role = roleMap.get(pin?.birth);
+
+  const setHarvestData = useStore((store: any) => store.setHarvestData);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const markComplete = async () => {
+    handleClose();
+    setParentTrying(true);
+    try {
+      const result = await api.markComplete(id);
+      log("markComplete result => ", result);
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to mark goal complete",
+        severity: "error",
+      });
+      log("markComplete error => ", e);
+    }
+  };
+  const unmarkComplete = async () => {
+    handleClose();
+    setParentTrying(true);
+    try {
+      const result = await api.unmarkComplete(id);
+      log("unmarkComplete result => ", result);
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to mark goal incomplete",
+        severity: "error",
+      });
+      log("unmarkComplete error => ", e);
+    }
+  };
+  const deletePool = async () => {
+    handleClose();
+    setParentTrying(true);
+
+    try {
+      const result = await api.deletePool(pin);
+      log("deletePool result => ", result);
+      toggleSnackBar(true, {
+        message: "successfully deleted pool",
+        severity: "success",
+      });
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to delete pool",
+        severity: "error",
+      });
+      log("deletePool error => ", e);
+    }
+  };
+  const archivePool = async () => {
+    handleClose();
+    setParentTrying(true);
+
+    try {
+      const result = await api.archivePool(pin);
+      log("archivePool result => ", result);
+      toggleSnackBar(true, {
+        message: "successfully archived pool",
+        severity: "success",
+      });
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to archive pool",
+        severity: "error",
+      });
+      log("archivePool error => ", e);
+    }
+  };
+  const renewPool = async () => {
+    handleClose();
+    setParentTrying(true);
+
+    try {
+      const result = await api.renewPool(pin);
+      log("renewPool result => ", result);
+      toggleSnackBar(true, {
+        message: "successfully renewed pool",
+        severity: "success",
+      });
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to renew pool",
+        severity: "error",
+      });
+      log("renewPool error => ", e);
+    }
+  };
+  const leavePool = async () => {
+    handleClose();
+    setParentTrying(true);
+
+    try {
+      const result = await api.leavePool(pin);
+      log("leavePool result => ", result);
+      toggleSnackBar(true, {
+        message: "successfully left pool",
+        severity: "success",
+      });
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to leave pool",
+        severity: "error",
+      });
+      log("leavePool error => ", e);
+    }
+  };
+  const deleteGoal = async () => {
+    handleClose();
+    setParentTrying(true);
+
+    try {
+      const result = await api.deleteGoal(id);
+      log("deleteGoal result => ", result);
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to delete goal",
+        severity: "error",
+      });
+      log("deleteGoal error => ", e);
+    }
+  };
+  const archiveGoal = async () => {
+    handleClose();
+    setParentTrying(true);
+
+    try {
+      const result = await api.archiveGoal(id);
+      log("archiveGoal result => ", result);
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to archive goal",
+        severity: "error",
+      });
+      log("archiveGoal error => ", e);
+    }
+  };
+  const renewGoal = async () => {
+    handleClose();
+    setParentTrying(true);
+
+    try {
+      const result = await api.renewGoal(id);
+      log("renewGoal result => ", result);
+      toggleSnackBar(true, {
+        message: "successfully renewed goal",
+        severity: "success",
+      });
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to renew goal",
+        severity: "error",
+      });
+      log("archiveGoal error => ", e);
+    }
+  };
+  const markActionable = async () => {
+    handleClose();
+    setParentTrying(true);
+    try {
+      const result = await api.markActionable(id);
+      log("markActionable result => ", result);
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to make goal actionable",
+        severity: "error",
+      });
+      log("markActionable error => ", e);
+    }
+  };
+  const unmarkActionable = async () => {
+    handleClose();
+    setParentTrying(true);
+    try {
+      const result = await api.unmarkActionable(id);
+      log("unmarkActionable result => ", result);
+    } catch (e) {
+      toggleSnackBar(true, {
+        message: "failed to remove goal actionable",
+        severity: "error",
+      });
+      log("unmarkActionable error => ", e);
+    }
+  };
+  const handleTimeline = () => {
+    handleClose();
+    const kickoff = currentGoal.nexus.kickoff?.moment;
+    const deadline = currentGoal.nexus.deadline?.moment;
+    log("kickoff", kickoff);
+    log("deadline", deadline);
+
+    toggleTimelineDialog(true, {
+      title: currentGoal.hitch.desc,
+      goalId: id,
+      kickoff,
+      deadline,
+    });
+  };
+  const handleMove = () => {
+    handleClose();
+
+    toggleSelectionMode(true, { goalId: id, poolId: pin, yokeType: "move" });
+  };
+  const handlePriortize = () => {
+    handleClose();
+    const startingConnections = currentGoal.nexus["prio-ryte"];
+    setSelectedGoals(startingConnections);
+    toggleSelectionMode(true, {
+      goalId: id,
+      poolId: pin,
+      yokeType: "prioritize",
+      startingConnections: startingConnections,
+      yokeName: "prio",
+    });
+  };
+  const handlePrecede = () => {
+    handleClose();
+    const startingConnections = currentGoal.nexus["prec-ryte"];
+    setSelectedGoals(startingConnections);
+    toggleSelectionMode(true, {
+      goalId: id,
+      poolId: pin,
+      yokeType: "precede",
+      startingConnections: startingConnections,
+      yokeName: "prec",
+    });
+  };
+  const handleNest = () => {
+    handleClose();
+    //we find all [yoke]-ryte connection here and update selectedGoals
+    const startingConnections = currentGoal.nexus["nest-ryte"];
+    setSelectedGoals(startingConnections);
+    toggleSelectionMode(true, {
+      goalId: id,
+      poolId: pin,
+      startingConnections: startingConnections,
+      yokeType: "nest",
+      yokeName: "nest",
+    });
+  };
+
+  const moveGoalToRoot = async () => {
+    handleClose();
+    try {
+      const result = await api.moveGoal(pin, id, null);
+      toggleSnackBar(true, {
+        message: "successfully moved goal",
+        severity: "success",
+      });
+      log("moveGoal result =>", result);
+    } catch (e) {
+      log("moveGoal error =>", e);
+      toggleSnackBar(true, {
+        message: "failed to move goal",
+        severity: "error",
+      });
+    }
+  };
+  const handleHarvestGoal = async () => {
+    handleClose();
+
+    try {
+      if (!id) throw Error("no id provided");
+      const result = await api.harvest(id.owner, id.birth);
+      //update the harvest data in our store
+      setHarvestData(true, {
+        startGoalId: id,
+        goals: result["full-harvest"],
+        pin,
+        role,
+        idList: result["full-harvest"]?.map(
+          (goalItem: any) => goalItem.id.birth
+        ),
+      });
+
+      log("handleHarvestGoal result =>", result);
+    } catch (e) {
+      log("handleHarvestGoal error =>", e);
+    }
+  };
+  const renderGoalMenu = () => {
+    if (isArchived)
+      return (
+        <>
+          <IconButton
+            // sx={{ position: "absolute", right: 35 }}
+            aria-label="renew goal"
+            size="small"
+            onClick={renewGoal}
+          >
+            <RestoreOutlinedIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            // sx={{ position: "absolute", right: 35 }}
+            aria-label="delete goal"
+            size="small"
+            onClick={deleteGoal}
+            disableRipple
+          >
+            <DeleteOutlineOutlinedIcon fontSize="small" />
+          </IconButton>
+        </>
+      );
+
+    return (
+      <>
+        <IconButton
+          // sx={{ position: "absolute", right: 35 }}
+          aria-label="add goal note"
+          size="small"
+          onClick={() => {
+            handleClose();
+            onEditGoalNote && onEditGoalNote();
+          }}
+        ></IconButton>
+        {complete ? (
+          <IconButton
+            // sx={{ position: "absolute", right: 35 }}
+            aria-label="mark goal incomplete"
+            size="small"
+            onClick={unmarkComplete}
+          >
+            <ClearIcon fontSize="small" />
+          </IconButton>
+        ) : (
+          <IconButton
+            // sx={{ position: "absolute", right: 35 }}
+            aria-label="mark goal incomplete"
+            size="small"
+            onClick={markComplete}
+          >
+            <CheckIcon fontSize="small" />
+          </IconButton>
+        )}
+        {actionable ? (
+          <IconButton
+            // sx={{ position: "absolute", right: 35 }}
+            aria-label="unmark goal actionable"
+            size="small"
+            onClick={unmarkActionable}
+          >
+            <PlayForWorkIcon fontSize="small" />
+          </IconButton>
+        ) : (
+          <IconButton
+            // sx={{ position: "absolute", right: 35 }}
+            aria-label="mark goal actionable"
+            size="small"
+            onClick={markActionable}
+          >
+            <PlayForWorkIcon fontSize="small" />
+          </IconButton>
+        )}
+        <Divider />
+        <IconButton
+          // sx={{ position: "absolute", right: 35 }}
+          aria-label="manage goal's participants"
+          size="small"
+          onClick={() => {
+            handleClose();
+            toggleGoalPermsDialog(true, {
+              pin,
+              id,
+              title: currentGoal.hitch.desc,
+              chief: currentGoal.nexus.chief,
+              ranks: currentGoal.nexus.ranks,
+              spawn: currentGoal.nexus.spawn,
+            });
+          }}
+        >
+          <PeopleAltOutlinedIcon fontSize="small" />
+        </IconButton>
+        <IconButton
+          // sx={{ position: "absolute", right: 35 }}
+          aria-label="manage goal's timeline"
+          size="small"
+          onClick={handleTimeline}
+        >
+          <CalendarMonthOutlinedIcon fontSize="small" />
+        </IconButton>
+        <IconButton
+          // sx={{ position: "absolute", right: 35 }}
+          aria-label="harvest this goal"
+          size="small"
+          onClick={handleHarvestGoal}
+        >
+          <AgricultureOutlinedIcon fontSize="small" />
+        </IconButton>
+
+        {/* We hide these from harvest panel */}
+        {!harvestGoal && (
+          <>
+            <Divider />
+            <IconButton
+              // sx={{ position: "absolute", right: 35 }}
+              aria-label="move goal"
+              size="small"
+              onClick={handleMove}
+            >
+              <OpenWithOutlinedIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              // sx={{ position: "absolute", right: 35 }}
+              aria-label="move goal to root"
+              size="small"
+              onClick={moveGoalToRoot}
+            >
+              <OpenWithOutlinedIcon fontSize="small" />
+            </IconButton>
+            <Divider />
+            {/* <MenuItem onClick={handlePriortize} disableRipple>
+              <LinkOutlinedIcon fontSize="small" />
+              prioritize
+            </MenuItem>
+            <MenuItem onClick={handlePrecede} disableRipple>
+              <LinkOutlinedIcon fontSize="small" />
+              precede
+        </MenuItem>*/}
+            <IconButton
+              // sx={{ position: "absolute", right: 35 }}
+              aria-label="virtually nest this goal"
+              size="small"
+              onClick={handleNest}
+            >
+              <LinkOutlinedIcon fontSize="small" />
+            </IconButton>
+          </>
+        )}
+        <Divider />
+        <IconButton
+          // sx={{ position: "absolute", right: 35 }}
+          aria-label="archive goal"
+          size="small"
+          onClick={archiveGoal}
+        >
+          <DeleteOutlineOutlinedIcon fontSize="small" />
+        </IconButton>
+        {(role === "owner" || role === "admin") && (
+          <IconButton
+            aria-label="delete goal"
+            size="small"
+            onClick={deleteGoal}
+            disableRipple
+          >
+            <DeleteOutlineOutlinedIcon fontSize="small" />
+          </IconButton>
+        )}
+      </>
+    );
+  };
+  const renderPoolMenu = () => {
+    if (isArchived) {
+      return (
+        <>
+          <IconButton aria-label="renew pool" size="small" onClick={renewPool}>
+            <RestoreOutlinedIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            aria-label="delete pool"
+            size="small"
+            onClick={() => {
+              handleClose();
+              toggleDeleteDialog(true, {
+                title: poolData.title,
+                callback: deletePool,
+              });
+            }}
+          >
+            <DeleteOutlineOutlinedIcon fontSize="small" />
+          </IconButton>
+        </>
+      );
+    }
+
+    return (
+      <>
+        {(role === "owner" || role === "admin") && (
+          <>
+            <IconButton
+              aria-label="renew pool"
+              size="small"
+              onClick={() => {
+                handleClose();
+                toggleShareDialog(true, poolData);
+              }}
+            >
+              <PeopleAltOutlinedIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              aria-label="share pool with groups"
+              size="small"
+              onClick={() => {
+                handleClose();
+                toggleGroupsShareDialog(true, {
+                  title: poolData.title,
+                  participants: poolData,
+                  pin,
+                });
+              }}
+              disableRipple
+            >
+              <PeopleAltOutlinedIcon fontSize="small" />
+            </IconButton>
+          </>
+        )}
+        {role !== "owner" && (
+          <IconButton
+            aria-label="leave pool"
+            size="small"
+            onClick={() => {
+              handleClose();
+              toggleLeaveDialog(true, {
+                title: poolData.title,
+                callback: leavePool,
+              });
+            }}
+          >
+            <LogoutIcon fontSize="small" />
+          </IconButton>
+        )}
+        <Divider />
+
+        <IconButton
+          aria-label="duplicate pool"
+          size="small"
+          onClick={() => {
+            handleClose();
+            toggleCopyPoolDialog(true, {
+              title: poolData.title,
+              pin,
+            });
+          }}
+          disableRipple
+        >
+          <FolderCopyOutlinedIcon fontSize="small" />
+        </IconButton>
+
+        <IconButton
+          aria-label="get pool's link"
+          size="small"
+          onClick={async () => {
+            handleClose();
+            const link = `/${pin?.owner}/${pin?.birth}`;
+
+            if (navigator.clipboard) {
+              try {
+                await navigator.clipboard.writeText(link);
+                log("copied link to clipboard");
+              } catch (err) {
+                log("failed  to copy link to clipboard", err);
+              }
+            } else {
+              alert(link);
+            }
+          }}
+          disableRipple
+        >
+          <ContentCopyOutlinedIcon fontSize="small" />
+        </IconButton>
+        {role === "owner" && (
+          <>
+            <Divider />
+
+            <IconButton
+              aria-label="add note to pool"
+              size="small"
+              onClick={() => {
+                handleClose();
+                onEditPoolNote && onEditPoolNote();
+              }}
+              disableRipple
+            ></IconButton>
+
+            <IconButton
+              aria-label="archive pool"
+              size="small"
+              onClick={() => {
+                handleClose();
+                toggleArchiveDialog(true, {
+                  title: poolData.title,
+                  callback: archivePool,
+                });
+              }}
+              disableRipple
+            >
+              <DeleteOutlineOutlinedIcon fontSize="small" />
+            </IconButton>
+
+            <IconButton
+              aria-label="delete pool"
+              size="small"
+              onClick={() => {
+                handleClose();
+                toggleDeleteDialog(true, {
+                  title: poolData.title,
+                  callback: deletePool,
+                });
+              }}
+            >
+              <DeleteOutlineOutlinedIcon fontSize="small" />
+            </IconButton>
+          </>
+        )}
+      </>
+    );
+  };
+  return (
+    <Stack direction="row" className="show-on-hover" sx={{ opacity: 0 }}>
+      {type === "goal" ? renderGoalMenu() : renderPoolMenu()}
+    </Stack>
+  );
+}

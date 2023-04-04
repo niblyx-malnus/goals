@@ -21,6 +21,7 @@ import { log, shipName, getRoleTitle } from "../helpers";
 import { blue, orange, green, red, purple } from "@mui/material/colors";
 import api from "../api";
 import { useDrag, useDrop } from "react-dnd";
+import QuickActions from "./QuickActions";
 
 //TODO: make some components to simplify the logic of this component
 interface GoalItemProps {
@@ -88,6 +89,8 @@ const GoalItem = memo(
     const onNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       setNoteValue(event.target.value);
     };
+    const ctrlPressed = useStore((store) => store.ctrlPressed);
+
     const handleNoteKeyDown = (
       event: React.KeyboardEvent<HTMLInputElement>
     ) => {
@@ -186,6 +189,36 @@ const GoalItem = memo(
       if (!disableActions) {
         return (
           <IconMenu
+            type="goal"
+            //TODO: just pass togls entirely to this
+            actionable={goal.nexus.actionable}
+            complete={goal.nexus.complete}
+            goalId={idObject}
+            pin={pin}
+            currentGoal={goal}
+            setParentTrying={(value: boolean) => setTrying(id, value)}
+            isVirtual={goal.isVirtual}
+            virtualId={goal.virtualId} //refers to the original goal(none-virtualised counterpart of this one)
+            isArchived={goal.isArchived}
+            harvestGoal={harvestGoal}
+            onEditGoalNote={() => {
+              setEditingNote(!editingNote);
+              setNoteValue("note");
+            }}
+          />
+        );
+      }
+    };
+    const renderQuickActions = () => {
+      if (!ctrlPressed) return;
+      if ((poolRole === "spawn" || poolRole === null) && !isChief) return;
+      if (poolRole !== "owner" && poolRole !== "admin" && goal.isArchived)
+        return;
+      if (trying) return;
+
+      if (!disableActions) {
+        return (
+          <QuickActions
             type="goal"
             //TODO: just pass togls entirely to this
             actionable={goal.nexus.actionable}
@@ -360,6 +393,7 @@ const GoalItem = memo(
         />
       );
     };
+
     return (
       <Box
         sx={{
@@ -412,6 +446,7 @@ const GoalItem = memo(
             {renderTimeline()}
             {renderIconMenu()}
             {renderAddButton()}
+            {renderQuickActions()}
           </>
           {!editingTitle && !harvestGoal && (
             <Stack

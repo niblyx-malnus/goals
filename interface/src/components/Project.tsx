@@ -19,6 +19,7 @@ import Badge from "@mui/material/Badge";
 import Stack from "@mui/material/Stack";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
+import QuickActions from "./QuickActions";
 const Project = memo(
   ({
     title,
@@ -101,6 +102,27 @@ const Project = memo(
       if (!disableActions) {
         return (
           <IconMenu
+            poolData={{ title, permList, pin }}
+            type="pool"
+            pin={pin}
+            setParentTrying={(value: boolean) => setTrying(pin.birth, value)}
+            isArchived={isArchived}
+            onEditPoolNote={() => {
+              setEditingNote(!editingNote);
+              setNoteValue(note);
+            }}
+          />
+        );
+      }
+    };
+    const ctrlPressed = useStore((store) => store.ctrlPressed);
+
+    const renderQuickActions = () => {
+      if (!ctrlPressed) return;
+      if (trying) return;
+      if (!disableActions) {
+        return (
+          <QuickActions
             poolData={{ title, permList, pin }}
             type="pool"
             pin={pin}
@@ -237,6 +259,7 @@ const Project = memo(
           {renderArchivedTag()}
           {renderIconMenu()}
           {renderAddButton()}
+          {renderQuickActions()}
           {!editingTitle && (
             <Stack
               flexDirection={"row"}

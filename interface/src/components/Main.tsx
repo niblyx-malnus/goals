@@ -257,6 +257,32 @@ function Main() {
     window["scry"] = api.scry;
     window["poke"] = api.poke;
   }, []);
+  const setCtrlPressed = useStore((store) => store.setCtrlPressed);
+
+  const onKeyDown = (event: any) => {
+    if (event.key === "Control") {
+      setCtrlPressed(true);
+    }
+  };
+  const onKeyUp = (event: any) => {
+    if (event.key === "Control") {
+      setCtrlPressed(false);
+    }
+  };
+  const onWindowBlur = (event: any) => {
+    setCtrlPressed(false);
+  };
+  useEffect(() => {
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keyup", onKeyUp);
+    window.addEventListener("blur", onWindowBlur);
+
+    return () => {
+      document.removeEventListener("keyup", onKeyDown);
+      document.addEventListener("keyup", onKeyUp);
+      window.addEventListener("blur", onWindowBlur);
+    };
+  }, []);
   const roleMap = useStore((store: any) => store.roleMap);
   const selectionMode = useStore((store) => store.selectionMode);
   const selectionModeYokeData = useStore(
