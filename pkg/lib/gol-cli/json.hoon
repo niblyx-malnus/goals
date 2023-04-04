@@ -475,6 +475,7 @@
       :-  %hitch
       %-  pairs
       :~  [%title s+title.pool]
+          [%note s+note.pool]
       ==
   ==
 ::
@@ -552,6 +553,8 @@
       :-  %hitch
       %-  pairs
       :~  [%desc s+desc.goal]
+          [%note s+note.goal]
+          [%tags a+(turn ~(tap in tags.goal) |=(=@t s+t))]
       ==
   ==
 ::
