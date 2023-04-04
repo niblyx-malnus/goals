@@ -44,6 +44,8 @@
           [%update-pool-perms (ot ~[pin+dejs-pin new+dejs-pool-perms])]
           [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
           [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
+          [%edit-goal-note (ot ~[id+dejs-id note+so])]
+          [%edit-pool-note (ot ~[pin+dejs-pin note+so])]
           [%subscribe (ot ~[pin+dejs-pin])]
           [%unsubscribe (ot ~[pin+dejs-pin])]
       ==
@@ -253,6 +255,7 @@
           %pool-hitch
         ?-  +<.upd
           %title  (frond +<.upd s+title.upd)
+          %note  (frond +<.upd s+note.upd)
         ==
         ::
           %pool-nexus
@@ -290,6 +293,7 @@
             :-  +>-.upd
             ?-  +>-.upd
               %desc  s+desc.upd
+              %note  s+note.upd
             ==
         ==
       ==

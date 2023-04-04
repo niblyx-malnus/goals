@@ -6,6 +6,7 @@
     tv    ~(. gol-cli-traverse goals.p)
     nd    ~(. gol-cli-node goals.p)
     vzn   vzn:gol
+::
 ++  pore  |.(~(. gol-cli-pool p))
 ::
 :: return this core with initial value
@@ -325,7 +326,7 @@
   ==
 ::
 ++  update-goal-perms
-  |=  [=id:gol chief=ship rec=?(%.y %.n) spawn=(set ship) mod=ship]
+  |=  [=id:gol chief=ship rec=_| spawn=(set ship) mod=ship]
   ^-  _this
   =/  tore  (apply set-chief:(pore) id chief rec mod)
   =.  tore  (apply replace-spawn-set:(pore.tore) id spawn mod)
@@ -340,6 +341,15 @@
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(desc desc))
   (emot old [vzn %goal-hitch id %desc desc])
+::
+++  edit-goal-note
+  |=  [=id:gol note=@t mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-goal-edit-perm:(pore) id mod)
+  =/  goal  (~(got by goals.p) id)
+  =.  goals.p  (~(put by goals.p) id goal(note note))
+  (emot old [vzn %goal-hitch id %note note])
 :: 
 ++  edit-pool-title
   |=  [title=@t mod=ship]
@@ -348,10 +358,18 @@
   ?>  (check-pool-edit-perm:(pore) mod)
   =.  p  p(title title)
   (emot old [vzn %pool-hitch %title title])
+:: 
+++  edit-pool-note
+  |=  [note=@t mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-pool-edit-perm:(pore) mod)
+  =.  p  p(note note)
+  (emot old [vzn %pool-hitch %note note])
 ::
 :: wit all da fixin's
 ++  spawn-goal-fixns
-  |=  [=id:gol upid=(unit id:gol) desc=@t actionable=?(%.y %.n) mod=ship]
+  |=  [=id:gol upid=(unit id:gol) desc=@t actionable=_| mod=ship]
   ^-  _this
   =/  old  this
   =/  tore  (apply spawn-goal:(pore) id upid mod)
@@ -403,6 +421,9 @@
     ::
       [%pool-hitch %title *]
     (title:pool-hitch title.upd)
+    ::
+      [%pool-hitch %note *]
+    (title:pool-hitch note.upd)
     :: ------------------------------------------------------------------------
     :: pool-nexus
     ::
@@ -423,6 +444,9 @@
     ::
       [%goal-hitch id:gol %desc *]
     (desc:goal-hitch [id desc]:upd)
+    ::
+      [%goal-hitch id:gol %note *]
+    (note:goal-hitch [id note]:upd)
     :: ------------------------------------------------------------------------
     :: goal-togls
     ::
@@ -478,11 +502,17 @@
   ::
   ++  pool-hitch
     |%
+    ++  note   |=(note=@t `_this`this(p p(note note)))
     ++  title  |=(title=@t `_this`this(p p(title title)))
     --
   ::
   ++  goal-hitch
     |%
+    ++  note
+      |=  [=id:gol note=@t]
+      ^-  _this
+      =/  goal  (~(got by goals.p) id)
+      this(goals.p (~(put by goals.p) id goal(note note)))
     ++  desc
       |=  [=id:gol desc=@t]
       ^-  _this

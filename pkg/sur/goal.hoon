@@ -135,13 +135,27 @@
   ::
   +$  nux           nux:s4
   +$  nex           nex:s4
+  ::
+  +$  pool-hitch-update
+    $%  [%title title=@t]
+        [%note note=@t]
+    ==
+  ::
+  +$  goal-hitch-update
+    $%  [%desc desc=@t]
+        [%note note=@t]
+    ==
+  ::
   +$  unver-update  :: underlying data structures have changed
                     $%  [%spawn-pool =pool]
                         [%renew-pool =pin =pool]
                         [%spawn-goal =nex =id =goal]
                         [%renew-goal =id ren=goals]
+                        [%pool-hitch pool-hitch-update]
+                        [%goal-hitch =id goal-hitch-update]
                         $<  %spawn-pool  $<  %renew-pool
                         $<  %spawn-goal  $<  %renew-goal
+                        $<  %pool-hitch  $<  %goal-hitch
                         unver-update:s4
                     ==
   +$  update        [%5 unver-update]
@@ -304,7 +318,6 @@
   ::
   +$  pool-hitch-update
     $%  [%title title=@t]
-        [%note note=@t]
     ==
   ::
   +$  pool-nexus-update
@@ -313,7 +326,6 @@
   ::
   +$  goal-hitch-update
     $%  [%desc desc=@t]
-        [%note note=@t]
     ==
   ::
   +$  goal-togls-update

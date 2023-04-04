@@ -103,6 +103,29 @@
       =/  pid  pid.action
       =/  pok  pok.action
       ?-    -.pok
+          :: [%edit-goal-note =id note=@t]
+          ::
+          %edit-goal-note
+        =/  pin  (got:idx-orm:gol index.store id.pok)
+        =*  poke-other
+          ~(poke-other pass:hc (en-away-path pid pin %edit-goal-note))
+        ?.  =(our.bowl owner.id.pok)
+          :_  state
+          [(poke-other owner.id.pok goal-action+!>(action))]~
+        =/  pore
+          (edit-goal-note:(apex-em:hc pin) id.pok note.pok src.bowl)
+        (send-away-updates:hc ~ pin src.bowl pid pore)
+          :: [%edit-pool-note =pin note=@t]
+          ::
+          %edit-pool-note
+        =*  poke-other
+          ~(poke-other pass:hc (en-away-path pid pin.pok %edit-pool-note))
+        ?.  =(our.bowl owner.pin.pok)
+          :_  state
+          [(poke-other owner.pin.pok goal-action+!>(action))]~
+        =/  pore
+          (edit-pool-note:(apex-em:hc pin.pok) note.pok src.bowl)
+        (send-away-updates:hc ~ pin.pok src.bowl pid pore)      
           ::
           %spawn-pool
         ?>  =(src.bowl our.bowl)
@@ -428,12 +451,6 @@
         ?>  =(ship.pok src.bowl) :: any ship can kick self, not others
         :_  state
         [%give %kick ~[/[`@`+<.pin.pok]/[`@`+>.pin.pok]] `ship.pok]~
-        ::
-          %edit-goal-note
-        !!
-        ::
-          %edit-pool-note
-        !!
       ==
     ==
   [cards this]
