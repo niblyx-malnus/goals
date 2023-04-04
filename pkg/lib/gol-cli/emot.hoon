@@ -1,5 +1,9 @@
 /-  gol=goal
-/+  *gol-cli-util, gol-cli-pool, gol-cli-node, gol-cli-traverse
+/+  *gol-cli-util, gol-cli-pool, gol-cli-node, gol-cli-traverse,
+:: import during development to force compilation
+::
+    gol-cli-json
+::
 =|  efx=(list update:gol)
 |_  p=pool:gol
 +*  this  .
@@ -350,6 +354,26 @@
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(note note))
   (emot old [vzn %goal-hitch id %note note])
+::
+++  add-goal-tag
+  |=  [=id:gol tag=@t mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-goal-edit-perm:(pore) id mod)
+  =/  goal  (~(got by goals.p) id)
+  =.  goals.p
+    (~(put by goals.p) id goal(tags (~(put in tags.goal) tag)))
+  (emot old [vzn %goal-hitch id %add-tag tag])
+:: 
+++  del-goal-tag
+  |=  [=id:gol tag=@t mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-goal-edit-perm:(pore) id mod)
+  =/  goal  (~(got by goals.p) id)
+  =.  goals.p
+    (~(put by goals.p) id goal(tags (~(del in tags.goal) tag)))
+  (emot old [vzn %goal-hitch id %del-tag tag])
 :: 
 ++  edit-pool-title
   |=  [title=@t mod=ship]
@@ -447,6 +471,12 @@
     ::
       [%goal-hitch id:gol %note *]
     (note:goal-hitch [id note]:upd)
+    ::
+      [%goal-hitch id:gol %add-tag *]
+    (add-tag:goal-hitch [id tag]:upd)
+    ::
+      [%goal-hitch id:gol %del-tag *]
+    (del-tag:goal-hitch [id tag]:upd)
     :: ------------------------------------------------------------------------
     :: goal-togls
     ::
@@ -518,6 +548,22 @@
       ^-  _this
       =/  goal  (~(got by goals.p) id)
       this(goals.p (~(put by goals.p) id goal(desc desc)))
+    ++  add-tag
+      |=  [=id:gol tag=@t]
+      ^-  _this
+      =/  goal  (~(got by goals.p) id)
+      %=    this
+          goals.p
+        (~(put by goals.p) id goal(tags (~(put in tags.goal) tag)))
+      ==
+    ++  del-tag
+      |=  [=id:gol tag=@t]
+      ^-  _this
+      =/  goal  (~(got by goals.p) id)
+      %=    this
+          goals.p
+        (~(put by goals.p) id goal(tags (~(del in tags.goal) tag)))
+      ==
     --
   ::
   ++  goal-togls

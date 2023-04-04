@@ -103,6 +103,27 @@
       =/  pid  pid.action
       =/  pok  pok.action
       ?-    -.pok
+          %add-goal-tag
+        =/  pin  (got:idx-orm:gol index.store id.pok)
+        =*  poke-other
+          ~(poke-other pass:hc (en-away-path pid pin %add-goal-tag))
+        ?.  =(our.bowl owner.id.pok)
+          :_  state
+          [(poke-other owner.id.pok goal-action+!>(action))]~
+        =/  pore
+          (add-goal-tag:(apex-em:hc pin) id.pok tag.pok src.bowl)
+        (send-away-updates:hc ~ pin src.bowl pid pore)
+        ::
+          %del-goal-tag
+        =/  pin  (got:idx-orm:gol index.store id.pok)
+        =*  poke-other
+          ~(poke-other pass:hc (en-away-path pid pin %del-goal-tag))
+        ?.  =(our.bowl owner.id.pok)
+          :_  state
+          [(poke-other owner.id.pok goal-action+!>(action))]~
+        =/  pore
+          (del-goal-tag:(apex-em:hc pin) id.pok tag.pok src.bowl)
+        (send-away-updates:hc ~ pin src.bowl pid pore)
           :: [%edit-goal-note =id note=@t]
           ::
           %edit-goal-note

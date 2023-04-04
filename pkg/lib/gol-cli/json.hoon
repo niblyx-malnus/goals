@@ -46,6 +46,8 @@
           [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
           [%edit-goal-note (ot ~[id+dejs-id note+so])]
           [%edit-pool-note (ot ~[pin+dejs-pin note+so])]
+          [%add-goal-tag (ot ~[id+dejs-id tag+so])]
+          [%del-goal-tag (ot ~[id+dejs-id tag+so])]
           [%subscribe (ot ~[pin+dejs-pin])]
           [%unsubscribe (ot ~[pin+dejs-pin])]
       ==
@@ -294,6 +296,8 @@
             ?-  +>-.upd
               %desc  s+desc.upd
               %note  s+note.upd
+              %add-tag  s+tag.upd
+              %del-tag  s+tag.upd
             ==
         ==
       ==

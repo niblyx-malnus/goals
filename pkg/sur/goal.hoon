@@ -144,6 +144,8 @@
   +$  goal-hitch-update
     $%  [%desc desc=@t]
         [%note note=@t]
+        [%add-tag tag=@t]
+        [%del-tag tag=@t]
     ==
   ::
   +$  unver-update  :: underlying data structures have changed
@@ -183,6 +185,8 @@
   +$  unver-action
     $%  [%edit-goal-note =id note=@t]
         [%edit-pool-note =pin note=@t]
+        [%add-goal-tag =id tag=@t]
+        [%del-goal-tag =id tag=@t]
         unver-action:s4
     ==
   +$  action  [%5 pid=@ pok=unver-action]
