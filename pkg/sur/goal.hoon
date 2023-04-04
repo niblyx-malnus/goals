@@ -83,6 +83,7 @@
   +$  goal-hitch
     $:  desc=@t
         note=@t
+        tags=(set @t)
     ==
   ::
   +$  goal  [goal-nexus goal-froze goal-trace goal-hitch]

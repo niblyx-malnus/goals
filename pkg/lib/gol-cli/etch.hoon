@@ -62,12 +62,14 @@
     ++  spawn-pool
       |=  [=pin:gol =pool:gol]
       ^-  store:gol
+      =.  pools.store  (~(put by pools.store) pin pool)
       %=  store
         index
           %+  gas:idx-orm:gol
             index.store
-          (turn ~(tap in ~(key by goals.pool)) |=(=id:gol [id pin]))
-        pools  (~(put by pools.store) pin pool)
+          %+  turn
+            (coals pin)
+          |=(=id:gol [id pin])
       ==
     ::
     ++  cache-pool
@@ -90,8 +92,7 @@
       |=  =pin:gol
       ^-  store:gol
       %=  store
-        index  %-  gus-idx-orm
-               ~(tap in ~(key by goals:(~(got by pools.store) pin)))
+        index  (gus-idx-orm (coals pin))
         pools  (~(del by pools.store) pin)
       ==
     ::
@@ -99,11 +100,18 @@
       |=  =pin:gol
       ^-  store:gol
       %=  store
-        index  %-  gus-idx-orm
-               ~(tap in ~(key by goals:(~(got by cache.store) pin)))
+        index  (gus-idx-orm (coals pin))
         cache  (~(del by cache.store) pin)
       ==
     --
+  ::
+  ++  coals
+    |=  =pin:gol
+    ^-  (list id:gol)
+    =/  pool  (~(got by pools.store) pin)
+    =/  cache-keys  ~(key by cache.pool)
+    =/  goals-keys  ~(key by goals.pool)
+    ~(tap in (~(uni in cache-keys) goals-keys))
   ::
   ++  gus-idx-orm
     |=  ids=(list id:gol)
