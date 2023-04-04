@@ -9,12 +9,14 @@
 +$  state-2  state-2:gol
 +$  state-3  state-3:gol
 +$  state-4  state-4:gol
++$  state-5  state-5:gol
 +$  versioned-state
   $%  state-0
       state-1
       state-2
       state-3
       state-4
+      state-5
   ==
 +$  card  card:agent:gall
 ++  log-orm  ((on @ log-update:gol) lth)
@@ -28,7 +30,7 @@
     unix-ms
   $(unix-ms (add unix-ms 1))
 --
-=|  state-4
+=|  state-5
 =*  state  -
 =*  vzn  vzn:gol
 ::
@@ -64,7 +66,7 @@
   =/  old  !<(versioned-state old-vase)
   |-
   ?-    -.old
-      %4
+      %5
     =.  old
       %=  old
         pools.store
@@ -78,6 +80,8 @@
     ?:  (~(has by wex.bowl) [/groups our.bowl %group-store])
       ~
     [(~(watch-our pass:io /groups) %group-store /groups)]~
+      %4
+    $(old (convert-4-to-5:gol old))
       %3
     $(old (convert-3-to-4:gol old))
       %2
@@ -424,6 +428,12 @@
         ?>  =(ship.pok src.bowl) :: any ship can kick self, not others
         :_  state
         [%give %kick ~[/[`@`+<.pin.pok]/[`@`+>.pin.pok]] `ship.pok]~
+        ::
+          %edit-goal-note
+        !!
+        ::
+          %edit-pool-note
+        !!
       ==
     ==
   [cards this]
@@ -670,7 +680,7 @@
       ~|  "crashing on update"
       ?+    +<.update  (on-agent:def wire sign)
           $?  %spawn-pool
-              %spawn-goal  %trash-goal  %waste-goal
+              %spawn-goal  %trash-goal  %waste-goal  %cache-goal  %renew-goal
               %pool-perms  %pool-hitch  %pool-nexus
               %goal-perms  %goal-hitch  %goal-nexus  %goal-togls  %goal-dates
           ==

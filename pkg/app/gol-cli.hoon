@@ -482,13 +482,25 @@
 ++  def-cols  ~[%handle %level %deadline %priority]
 ::
 ++  yoke-command
-  |=  command=[yoke-tag:gol l=@t r=@t]
+  |*  [hed=term l=@t r=@t]
   ^-  (list card)
-  =*  poke-our  ~(poke-our pass:io /mod-command/[-.command])
-  =+  [msg l]=(invalid-goal-error:prtr l.command)  ?.  =(~ msg)  msg
-  =+  [msg r]=(invalid-goal-error:prtr r.command)  ?.  =(~ msg)  msg
+  =*  poke-our  ~(poke-our pass:io /mod-command/[hed])
+  =+  [msg l]=(invalid-goal-error:prtr l)  ?.  =(~ msg)  msg
+  =+  [msg r]=(invalid-goal-error:prtr r)  ?.  =(~ msg)  msg
   ?.  =(owner.id.l owner.id.r)  (print-cards:prtr ~["diff-ownr"])
   =/  pin  (got-pin:scry id.l)
-  =/  yok  [-.command id.l id.r]
+  =/  yok=exposed-yoke:gol
+    ?+    hed  !!
+      %prio-rend  [%prio-rend id.l id.r]
+      %prio-yoke  [%prio-yoke id.l id.r]
+      %prec-rend  [%prec-rend id.l id.r]
+      %prec-yoke  [%prec-yoke id.l id.r]
+      %nest-rend  [%nest-rend id.l id.r]
+      %nest-yoke  [%nest-yoke id.l id.r]
+      %hook-rend  [%hook-rend id.l id.r]
+      %hook-yoke  [%hook-yoke id.l id.r]
+      %held-rend  [%held-rend id.l id.r]
+      %held-yoke  [%held-yoke id.l id.r]
+    ==
   [(poke-our %goal-store goal-action+!>([vzn now.bowl %yoke pin ~[yok]]))]~
 --

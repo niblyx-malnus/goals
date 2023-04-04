@@ -2,67 +2,187 @@
 /+  *gol-cli-util
 |%
 ::
-++  vzn  %4
+++  vzn  %5
 ::
++$  state-5  [%5 =store:s5 =groups =log:s5]
 +$  state-4  [%4 =store:s4 =groups =log:s4]
 +$  state-3  [%3 =store:s3]
 +$  state-2  [%2 =store:s2]
 +$  state-1  [%1 =store:s1]
 +$  state-0  [%0 =store:s0]
 ::
-+$  id            id:s4
-+$  nid           nid:s4
-+$  pin           pin:s4
-+$  node          node:s4
-+$  edge          edge:s4
-+$  edges         edges:s4
-+$  pool-role     pool-role:s4
-+$  stock         stock:s4
-+$  ranks         ranks:s4
-+$  moment        moment:s4
++$  id            id:s5
++$  nid           nid:s5
++$  pin           pin:s5
++$  node          node:s5
++$  edge          edge:s5
++$  edges         edges:s5
++$  pool-role     pool-role:s5
++$  stock         stock:s5
++$  ranks         ranks:s5
++$  moment        moment:s5
 ::
-+$  goal-nexus    goal-nexus:s4
-+$  goal-froze    goal-froze:s4
-+$  goal-trace    goal-trace:s4
-+$  goal-hitch    goal-hitch:s4
++$  goal-nexus    goal-nexus:s5
++$  goal-froze    goal-froze:s5
++$  goal-trace    goal-trace:s5
++$  goal-hitch    goal-hitch:s5
 ::
-+$  goal          goal:s4
-+$  ngoal         ngoal:s4
-+$  goals         goals:s4
++$  goal          goal:s5
++$  ngoal         ngoal:s5
++$  goals         goals:s5
 ::
-+$  pool-nexus    pool-nexus:s4
-+$  pool-perms    pool-perms:s4
-+$  pool-froze    pool-froze:s4
-+$  pool-trace    pool-trace:s4
-+$  pool-hitch    pool-hitch:s4
++$  pool-nexus    pool-nexus:s5
++$  pool-perms    pool-perms:s5
++$  pool-froze    pool-froze:s5
++$  pool-trace    pool-trace:s5
++$  pool-hitch    pool-hitch:s5
 ::
-+$  pool          pool:s4
-+$  npool         npool:s4
-+$  pools         pools:s4
++$  pool          pool:s5
++$  npool         npool:s5
++$  pools         pools:s5
 ::
-+$  index         index:s4
-++  idx-orm       idx-orm:s4
++$  index         index:s5
+++  idx-orm       idx-orm:s5
 ::
-+$  store         store:s4
++$  store         store:s5
 ::
-+$  nux           nux:s4
-+$  nex           nex:s4
-+$  update        update:s4
-+$  home-update   home-update:s4
-+$  away-update   away-update:s4
-+$  log-update    log-update:s4
-+$  logged        logged:s4
-+$  log           log:s4
++$  nux           nux:s5
++$  nex           nex:s5
++$  update        update:s5
++$  home-update   home-update:s5
++$  away-update   away-update:s5
++$  log-update    log-update:s5
++$  logged        logged:s5
++$  log           log:s5
 ::
-+$  peek          peek:s4
++$  peek          peek:s5
 ::
-+$  core-yoke     core-yoke:s4
-++  yoke-tags     yoke-tags:s4
-+$  yoke-tag      yoke-tag:s4
-+$  exposed-yoke  exposed-yoke:s4
-+$  nuke          nuke:s4
-+$  plex          plex:s4
-+$  action        action:s4
++$  core-yoke     core-yoke:s5
++$  exposed-yoke  exposed-yoke:s5
++$  nuke          nuke:s5
++$  plex          plex:s5
+::
++$  action        action:s5
+::
+++  s5
+  |%
+  +$  id            id:s4
+  +$  nid           nid:s4
+  +$  pin           pin:s4
+  +$  node          node:s4
+  +$  edge          edge:s4
+  +$  edges         edges:s4
+  +$  pool-role     pool-role:s4
+  +$  stock         stock:s4
+  +$  ranks         ranks:s4
+  +$  moment        moment:s4
+  ::
+  +$  goal-nexus    goal-nexus:s4
+  +$  goal-froze    goal-froze:s4
+  +$  goal-trace    goal-trace:s4
+  +$  goal-hitch
+    $:  desc=@t
+        note=@t
+    ==
+  ::
+  +$  goal  [goal-nexus goal-froze goal-trace goal-hitch]
+  ::
+  :: named goal (modules are named)
+  +$  ngoal
+    $:  nexus=goal-nexus
+        froze=goal-froze
+        trace=goal-trace
+        hitch=goal-hitch
+    ==
+  ::
+  +$  goals  (map id goal)
+  ::
+  +$  pool-nexus
+    $:  =goals
+        cache=goals
+        owner=ship
+        perms=pool-perms
+    ==
+  +$  pool-perms    pool-perms:s4
+  +$  pool-froze    pool-froze:s4
+  +$  pool-trace    pool-trace:s4
+  +$  pool-hitch    
+    $:  title=@t
+        note=@t
+    ==
+  ::
+  +$  pool  [pool-nexus pool-froze trace=pool-trace pool-hitch]
+  ::
+  :: named pool (modules are named)
+  +$  npool
+    $:  nexus=pool-nexus
+        froze=pool-froze
+        trace=pool-trace
+        hitch=pool-hitch
+    ==
+  ::
+  +$  pools  (map pin pool)
+  ::
+  +$  index         index:s4
+  ++  idx-orm       idx-orm:s4
+  ::
+  +$  store  
+    $:  =index
+        =pools
+        cache=pools
+    ==
+  ::
+  +$  nux           nux:s4
+  +$  nex           nex:s4
+  +$  unver-update  :: underlying data structures have changed
+                    $%  [%spawn-pool =pool]
+                        [%renew-pool =pin =pool]
+                        [%spawn-goal =nex =id =goal]
+                        [%renew-goal =id ren=goals]
+                        $<  %spawn-pool  $<  %renew-pool
+                        $<  %spawn-goal  $<  %renew-goal
+                        unver-update:s4
+                    ==
+  +$  update        [%5 unver-update]
+  +$  away-update   [[mod=ship pid=@] update]
+  +$  home-update   [[=pin mod=ship pid=@] update]
+  +$  log-update    $%([%updt upd=home-update] [%init =store])
+  +$  log           ((mop @ log-update) lth)
+  +$  logged        (pair @ log-update)
+  ::  ::
+  +$  peek          :: underlying data structures have changed
+                    $%  [%initial =store] 
+                        [%updates =(list logged)]
+                        [%full-harvest harvest=goals]
+                        [%get-goal ugoal=(unit goal)]
+                        [%get-pool upool=(unit pool)]
+                        $<  %initial       $<  %updates
+                        $<  %full-harvest  $<  %get-goal
+                        $<(%get-pool peek:s4)
+                    ==
+  ::
+  +$  core-yoke     core-yoke:s4
+  +$  exposed-yoke  exposed-yoke:s4
+  +$  nuke          nuke:s4
+  +$  plex          plex:s4
+  +$  unver-action
+    $%  [%edit-goal-note =id note=@t]
+        [%edit-pool-note =pin note=@t]
+        unver-action:s4
+    ==
+  +$  action  [%5 pid=@ pok=unver-action]
+  --
+::
+:: ============================================================================
+::
+:: STRUCTURES HISTORY
+::
+:: ============================================================================
+::
+++  convert-4-to-5
+  |=  =state-4
+  ^-  state-5
+  *state-5  :: TODO: ACTUALLY IMPLEMENT
 ::
 ++  s4
   |%
@@ -102,8 +222,8 @@
         kids=(set id)
         kickoff=node
         deadline=node
-        complete=?(%.y %.n)
-        actionable=?(%.y %.n)
+        complete=_|
+        actionable=_|
         chief=ship
         spawn=(set ship)
     ==
@@ -183,6 +303,7 @@
   ::
   +$  pool-hitch-update
     $%  [%title title=@t]
+        [%note note=@t]
     ==
   ::
   +$  pool-nexus-update
@@ -191,15 +312,15 @@
   ::
   +$  goal-hitch-update
     $%  [%desc desc=@t]
+        [%note note=@t]
     ==
   ::
   +$  goal-togls-update
-    $%  [%complete complete=?(%.y %.n)]
-        [%actionable actionable=?(%.y %.n)]
+    $%  [%complete complete=_|]
+        [%actionable actionable=_|]
     ==
   ::
-  +$  update
-    $:  %4
+  +$  unver-update
     $%  [%spawn-pool =pool]
         [%cache-pool =pin]
         [%renew-pool =pin =pool]
@@ -218,7 +339,9 @@
         [%goal-hitch =id goal-hitch-update]
         [%goal-togls =id goal-togls-update]
         [%poke-error =tang]
-    ==  ==
+    ==
+  ::
+  +$  update  [%4 unver-update]
   ::
   +$  away-update  [[mod=ship pid=@] update]
   +$  home-update  [[=pin mod=ship pid=@] update]
@@ -258,22 +381,18 @@
         [%dag-rend n1=nid n2=nid]
     ==
   ::
-  ++  yoke-tags
-    :~  %prio-rend
-        %prio-yoke
-        %prec-rend
-        %prec-yoke
-        %nest-rend
-        %nest-yoke
-        %hook-rend
-        %hook-yoke
-        %held-rend
-        %held-yoke
+  +$  exposed-yoke  
+    $%  [%prio-rend lid=id rid=id]
+        [%prio-yoke lid=id rid=id]
+        [%prec-rend lid=id rid=id]
+        [%prec-yoke lid=id rid=id]
+        [%nest-rend lid=id rid=id]
+        [%nest-yoke lid=id rid=id]
+        [%hook-rend lid=id rid=id]
+        [%hook-yoke lid=id rid=id]
+        [%held-rend lid=id rid=id]
+        [%held-yoke lid=id rid=id]
     ==
-  ::
-  +$  yoke-tag  (union-from-list yoke-tags)
-  ::
-  +$  exposed-yoke  $%([yoke-tag lid=id rid=id])
   ::
   +$  nuke
     $%  [%nuke-prio-left =id]
@@ -292,11 +411,7 @@
     $%  exposed-yoke
         nuke
     ==
-  ::
-  +$  action
-    $:  %4
-    $:  pid=@
-    $=  pok
+  +$  unver-action
     $%  [%spawn-pool title=@t]
         [%clone-pool =pin title=@t]
         [%cache-pool =pin]
@@ -314,21 +429,17 @@
         [%unmark-actionable =id]
         [%mark-complete =id]
         [%unmark-complete =id]
-        [%update-goal-perms =id chief=ship rec=?(%.y %.n) spawn=(set ship)]
+        [%update-goal-perms =id chief=ship rec=_| spawn=(set ship)]
         [%update-pool-perms =pin new=pool-perms]
         [%edit-goal-desc =id desc=@t]
         [%edit-pool-title =pin title=@t]
         [%subscribe =pin]
         [%unsubscribe =pin]
         [%kicker =ship =pin]
-    ==  ==  ==
+    ==
+  ::
+  +$  action  [%4 pid=@ pok=unver-action]
   --
-::
-:: ============================================================================
-::
-:: STRUCTURES HISTORY
-::
-:: ============================================================================
 ::
 ++  convert-3-to-4
   |=  =state-3
@@ -336,10 +447,10 @@
   :*  %4
       :*  (index-3-to-4 directory.store.state-3)
           (pools-3-to-4 pools.store.state-3)
-          *pools
+          *pools:s4
       == 
       *groups
-      *log
+      *log:s4
   ==
   ::
 ++  index-3-to-4

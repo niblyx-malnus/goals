@@ -5,7 +5,7 @@
 +*  this  .
     tv    ~(. gol-cli-traverse goals.p)
     nd    ~(. gol-cli-node goals.p)
-++  vzn   %4
+    vzn   vzn:gol
 ++  pore  |.(~(. gol-cli-pool p))
 ::
 :: return this core with initial value
