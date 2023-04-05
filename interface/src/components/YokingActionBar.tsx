@@ -128,7 +128,6 @@ export default function YokingActionBar({}) {
         position: "fixed",
         bottom: 40,
         right: 40,
-        backgroundColor: "#fff",
         padding: 2,
         borderRadius: "4px",
       }}
