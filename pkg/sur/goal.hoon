@@ -21,6 +21,9 @@
 +$  stock         stock:s5
 +$  ranks         ranks:s5
 +$  moment        moment:s5
++$  tag           tag:s5
++$  field-type    field-type:s5
++$  field-data    field-data:s5
 ::
 +$  goal-nexus    goal-nexus:s5
 +$  goal-froze    goal-froze:s5
@@ -80,10 +83,26 @@
   +$  goal-nexus    goal-nexus:s4
   +$  goal-froze    goal-froze:s4
   +$  goal-trace    goal-trace:s4
+  ::
+  +$  tag  @t :: [text=@t color=@ux]
+  ::
+  +$  field-data
+    $%  [%ct d=@t] :: categorical
+        [%ud d=@ud]
+        [%rd d=@rd]
+    ==
+  ::
+  +$  field-type
+    $%  [%ct =(set @t)] :: categorical
+        [%ud ~]
+        [%rd ~]
+    ==
+  ::
   +$  goal-hitch
     $:  desc=@t
         note=@t
-        tags=(set @t)
+        tags=(set tag)
+        fields=(map @t field-data)
     ==
   ::
   +$  goal  [goal-nexus goal-froze goal-trace goal-hitch]
@@ -107,9 +126,11 @@
   +$  pool-perms    pool-perms:s4
   +$  pool-froze    pool-froze:s4
   +$  pool-trace    pool-trace:s4
+  ::
   +$  pool-hitch    
     $:  title=@t
         note=@t
+        fields=(map @t field-type)
     ==
   ::
   +$  pool  [pool-nexus pool-froze trace=pool-trace pool-hitch]
@@ -139,13 +160,17 @@
   +$  pool-hitch-update
     $%  [%title title=@t]
         [%note note=@t]
+        [%add-field-type field=@t =field-type]
+        [%del-field-type field=@t]
     ==
   ::
   +$  goal-hitch-update
     $%  [%desc desc=@t]
         [%note note=@t]
-        [%add-tag tag=@t]
-        [%del-tag tag=@t]
+        [%add-tag =tag]
+        [%del-tag =tag]
+        [%add-field-data field=@t =field-data]
+        [%del-field-data field=@t]
     ==
   ::
   +$  unver-update  :: underlying data structures have changed
@@ -185,8 +210,12 @@
   +$  unver-action
     $%  [%edit-goal-note =id note=@t]
         [%edit-pool-note =pin note=@t]
-        [%add-goal-tag =id tag=@t]
-        [%del-goal-tag =id tag=@t]
+        [%add-goal-tag =id =tag]
+        [%del-goal-tag =id =tag]
+        [%add-field-data =id field=@t =field-data]
+        [%del-field-data =id field=@t]
+        [%add-field-type =pin field=@t =field-type]
+        [%del-field-type =pin field=@t]
         unver-action:s4
     ==
   +$  action  [%5 pid=@ pok=unver-action]

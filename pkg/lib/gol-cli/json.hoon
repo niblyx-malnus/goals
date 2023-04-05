@@ -8,7 +8,7 @@
   :-  vzn
   %.  jon
   %-  ot
-  :~  pid+ni
+  :~  pid+so
       :-  %pok
       %-  of
       :~  [%spawn-pool (ot ~[title+so])]
@@ -48,9 +48,37 @@
           [%edit-pool-note (ot ~[pin+dejs-pin note+so])]
           [%add-goal-tag (ot ~[id+dejs-id tag+so])]
           [%del-goal-tag (ot ~[id+dejs-id tag+so])]
+          :-  %add-field-type
+          (ot ~[pin+dejs-pin field+so field-type+dejs-field-type])
+          [%del-field-type (ot ~[pin+dejs-pin field+so])]
+          :-  %add-field-data
+          (ot ~[id+dejs-id field+so field-data+dejs-field-data])
+          [%del-field-data (ot ~[id+dejs-id field+so])]
           [%subscribe (ot ~[pin+dejs-pin])]
           [%unsubscribe (ot ~[pin+dejs-pin])]
       ==
+  ==
+::
+++  dejs-field-type
+  =,  dejs:format
+  |=  jon=json
+  ^-  field-type
+  %.  jon
+  %-  of
+  :~  [%ct (as so)]
+      [%ud ul]
+      [%rd ul]
+  ==
+::
+++  dejs-field-data
+  =,  dejs:format
+  |=  jon=json
+  ^-  field-data
+  %.  jon
+  %-  of
+  :~  [%ct (ot ~[d+so])]
+      [%ud (ot ~[d+(cu |=(=@t (slav %ud t)) so)])]
+      [%rd (ot ~[d+(cu |=(=@t (slav %rd t)) so)])]
   ==
 ::
 ++  dejs-pool-perms
@@ -110,77 +138,6 @@
     %held-yoke   %held-yoke
   ==
 ::
-++  dejs-tests
-  |%
-  ++  test-date  s+(scot %da (add ~2000.1.1 ~s1..0001))
-  ++  new-pool
-    =,  enjs:format
-    ^-  json
-    %+  frond
-      %new-pool
-    %-  pairs
-    :~  [%title s+'test']
-        [%admins a+~[s+'zod' s+'nec' s+'bud']]
-        [%captains a+~[s+'zod' s+'nec' s+'bud']]
-        [%viewers a+~[s+'zod' s+'nec' s+'bud']]
-    ==
-  ++  invite
-    =,  enjs:format
-    ^-  json
-    %+  frond
-      %invite
-    %-  pairs
-    :~  [%invitee s+'zod']
-        [%pin (pairs ~[[%owner s+'zod'] [%birth test-date]])]
-    ==
-  ++  copy-pool
-    =,  enjs:format
-    ^-  json
-    %+  frond
-      %copy-pool
-    %-  pairs
-    :~  [%old-pin (pairs ~[[%owner s+'zod'] [%birth test-date]])]
-        [%title s+'test']
-        [%admins a+~[s+'zod' s+'nec' s+'bud']]
-        [%captains a+~[s+'zod' s+'nec' s+'bud']]
-        [%viewers a+~[s+'zod' s+'nec' s+'bud']]
-    ==
-  ++  new-goal
-    =,  enjs:format
-    ^-  json
-    %+  frond
-      %new-goal
-    %-  pairs
-    :~  [%pin (pairs ~[[%owner s+'zod'] [%birth test-date]])]
-        [%desc s+'test desc']
-        [%captains a+~[s+'zod' s+'nec' s+'bud']]
-        [%peons a+~[s+'zod' s+'nec' s+'bud']]
-        [%deadline test-date]
-        [%actionable b+%.n]
-    ==
-  ++  yoke-sequence
-    =,  enjs:format
-    ^-  json
-    %+  frond
-      %yoke-sequence
-    %-  pairs
-    :~  [%pin (pairs ~[[%owner s+'zod'] [%birth test-date]])]
-        :-  %yoke-sequence
-        :-  %a
-        :~  %-  pairs
-            :~  [%yoke s+'nest-yoke']
-                [%lid (pairs ~[[%owner s+'zod'] [%birth test-date]])]
-                [%rid (pairs ~[[%owner s+'zod'] [%birth test-date]])]
-            ==
-            %-  pairs
-            :~  [%yoke s+'prec-rend']
-                [%lid (pairs ~[[%owner s+'zod'] [%birth test-date]])]
-                [%rid (pairs ~[[%owner s+'zod'] [%birth test-date]])]
-            ==
-        ==
-    ==
-  --
-::
 ++  enjs-home-update
   =,  enjs:format
   |=  hom=home-update
@@ -192,7 +149,7 @@
       %-  pairs
       :~  [%pin (enjs-pin pin.hom)]
           [%mod (ship mod.hom)]
-          [%pid (numb pid.hom)]
+          [%pid s+`@t`pid.hom]
       ==
       :-  %tel
       %+  frond  -.upd
@@ -258,6 +215,13 @@
         ?-  +<.upd
           %title  (frond +<.upd s+title.upd)
           %note  (frond +<.upd s+note.upd)
+          %del-field-type  (frond +<.upd s+field.upd)
+            %add-field-type
+          %+  frond  +<.upd
+          %-  pairs
+          :~  [%field s+field.upd]
+              [%field-type (enjs-field-type field-type.upd)]
+          ==
         ==
         ::
           %pool-nexus
@@ -298,9 +262,37 @@
               %note  s+note.upd
               %add-tag  s+tag.upd
               %del-tag  s+tag.upd
+              %del-field-data  s+field.upd
+                %add-field-data
+              %-  pairs
+              :~  [%field s+field.upd]
+                  [%field-data (enjs-field-data field-data.upd)]
+              ==
             ==
         ==
       ==
+  ==
+::
+++  enjs-field-type
+  =,  enjs:format
+  |=  =field-type
+  ^-  json
+  %+  frond  -.field-type
+  ?-  -.field-type
+    %ct  a+(turn ~(tap in set.field-type) |=(=@t s+t))
+    %ud  ~
+    %rd  ~
+  ==
+::
+++  enjs-field-data
+  =,  enjs:format
+  |=  =field-data
+  ^-  json
+  %+  frond  -.field-data
+  ?-  -.field-data
+    %ct  s+d.field-data
+    %ud  s+(scot %ud d.field-data)
+    %rd  s+(scot %rd d.field-data)
   ==
 ::
 ++  enjs-peek

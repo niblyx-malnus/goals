@@ -103,6 +103,50 @@
       =/  pid  pid.action
       =/  pok  pok.action
       ?-    -.pok
+          %add-field-type
+        =*  poke-other
+          ~(poke-other pass:hc (en-away-path pid pin.pok %add-field-type))
+        ?.  =(our.bowl owner.pin.pok)
+          :_  state
+          [(poke-other owner.pin.pok goal-action+!>(action))]~
+        =/  pore
+          %-  add-field-type:(apex-em:hc pin.pok)
+          [field.pok field-type.pok src.bowl]
+        (send-away-updates:hc ~ pin.pok src.bowl pid pore)      
+        ::
+          %del-field-type
+        =*  poke-other
+          ~(poke-other pass:hc (en-away-path pid pin.pok %del-field-type))
+        ?.  =(our.bowl owner.pin.pok)
+          :_  state
+          [(poke-other owner.pin.pok goal-action+!>(action))]~
+        =/  pore
+          (del-field-type:(apex-em:hc pin.pok) field.pok src.bowl)
+        (send-away-updates:hc ~ pin.pok src.bowl pid pore)      
+        ::
+          %add-field-data
+        =/  pin  (got:idx-orm:gol index.store id.pok)
+        =*  poke-other
+          ~(poke-other pass:hc (en-away-path pid pin %add-field-data))
+        ?.  =(our.bowl owner.id.pok)
+          :_  state
+          [(poke-other owner.id.pok goal-action+!>(action))]~
+        =/  pore
+          %-  add-field-data:(apex-em:hc pin)
+          [id.pok field.pok field-data.pok src.bowl]
+        (send-away-updates:hc ~ pin src.bowl pid pore)
+        ::
+          %del-field-data
+        =/  pin  (got:idx-orm:gol index.store id.pok)
+        =*  poke-other
+          ~(poke-other pass:hc (en-away-path pid pin %del-field-data))
+        ?.  =(our.bowl owner.id.pok)
+          :_  state
+          [(poke-other owner.id.pok goal-action+!>(action))]~
+        =/  pore
+          (del-field-data:(apex-em:hc pin) id.pok field.pok src.bowl)
+        (send-away-updates:hc ~ pin src.bowl pid pore)
+        ::
           %add-goal-tag
         =/  pin  (got:idx-orm:gol index.store id.pok)
         =*  poke-other

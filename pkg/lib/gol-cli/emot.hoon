@@ -374,6 +374,33 @@
   =.  goals.p
     (~(put by goals.p) id goal(tags (~(del in tags.goal) tag)))
   (emot old [vzn %goal-hitch id %del-tag tag])
+::
+++  add-field-data
+  |=  [=id:gol field=@t =field-data:gol mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-goal-edit-perm:(pore) id mod)
+  ?>  (~(has by fields.p) field)
+  =/  =field-type:gol  (~(got by fields.p) field)
+  ?>  =(-.field-type -.field-data)
+  ?>  ?.  &(?=(%ct -.field-type) ?=(%ct -.field-data))  &
+      (~(has in set.field-type) d.field-data)
+  =/  goal  (~(got by goals.p) id)
+  =.  goals.p
+    %+  ~(put by goals.p)  id
+    goal(fields (~(put by fields.goal) field field-data))
+  (emot old [vzn %goal-hitch id %add-field-data field field-data])
+::
+++  del-field-data
+  |=  [=id:gol field=@t mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-goal-edit-perm:(pore) id mod)
+  =/  goal  (~(got by goals.p) id)
+  =.  goals.p
+    %+  ~(put by goals.p)  id
+    goal(fields (~(del by fields.goal) field))
+  (emot old [vzn %goal-hitch id %del-field-data field])
 :: 
 ++  edit-pool-title
   |=  [title=@t mod=ship]
@@ -390,6 +417,31 @@
   ?>  (check-pool-edit-perm:(pore) mod)
   =.  p  p(note note)
   (emot old [vzn %pool-hitch %note note])
+::
+++  add-field-type
+  |=  [field=@t =field-type:gol mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-pool-edit-perm:(pore) mod)
+  ?<  (~(has by fields.p) field) 
+  =.  p  p(fields (~(put by fields.p) field field-type))
+  (emot old [vzn %pool-hitch %add-field-type field field-type])
+::
+++  del-field-type
+  |=  [field=@t mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-pool-edit-perm:(pore) mod)
+  ::
+  =.  goals.p
+    %-  ~(gas by *goals:gol)
+    %+  turn  ~(tap by goals.p)
+    |=  [=id:gol =goal:gol]
+    ^-  [id:gol goal:gol]
+    [id goal(fields (~(del by fields.goal) field))]
+  ::
+  =.  p  p(fields (~(del by fields.p) field))
+  (emot old [vzn %pool-hitch %del-field-type field])
 ::
 :: wit all da fixin's
 ++  spawn-goal-fixns
@@ -447,7 +499,13 @@
     (title:pool-hitch title.upd)
     ::
       [%pool-hitch %note *]
-    (title:pool-hitch note.upd)
+    (note:pool-hitch note.upd)
+    ::
+      [%pool-hitch %add-field-type *]
+    (add-field-type:pool-hitch [field field-type]:upd)
+    ::
+      [%pool-hitch %del-field-type *]
+    (del-field-type:pool-hitch field.upd)
     :: ------------------------------------------------------------------------
     :: pool-nexus
     ::
@@ -477,6 +535,12 @@
     ::
       [%goal-hitch id:gol %del-tag *]
     (del-tag:goal-hitch [id tag]:upd)
+    ::
+      [%goal-hitch id:gol %add-field-data *]
+    (add-field-data:goal-hitch [id field field-data]:upd)
+    ::
+      [%goal-hitch id:gol %del-field-data *]
+    (del-field-data:goal-hitch [id field]:upd)
     :: ------------------------------------------------------------------------
     :: goal-togls
     ::
@@ -534,6 +598,22 @@
     |%
     ++  note   |=(note=@t `_this`this(p p(note note)))
     ++  title  |=(title=@t `_this`this(p p(title title)))
+    ++  add-field-type
+      |=  [field=@t =field-type:gol]
+      ^-  _this
+      this(p p(fields (~(put by fields.p) field field-type)))
+    ++  del-field-type
+      |=  field=@t
+      ^-  _this
+      ::
+      =.  goals.p
+        %-  ~(gas by *goals:gol)
+        %+  turn  ~(tap by goals.p)
+        |=  [=id:gol =goal:gol]
+        ^-  [id:gol goal:gol]
+        [id goal(fields (~(del by fields.goal) field))]
+      ::
+      this(p p(fields (~(del by fields.p) field)))
     --
   ::
   ++  goal-hitch
@@ -563,6 +643,24 @@
       %=    this
           goals.p
         (~(put by goals.p) id goal(tags (~(del in tags.goal) tag)))
+      ==
+    ++  add-field-data  
+      |=  [=id:gol field=@t =field-data:gol]
+      ^-  _this
+      =/  goal  (~(got by goals.p) id)
+      %=    this
+          goals.p
+        %+  ~(put by goals.p)  id
+        goal(fields (~(put by fields.goal) field field-data))
+      ==
+    ++  del-field-data
+      |=  [=id:gol field=@t]
+      ^-  _this
+      =/  goal  (~(got by goals.p) id)
+      %=    this
+          goals.p
+        %+  ~(put by goals.p)  id
+        goal(fields (~(del by fields.goal) field))
       ==
     --
   ::
