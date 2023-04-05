@@ -90,7 +90,7 @@ interface Store {
   resetSelectedGoals: () => void;
 
   showArchived: boolean;
-  toggleShowArchived: (newStatus: boolean) => void;
+  toggleShowArchived: () => void;
 
   groupsMap: Map<string, any>; // a map of group names to their data
   groupsList: any; //an array of groups name and their member count
@@ -284,13 +284,14 @@ const useStore = create<Store>((set, get) => ({
   },
 
   showArchived: false,
-  toggleShowArchived: (newStatus: boolean) => {
+  toggleShowArchived: () => {
     //toggle showArchived and copy cached pools/goals to the live goals
     //newStatus => true => add the cached goals/pools
     //newStatus => false => remove the cached goals/pools if any
     let pools: any = get().pools;
     let archivedPools: any = get().archivedPools;
-    log("archivedPools", archivedPools);
+    let newStatus = !get().showArchived;
+
     let newPools: any;
     if (newStatus) {
       //go through pool (reviving) cached goals
