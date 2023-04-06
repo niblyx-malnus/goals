@@ -4,7 +4,7 @@
 ::
 ++  vzn  %5
 ::
-+$  state-5  [%5 =store:s5 =local:s5 =groups =log:s5]
++$  state-5  [%5 =store:s5 =groups =log:s5]
 +$  state-4  [%4 =store:s4 =groups =log:s4]
 +$  state-3  [%3 =store:s3]
 +$  state-2  [%2 =store:s2]
@@ -107,13 +107,7 @@
         fields=(map @t field-data)
     ==
   ::
-  +$  goal-local
-    $:  tags=$~(tag-bunt (set tag))
-        fields=(map @t field-data)
-        note=@t  
-    ==
-  ::
-  +$  goal  [goal-nexus goal-froze goal-trace goal-hitch goal-local]
+  +$  goal  [goal-nexus goal-froze goal-trace goal-hitch]
   ::
   :: named goal (modules are named)
   +$  ngoal
@@ -121,7 +115,6 @@
         froze=goal-froze
         trace=goal-trace
         hitch=goal-hitch
-        local=goal-local
     ==
   ::
   +$  goals  (map id goal)
@@ -144,10 +137,6 @@
   ::
   +$  pool  [pool-nexus pool-froze trace=pool-trace pool-hitch]
   ::
-  +$  local
-    $:  fields=(map @t field-type)
-    ==
-  ::
   :: named pool (modules are named)
   +$  npool
     $:  nexus=pool-nexus
@@ -161,10 +150,13 @@
   +$  index         index:s4
   ++  idx-orm       idx-orm:s4
   ::
+  +$  pags  (map id (set tag))
+  ::
   +$  store  
     $:  =index
         =pools
         cache=pools
+        =pags
     ==
   ::
   +$  nux           nux:s4
@@ -205,7 +197,9 @@
   +$  log-update    $%([%updt upd=home-update] [%init =store])
   +$  log           ((mop @ log-update) lth)
   +$  logged        (pair @ log-update)
-  ::  ::
+  ::
+  +$  pags-update   [=id tags=(set tag)]
+  ::
   +$  peek          :: underlying data structures have changed
                     $%  [%initial =store] 
                         [%updates =(list logged)]
@@ -229,8 +223,6 @@
       $%  [%subscribe =pin]
           [%unsubscribe =pin]
           [%kicker =ship =pin]
-          :: [%add-local-field-type field=@t =field-type]
-          :: [%del-local-field-type field=@t]
       ==
     ++  pool-action
       =<  pool-action
@@ -258,7 +250,7 @@
     ++  goal-action
       =<  goal-action
       |%
-      +$  goal-action  $%(spawn mutate)
+      +$  goal-action  $%(spawn mutate local)
       +$  spawn  [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
       +$  mutate  $%(life-cycle nexus hitch)
       +$  life-cycle
@@ -285,12 +277,9 @@
             [%add-field-data =id field=@t =field-data]
             [%del-field-data =id field=@t]
         ==
+      ::
       +$  local
-        $%  [%add-local-tag =id =tag]
-            [%del-local-tag =id =tag]
-            [%put-local-tags =id tags=(set tag)]
-            [%add-local-field-data =id field=@t =field-data]
-            [%del-local-field-data =id field=@t]
+        $%  [%put-private-tags =id tags=(set tag)]
         ==
       --
     --
