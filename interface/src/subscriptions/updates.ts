@@ -170,8 +170,10 @@ const updateHandler = (update: any) => {
     }
   }
 };
+const apiApp = process.env.REACT_APP_APP;
+
 const updates = {
-  app: "goal-store-test",
+  app: apiApp,
   path: "/goals",
   event: updateHandler,
   //TODO: handle sub death/kick/err

@@ -26,6 +26,8 @@ declare const window: Window &
 //TODO: Don't allow to drop goal over itself
 //TODO: add API to ordering goals among themselves and related frontend logic
 //TODO: make the highlighting grey?(drag and drop)
+//TODO: add tooltips to header buttons
+//TODO: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -257,32 +259,7 @@ function Main() {
     window["scry"] = api.scry;
     window["poke"] = api.poke;
   }, []);
-  const setCtrlPressed = useStore((store) => store.setCtrlPressed);
 
-  const onKeyDown = (event: any) => {
-    if (event.key === "Control") {
-      setCtrlPressed(true);
-    }
-  };
-  const onKeyUp = (event: any) => {
-    if (event.key === "Control") {
-      setCtrlPressed(false);
-    }
-  };
-  const onWindowBlur = (event: any) => {
-    setCtrlPressed(false);
-  };
-  useEffect(() => {
-    document.addEventListener("keydown", onKeyDown);
-    document.addEventListener("keyup", onKeyUp);
-    window.addEventListener("blur", onWindowBlur);
-
-    return () => {
-      document.removeEventListener("keyup", onKeyDown);
-      document.addEventListener("keyup", onKeyUp);
-      window.addEventListener("blur", onWindowBlur);
-    };
-  }, []);
   const roleMap = useStore((store: any) => store.roleMap);
   const selectionMode = useStore((store) => store.selectionMode);
   const selectionModeYokeData = useStore(
@@ -291,16 +268,16 @@ function Main() {
 
   return (
     <Container sx={{ paddingBottom: 10 }}>
-      <Header />
-      {loading.trying && (
-        <Stack flexDirection="row" alignItems="center">
-          <CircularProgress size={28} />
-          <Typography sx={{ marginLeft: 2 }} variant="h6" fontWeight={"bold"}>
-            Loading pools...
-          </Typography>
-        </Stack>
-      )}
       <DndProvider backend={HTML5Backend}>
+        <Header />
+        {loading.trying && (
+          <Stack flexDirection="row" alignItems="center">
+            <CircularProgress size={28} />
+            <Typography sx={{ marginLeft: 2 }} variant="h6" fontWeight={"bold"}>
+              Loading pools...
+            </Typography>
+          </Stack>
+        )}
         {loading.success && pools.length === 0 ? (
           <Typography variant="h6" fontWeight={"bold"}>
             Add a pool to get started
@@ -351,9 +328,9 @@ function Main() {
             );
           })
         )}
-      </DndProvider>
 
-      {loading.error && <ErrorAlert onRetry={fetchInitial} />}
+        {loading.error && <ErrorAlert onRetry={fetchInitial} />}
+      </DndProvider>
     </Container>
   );
 }

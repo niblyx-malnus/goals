@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import api from "../api";
 import OutlinedInput from "@mui/material/OutlinedInput";
@@ -40,7 +40,7 @@ import InputLabel from "@mui/material/InputLabel";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import { useTheme, ThemeProvider, createTheme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 
@@ -83,7 +83,6 @@ export default function Header() {
     if (newProjectTitle?.length > 0) {
       setTrying(true);
       try {
-
         const result = await api.addPool(newProjectTitle);
         log("addNewPool result => ", result);
         toggleSnackBar(true, {
@@ -106,7 +105,7 @@ export default function Header() {
     orderPoolsAction(event.target.value as Order);
   };
   const handleShowArchived = () => {
-    toggleShowArchived(!showArchived);
+    toggleShowArchived();
   };
   const handleFilterUpdate = (newValue: string | null) => {
     setFilterValue(newValue);
@@ -124,6 +123,43 @@ export default function Header() {
       setFilterGoals("actionable");
     }
   };
+
+  const setCtrlPressed = useStore((store) => store.setCtrlPressed);
+
+  const onKeyDown = (event: any) => {
+    if (event.ctrlKey && event.shiftKey && event.key === "Y") {
+      // ctrl + ship + Y
+      setCollapseAll(true);
+    } else if (event.ctrlKey && event.shiftKey && event.key === "U") {
+      // ctrl + ship + U
+      setCollapseAll(false);
+    } else if (event.ctrlKey && event.shiftKey && event.key === "P") {
+      // ctrl + ship + P
+      toggleShowArchived();
+    } else if (event.key === "Control") {
+      //this will display shortcut actions on our goals/pools
+      setCtrlPressed(true);
+    }
+  };
+  const onKeyUp = (event: any) => {
+    if (event.key === "Control") {
+      setCtrlPressed(false);
+    }
+  };
+  const onWindowBlur = (event: any) => {
+    setCtrlPressed(false);
+  };
+  useEffect(() => {
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keyup", onKeyUp);
+    window.addEventListener("blur", onWindowBlur);
+
+    return () => {
+      document.removeEventListener("keyup", onKeyDown);
+      document.addEventListener("keyup", onKeyUp);
+      window.addEventListener("blur", onWindowBlur);
+    };
+  }, []);
   return (
     <Box
       sx={{
