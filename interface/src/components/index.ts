@@ -19,6 +19,8 @@ import GoalTimeline from "./GoalTimeline";
 import JoinPoolDialog from "./JoinPoolDialog";
 import Main from "./Main";
 import Project from "./Project";
+import GoalTagsDialog from "./GoalTagsDialog";
+import ChipsGroup from "./ChipsGroup";
 
 export {
   EditInput,
@@ -42,4 +44,6 @@ export {
   JoinPoolDialog,
   Main,
   Project,
+  GoalTagsDialog,
+  ChipsGroup
 };

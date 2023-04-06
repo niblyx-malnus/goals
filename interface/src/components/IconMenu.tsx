@@ -130,6 +130,10 @@ export default function IconMenu({
   const toggleGoalPermsDialog = useStore(
     (store: any) => store.toggleGoalPermsDialog
   );
+  const toggleGoalTagsDialog = useStore(
+    (store: any) => store.toggleGoalTagsDialog
+  );
+
   const setSelectedGoals = useStore((store: any) => store.setSelectedGoals);
   const roleMap = useStore((store: any) => store.roleMap);
   const role = roleMap.get(pin?.birth);
@@ -436,6 +440,19 @@ export default function IconMenu({
 
     return (
       <div>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            toggleGoalTagsDialog(true, {
+              title: currentGoal.hitch.desc,
+              id,
+              tags: currentGoal.hitch.tags
+            });
+          }}
+          disableRipple
+        >
+          Manage Tags
+        </MenuItem>
         <MenuItem
           onClick={() => {
             handleClose();

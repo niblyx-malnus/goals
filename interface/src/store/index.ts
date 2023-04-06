@@ -128,6 +128,13 @@ interface Store {
 
   ctrlPressed: boolean;
   setCtrlPressed: (state: boolean) => void;
+
+  goalTagsDialogOpen: boolean;
+  goalTagsDialogData: any;
+  toggleGoalTagsDialog: (
+    newStatus: boolean,
+    newGoalTagsDialogData: any
+  ) => void;
 }
 /**
  * 
@@ -417,6 +424,14 @@ const useStore = create<Store>((set, get) => ({
 
   ctrlPressed: false,
   setCtrlPressed: (state: boolean) => set(() => ({ ctrlPressed: state })),
+
+  goalTagsDialogOpen: false,
+  goalTagsDialogData: null,
+  toggleGoalTagsDialog: (newStatus: boolean, newGoalTagsDialogData: any) =>
+    set(() => ({
+      goalTagsDialogOpen: newStatus,
+      goalTagsDialogData: newGoalTagsDialogData,
+    })),
 }));
 
 export default useStore;

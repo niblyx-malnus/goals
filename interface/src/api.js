@@ -45,7 +45,7 @@ const api = {
   }) => {
     try {
       const relay = { pid: pokeId, pok: json };
-      
+
       return api.createApi().poke({
         app,
         mark,
@@ -213,6 +213,29 @@ const api = {
       app: apiApp,
       mark: apiMark,
       json: goalToArchive,
+      pokeId: id.birth,
+    });
+  },
+  putGoalTags: async (id, tags) => {
+    const goalToEdit = {
+      "put-goal-tags": {
+        id,
+        tags: tags /* [
+            {
+              "text": "this is a tag!",
+              "color":"0xab.cdef"
+            },
+            {
+              "text":"another TAG, fr",
+              "color":"0x00.defc"
+            }
+          ]*/,
+      },
+    };
+    return api.poke({
+      app: apiApp,
+      mark: apiMark,
+      json: goalToEdit,
       pokeId: id.birth,
     });
   },

@@ -31,6 +31,7 @@ import {
   ArchiveDialog,
   GoalPermsDialog,
   JoinPoolDialog,
+  GoalTagsDialog,
 } from "./";
 import Tooltip from "@mui/material/Tooltip";
 
@@ -181,6 +182,7 @@ export default function Header() {
       <GoalPermsDialog />
       <GroupsShareDialog />
       <JoinPoolDialog />
+      <GoalTagsDialog /> 
       <Snackie />
       <Stack direction="row" alignItems="center" spacing={1}>
         <OutlinedInput

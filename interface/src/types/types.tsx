@@ -18,3 +18,9 @@ export type FilterGoals = null | "complete" | "incomplete" | "actionable";
 export type Order = "asc" | "dsc" | "prio";
 
 export type Tree = ReadonlyArray<TreeBranch>;
+
+export interface ChipData {
+  key: string;
+  label: string;
+  canDelete: boolean;
+}
