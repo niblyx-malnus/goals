@@ -105,7 +105,7 @@
       ?-    -.pok
           %put-private-tags
         ?>  =(src our):bowl
-        :_  state(pags (~(put by pags) [id tags]:pok))
+        :_  state(pags.store (~(put by pags.store) [id tags]:pok))
         [%give %fact ~[/goals] goal-pags-update+!>([id tags]:pok)]~
 
           %add-field-type

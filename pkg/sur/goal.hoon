@@ -4,7 +4,7 @@
 ::
 ++  vzn  %5
 ::
-+$  state-5  [%5 =store:s5 =pags:s5 =groups =log:s5]
++$  state-5  [%5 =store:s5 =groups =log:s5]
 +$  state-4  [%4 =store:s4 =groups =log:s4]
 +$  state-3  [%3 =store:s3]
 +$  state-2  [%2 =store:s2]
@@ -86,8 +86,6 @@
   ::
   +$  tag  [text=@t color=@t]
   ::
-  +$  pags  (map id (set tag))
-  ::
   +$  field-data
     $%  [%ct d=@t] :: categorical
         [%ud d=@ud]
@@ -152,10 +150,13 @@
   +$  index         index:s4
   ++  idx-orm       idx-orm:s4
   ::
+  +$  pags  (map id (set tag))
+  ::
   +$  store  
     $:  =index
         =pools
         cache=pools
+        =pags
     ==
   ::
   +$  nux           nux:s4

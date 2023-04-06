@@ -436,6 +436,17 @@
   :~  [%index (enjs-index index.store)]
       [%pools (enjs-pools pools.store)]
       [%cache (enjs-pools cache.store)]
+      [%pags (enjs-pags pags.store)]
+  ==
+::
+++  enjs-pags
+  =,  enjs:format
+  |=  pags=(map id (set tag))
+  :-  %a  %+  turn  ~(tap by pags) 
+  |=  [=id tags=(set tag)] 
+  %-  pairs
+  :~  [%id (enjs-id id)]
+      [%tags a+(turn ~(tap in tags) enjs-tag)]
   ==
 ::
 ++  enjs-logged
