@@ -84,7 +84,7 @@
   +$  goal-froze    goal-froze:s4
   +$  goal-trace    goal-trace:s4
   ::
-  +$  tag  [text=@t color=@ux]
+  +$  tag  [text=@t color=@t]
   ::
   +$  field-data
     $%  [%ct d=@t] :: categorical
@@ -104,7 +104,7 @@
         tags=(set tag)
         fields=(map @t field-data)
     ==
-  ++  tag-bunt  (sy ~[tag1+0xff.0000 tag2+0x10.ff00 tag3+0x10.00ff])
+  ++  tag-bunt  (sy ~[tag1+'#ff0000' tag2+'#00ff00' tag3+'#0000ff'])
   ::
   +$  goal-local
     $:  tags=$~(tag-bunt (set tag))

@@ -64,7 +64,7 @@
   =,  dejs:format
   %-  ot
   :~  text+so
-      color+(cu |=(=@t (slav %ux t)) so)
+      color+so
   ==
 ::
 ++  dejs-field-type
@@ -288,7 +288,7 @@
   ^-  json
   %-  pairs
   :~  [%text s+text.tag]
-      [%color s+(scot %ux color.tag)]
+      [%color s+color.tag]
   ==
 ::
 ++  enjs-field-type
