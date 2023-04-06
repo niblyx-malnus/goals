@@ -46,8 +46,8 @@
           [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
           [%edit-goal-note (ot ~[id+dejs-id note+so])]
           [%edit-pool-note (ot ~[pin+dejs-pin note+so])]
-          [%add-goal-tag (ot ~[id+dejs-id tag+so])]
-          [%del-goal-tag (ot ~[id+dejs-id tag+so])]
+          [%add-goal-tag (ot ~[id+dejs-id tag+dejs-tag])]
+          [%del-goal-tag (ot ~[id+dejs-id tag+dejs-tag])]
           :-  %add-field-type
           (ot ~[pin+dejs-pin field+so field-type+dejs-field-type])
           [%del-field-type (ot ~[pin+dejs-pin field+so])]
@@ -57,6 +57,13 @@
           [%subscribe (ot ~[pin+dejs-pin])]
           [%unsubscribe (ot ~[pin+dejs-pin])]
       ==
+  ==
+::
+++  dejs-tag
+  =,  dejs:format
+  %-  ot
+  :~  text+so
+      color+(cu |=(=@t (slav %ux t)) so)
   ==
 ::
 ++  dejs-field-type
@@ -260,8 +267,8 @@
             ?-  +>-.upd
               %desc  s+desc.upd
               %note  s+note.upd
-              %add-tag  s+tag.upd
-              %del-tag  s+tag.upd
+              %add-tag  (enjs-tag tag.upd)
+              %del-tag  (enjs-tag tag.upd)
               %del-field-data  s+field.upd
                 %add-field-data
               %-  pairs
@@ -271,6 +278,15 @@
             ==
         ==
       ==
+  ==
+::
+++  enjs-tag
+  =,  enjs:format
+  |=  =tag
+  ^-  json
+  %-  pairs
+  :~  [%text s+text.tag]
+      [%color s+(scot %ux color.tag)]
   ==
 ::
 ++  enjs-field-type
@@ -546,7 +562,7 @@
       %-  pairs
       :~  [%desc s+desc.goal]
           [%note s+note.goal]
-          [%tags a+(turn ~(tap in tags.goal) |=(=@t s+t))]
+          [%tags a+(turn ~(tap in tags.goal) enjs-tag)]
       ==
   ==
 ::

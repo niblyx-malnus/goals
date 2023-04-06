@@ -356,7 +356,7 @@
   (emot old [vzn %goal-hitch id %note note])
 ::
 ++  add-goal-tag
-  |=  [=id:gol tag=@t mod=ship]
+  |=  [=id:gol =tag:gol mod=ship]
   ^-  _this
   =/  old  this
   ?>  (check-goal-edit-perm:(pore) id mod)
@@ -366,7 +366,7 @@
   (emot old [vzn %goal-hitch id %add-tag tag])
 :: 
 ++  del-goal-tag
-  |=  [=id:gol tag=@t mod=ship]
+  |=  [=id:gol =tag:gol mod=ship]
   ^-  _this
   =/  old  this
   ?>  (check-goal-edit-perm:(pore) id mod)
@@ -629,7 +629,7 @@
       =/  goal  (~(got by goals.p) id)
       this(goals.p (~(put by goals.p) id goal(desc desc)))
     ++  add-tag
-      |=  [=id:gol tag=@t]
+      |=  [=id:gol =tag:gol]
       ^-  _this
       =/  goal  (~(got by goals.p) id)
       %=    this
@@ -637,7 +637,7 @@
         (~(put by goals.p) id goal(tags (~(put in tags.goal) tag)))
       ==
     ++  del-tag
-      |=  [=id:gol tag=@t]
+      |=  [=id:gol =tag:gol]
       ^-  _this
       =/  goal  (~(got by goals.p) id)
       %=    this

@@ -84,7 +84,7 @@
   +$  goal-froze    goal-froze:s4
   +$  goal-trace    goal-trace:s4
   ::
-  +$  tag  @t :: [text=@t color=@ux]
+  +$  tag  [text=@t color=@ux]
   ::
   +$  field-data
     $%  [%ct d=@t] :: categorical
