@@ -168,6 +168,17 @@
         =/  pore
           (del-goal-tag:(apex-em:hc pin) id.pok tag.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
+        ::
+          %put-goal-tags
+        =/  pin  (got:idx-orm:gol index.store id.pok)
+        =*  poke-other
+          ~(poke-other pass:hc (en-away-path pid pin %put-goal-tags))
+        ?.  =(our.bowl owner.id.pok)
+          :_  state
+          [(poke-other owner.id.pok goal-action+!>(action))]~
+        =/  pore
+          (put-goal-tags:(apex-em:hc pin) id.pok tags.pok src.bowl)
+        (send-away-updates:hc ~ pin src.bowl pid pore)
           :: [%edit-goal-note =id note=@t]
           ::
           %edit-goal-note

@@ -375,6 +375,15 @@
     (~(put by goals.p) id goal(tags (~(del in tags.goal) tag)))
   (emot old [vzn %goal-hitch id %del-tag tag])
 ::
+++  put-goal-tags
+  |=  [=id:gol tags=(set tag:gol) mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-goal-edit-perm:(pore) id mod)
+  =/  goal  (~(got by goals.p) id)
+  =.  goals.p  (~(put by goals.p) id goal(tags tags))
+  (emot old [vzn %goal-hitch id %put-tags tags])
+::
 ++  add-field-data
   |=  [=id:gol field=@t =field-data:gol mod=ship]
   ^-  _this
@@ -536,6 +545,9 @@
       [%goal-hitch id:gol %del-tag *]
     (del-tag:goal-hitch [id tag]:upd)
     ::
+      [%goal-hitch id:gol %put-tags *]
+    (put-tags:goal-hitch [id tags]:upd)
+    ::
       [%goal-hitch id:gol %add-field-data *]
     (add-field-data:goal-hitch [id field field-data]:upd)
     ::
@@ -643,6 +655,14 @@
       %=    this
           goals.p
         (~(put by goals.p) id goal(tags (~(del in tags.goal) tag)))
+      ==
+    ++  put-tags
+      |=  [=id:gol tags=(set tag:gol)]
+      ^-  _this
+      =/  goal  (~(got by goals.p) id)
+      %=    this
+          goals.p
+        (~(put by goals.p) id goal(tags tags))
       ==
     ++  add-field-data  
       |=  [=id:gol field=@t =field-data:gol]

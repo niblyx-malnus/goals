@@ -169,6 +169,7 @@
         [%note note=@t]
         [%add-tag =tag]
         [%del-tag =tag]
+        [%put-tags tags=(set tag)]
         [%add-field-data field=@t =field-data]
         [%del-field-data field=@t]
     ==
@@ -212,6 +213,7 @@
         [%edit-pool-note =pin note=@t]
         [%add-goal-tag =id =tag]
         [%del-goal-tag =id =tag]
+        [%put-goal-tags =id tags=(set tag)]
         [%add-field-data =id field=@t =field-data]
         [%del-field-data =id field=@t]
         [%add-field-type =pin field=@t =field-type]

@@ -48,6 +48,7 @@
           [%edit-pool-note (ot ~[pin+dejs-pin note+so])]
           [%add-goal-tag (ot ~[id+dejs-id tag+dejs-tag])]
           [%del-goal-tag (ot ~[id+dejs-id tag+dejs-tag])]
+          [%put-goal-tags (ot ~[id+dejs-id tags+(as dejs-tag)])]
           :-  %add-field-type
           (ot ~[pin+dejs-pin field+so field-type+dejs-field-type])
           [%del-field-type (ot ~[pin+dejs-pin field+so])]
@@ -269,6 +270,7 @@
               %note  s+note.upd
               %add-tag  (enjs-tag tag.upd)
               %del-tag  (enjs-tag tag.upd)
+              %put-tags  a+(turn ~(tap in tags.upd) enjs-tag)
               %del-field-data  s+field.upd
                 %add-field-data
               %-  pairs
