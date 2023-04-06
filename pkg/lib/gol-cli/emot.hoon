@@ -70,7 +70,7 @@
   =/  nex  (make-nex b sig) :: changed
   [pon waz nex]
 ::
-:: a is a map from ids to a goal nexus
+:: a nex is a map from ids to a goal nexus
 :: it contains crucial information regarding graph structure
 :: it is easier to stay sane by sending updates in this manner
 ++  make-nex

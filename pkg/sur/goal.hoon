@@ -98,13 +98,14 @@
         [%rd ~]
     ==
   ::
+  ++  tag-bunt  (sy ~[tag1+'#ff0000' tag2+'#00ff00' tag3+'#0000ff'])
+  ::
   +$  goal-hitch
     $:  desc=@t
         note=@t
-        tags=(set tag)
+        tags=$~(tag-bunt (set tag))
         fields=(map @t field-data)
     ==
-  ++  tag-bunt  (sy ~[tag1+'#ff0000' tag2+'#00ff00' tag3+'#0000ff'])
   ::
   +$  goal-local
     $:  tags=$~(tag-bunt (set tag))
