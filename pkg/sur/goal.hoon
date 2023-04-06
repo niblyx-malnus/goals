@@ -4,7 +4,7 @@
 ::
 ++  vzn  %5
 ::
-+$  state-5  [%5 =store:s5 =groups =log:s5]
++$  state-5  [%5 =store:s5 =pags:s5 =groups =log:s5]
 +$  state-4  [%4 =store:s4 =groups =log:s4]
 +$  state-3  [%3 =store:s3]
 +$  state-2  [%2 =store:s2]
@@ -85,6 +85,8 @@
   +$  goal-trace    goal-trace:s4
   ::
   +$  tag  [text=@t color=@t]
+  ::
+  +$  pags  (map id (set tag))
   ::
   +$  field-data
     $%  [%ct d=@t] :: categorical
@@ -194,7 +196,9 @@
   +$  log-update    $%([%updt upd=home-update] [%init =store])
   +$  log           ((mop @ log-update) lth)
   +$  logged        (pair @ log-update)
-  ::  ::
+  ::
+  +$  pags-update   [=id tags=(set tag)]
+  ::
   +$  peek          :: underlying data structures have changed
                     $%  [%initial =store] 
                         [%updates =(list logged)]
@@ -245,7 +249,7 @@
     ++  goal-action
       =<  goal-action
       |%
-      +$  goal-action  $%(spawn mutate)
+      +$  goal-action  $%(spawn mutate local)
       +$  spawn  [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
       +$  mutate  $%(life-cycle nexus hitch)
       +$  life-cycle
@@ -271,6 +275,10 @@
             [%put-goal-tags =id tags=(set tag)]
             [%add-field-data =id field=@t =field-data]
             [%del-field-data =id field=@t]
+        ==
+      ::
+      +$  local
+        $%  [%put-private-tags =id tags=(set tag)]
         ==
       --
     --

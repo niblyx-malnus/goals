@@ -103,6 +103,11 @@
       =/  pid  pid.action
       =/  pok  pok.action
       ?-    -.pok
+          %put-private-tags
+        ?>  =(src our):bowl
+        :_  state(pags (~(put by pags) [id tags]:pok))
+        [%give %fact ~[/goals] goal-pags-update+!>([id tags]:pok)]~
+
           %add-field-type
         =*  poke-other
           ~(poke-other pass:hc (en-away-path pid pin.pok %add-field-type))

@@ -55,6 +55,7 @@
           :-  %add-field-data
           (ot ~[id+dejs-id field+so field-data+dejs-field-data])
           [%del-field-data (ot ~[id+dejs-id field+so])]
+          [%put-private-tags (ot ~[id+dejs-id tags+(as dejs-tag)])]
           [%subscribe (ot ~[pin+dejs-pin])]
           [%unsubscribe (ot ~[pin+dejs-pin])]
       ==
@@ -144,6 +145,16 @@
     %hook-yoke   %hook-yoke
     %held-rend   %held-rend
     %held-yoke   %held-yoke
+  ==
+::
+++  enjs-pags-update
+  =,  enjs:format
+  |=  [=id tags=(set tag)]
+  ^-  json
+  %+  frond  %pags-update
+  %-  pairs
+  :~  [%id (enjs-id id)]
+      [%tags a+(turn ~(tap in tags) enjs-tag)]
   ==
 ::
 ++  enjs-home-update
