@@ -65,7 +65,7 @@
 +$  nuke          nuke:s5
 +$  plex          plex:s5
 ::
-+$  action        action:s5
+++  action        action:s5
 ::
 ++  s5
   |%
@@ -208,19 +208,70 @@
   +$  exposed-yoke  exposed-yoke:s4
   +$  nuke          nuke:s4
   +$  plex          plex:s4
-  +$  unver-action
-    $%  [%edit-goal-note =id note=@t]
-        [%edit-pool-note =pin note=@t]
-        [%add-goal-tag =id =tag]
-        [%del-goal-tag =id =tag]
-        [%put-goal-tags =id tags=(set tag)]
-        [%add-field-data =id field=@t =field-data]
-        [%del-field-data =id field=@t]
-        [%add-field-type =pin field=@t =field-type]
-        [%del-field-type =pin field=@t]
-        unver-action:s4
-    ==
-  +$  action  [%5 pid=@ pok=unver-action]
+  ++  action
+    =<  action
+    |%
+    +$  action  [%5 pid=@ pok=$%(util-action pool-action goal-action)]
+    +$  util-action
+      $%  [%subscribe =pin]
+          [%unsubscribe =pin]
+          [%kicker =ship =pin]
+      ==
+    ++  pool-action
+      =<  pool-action
+      |%
+      +$  pool-action  $%(spawn mutate)
+      +$  spawn  [%spawn-pool title=@t]
+      +$  mutate  $%(life-cycle nexus hitch)
+      +$  life-cycle
+        $%  [%clone-pool =pin title=@t]
+            [%cache-pool =pin]
+            [%renew-pool =pin]
+            [%trash-pool =pin]
+        ==
+      +$  nexus
+        $%  [%yoke =pin yoks=(list plex)]
+            [%update-pool-perms =pin new=pool-perms]
+        ==
+      +$  hitch
+        $%  [%edit-pool-title =pin title=@t]
+            [%edit-pool-note =pin note=@t]
+            [%add-field-type =pin field=@t =field-type]
+            [%del-field-type =pin field=@t]
+        ==
+      --
+    ++  goal-action
+      =<  goal-action
+      |%
+      +$  goal-action  $%(spawn mutate)
+      +$  spawn  [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
+      +$  mutate  $%(life-cycle nexus hitch)
+      +$  life-cycle
+        $%  [%cache-goal =id]
+            [%renew-goal =id]
+            [%trash-goal =id]
+        ==
+      +$  nexus
+        $%  [%move cid=id upid=(unit id)] :: should probably be in nexus:pool-action
+            [%set-kickoff =id kickoff=(unit @da)]
+            [%set-deadline =id deadline=(unit @da)]
+            [%mark-actionable =id]
+            [%unmark-actionable =id]
+            [%mark-complete =id]
+            [%unmark-complete =id]
+            [%update-goal-perms =id chief=ship rec=_| spawn=(set ship)]
+        ==
+      +$  hitch
+        $%  [%edit-goal-desc =id desc=@t]
+            [%edit-goal-note =id note=@t]
+            [%add-goal-tag =id =tag]
+            [%del-goal-tag =id =tag]
+            [%put-goal-tags =id tags=(set tag)]
+            [%add-field-data =id field=@t =field-data]
+            [%del-field-data =id field=@t]
+        ==
+      --
+    --
   --
 ::
 :: ============================================================================
