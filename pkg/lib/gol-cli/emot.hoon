@@ -1,8 +1,5 @@
 /-  gol=goal
-/+  *gol-cli-util, gol-cli-pool, gol-cli-node, gol-cli-traverse,
-:: import during development to force compilation
-::
-    gol-cli-json
+/+  *gol-cli-util, gol-cli-pool, gol-cli-node, gol-cli-traverse
 ::
 =|  efx=(list update:gol)
 |_  p=pool:gol
@@ -301,6 +298,13 @@
   =/  tore  (apply unmark-complete:(pore) id mod)
   (emot:tore this [vzn %goal-togls id %complete %.n])
 ::
+++  reorder-young
+  |=  [=id:gol young=(list id:gol) mod=ship]
+  ^-  _this
+  =/  tore  (apply reorder-young:(pore) id young mod)
+  =/  fd  (full-diff goals.p goals.p.tore)
+  (emot:tore this [vzn %goal-young nex.fd])
+::
 ++  set-kickoff
   |=  [=id:gol =moment:gol mod=ship]
   ^-  _this
@@ -529,6 +533,11 @@
     :: goal-perms
     ::
       [%goal-perms *]
+    (apply-nex nex.upd)
+    :: ------------------------------------------------------------------------
+    :: goal-young
+    ::
+      [%goal-young *]
     (apply-nex nex.upd)
     :: ------------------------------------------------------------------------
     :: goal-hitch

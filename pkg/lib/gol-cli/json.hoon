@@ -41,6 +41,7 @@
               rec+bo
               spawn+dejs-set-ships
           ==
+          [%reorder-young (ot ~[id+dejs-id young+(ar dejs-id)])]
           [%update-pool-perms (ot ~[pin+dejs-pin new+dejs-pool-perms])]
           [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
           [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
@@ -257,6 +258,10 @@
         (enjs-nex nex.upd)
         ::
           %goal-perms
+        %+  frond  %nex
+        (enjs-nex nex.upd)
+        ::
+          %goal-young
         %+  frond  %nex
         (enjs-nex nex.upd)
         ::
@@ -547,6 +552,7 @@
   %-  pairs
   :~  [%par ?~(par.nexus ~ (enjs-id u.par.nexus))]
       [%kids a+(turn ~(tap in kids.nexus) enjs-id)]
+      [%young a+(turn young.nexus enjs-id)]
       [%kickoff (enjs-node kickoff.nexus)]
       [%deadline (enjs-node deadline.nexus)]
       [%complete b+complete.nexus]

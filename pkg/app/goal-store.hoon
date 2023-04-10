@@ -2,7 +2,10 @@
 /+  dbug, default-agent, verb, agentio,
     pl=gol-cli-pool, gol-cli-goals, gol-cli-pools,
     em=gol-cli-emot, gol-cli-node, gol-cli-traverse,
-    gol-cli-etch, group-update
+    gol-cli-etch, group-update,
+:: import during development to force compilation
+::
+    gol-cli-json
 |%
 +$  state-0  state-0:gol
 +$  state-1  state-1:gol  
@@ -463,6 +466,18 @@
             spawn.pok
             src.bowl
           ==
+        (send-away-updates:hc ~ pin src.bowl pid pore)
+          ::
+          %reorder-young
+        =/  pin  (got:idx-orm:gol index.store id.pok)
+        =*  poke-other
+          %~  poke-other
+            pass:hc
+          (en-away-path pid pin %reorder-young)
+        ?.  =(our.bowl owner.id.pok)
+          :_  state
+          [(poke-other owner.id.pok goal-action+!>(action))]~
+        =/  pore  (reorder-young:(apex-em:hc pin) id.pok young.pok src.bowl)
         (send-away-updates:hc ~ pin src.bowl pid pore)
           ::
           :: [%update-pool-perms =pin new=pool-perms]

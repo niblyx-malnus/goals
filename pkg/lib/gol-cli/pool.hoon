@@ -4,7 +4,7 @@
 +*  this  .
     tv    ~(. gol-cli-traverse goals.p)
     nd    ~(. gol-cli-node goals.p)
-++  vzn  %4
+++  vzn  vzn:gol
 ::
 :: ============================================================================
 :: 
@@ -351,6 +351,7 @@
 ++  yoke
   |=  [yok=exposed-yoke:gol mod=ship]
   ^-  _this
+  =;  pore  (on-yoke:pore yok)
   =,  yok
   ?-  -.yok
     %prio-yoke  (dag-yoke [%k lid] [%k rid] mod)
@@ -368,6 +369,41 @@
     =/  pore  (dag-rend [%d lid] [%d rid] mod)
     (dag-rend:pore [%k rid] [%k lid] mod)
   ==
+::
+++  on-yoke
+  |=  yok=exposed-yoke:gol
+  ^-  _this
+  =.  this  (toposort-young yok)
+  this
+::
+++  toposort-young
+  |=  yok=exposed-yoke:gol
+  ^-  _this
+  =/  goal  (~(got by goals.p) rid.yok)
+  =.  young.goal
+    ?+    -.yok  young.goal
+        ?(%nest-yoke %held-yoke)
+      [lid.yok young.goal]
+      ::
+        ?(%nest-rend %held-rend)
+      ?~  idx=(find ~[lid.yok] young.goal)
+        young.goal
+      (oust [u.idx 1] young.goal)
+    ==
+  =?  young.goal  !=((sy young.goal) (young:nd rid.yok))
+    ~&  "Woopsy! Resetting young...."
+    ~(tap in (young:nd rid.yok))
+  =.  young.goal  (topological-sort:tv young.goal)
+  this(goals.p (~(put by goals.p) rid.yok goal))
+::
+++  reorder-young
+  |=  [=id:gol young=(list id:gol) mod=ship]
+  ^-  _this
+  ?>  (check-goal-edit-perm id mod)
+  ?>  =((sy young) (young:nd id))
+  =/  goal  (~(got by goals.p) id)
+  =.  young.goal  (topological-sort:tv young)
+  this(goals.p (~(put by goals.p) id goal))
 ::
 ++  move-to-root
   |=  [=id:gol mod=ship]

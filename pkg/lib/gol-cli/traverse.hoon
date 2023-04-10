@@ -280,6 +280,87 @@
       exit  |=([=nid:gol vis=(map nid:gol (unit ?))] vis)
     ==
   (((traverse nid:gol (unit ?) (map nid:gol (unit ?))) gine vis) nid)
+:: get set of all ids whose deadline precedes a given node
+::
+++  precedents
+  |=  [=nid:gol vis=(map nid:gol (set id:gol))]
+  ^-  (map nid:gol (set id:gol))
+  =/  gine  (gine nid:gol (set id:gol) (map nid:gol (set id:gol)))
+  =.  gine
+    %=  gine
+      init
+        |=  =nid:gol
+        %-  ~(gas by *(set id:gol))
+        %+  murn  ~(tap in (iflo nid))
+        |=  =nid:gol
+        ?.  ?=(%d -.nid)
+          ~
+        (some id.nid)
+      flow  |=(=nid:gol ~(tap in (iflo nid)))
+      meld  |=([nid:gol nid:gol a=(set id:gol) b=(set id:gol)] (~(uni in a) b))
+      land  |=([=nid:gol out=(set id:gol) ?] out)
+      exit  |=([=nid:gol vis=(map nid:gol (set id:gol))] vis)
+    ==
+  (((traverse nid:gol (set id:gol) (map nid:gol (set id:gol))) gine vis) nid)
+:: Get ids whose deadline comes before an id kickoff
+::
+++  precedents-map
+  ^-  (map id:gol (set id:gol))
+  %-  ~(gas by *(map id:gol (set id:gol)))
+  %+  murn
+    %~  tap  by
+    ((chain nid:gol (set id:gol)) precedents (root-nodes:nd) ~)
+  |=  [=nid:gol precs=(set id:gol)]
+  ?.  ?=(%k -.nid)  ~  :: only get kickoffs
+  (some [id.nid precs])
+:: force a list of ids to be topologically sorted
+::
+++  topological-sort
+  |=  ids=(list id:gol)
+  ^-  (list id:gol)
+  =/  precs  precedents-map
+  |^
+  =.  precs  purge :: only keep ids in list
+  |-  ^-  (list id:gol)
+  ?:  =(~ precs)  ~
+  :-  first
+  $(precs (evict first))
+  ++  ranks
+    ^-  (map id:gol @)
+    =|  idx=@
+    %-  ~(gas by *(map id:gol @))
+    |-  ^-  (list [id:gol @])
+    ?~  ids  ~
+    :-  [i.ids idx]
+    $(idx +(idx), ids t.ids)
+  ++  evict
+    |=  =id:gol
+    ^-  (map id:gol (set id:gol))
+    %-  ~(gas by *(map id:gol (set id:gol)))
+    %+  murn  ~(tap by precs)
+    |=  [=id:gol =(set id:gol)]
+    ?:  =(id ^id)  ~
+    (some [id (~(del in set) ^id)])
+  ++  purge
+    =/  del=(list id:gol)
+      ~(tap in (~(dif in ~(key by goals)) (sy ids)))
+    |-  ?~  del  precs
+    $(del t.del, precs (evict i.del))
+  ++  outer
+    ^-  (list id:gol)
+    %+  murn  ~(tap by precs)
+    |=  [=id:gol =(set id:gol)]
+    ?.(=(~ set) ~ (some id))
+  ++  first
+    ^-  id:gol
+    =/  outer=(list id:gol)  outer
+    ?>  ?=(^ outer)
+    %+  roll  t.outer
+    |:  [id=`id:gol`i.outer ac=`id:gol`i.outer]
+    =/  i=@  (~(got by ranks) id)
+    =/  a=@  (~(got by ranks) ac)
+    ?:((lth i a) id ac)
+  --
 ::
 :: get uncompleted leaf goals left of id
 ++  harvest
