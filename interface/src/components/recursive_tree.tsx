@@ -99,6 +99,7 @@ const RecursiveTree = ({
           yokingGoalId={yokingGoalId}
           poolArchived={poolArchived}
           note={currentGoal.hitch.note}
+          tags={currentGoal.hitch.tags}
         >
           {childGoals.map((goal: any) => {
             const currentChildGoalId = goal.id.birth;

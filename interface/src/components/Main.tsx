@@ -28,6 +28,7 @@ declare const window: Window &
 //TODO: make the highlighting grey?(drag and drop)
 //TODO: add tooltips to header buttons
 //TODO: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
+//TODO: add update for put tags
 interface Loading {
   trying: boolean;
   success: boolean;

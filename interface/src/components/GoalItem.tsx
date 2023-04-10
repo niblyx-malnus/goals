@@ -39,6 +39,7 @@ interface GoalItemProps {
   harvestGoal?: boolean;
   poolArchived?: boolean;
   note: string;
+  tags?: any;
 }
 
 const GoalItem = memo(
@@ -57,6 +58,7 @@ const GoalItem = memo(
     harvestGoal = false,
     poolArchived = false,
     note = "this is a note",
+    tags = [],
   }: //inSelectMode
   GoalItemProps) => {
     const [{ isDragging }, drag] = useDrag(() => ({
@@ -441,7 +443,19 @@ const GoalItem = memo(
               </Box>
             )}
             <Box ref={drag}>{renderTitle()}</Box>
+            {tags.map((tag: any) => {
+              return (
+                <Chip
+                  size="small"
+                  label={
+                    <Typography fontWeight={"bold"}>{tag.text}</Typography>
+                  }
+                  variant="outlined"
+                />
+              );
+            })}
             {renderArchivedTag()}
+
             {renderVirtualTag()}
             {renderTimeline()}
             {renderIconMenu()}
