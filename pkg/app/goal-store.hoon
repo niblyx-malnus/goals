@@ -417,7 +417,9 @@
         %=    goal
             tags
          %-  ~(uni in tags.goal)
-         tags:(~(got by local.store) id)
+         ?~  get=(~(get by local.store) id)
+           ~
+         tags.u.get
         ==
       ==
     --
