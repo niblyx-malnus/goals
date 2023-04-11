@@ -21,6 +21,7 @@ import Main from "./Main";
 import Project from "./Project";
 import GoalTagsDialog from "./GoalTagsDialog";
 import ChipsGroup from "./ChipsGroup";
+import FilterTagsDialog from "./FilterTagsDialog";
 
 export {
   EditInput,
@@ -45,5 +46,6 @@ export {
   Main,
   Project,
   GoalTagsDialog,
-  ChipsGroup
+  ChipsGroup,
+  FilterTagsDialog
 };

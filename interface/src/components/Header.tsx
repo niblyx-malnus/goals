@@ -9,7 +9,7 @@ import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
 import useStore from "../store";
 import { log } from "../helpers";
 import CircularProgress from "@mui/material/CircularProgress";
-import { Order } from "../types/types";
+import { ChipData, Order } from "../types/types";
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import { orderPoolsAction } from "../store/actions";
@@ -17,6 +17,9 @@ import Stack from "@mui/material/Stack";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import Chip from "@mui/material/Chip";
 import {
   ShareDialog,
   DeletionDialog,
@@ -32,6 +35,7 @@ import {
   GoalPermsDialog,
   JoinPoolDialog,
   GoalTagsDialog,
+  FilterTagsDialog,
 } from "./";
 import Tooltip from "@mui/material/Tooltip";
 
@@ -65,6 +69,10 @@ export default function Header() {
   const toggleSnackBar = useStore((store) => store.toggleSnackBar);
 
   const toggleShowArchived = useStore((store) => store.toggleShowArchived);
+
+  const toggleFilterTagsDialog = useStore(
+    (store) => store.toggleFilterTagsDialog
+  );
 
   const showArchived = useStore((store) => store.showArchived);
 
@@ -162,7 +170,7 @@ export default function Header() {
     };
   }, []);
   return (
-    <Box
+    <Stack
       sx={{
         position: "sticky",
         top: 0,
@@ -182,7 +190,8 @@ export default function Header() {
       <GoalPermsDialog />
       <GroupsShareDialog />
       <JoinPoolDialog />
-      <GoalTagsDialog /> 
+      <GoalTagsDialog />
+      <FilterTagsDialog />
       <Snackie />
       <Stack direction="row" alignItems="center" spacing={1}>
         <OutlinedInput
@@ -293,8 +302,43 @@ export default function Header() {
             )}
           </IconButton>
         </Box>
+        <IconButton
+          onClick={() => {
+            toggleFilterTagsDialog(true);
+          }}
+        >
+          <FilterAltOutlinedIcon />
+        </IconButton>
       </Stack>
+      <FilterChips />
       <Divider sx={{ paddingTop: 2 }} />
-    </Box>
+    </Stack>
+  );
+}
+function FilterChips() {
+  const [chips, setChips] = useState<ChipData[]>([]);
+  const tagFilterArray = useStore((store) => store.tagFilterArray);
+  useEffect(() => {
+    const newChips: ChipData[] = tagFilterArray.map(
+      (item: any, index: number) => {
+        return { key: index.toString(), label: item, canDelete: false };
+      }
+    );
+    setChips(newChips);
+  }, [tagFilterArray]);
+  if (tagFilterArray.length === 0) return null;
+  return (
+    <Stack direction={"row"} spacing={1} marginTop={2}>
+      <Typography variant="body1">Filtering Harvested Goals By: </Typography>
+      {chips.map((tag: any) => {
+        return (
+          <Chip
+            size="small"
+            label={<Typography fontWeight={"bold"}>{tag.label}</Typography>}
+            variant="outlined"
+          />
+        );
+      })}
+    </Stack>
   );
 }
