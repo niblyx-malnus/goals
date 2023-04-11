@@ -135,7 +135,17 @@ interface Store {
     newStatus: boolean,
     newGoalTagsDialogData: any
   ) => void;
+
+  filterTagsDialogOpen: boolean;
+  toggleFilterTagsDialog: (newStatus: boolean) => void;
+
+  allTags: Set<string>;
+  setAllTags: (newAllTags: Set<string>) => void;
+
+  tagFilterArray: Array<string>;
+  setTagFilterArray: (newTagFilterArray: Array<string>) => void;
 }
+
 /**
  * 
   const toggleShowArchived = useStore((store) => store.toggleShowArchived);
@@ -432,6 +442,20 @@ const useStore = create<Store>((set, get) => ({
       goalTagsDialogOpen: newStatus,
       goalTagsDialogData: newGoalTagsDialogData,
     })),
+
+  filterTagsDialogOpen: false,
+  filterTagsDialogData: null,
+  toggleFilterTagsDialog: (newStatus: boolean) =>
+    set(() => ({
+      filterTagsDialogOpen: newStatus,
+    })),
+
+  allTags: new Set(),
+  setAllTags: (newAllTags: Set<string>) => set(() => ({ allTags: newAllTags })),
+
+  tagFilterArray: [],
+  setTagFilterArray: (newTagFilterArray: Array<string>) =>
+    set(() => ({ tagFilterArray: newTagFilterArray })),
 }));
 
 export default useStore;

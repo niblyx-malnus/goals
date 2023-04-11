@@ -25,6 +25,7 @@ export default function HarvestPanel() {
   const fetchedPools = useStore((store) => store.pools);
   const harvestData = useStore((store) => store.harvestData);
   const setHarvestData = useStore((store) => store.setHarvestData);
+  const tagFilterArray = useStore((store) => store.tagFilterArray);
 
   useEffect(() => {
     if (open && harvestData.goals) {
@@ -46,12 +47,21 @@ export default function HarvestPanel() {
           });
         }
       });
-      log("harvestGoals", harvestGoals);
-      log("startGoalDesc", startGoalDesc);
+      let newFilteredGoals = harvestGoals;
+      //we fitler the goals by tags if filtering is on
+
+      if (tagFilterArray.length > 0) {
+        newFilteredGoals = harvestGoals.filter((item: any) => {
+          return item.goal.hitch.tags.some((item: any) =>
+            tagFilterArray.includes(item.text)
+          );
+        });
+      }
+
       setStartGoalTitle(startGoalDesc);
-      setHarvestGoals(harvestGoals);
+      setHarvestGoals(newFilteredGoals);
     }
-  }, [fetchedPools, harvestData]);
+  }, [fetchedPools, harvestData, tagFilterArray]);
 
   const handleDrawerClose = () => {
     setHarvestData(false, {});

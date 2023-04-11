@@ -29,6 +29,8 @@ declare const window: Window &
 //TODO: add tooltips to header buttons
 //TODO: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
 //TODO: add update for put tags
+//TODO: add private tagging
+//TODO: add private tags
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -45,6 +47,8 @@ function Main() {
   const tryingMap: any = useStore((store) => store.tryingMap);
   const setTryingMap = useStore((store) => store.setTryingMap);
 
+  const setAllTags = useStore((store) => store.setAllTags);
+
   const setArchivedPools = useStore((store) => store.setArchivedPools);
   const [pools, setPools] = useState([]);
   const [loading, setLoading] = useState<Loading>({
@@ -58,11 +62,13 @@ function Main() {
     // You can put whatever here
     log("you clicked: " + id);
   };
+
   useEffect(() => {
     //convert flat goals into nested goals for each pool
     //make our role map
     const roleMap = new Map();
     const newTryingMap: any = new Map();
+    const allTagsSet: Set<string> = new Set();
     const newProjects = fetchedPools.map((poolItem: any, id: any) => {
       //update the perms here, in case they do change
       const { pin, pool } = poolItem;
@@ -84,18 +90,21 @@ function Main() {
           : false,
       });
       //create a map of goal to id(birth)
+
       const goalsMap = new Map();
       pool.nexus.goals.forEach((item: any) => {
         goalsMap.set(item.id.birth, item);
-
+        item.goal.hitch.tags?.forEach((element: any) => {
+          allTagsSet.add(element.text);
+        });
         newTryingMap.set(item.id.birth, {
           trying: tryingMap.has(item.id.birth) //make sure to check the previous tryingMap for this value
             ? tryingMap.get(item.id.birth).trying
             : false,
         });
       });
-      const virtualChildren: any = [];
 
+      const virtualChildren: any = [];
       function connect(goal: any, parentId: any) {
         //recursively build virtual children connections
         //flushing them out to the flat pool.nexus.goals
@@ -161,7 +170,6 @@ function Main() {
             virtualChildren.push(parentVirtualGoal);
 
             connect(parentVirtualGoal, parentId);
-            log("virtualChildren", virtualChildren);
           }
         });
       });
@@ -179,6 +187,7 @@ function Main() {
     setTryingMap(newTryingMap);
     setPools(newProjects);
     setRoleMap(roleMap);
+    setAllTags(allTagsSet);
   }, [fetchedPools]);
 
   const fetchInitial = async () => {
