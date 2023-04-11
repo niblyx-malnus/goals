@@ -1,5 +1,10 @@
 /-  *goal
 /+  *gol-cli-util
+:: TODO:
+::  - send pex for pool trace
+::  - convert young to show virtual children
+::  - send all of young, young-by...etc (young update just send nex)
+::  - same for roots, roots-by...etc (just send pex)
 |%
 ++  dejs-action
   =,  dejs:format
@@ -68,6 +73,7 @@
   %-  ot
   :~  text+so
       color+so
+      private+bo
   ==
 ::
 ++  dejs-field-type
@@ -293,7 +299,7 @@
               %note  s+note.upd
               %add-tag  (enjs-tag tag.upd)
               %del-tag  (enjs-tag tag.upd)
-              %put-tags  a+(turn ~(tap in tags.upd) enjs-tag)
+              %put-tags  (frond %tags a+(turn ~(tap in tags.upd) enjs-tag))
               %del-field-data  s+field.upd
                 %add-field-data
               %-  pairs
@@ -312,6 +318,7 @@
   %-  pairs
   :~  [%text s+text.tag]
       [%color s+color.tag]
+      [%private b+private.tag]
   ==
 ::
 ++  enjs-field-type
@@ -443,17 +450,6 @@
   :~  [%index (enjs-index index.store)]
       [%pools (enjs-pools pools.store)]
       [%cache (enjs-pools cache.store)]
-      [%pags (enjs-pags pags.store)]
-  ==
-::
-++  enjs-pags
-  =,  enjs:format
-  |=  pags=(map id (set tag))
-  :-  %a  %+  turn  ~(tap by pags) 
-  |=  [=id tags=(set tag)] 
-  %-  pairs
-  :~  [%id (enjs-id id)]
-      [%tags a+(turn ~(tap in tags) enjs-tag)]
   ==
 ::
 ++  enjs-logged

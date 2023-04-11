@@ -103,9 +103,15 @@
       =/  pok  pok.action
       ?-    -.pok
           %put-private-tags
+        =/  pin  (got:idx-orm:gol index.store id.pok)
         ?>  =(src our):bowl
-        :_  state(pags.store (~(put by pags.store) [id tags]:pok))
-        [%give %fact ~[/goals] goal-pags-update+!>([id tags]:pok)]~
+        ?>  (~(all in tags.pok) |=(=tag:gol private.tag)) 
+        =/  gl=goal-local:gol  (~(got by local.store) id.pok)
+        =.  tags.gl  tags.pok
+        :_  state(local.store (~(put by local.store) id.pok gl))
+        =/  hom=home-update:gol
+          [[pin our.bowl pid] vzn %goal-hitch id.pok %put-tags tags.pok]
+        [%give %fact ~[/goals] goal-home-update+!>(hom)]~
         ::
           %add-field-type
         ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
@@ -136,18 +142,21 @@
           %add-goal-tag
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
+        ?<  private.tag.pok
         =/  pore  (add-goal-tag:(apex-em:hc pin) id.pok tag.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
         ::
           %del-goal-tag
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
+        ?<  private.tag.pok
         =/  pore  (del-goal-tag:(apex-em:hc pin) id.pok tag.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
         ::
           %put-goal-tags
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
+        ?>  (~(all in tags.pok) |=(=tag:gol !private.tag)) 
         =/  pore  (put-goal-tags:(apex-em:hc pin) id.pok tags.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           :: [%edit-goal-note =id note=@t]
@@ -383,7 +392,35 @@
   ^-  (unit (unit cage))
   ?+    path  (on-peek:def path)
       [%x %initial ~]
-    ``goal-peek+!>(initial+store)
+    |^
+    :-  ~  :-  ~  :-  %goal-peek
+    !>  :-  %initial
+    %=  store
+      pools  (unify-tags pools)
+      cache  (unify-tags cache)
+    ==
+    ++  unify-tags
+      |=  =pools:gol
+      ^-  pools:gol
+      %-  ~(gas by *pools:gol)
+      %+  turn  ~(tap by pools)
+      |=  [=pin:gol =pool:gol]
+      ^-  [pin:gol pool:gol]
+      :-  pin
+      %=    pool
+          goals
+        %-  ~(gas by *goals:gol)
+        %+  turn  ~(tap by goals.pool)
+        |=  [=id:gol =goal:gol]
+        ^-  [id:gol goal:gol]
+        :-  id
+        %=    goal
+            tags
+         %-  ~(uni in tags.goal)
+         tags:(~(got by local.store) id)
+        ==
+      ==
+    --
     ::
       [%x %updates *]
     ?+    t.t.path  (on-peek:def path)

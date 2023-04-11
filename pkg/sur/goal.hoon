@@ -29,6 +29,9 @@
 +$  goal-froze    goal-froze:s5
 +$  goal-trace    goal-trace:s5
 +$  goal-hitch    goal-hitch:s5
++$  goal-local    goal-local:s5
+::
++$  local         local:s5
 ::
 +$  goal          goal:s5
 +$  ngoal         ngoal:s5
@@ -107,7 +110,7 @@
         nest-ryte=(set id)
     ==
   ::
-  +$  tag  [text=@t color=@t]
+  +$  tag  [text=@t color=@t private=?]
   ::
   +$  field-data
     $%  [%ct d=@t] :: categorical
@@ -121,7 +124,12 @@
         [%rd ~]
     ==
   ::
-  ++  tag-bunt  (sy ~[tag1+'#ff0000' tag2+'#00ff00' tag3+'#0000ff'])
+  ++  tag-bunt
+    %-  sy
+    :~  [%tag1 '#ff0000' |]
+        [%tag2 '#00ff00' |]
+        [%tag3 '#0000ff' |]
+    ==
   ::
   +$  goal-hitch
     $:  desc=@t
@@ -184,13 +192,16 @@
   +$  index         index:s4
   ++  idx-orm       idx-orm:s4
   ::
-  +$  pags  (map id (set tag))
+  +$  goal-local
+    $:  tags=(set tag)
+    ==
+  +$  local  (map id goal-local)
   ::
   +$  store  
     $:  =index
         =pools
         cache=pools
-        =pags
+        =local
     ==
   ::
   +$  nux  [goal-nexus goal-trace]
@@ -250,8 +261,6 @@
   +$  log-update    $%([%updt upd=home-update] [%init =store])
   +$  log           ((mop @ log-update) lth)
   +$  logged        (pair @ log-update)
-  ::
-  +$  pags-update   [=id tags=(set tag)]
   ::
   +$  peek          :: underlying data structures have changed
                     $%  [%initial =store] 
