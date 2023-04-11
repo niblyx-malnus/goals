@@ -4,7 +4,7 @@
 +*  this  .
     tv    ~(. gol-cli-traverse goals.p)
     nd    ~(. gol-cli-node goals.p)
-++  vzn  %4
+++  vzn  vzn:gol
 ::
 :: ============================================================================
 :: 

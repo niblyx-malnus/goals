@@ -1,5 +1,5 @@
 /-  *goal
-/+  *gol-cli-util, group-store, metadata-store
+/+  *gol-cli-util
 |%
 ++  dejs-action
   =,  dejs:format
@@ -41,6 +41,8 @@
               rec+bo
               spawn+dejs-set-ships
           ==
+          [%reorder-roots (ot ~[pin+dejs-pin roots+(ar dejs-id)])]
+          [%reorder-young (ot ~[id+dejs-id young+(ar dejs-id)])]
           [%update-pool-perms (ot ~[pin+dejs-pin new+dejs-pool-perms])]
           [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
           [%edit-pool-title (ot ~[pin+dejs-pin title+so])]
@@ -260,6 +262,16 @@
         %+  frond  %nex
         (enjs-nex nex.upd)
         ::
+          %goal-young
+        %-  pairs
+        :~  [%id (enjs-id id.upd)]
+            [%young a+(turn young.upd enjs-id)]
+        ==
+        ::
+          %goal-roots
+        %+  frond  %roots
+        a+(turn roots.upd enjs-id)
+        ::
           %goal-togls
         %-  pairs
         :~  [%id (enjs-id id.upd)]
@@ -339,11 +351,6 @@
     %+  frond
       %updates
     a+(turn list.pyk enjs-logged)
-    ::
-    %groups  (frond %groups (initial:enjs:group-store [%initial groups.pyk]))
-    ::
-      %groups-metadata
-    (frond %metadata (associations:enjs:metadata-store metadata.pyk))
     ::
       %pool-keys
     %+  frond
@@ -561,6 +568,10 @@
       :-  %ranks  :-  %a
       %+  turn  ~(tap by ranks.nexus)
       |=([chip=@p =id] (pairs ~[[%ship (ship chip)] [%id (enjs-id id)]]))
+      ::
+      [%young a+(turn young.nexus enjs-id)]
+      [%young-by-kickoff a+(turn young.nexus enjs-id)]
+      [%young-by-deadline a+(turn young.nexus enjs-id)]
       ::
       [%prio-left a+(turn ~(tap in prio-left.nexus) enjs-id)]
       [%prio-ryte a+(turn ~(tap in prio-ryte.nexus) enjs-id)]

@@ -1,10 +1,10 @@
-/-  *group, ms=metadata-store
+/-  *group, ms=metadata-store :: need to keep for historical reasons
 /+  *gol-cli-util
 |%
 ::
 ++  vzn  %5
 ::
-+$  state-5  [%5 =store:s5 =groups =log:s5]
++$  state-5  [%5 =store:s5 =log:s5]
 +$  state-4  [%4 =store:s4 =groups =log:s4]
 +$  state-3  [%3 =store:s3]
 +$  state-2  [%2 =store:s2]
@@ -80,9 +80,32 @@
   +$  ranks         ranks:s4
   +$  moment        moment:s4
   ::
-  +$  goal-nexus    goal-nexus:s4
+  +$  goal-nexus
+    $:  par=(unit id)
+        kids=(set id)
+        kickoff=node
+        deadline=node
+        complete=_|
+        actionable=_|
+        chief=ship
+        spawn=(set ship)
+    ==
   +$  goal-froze    goal-froze:s4
-  +$  goal-trace    goal-trace:s4
+  ::
+  :: values implied by the data structure
+  +$  goal-trace
+    $:  =stock
+        =ranks
+        young=(list id)
+        young-by-kickoff=(list id)
+        young-by-deadline=(list id)
+        prio-left=(set id)
+        prio-ryte=(set id)
+        prec-left=(set id)
+        prec-ryte=(set id)
+        nest-left=(set id)
+        nest-ryte=(set id)
+    ==
   ::
   +$  tag  [text=@t color=@t]
   ::
@@ -119,15 +142,26 @@
   ::
   +$  goals  (map id goal)
   ::
+  +$  pool-perms   pool-perms:s4
   +$  pool-nexus
     $:  =goals
         cache=goals
         owner=ship
         perms=pool-perms
+        roots=(list id)
     ==
-  +$  pool-perms    pool-perms:s4
   +$  pool-froze    pool-froze:s4
-  +$  pool-trace    pool-trace:s4
+  ::
+  +$  pool-trace
+    $:  stock-map=(map id stock)
+        roots=(list id)
+        roots-by-kickoff=(list id)
+        roots-by-deadline=(list id)
+        left-bounds=(map nid moment)
+        ryte-bounds=(map nid moment)
+        left-plumbs=(map nid @)
+        ryte-plumbs=(map nid @)
+    ==
   ::
   +$  pool-hitch    
     $:  title=@t
@@ -159,8 +193,12 @@
         =pags
     ==
   ::
-  +$  nux           nux:s4
-  +$  nex           nex:s4
+  +$  nux  [goal-nexus goal-trace]
+  +$  nex  (map id nux)
+  ::
+  +$  pool-nexus-update
+    $%  [%yoke =nex]
+    ==
   ::
   +$  pool-hitch-update
     $%  [%title title=@t]
@@ -179,18 +217,33 @@
         [%del-field-data field=@t]
     ==
   ::
+  +$  goal-togls-update
+    $%  [%complete complete=_|]
+        [%actionable actionable=_|]
+    ==
+  ::
   +$  unver-update  :: underlying data structures have changed
-                    $%  [%spawn-pool =pool]
-                        [%renew-pool =pin =pool]
-                        [%spawn-goal =nex =id =goal]
-                        [%renew-goal =id ren=goals]
-                        [%pool-hitch pool-hitch-update]
-                        [%goal-hitch =id goal-hitch-update]
-                        $<  %spawn-pool  $<  %renew-pool
-                        $<  %spawn-goal  $<  %renew-goal
-                        $<  %pool-hitch  $<  %goal-hitch
-                        unver-update:s4
-                    ==
+    $%  [%spawn-pool =pool]
+        [%cache-pool =pin]
+        [%renew-pool =pin =pool]
+        [%waste-pool ~]
+        [%trash-pool ~]
+        [%spawn-goal =nex =id =goal]
+        [%waste-goal =nex =id waz=(set id)]
+        [%cache-goal =nex =id cas=(set id)]
+        [%renew-goal =id ren=goals]
+        [%trash-goal =id tas=(set id)]
+        [%pool-perms =nex new=pool-perms]
+        [%pool-hitch pool-hitch-update]
+        [%pool-nexus pool-nexus-update]
+        [%goal-dates =nex]
+        [%goal-perms =nex]
+        [%goal-roots roots=(list id)]
+        [%goal-young =id young=(list id)]
+        [%goal-hitch =id goal-hitch-update]
+        [%goal-togls =id goal-togls-update]
+        [%poke-error =tang]
+    ==
   +$  update        [%5 unver-update]
   +$  away-update   [[mod=ship pid=@] update]
   +$  home-update   [[=pin mod=ship pid=@] update]
@@ -222,7 +275,6 @@
     +$  util-action
       $%  [%subscribe =pin]
           [%unsubscribe =pin]
-          [%kicker =ship =pin]
       ==
     ++  pool-action
       =<  pool-action
@@ -252,32 +304,37 @@
       |%
       +$  goal-action  $%(spawn mutate local)
       +$  spawn  [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
-      +$  mutate  $%(life-cycle nexus hitch)
-      +$  life-cycle
-        $%  [%cache-goal =id]
-            [%renew-goal =id]
-            [%trash-goal =id]
-        ==
-      +$  nexus
-        $%  [%move cid=id upid=(unit id)] :: should probably be in nexus:pool-action
-            [%set-kickoff =id kickoff=(unit @da)]
-            [%set-deadline =id deadline=(unit @da)]
-            [%mark-actionable =id]
-            [%unmark-actionable =id]
-            [%mark-complete =id]
-            [%unmark-complete =id]
-            [%update-goal-perms =id chief=ship rec=_| spawn=(set ship)]
-        ==
-      +$  hitch
-        $%  [%edit-goal-desc =id desc=@t]
-            [%edit-goal-note =id note=@t]
-            [%add-goal-tag =id =tag]
-            [%del-goal-tag =id =tag]
-            [%put-goal-tags =id tags=(set tag)]
-            [%add-field-data =id field=@t =field-data]
-            [%del-field-data =id field=@t]
-        ==
-      ::
+      ++  mutate
+        =<  mutate
+        |%
+        +$  mutate  $%(life-cycle nexus hitch)
+        +$  life-cycle
+          $%  [%cache-goal =id]
+              [%renew-goal =id]
+              [%trash-goal =id]
+          ==
+        +$  nexus
+          $%  [%move cid=id upid=(unit id)] :: should probably be in nexus:pool-action
+              [%set-kickoff =id kickoff=(unit @da)]
+              [%set-deadline =id deadline=(unit @da)]
+              [%mark-actionable =id]
+              [%unmark-actionable =id]
+              [%mark-complete =id]
+              [%unmark-complete =id]
+              [%update-goal-perms =id chief=ship rec=_| spawn=(set ship)]
+              [%reorder-roots =pin roots=(list id)]
+              [%reorder-young =id young=(list id)]
+          ==
+        +$  hitch
+          $%  [%edit-goal-desc =id desc=@t]
+              [%edit-goal-note =id note=@t]
+              [%add-goal-tag =id =tag]
+              [%del-goal-tag =id =tag]
+              [%put-goal-tags =id tags=(set tag)]
+              [%add-field-data =id field=@t =field-data]
+              [%del-field-data =id field=@t]
+          ==
+        --
       +$  local
         $%  [%put-private-tags =id tags=(set tag)]
         ==
@@ -466,8 +523,6 @@
   +$  peek
     $%  [%initial =store]
         [%updates =(list logged)]
-        [%groups =groups]
-        [%groups-metadata metadata=associations:ms]
         [%pool-keys keys=(set pin)]
         [%all-goal-keys keys=(set id)]
         [%harvest harvest=(list id)]

@@ -1,8 +1,5 @@
 /-  gol=goal
-/+  *gol-cli-util, gol-cli-pool, gol-cli-node, gol-cli-traverse,
-:: import during development to force compilation
-::
-    gol-cli-json
+/+  *gol-cli-util, gol-cli-pool, gol-cli-node, gol-cli-traverse
 ::
 =|  efx=(list update:gol)
 |_  p=pool:gol
@@ -34,7 +31,6 @@
   |=  [old=_this upd=update:gol]
   ::
   :: confirm that applying update yields equivalent state
-  =.  old  old(trace.p trace.p)
   ?.  =(p.this p:(etch:old upd))
     ~|("non-equivalent-update" !!)
   (emit upd)
@@ -93,41 +89,29 @@
         ^-  [id:gol goal:gol]
         =/  =ngoal:gol  (~(got by goals.p) id)
         [id ngoal(nexus -.nux, trace +.nux)]
-      trace.p
-        =/  nex  ~(tap by nex)
-        |-
-        ?~  nex
-          trace.p
-        %=  $
-          nex  t.nex
-          trace.p  (nex-trace-update -.i.nex +.i.nex)
-        ==
     ==
-::
-++  nex-trace-update
-  |=  [=id:gol nus=goal-nexus:gol tar=goal-trace:gol]
-  ^-  pool-trace:gol
-  %=  trace.p
-    stock-map  (~(put by stock-map.trace.p) id stock.tar)
-    left-bounds  
-      %-  ~(gas by left-bounds.trace.p)
-      ~[[[%k id] left-bound.kickoff.nus] [[%d id] left-bound.deadline.nus]]
-    ryte-bounds
-      %-  ~(gas by ryte-bounds.trace.p)
-      ~[[[%k id] ryte-bound.kickoff.nus] [[%d id] ryte-bound.deadline.nus]]
-    left-plumbs
-      %-  ~(gas by left-plumbs.trace.p)
-      ~[[[%k id] left-plumb.kickoff.nus] [[%d id] left-plumb.deadline.nus]]
-    ryte-plumbs
-      %-  ~(gas by ryte-plumbs.trace.p)
-      ~[[[%k id] ryte-plumb.kickoff.nus] [[%d id] ryte-plumb.deadline.nus]]
-  ==
 ::
 :: ============================================================================
 :: 
 :: GOAL INFLATION (UPDATE WITH REDUNDANT INFORMATION)
 ::
 :: ============================================================================
+::
+++  fix-list
+  |=  [typ=?(%p %k %d) old=(list id:gol) new=(set id:gol)]
+  ^-  (list id:gol)
+  :: remove stale ids
+  =/  fix
+    |-  ^-  (list id:gol)
+    ?~  old  ~
+    ?.  (~(has in new) i.old)
+      $(old t.old)
+    [i.old $(old t.old)]
+  ::  add fresh ids to front and sort
+  %+  topological-sort:tv  typ
+  %+  weld
+    ~(tap in (~(dif in new) (sy old)))
+  fix
 ::
 :: all of these should be O(nlogn) with size of the goals map
 :: if it starts taking real performance hits we can revisit this...
@@ -139,6 +123,9 @@
   ::
   ^-  pool-trace:gol
   :*  stock-map=((chain:tv id:gol stock:gol) get-stocks:tv (bare-goals:nd) ~)
+      roots=(fix-list %p roots.p (sy (root-goals:nd)))
+      roots-by-kickoff=(fix-list %k roots.p (sy (root-goals:nd)))
+      roots-by-deadline=(fix-list %d roots.p (sy (root-goals:nd)))
       ^=  left-bounds
         ((chain:tv nid:gol moment:gol) (get-bounds:tv %l) (root-nodes:nd) ~)
       ^=  ryte-bounds
@@ -156,14 +143,17 @@
   ::
   =/  goal  (~(got by goals.p) id)
   %=  goal
-    stock  (~(got by stock-map.trace.p) id)
-    ranks  (get-ranks:tv (~(got by stock-map.trace.p) id))
-    prio-left  (prio-left:nd id)
-    prio-ryte  (prio-ryte:nd id)
-    prec-left  (prec-left:nd id)
-    prec-ryte  (prec-ryte:nd id)
-    nest-left  (nest-left:nd id)
-    nest-ryte  (nest-ryte:nd id)
+    stock               (~(got by stock-map.trace.p) id)
+    ranks               (get-ranks:tv (~(got by stock-map.trace.p) id))
+    young               (fix-list %p young.goal (young:nd id))
+    young-by-kickoff    (fix-list %k young.goal (young:nd id))
+    young-by-deadline   (fix-list %d young.goal (young:nd id))
+    prio-left           (prio-left:nd id)
+    prio-ryte           (prio-ryte:nd id)
+    prec-left           (prec-left:nd id)
+    prec-ryte           (prec-ryte:nd id)
+    nest-left           (nest-left:nd id)
+    nest-ryte           (nest-ryte:nd id)
     left-bound.kickoff  (~(got by left-bounds.trace.p) [%k id])
     ryte-bound.kickoff  (~(got by ryte-bounds.trace.p) [%k id]) 
     left-plumb.kickoff  (~(got by left-plumbs.trace.p) [%k id]) 
@@ -300,6 +290,26 @@
   ^-  _this
   =/  tore  (apply unmark-complete:(pore) id mod)
   (emot:tore this [vzn %goal-togls id %complete %.n])
+::
+++  reorder-young
+  |=  [=id:gol young=(list id:gol) mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-goal-edit-perm:(pore) id mod)
+  ?>  =((sy young) (young:nd id))
+  =/  goal  (~(got by goals.p) id)
+  =.  young.goal  (topological-sort:tv %p young)
+  =.  goals.p     (~(put by goals.p) id goal)
+  (emot old [vzn %goal-young id young.goal])
+::
+++  reorder-roots
+  |=  [roots=(list id:gol) mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-pool-edit-perm:(pore) mod)
+  ?>  =((sy roots) (sy (root-goals:nd)))
+  =.  roots.p  (topological-sort:tv %p roots)
+  (emot old [vzn %goal-roots roots.p])
 ::
 ++  set-kickoff
   |=  [=id:gol =moment:gol mod=ship]
@@ -477,6 +487,7 @@
   |=  upd=update:gol
   ^-  _this
   |^
+  =;  tore  (inflater:tore)
   ?+    +.upd  !!
     :: ------------------------------------------------------------------------
     :: spawn/trash
@@ -530,6 +541,18 @@
     ::
       [%goal-perms *]
     (apply-nex nex.upd)
+    :: ------------------------------------------------------------------------
+    :: goal-young
+    ::
+      [%goal-young *]
+    =/  =goal:gol  (~(got by goals.p) id.upd)
+    =.  young.goal  young.upd
+    this(goals.p (~(put by goals.p) id.upd goal))
+    :: ------------------------------------------------------------------------
+    :: goal-roots
+    ::
+      [%goal-roots *]
+    this(roots.p roots.upd)
     :: ------------------------------------------------------------------------
     :: goal-hitch
     ::
