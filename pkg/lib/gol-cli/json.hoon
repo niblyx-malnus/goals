@@ -41,6 +41,7 @@
               rec+bo
               spawn+dejs-set-ships
           ==
+          [%reorder-roots (ot ~[pin+dejs-pin roots+(ar dejs-id)])]
           [%reorder-young (ot ~[id+dejs-id young+(ar dejs-id)])]
           [%update-pool-perms (ot ~[pin+dejs-pin new+dejs-pool-perms])]
           [%edit-goal-desc (ot ~[id+dejs-id desc+so])]
@@ -262,8 +263,14 @@
         (enjs-nex nex.upd)
         ::
           %goal-young
-        %+  frond  %nex
-        (enjs-nex nex.upd)
+        %-  pairs
+        :~  [%id (enjs-id id.upd)]
+            [%young a+(turn young.upd enjs-id)]
+        ==
+        ::
+          %goal-roots
+        %+  frond  %roots
+        a+(turn roots.upd enjs-id)
         ::
           %goal-togls
         %-  pairs
@@ -547,7 +554,6 @@
   %-  pairs
   :~  [%par ?~(par.nexus ~ (enjs-id u.par.nexus))]
       [%kids a+(turn ~(tap in kids.nexus) enjs-id)]
-      [%young a+(turn young.nexus enjs-id)]
       [%kickoff (enjs-node kickoff.nexus)]
       [%deadline (enjs-node deadline.nexus)]
       [%complete b+complete.nexus]
@@ -562,6 +568,10 @@
       :-  %ranks  :-  %a
       %+  turn  ~(tap by ranks.nexus)
       |=([chip=@p =id] (pairs ~[[%ship (ship chip)] [%id (enjs-id id)]]))
+      ::
+      [%young a+(turn young.nexus enjs-id)]
+      [%young-by-kickoff a+(turn young.nexus enjs-id)]
+      [%young-by-deadline a+(turn young.nexus enjs-id)]
       ::
       [%prio-left a+(turn ~(tap in prio-left.nexus) enjs-id)]
       [%prio-ryte a+(turn ~(tap in prio-ryte.nexus) enjs-id)]

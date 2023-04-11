@@ -83,7 +83,6 @@
   +$  goal-nexus
     $:  par=(unit id)
         kids=(set id)
-        young=(list id)
         kickoff=node
         deadline=node
         complete=_|
@@ -92,7 +91,21 @@
         spawn=(set ship)
     ==
   +$  goal-froze    goal-froze:s4
-  +$  goal-trace    goal-trace:s4
+  ::
+  :: values implied by the data structure
+  +$  goal-trace
+    $:  =stock
+        =ranks
+        young=(list id)
+        young-by-kickoff=(list id)
+        young-by-deadline=(list id)
+        prio-left=(set id)
+        prio-ryte=(set id)
+        prec-left=(set id)
+        prec-ryte=(set id)
+        nest-left=(set id)
+        nest-ryte=(set id)
+    ==
   ::
   +$  tag  [text=@t color=@t]
   ::
@@ -138,7 +151,17 @@
         roots=(list id)
     ==
   +$  pool-froze    pool-froze:s4
-  +$  pool-trace    pool-trace:s4
+  ::
+  +$  pool-trace
+    $:  stock-map=(map id stock)
+        roots=(list id)
+        roots-by-kickoff=(list id)
+        roots-by-deadline=(list id)
+        left-bounds=(map nid moment)
+        ryte-bounds=(map nid moment)
+        left-plumbs=(map nid @)
+        ryte-plumbs=(map nid @)
+    ==
   ::
   +$  pool-hitch    
     $:  title=@t
@@ -215,7 +238,8 @@
         [%pool-nexus pool-nexus-update]
         [%goal-dates =nex]
         [%goal-perms =nex]
-        [%goal-young =nex]
+        [%goal-roots roots=(list id)]
+        [%goal-young =id young=(list id)]
         [%goal-hitch =id goal-hitch-update]
         [%goal-togls =id goal-togls-update]
         [%poke-error =tang]
@@ -298,6 +322,7 @@
               [%mark-complete =id]
               [%unmark-complete =id]
               [%update-goal-perms =id chief=ship rec=_| spawn=(set ship)]
+              [%reorder-roots =pin roots=(list id)]
               [%reorder-young =id young=(list id)]
           ==
         +$  hitch

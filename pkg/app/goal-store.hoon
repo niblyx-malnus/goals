@@ -326,6 +326,11 @@
         =/  pore  (reorder-young:(apex-em:hc pin) id.pok young.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
+          %reorder-roots
+        ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
+        =/  pore  (reorder-roots:(apex-em:hc pin.pok) roots.pok src.bowl)
+        abet:(send-away-updates:hc ~ [pin.pok src.bowl pid] efx:abet:pore)
+          ::
           :: [%update-pool-perms =pin new=pool-perms]
           %update-pool-perms
         ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)

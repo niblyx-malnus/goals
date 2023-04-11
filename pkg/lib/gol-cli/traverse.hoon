@@ -280,9 +280,10 @@
       exit  |=([=nid:gol vis=(map nid:gol (unit ?))] vis)
     ==
   (((traverse nid:gol (unit ?) (map nid:gol (unit ?))) gine vis) nid)
-:: get set of all ids whose deadline precedes a given node
+:: get set of all ids whose kickoff/deadline precedes a given node
 ::
 ++  precedents
+  |=  kd=?(%k %d)
   |=  [=nid:gol vis=(map nid:gol (set id:gol))]
   ^-  (map nid:gol (set id:gol))
   =/  gine  (gine nid:gol (set id:gol) (map nid:gol (set id:gol)))
@@ -293,7 +294,7 @@
         %-  ~(gas by *(set id:gol))
         %+  murn  ~(tap in (iflo nid))
         |=  =nid:gol
-        ?.  ?=(%d -.nid)
+        ?.  =(kd -.nid)
           ~
         (some id.nid)
       flow  |=(=nid:gol ~(tap in (iflo nid)))
@@ -305,20 +306,26 @@
 :: Get ids whose deadline comes before an id kickoff
 ::
 ++  precedents-map
+  |=  [bef=?(%k %d) aft=?(%k %d)]
   ^-  (map id:gol (set id:gol))
   %-  ~(gas by *(map id:gol (set id:gol)))
   %+  murn
     %~  tap  by
-    ((chain nid:gol (set id:gol)) precedents (root-nodes:nd) ~)
+    ((chain nid:gol (set id:gol)) (precedents bef) (root-nodes:nd) ~)
   |=  [=nid:gol precs=(set id:gol)]
-  ?.  ?=(%k -.nid)  ~  :: only get kickoffs
+  ?.  =(aft -.nid)  ~
   (some [id.nid precs])
 :: force a list of ids to be topologically sorted
 ::
 ++  topological-sort
-  |=  ids=(list id:gol)
+  |=  [typ=?(%p %k %d) ids=(list id:gol)]
   ^-  (list id:gol)
-  =/  precs  precedents-map
+  =/  precs
+    ?-  typ
+      %p  (precedents-map %d %k)
+      %d  (precedents-map %d %d)
+      %k  (precedents-map %k %k)
+    ==
   |^
   =.  precs  purge :: only keep ids in list
   |-  ^-  (list id:gol)
@@ -351,15 +358,37 @@
     %+  murn  ~(tap by precs)
     |=  [=id:gol =(set id:gol)]
     ?.(=(~ set) ~ (some id))
+  ++  ranks-lth
+    |=  [=id:gol ac=id:gol]
+    ^-  id:gol
+    =/  i=@  (~(got by ranks) id)
+    =/  a=@  (~(got by ranks) ac)
+    ?:((lth i a) id ac)
+  ++  k-lth
+    |=  [=id:gol ac=id:gol]
+    ^-  id:gol
+    =/  im  moment.kickoff:(~(got by goals) id)
+    =/  am  moment.kickoff:(~(got by goals) ac)
+    ?:  =(im am)  (ranks-lth id ac)
+    ?~(im id ?~(am ac ?:((lth u.im u.am) id ac)))
+  ++  d-lth
+    |=  [=id:gol ac=id:gol]
+    ^-  id:gol
+    =/  im  moment.deadline:(~(got by goals) id)
+    =/  am  moment.deadline:(~(got by goals) ac)
+    ?:  =(im am)  (ranks-lth id ac)
+    ?~(am id ?~(im ac ?:((lth u.im u.am) id ac)))
   ++  first
     ^-  id:gol
     =/  outer=(list id:gol)  outer
     ?>  ?=(^ outer)
     %+  roll  t.outer
     |:  [id=`id:gol`i.outer ac=`id:gol`i.outer]
-    =/  i=@  (~(got by ranks) id)
-    =/  a=@  (~(got by ranks) ac)
-    ?:((lth i a) id ac)
+    ?-  typ
+      %p  (ranks-lth id ac)
+      %k  (k-lth id ac)
+      %d  (d-lth id ac)
+    ==
   --
 ::
 :: get uncompleted leaf goals left of id

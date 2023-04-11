@@ -44,13 +44,24 @@
     |=([id:gol =goal:gol] =(~ inflow.kickoff.goal))
   |=([=id:gol =goal:gol] [%k id])
 ::
-:: goals whose deadlines have no outflows
+++  is-unnested
+  |=  =id:gol
+  ^-  ?
+  =;  d-outflow  =(~ d-outflow)
+  %+  murn
+    ~(tap in (oflo [%d id]))
+  |=  =nid:gol
+  ?.  ?=(%d -.nid)
+    ~
+  (some nid)
+::
+:: goals whose deadlines have no outflows to deadlines
 ++  root-goals
   |.  ^-  (list id:gol)
   %+  turn
     %+  skim
       ~(tap by goals)
-    |=([id:gol =goal:gol] =(~ outflow.deadline.goal))
+    |=([=id:gol goal:gol] (is-unnested id))
   |=([=id:gol =goal:gol] id)
 ::
 :: parentless goals

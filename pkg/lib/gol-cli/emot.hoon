@@ -97,6 +97,22 @@
 ::
 :: ============================================================================
 ::
+++  fix-list
+  |=  [typ=?(%p %k %d) old=(list id:gol) new=(set id:gol)]
+  ^-  (list id:gol)
+  :: remove stale ids
+  =/  fix
+    |-  ^-  (list id:gol)
+    ?~  old  ~
+    ?.  (~(has in new) i.old)
+      $(old t.old)
+    [i.old $(old t.old)]
+  ::  add fresh ids to front and sort
+  %+  topological-sort:tv  typ
+  %+  weld
+    ~(tap in (~(dif in new) (sy old)))
+  fix
+::
 :: all of these should be O(nlogn) with size of the goals map
 :: if it starts taking real performance hits we can revisit this...
 ++  trace-update
@@ -107,6 +123,9 @@
   ::
   ^-  pool-trace:gol
   :*  stock-map=((chain:tv id:gol stock:gol) get-stocks:tv (bare-goals:nd) ~)
+      roots=(fix-list %p roots.p (sy (root-goals:nd)))
+      roots-by-kickoff=(fix-list %k roots.p (sy (root-goals:nd)))
+      roots-by-deadline=(fix-list %d roots.p (sy (root-goals:nd)))
       ^=  left-bounds
         ((chain:tv nid:gol moment:gol) (get-bounds:tv %l) (root-nodes:nd) ~)
       ^=  ryte-bounds
@@ -124,14 +143,17 @@
   ::
   =/  goal  (~(got by goals.p) id)
   %=  goal
-    stock  (~(got by stock-map.trace.p) id)
-    ranks  (get-ranks:tv (~(got by stock-map.trace.p) id))
-    prio-left  (prio-left:nd id)
-    prio-ryte  (prio-ryte:nd id)
-    prec-left  (prec-left:nd id)
-    prec-ryte  (prec-ryte:nd id)
-    nest-left  (nest-left:nd id)
-    nest-ryte  (nest-ryte:nd id)
+    stock               (~(got by stock-map.trace.p) id)
+    ranks               (get-ranks:tv (~(got by stock-map.trace.p) id))
+    young               (fix-list %p young.goal (young:nd id))
+    young-by-kickoff    (fix-list %k young.goal (young:nd id))
+    young-by-deadline   (fix-list %d young.goal (young:nd id))
+    prio-left           (prio-left:nd id)
+    prio-ryte           (prio-ryte:nd id)
+    prec-left           (prec-left:nd id)
+    prec-ryte           (prec-ryte:nd id)
+    nest-left           (nest-left:nd id)
+    nest-ryte           (nest-ryte:nd id)
     left-bound.kickoff  (~(got by left-bounds.trace.p) [%k id])
     ryte-bound.kickoff  (~(got by ryte-bounds.trace.p) [%k id]) 
     left-plumb.kickoff  (~(got by left-plumbs.trace.p) [%k id]) 
@@ -272,9 +294,22 @@
 ++  reorder-young
   |=  [=id:gol young=(list id:gol) mod=ship]
   ^-  _this
-  =/  tore  (apply reorder-young:(pore) id young mod)
-  =/  fd  (full-diff goals.p goals.p.tore)
-  (emot:tore this [vzn %goal-young nex.fd])
+  =/  old  this
+  ?>  (check-goal-edit-perm:(pore) id mod)
+  ?>  =((sy young) (young:nd id))
+  =/  goal  (~(got by goals.p) id)
+  =.  young.goal  (topological-sort:tv %p young)
+  =.  goals.p     (~(put by goals.p) id goal)
+  (emot old [vzn %goal-young id young.goal])
+::
+++  reorder-roots
+  |=  [roots=(list id:gol) mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-pool-edit-perm:(pore) mod)
+  ?>  =((sy roots) (sy (root-goals:nd)))
+  =.  roots.p  (topological-sort:tv %p roots)
+  (emot old [vzn %goal-roots roots.p])
 ::
 ++  set-kickoff
   |=  [=id:gol =moment:gol mod=ship]
@@ -510,7 +545,14 @@
     :: goal-young
     ::
       [%goal-young *]
-    (apply-nex nex.upd)
+    =/  =goal:gol  (~(got by goals.p) id.upd)
+    =.  young.goal  young.upd
+    this(goals.p (~(put by goals.p) id.upd goal))
+    :: ------------------------------------------------------------------------
+    :: goal-roots
+    ::
+      [%goal-roots *]
+    this(roots.p roots.upd)
     :: ------------------------------------------------------------------------
     :: goal-hitch
     ::
