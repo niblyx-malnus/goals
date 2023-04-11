@@ -1,8 +1,8 @@
-/-  gol=goal, group-store, metadata-store
+/-  gol=goal
 /+  dbug, default-agent, verb, agentio,
     pl=gol-cli-pool, gol-cli-goals, gol-cli-pools,
     em=gol-cli-emot, gol-cli-node, gol-cli-traverse,
-    gol-cli-etch, group-update,
+    gol-cli-etch,
 :: import during development to force compilation
 ::
     gol-cli-json
@@ -45,7 +45,8 @@
 +*  this    .
     def   ~(. (default-agent this %.n) bowl)
     io    ~(. agentio bowl)
-    hc    ~(. +> bowl)
+    hc    ~(. +> [bowl ~])
+    cc    |=(cards=(list card) ~(. +> [bowl cards]))
     gols  ~(. gol-cli-goals store)
     puls  ~(. gol-cli-pools store)
     etch  ~(. gol-cli-etch store)
@@ -56,10 +57,7 @@
 ++  on-init   
   ^-  (quip card _this)
   =/  now=@  (unique-time now.bowl log)
-  :_  this(log (put:log-orm *log:gol now [%init store]))
-  ?:  (~(has by wex.bowl) [/groups our.bowl %group-store])
-    ~
-  [(~(watch-our pass:io /groups) %group-store /groups)]~
+  `this(log (put:log-orm *log:gol now [%init store]))
 ::
 ++  on-save   !>(state)
 ::
@@ -70,6 +68,7 @@
   |-
   ?-    -.old
       %5
+    :: TODO: Reload subscriptions according to new format
     =.  old
       %=  old
         pools.store
@@ -79,10 +78,7 @@
           pool:abet:(inflater:(apex:em pool))
       ==
     =/  now=@  (unique-time now.bowl log)
-    :_  this(state old(log (put:log-orm *log:gol now [%init store.old])))
-    ?:  (~(has by wex.bowl) [/groups our.bowl %group-store])
-      ~
-    [(~(watch-our pass:io /groups) %group-store /groups)]~
+    `this(state old(log (put:log-orm *log:gol now [%init store.old])))
       %4
     $(old (convert-4-to-5:gol old))
       %3
@@ -110,161 +106,106 @@
         ?>  =(src our):bowl
         :_  state(pags.store (~(put by pags.store) [id tags]:pok))
         [%give %fact ~[/goals] goal-pags-update+!>([id tags]:pok)]~
-
+        ::
           %add-field-type
-        =*  poke-other
-          ~(poke-other pass:hc (en-away-path pid pin.pok %add-field-type))
-        ?.  =(our.bowl owner.pin.pok)
-          :_  state
-          [(poke-other owner.pin.pok goal-action+!>(action))]~
+        ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
         =/  pore
           %-  add-field-type:(apex-em:hc pin.pok)
           [field.pok field-type.pok src.bowl]
-        (send-away-updates:hc ~ pin.pok src.bowl pid pore)      
+        abet:(send-away-updates:hc ~ [pin.pok src.bowl pid] efx:abet:pore)
         ::
           %del-field-type
-        =*  poke-other
-          ~(poke-other pass:hc (en-away-path pid pin.pok %del-field-type))
-        ?.  =(our.bowl owner.pin.pok)
-          :_  state
-          [(poke-other owner.pin.pok goal-action+!>(action))]~
-        =/  pore
-          (del-field-type:(apex-em:hc pin.pok) field.pok src.bowl)
-        (send-away-updates:hc ~ pin.pok src.bowl pid pore)      
+        ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
+        =/  pore  (del-field-type:(apex-em:hc pin.pok) field.pok src.bowl)
+        abet:(send-away-updates:hc ~ [pin.pok src.bowl pid] efx:abet:pore)
         ::
           %add-field-data
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          ~(poke-other pass:hc (en-away-path pid pin %add-field-data))
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         =/  pore
           %-  add-field-data:(apex-em:hc pin)
           [id.pok field.pok field-data.pok src.bowl]
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
         ::
           %del-field-data
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          ~(poke-other pass:hc (en-away-path pid pin %del-field-data))
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore
-          (del-field-data:(apex-em:hc pin) id.pok field.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
+        =/  pore  (del-field-data:(apex-em:hc pin) id.pok field.pok src.bowl)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
         ::
           %add-goal-tag
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          ~(poke-other pass:hc (en-away-path pid pin %add-goal-tag))
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore
-          (add-goal-tag:(apex-em:hc pin) id.pok tag.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
+        =/  pore  (add-goal-tag:(apex-em:hc pin) id.pok tag.pok src.bowl)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
         ::
           %del-goal-tag
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          ~(poke-other pass:hc (en-away-path pid pin %del-goal-tag))
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore
-          (del-goal-tag:(apex-em:hc pin) id.pok tag.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
+        =/  pore  (del-goal-tag:(apex-em:hc pin) id.pok tag.pok src.bowl)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
         ::
           %put-goal-tags
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          ~(poke-other pass:hc (en-away-path pid pin %put-goal-tags))
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore
-          (put-goal-tags:(apex-em:hc pin) id.pok tags.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
+        =/  pore  (put-goal-tags:(apex-em:hc pin) id.pok tags.pok src.bowl)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           :: [%edit-goal-note =id note=@t]
           ::
           %edit-goal-note
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          ~(poke-other pass:hc (en-away-path pid pin %edit-goal-note))
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore
-          (edit-goal-note:(apex-em:hc pin) id.pok note.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
+        =/  pore  (edit-goal-note:(apex-em:hc pin) id.pok note.pok src.bowl)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           :: [%edit-pool-note =pin note=@t]
           ::
           %edit-pool-note
-        =*  poke-other
-          ~(poke-other pass:hc (en-away-path pid pin.pok %edit-pool-note))
-        ?.  =(our.bowl owner.pin.pok)
-          :_  state
-          [(poke-other owner.pin.pok goal-action+!>(action))]~
-        =/  pore
-          (edit-pool-note:(apex-em:hc pin.pok) note.pok src.bowl)
-        (send-away-updates:hc ~ pin.pok src.bowl pid pore)      
+        ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
+        =/  pore  (edit-pool-note:(apex-em:hc pin.pok) note.pok src.bowl)
+        abet:(send-away-updates:hc ~ [pin.pok src.bowl pid] efx:abet:pore)
           ::
           %spawn-pool
         ?>  =(src.bowl our.bowl)
         =+  [pin pool]=(spawn-pool:puls title.pok src.bowl now.bowl)
-        (send-home-updates:hc ~ pin src.bowl pid [vzn %spawn-pool pool]~)
+        =/  upds=(list update:gol)  [vzn %spawn-pool pool]~
+        abet:(send-home-updates:hc ~ [pin src.bowl pid] upds)
           ::
           %clone-pool
         ?>  =(src.bowl our.bowl)
         =+  ^=  [pin pool]
           (clone-pool:puls pin.pok title.pok src.bowl now.bowl)
-        (send-home-updates:hc ~ pin src.bowl pid [vzn %spawn-pool pool]~)
+        =/  upds=(list update:gol)  [vzn %spawn-pool pool]~
+        abet:(send-home-updates:hc ~ [pin src.bowl pid] upds)
           ::
           :: [%cache-pool =pin]
           %cache-pool
         ?>  =(src.bowl our.bowl)
         ?>  =(src.bowl owner.pin.pok)
-        %+  send-home-updates:hc
-          [%give %kick ~[/[`@`+<.pin.pok]/[`@`+>.pin.pok]] ~]~
-        [pin.pok src.bowl pid [vzn %cache-pool pin.pok]~]
+        =/  cards=(list card)  [%give %kick ~[(en-pool-path:hc pin.pok)] ~]~
+        =/  upds=(list update:gol)  [vzn %cache-pool pin.pok]~
+        abet:(send-home-updates:hc cards [pin.pok src.bowl pid] upds)
           ::
           :: [%renew-pool =pin]
           %renew-pool
         ?>  =(src.bowl our.bowl)
         ?>  =(src.bowl owner.pin.pok)
-        =*  poke-other  ~(poke-other pass:hc /away/renew-pool)
-        %+  send-home-updates:hc
-            %+  turn
-              %~  tap  in
-              (~(del in ~(key by perms:(~(got by cache) pin.pok))) our.bowl)
-            |=  =ship
-            ^-  card
-            (poke-other ship goal-action+!>([vzn 0 %subscribe pin.pok]))
-        =/  pool  (~(got by cache) pin.pok) :: this is redundant information
-        [pin.pok src.bowl pid [vzn %renew-pool pin.pok pool]~]
+        =/  pool  (~(got by cache) pin.pok)
+        =/  upds=(list update:gol)  [vzn %renew-pool pin.pok pool]~
+        abet:(send-home-updates:hc ~ [pin.pok src.bowl pid] upds)
           ::
           :: [%trash-pool =pin]
           %trash-pool
         ?>  =(src.bowl our.bowl)
         ?>  =(src.bowl owner.pin.pok)
-        %+  send-home-updates:hc
-          [%give %kick ~[/[`@`+<.pin.pok]/[`@`+>.pin.pok]] ~]~
-        ?:  (~(has by pools) pin.pok)
-          [pin.pok src.bowl pid [vzn %waste-pool ~]~]
-        ?>  (~(has by cache) pin.pok)
-        [pin.pok src.bowl pid [vzn %trash-pool ~]~]
+        =/  cards=(list card)  [%give %kick ~[(en-pool-path:hc pin.pok)] ~]~
+        =/  upds=(list update:gol)
+          ?:  (~(has by pools) pin.pok)  [vzn %waste-pool ~]~
+          ?>  (~(has by cache) pin.pok)  [vzn %trash-pool ~]~
+        abet:(send-home-updates:hc cards [pin.pok src.bowl pid] upds)
           ::
           :: [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
           %spawn-goal
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin.pok %spawn-goal)
-        ?.  =(our.bowl owner.pin.pok)
-          :_  state
-          [(poke-other owner.pin.pok goal-action+!>(action))]~
+        ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
         =/  =id:gol  (unique-id:gols [our.bowl now.bowl])
         =/  pore
           %:  spawn-goal-fixns:(apex-em:hc pin.pok)
@@ -274,190 +215,101 @@
             actionable.pok
             src.bowl
           ==
-        (send-away-updates:hc ~ pin.pok src.bowl pid pore)
+        abet:(send-away-updates:hc ~ [pin.pok src.bowl pid] efx:abet:pore)
           ::
           :: [%cache-goal =id]
           %cache-goal
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %cache-goal)
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         =/  pore  (cache-goal:(apex-em:hc pin) id.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%renew-goal =id]
           %renew-goal
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %renew-goal)
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         =/  pore  (renew-goal:(apex-em:hc pin) id.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%trash-goal =id]
           %trash-goal
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %trash-goal)
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         =/  pore  (trash-goal:(apex-em:hc pin) id.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%edit-goal-desc =id desc=@t]
           %edit-goal-desc
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %edit-goal-desc)
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore
-          (edit-goal-desc:(apex-em:hc pin) id.pok desc.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
+        =/  pore  (edit-goal-desc:(apex-em:hc pin) id.pok desc.pok src.bowl)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%edit-pool-title =pin title=@t]
           %edit-pool-title
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin.pok %edit-pool-title)
-        ?.  =(our.bowl owner.pin.pok)
-          :_  state
-          [(poke-other owner.pin.pok goal-action+!>(action))]~
-        =/  pore
-          (edit-pool-title:(apex-em:hc pin.pok) title.pok src.bowl)
-        (send-away-updates:hc ~ pin.pok src.bowl pid pore)
+        ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
+        =/  pore  (edit-pool-title:(apex-em:hc pin.pok) title.pok src.bowl)
+        abet:(send-away-updates:hc ~ [pin.pok src.bowl pid] efx:abet:pore)
           ::
           :: [%yoke =pin yoks=(list plex)]
           %yoke
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin.pok %yoke)
-        ?.  =(our.bowl owner.pin.pok)
-          :_  state
-          [(poke-other owner.pin.pok goal-action+!>(action))]~
+        ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
         =/  pore  (plex-sequence:(apex-em:hc pin.pok) yoks.pok src.bowl)
-        (send-away-updates:hc ~ pin.pok src.bowl pid pore)
+        abet:(send-away-updates:hc ~ [pin.pok src.bowl pid] efx:abet:pore)
           ::
           :: [%move cid=id upid=(unit id)]
           %move
         =/  pin  (got:idx-orm:gol index.store cid.pok)
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %move)
-        ?.  =(our.bowl owner.cid.pok)
-          :_  state
-          [(poke-other owner.cid.pok goal-action+!>(action))]~
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         =/  pore  (move:(apex-em:hc pin) cid.pok upid.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%set-kickoff =id kickoff=(unit @da)]
           %set-kickoff
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %set-kickoff)
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore
-          (set-kickoff:(apex-em:hc pin) id.pok kickoff.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
+        =/  pore  (set-kickoff:(apex-em:hc pin) id.pok kickoff.pok src.bowl)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%set-deadline =id deadline=(unit @da)]
           %set-deadline
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %set-deadline)
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
-        =/  pore
-          (set-deadline:(apex-em:hc pin) id.pok deadline.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
-          ::
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
+        =/  pore  (set-deadline:(apex-em:hc pin) id.pok deadline.pok src.bowl)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%mark-actionable =id]
           %mark-actionable
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %mark-actionable)
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         =/  pore  (mark-actionable:(apex-em:hc pin) id.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%unmark-actionable =id]
           %unmark-actionable
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %unmark-actionable)
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         =/  pore  (unmark-actionable:(apex-em:hc pin) id.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%mark-complete =id]
           %mark-complete
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %mark-complete)
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         =/  pore  (mark-complete:(apex-em:hc pin) id.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%unmark-complete =id]
           %unmark-complete
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %unmark-complete)
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         =/  pore  (unmark-complete:(apex-em:hc pin) id.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%update-goal-perms =id chief=ship rec=?(%.y %.n) spawn=(set ship)]
           %update-goal-perms
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %update-goal-perms)
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         =/  pore
           %:  update-goal-perms:(apex-em:hc pin)
             id.pok
@@ -466,87 +318,39 @@
             spawn.pok
             src.bowl
           ==
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           %reorder-young
         =/  pin  (got:idx-orm:gol index.store id.pok)
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin %reorder-young)
-        ?.  =(our.bowl owner.id.pok)
-          :_  state
-          [(poke-other owner.id.pok goal-action+!>(action))]~
+        ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         =/  pore  (reorder-young:(apex-em:hc pin) id.pok young.pok src.bowl)
-        (send-away-updates:hc ~ pin src.bowl pid pore)
+        abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%update-pool-perms =pin new=pool-perms]
           %update-pool-perms
-        ~&  "update-pool-perms"
-        =*  poke-other
-          %~  poke-other
-            pass:hc
-          (en-away-path pid pin.pok %update-pool-perms)
-        ?.  =(our.bowl owner.pin.pok)
-          :_  state
-          [(poke-other owner.pin.pok goal-action+!>(action))]~
-        =/  pool  (~(got by pools) pin.pok)
-        =/  diff  (~(pool-diff em pool) new.pok)
-        ~&  diff
-        %+  send-away-updates:hc
-          ;:  welp
-            %+  turn  invite.diff
-            |=  =ship
-            (poke-other ship goal-action+!>([vzn 0 %subscribe pin.pok]))
-            %+  turn  remove.diff
-            |=  =ship
-            [%give %kick ~[/[`@`+<.pin.pok]/[`@`+>.pin.pok]] `ship]
-          ==
-        =/  pore
-          (update-pool-perms:(apex-em:hc pin.pok) new.pok src.bowl)
-        [pin.pok src.bowl pid pore]
+        ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
+        =/  pore  (update-pool-perms:(apex-em:hc pin.pok) new.pok src.bowl)
+        abet:(send-away-updates:hc cards [pin.pok src.bowl pid] efx:abet:pore)
           ::
           :: [%subscribe =pin]
-          :: for some reason this is always called twice in a row ?!?
           %subscribe
-        =/  pite  /[`@`+<.pin.pok]/[`@`+>.pin.pok]
+        ?>  =(src our):bowl
         ?<  =(owner.pin.pok our.bowl)
-        :: ?:  (~(has by wex.bowl) [pite owner.pin.pok dap.bowl])
-        ::   =*  poke-other  ~(poke-other pass:hc [%kicker pite])
-        ::   ~&  "%goal-store: kicking myself..."
-        ::   :_  state
-        ::   :~  %+  poke-other
-        ::         owner.pin.pok
-        ::       :: 
-        ::       :: on kick, we'll resubscribe and get the initial update
-        ::       goal-action+!>([vzn 0 %kicker our.bowl pin.pok])
-        ::   ==
-        =*  watch-other  ~(watch-other pass:hc pite)
-        :_  state
-        [(watch-other owner.pin.pok pite)]~
+        =/  pite  (en-pool-path:hc pin.pok)
+        =/  =dock  [owner.pin.pok dap.bowl]
+        :_(state [%pass pite %agent dock %watch pite]~)
           ::
           :: [%unsubscribe =pin]
           %unsubscribe
-        =/  wire  /[`@`+<.pin.pok]/[`@`+>.pin.pok]
         ?<  =(owner.pin.pok our.bowl)
-        =*  leave-other  ~(leave-other pass:hc wire)
-        %+  send-home-updates:hc
-          [(leave-other owner.pin.pok)]~
-        =/  upds
-          ?:  (~(has by cache) pin.pok)
-            [vzn %trash-pool ~]~
-          ?:  (~(has by pools) pin.pok)
-            [vzn %waste-pool ~]~
+        =/  =wire  (en-pool-path:hc pin.pok)
+        =/  cards=(list card)
+          [%pass wire %agent [owner.pin.pok dap.bowl] %leave ~]~
+        =/  upds=(list update:gol)
+          ?:  (~(has by cache) pin.pok)  [vzn %trash-pool ~]~
+          ?:  (~(has by pools) pin.pok)  [vzn %waste-pool ~]~
           ~
-        [pin.pok src.bowl pid upds]
-          ::
-          :: [%kicker =ship =pin]
-          %kicker
-        ?>  =(owner.pin.pok our.bowl) :: assert we own the pool
-        ?<  =(ship.pok our.bowl) :: assert not kicking ourself
-        ?>  =(ship.pok src.bowl) :: any ship can kick self, not others
-        :_  state
-        [%give %kick ~[/[`@`+<.pin.pok]/[`@`+>.pin.pok]] `ship.pok]~
+        abet:(send-home-updates:hc cards [pin.pok src.bowl pid] upds)
       ==
     ==
   [cards this]
@@ -555,48 +359,19 @@
   |=  =path
   ^-  (quip card _this)
   ?+    path  (on-watch:def path)
-      [%goals ~]  ?>(=(our.bowl src.bowl) `this)
+      [%goals ~]  ?>(=(src our):bowl `this)
       ::
       [@ @ ~]
     =/  owner  `@p`i.path
     =/  birth  `@da`i.t.path
     =/  pin  `pin:gol`[%pin owner birth]
     =/  pool  (~(got by pools) pin)
-    :: 
-    :: just let everyone in for now;
-    :: we gonna fix sharing soon; hasn't been a priority
-    :: ?>  (~(has by perms.pool) src.bowl)
-    =^  cards  state
-      =/  cards
-        [%give %fact ~ %goal-away-update !>([[our.bowl 0] vzn spawn-pool+pool])]~
-      ?:  (~(has by perms.pool) src.bowl)
-        [cards state]
-      %+  send-away-updates:hc
-        cards
-      =/  new  (~(put by perms.pool) src.bowl ~)
-      =/  pore  (update-pool-perms:(apex-em:hc pin) new our.bowl)
-      [pin our.bowl 0 pore]
-    [cards this]
+    ?>  (~(has by perms.pool) src.bowl)
+    =/  way=away-update:gol  [[our.bowl 0] vzn spawn-pool+pool]
+    :_(this [%give %fact ~ goal-away-update+!>(way)]~)
   ==
 ::
 ++  on-leave  on-leave:def
-  :: |=  =path
-  :: ^-  (quip card _this)
-  :: ?+    path  (on-watch:def path)
-  ::     [@ @ ~]
-  ::   =*  poke-self  ~(poke-self pass:io /viewer-leave)
-  ::   =/  owner  `@p`i.path
-  ::   =/  birth  `@da`i.t.path
-  ::   =/  pin  `pin:gol`[%pin owner birth]
-  ::   =/  pool  (~(got by pools) pin)
-  ::   ::
-  ::   :: 0 is reserved for endogenous updates
-  ::   :_  this
-  ::   :_  ~
-  ::   %-  poke-self
-  ::   :-  %goal-action
-  ::   !>([vzn 0 %update-pool-perms pin (~(del by perms.pool) src.bowl)])
-  :: ==
 ::
 ++  on-peek
   |=  =path
@@ -614,19 +389,6 @@
       =/  since=@  (rash i.t.t.t.path dem)
       ``goal-peek+!>(updates+(tap:log-orm (lot:log-orm log `since ~)))
     ==
-    ::
-      [%x %groups ~]
-    ``goal-peek+!>(groups+groups)
-    ::
-      [%x %groups-metadata ~]
-    =/  gmd
-      .^  associations:metadata-store 
-        %gx
-        :~  (scot %p our.bowl)  %metadata-store  (scot %da now.bowl)
-            %app-name  %groups  %noun
-        ==
-      ==
-    ``goal-peek+!>(groups-metadata+gmd)
     ::
       [%x %pool-keys ~]
     ``goal-peek+!>(pool-keys+~(key by pools))
@@ -738,163 +500,160 @@
 ++  on-agent
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
-  ~&  wire
   ?+    wire  (on-agent:def wire sign)
       [%away @ @ @ *]
-    =/  pid  i.t.wire
-    =/  owner  `@p`i.t.t.wire
-    =/  birth  `@da`i.t.t.t.wire
-    =/  pin  `pin:gol`[%pin owner birth]
+    =/  [pid=@ =pin:gol =term]  (de-relay-wire:hc wire)
+    ?>  =(src.bowl owner.pin)
     ?+    -.sign  (on-agent:def wire sign)
         %poke-ack
-      ?~  p.sign
-        `this
+      ?~  p.sign  `this
       =^  cards  state
         %-  (slog u.p.sign)
-        (send-home-updates:hc ~ pin our.bowl pid [vzn %poke-error u.p.sign]~)
+        =/  upds=(list update:gol)  [vzn %poke-error u.p.sign]~
+        abet:(send-home-updates:hc ~ [pin src.bowl pid] upds)
       [cards this]
     ==
     ::
       [@ @ ~] 
-    =/  owner  `@p`i.wire
-    =/  birth  `@da`i.t.wire
-    =/  pin  `pin:gol`[%pin owner birth]
-    ?>  =(src.bowl owner)
+    =/  =pin:gol  (de-pool-path wire)
+    ?>  =(src.bowl owner.pin)
     ?+    -.sign  (on-agent:def wire sign)
         %watch-ack
-      ?~  p.sign
-        =*  poke-our  ~(poke-our pass:io /invite)
-        ((slog 'You\'ve been invited to view a goal!' ~) `this)
+      ?~  p.sign  `this
       =/  upd
         ?:  (~(has by pools) pin)
           (some [vzn %waste-pool ~])
         ?:  (~(has by cache) pin)
           (some [vzn %trash-pool ~])
         ~
-      %-  (slog 'Invite failure.' ~)
+      %-  (slog 'Subscribe failure.' ~)
       %-  (slog u.p.sign)
-      ?~  upd
-        `this
+      ?~  upd  `this
       =^  cards  state
-        (send-home-updates:hc ~ pin our.bowl 0 [u.upd]~)
+        abet:(send-home-updates:hc ~ [pin our.bowl 0] [u.upd]~)
       [cards this]
       ::
         %kick
       %-  (slog '%goal-store: Got kick, resubscribing...' ~)
-      :_  this
-      [%pass wire %agent [src.bowl %goal-store] %watch wire]~
+      :_(this [%pass wire %agent [src dap]:bowl %watch wire]~)
       ::
         %fact
       ?>  =(p.cage.sign %goal-away-update)
-      =+  ^-  [[mod=ship pid=@] =update:gol]
-        !<(away-update:gol q.cage.sign)
+      =/  [[mod=ship pid=@] =update:gol]  !<(away-update:gol q.cage.sign)
       ?.  =(vzn -.update)  :: assert updates are correct version
         ~|("incompatible version" !!)
-      ~|  "crashing on update"
-      ?+    +<.update  (on-agent:def wire sign)
-          $?  %spawn-pool
-              %spawn-goal  %trash-goal  %waste-goal  %cache-goal  %renew-goal
-              %pool-perms  %pool-hitch  %pool-nexus
-              %goal-perms  %goal-hitch  %goal-nexus  %goal-togls  %goal-dates
-          ==
-        ::
-        :: quick fix for some duplicates
-        ?:  &(=(%spawn-pool +<.update) (~(has by pools) pin))
-          `this
-        =^  cards  state
-          (send-home-updates:hc ~ pin mod 0 [update]~)
-        [cards this]
-      ==
-    ==
-      [%groups ~]
-    ?>  =(src.bowl our.bowl)
-    ?+    -.sign  (on-agent:def wire sign)
-        %watch-ack
-      ?~  p.sign
-        ((slog '%goal-store: Watch /groups succeeded.' ~) `this)
-      ((slog '%goal-store: Watch /groups failed.' ~) `this)
-      ::
-        %kick
-      %-  (slog '%goal-store: Got kick from %group-store, resubscribing...' ~)
-      :_  this
-      [%pass wire %agent [our.bowl %group-store] %watch wire]~
-      ::
-        %fact
-      ?+    p.cage.sign  (on-agent:def wire sign)
-          ?(%group-update-0 %group-action)
-        =/  =update:group-store  !<(update:group-store q.cage.sign)
-        :-  ~
-        this(groups (~(group-update group-update [groups our.bowl]) update))
-      ==
+      =^  cards  state
+        abet:(send-home-updates:hc ~ [pin mod 0] [update]~)
+      [cards this]
     ==
   ==
 ::
 ++  on-arvo   on-arvo:def
 ++  on-fail   on-fail:def
 --
-|_  =bowl:gall
-+*  io    ~(. agentio bowl)
+|_  [=bowl:gall cards=(list card)]
++*  core  .
     etch  ~(. gol-cli-etch store)
+++  abet  [(flop cards) state]
+++  emit  |=(=card core(cards [card cards]))
+++  emil  |=(cadz=(list card) core(cards (weld cadz cards)))
 ::
-++  en-away-path
+++  en-pool-path
+  |=(=pin:gol `path`/(scot %p owner.pin)/(scot %da birth.pin))
+::
+++  de-pool-path
+  |=  =path
+  ^-  pin:gol
+  ?>  ?=([@ta @ta ~] path)
+  [%pin (slav %p i.path) (slav %da i.t.path)]
+::
+++  en-relay-wire
   |=  [pid=@ =pin:gol =term]
-  ^-  path
-  /away/[`@`pid]/[`@`owner.pin]/[`@`birth.pin]/[term]
+  ^-  wire
+  /away/[pid]/(scot %p owner.pin)/(scot %da birth.pin)/[term]
 ::
-++  pass
-  |_  =wire
-  ++  poke-other
-    |=  [other=@p =cage]
-    ^-  card
-    (~(poke pass:io wire) [other dap.bowl] cage)
-  ::
-  ++  watch-other
-    |=  [other=@p =path]
-    ^-  card
-    (~(watch pass:io wire) [other dap.bowl] path)
-  ::
-  ++  leave-other
-    |=  other=@p
-    ^-  card
-    (~(leave pass:io wire) other dap.bowl)
-  --
+++  de-relay-wire
+  |=  =wire
+  ^-  [@ pin:gol term]
+  ?>  ?=([%away @ @ta @ta @ta ~] wire)
+  :*  i.t.wire
+      [%pin (slav %p i.t.t.wire) (slav %da i.t.t.t.wire)] 
+      i.t.t.t.t.wire
+  ==
+::
+++  relay
+  |=  [=pin:gol axn=action:gol]
+  ^-  _core
+  ?>  =(src our):bowl
+  =/  =wire  (en-relay-wire pid.axn pin -.pok.axn)
+  =/  =dock  [owner.pin dap.bowl]
+  (emit %pass wire %agent dock %poke goal-action+!>(axn))
 ::
 ++  apex-em  |=(=pin:gol (apex:em (~(got by pools.store) pin)))
 ::
+++  etch-updt
+  |=  [[=pin:gol mod=ship pid=@] =update:gol]
+  ^-  _core
+  core(store (etch:etch pin ~[update]))
+::
+++  etch-upds
+  |=  [[=pin:gol mod=ship pid=@] upds=(list update:gol)]
+  ^-  _core
+  ?~  upds  core
+  $(upds t.upds, core (etch-updt:core [pin mod pid] i.upds))
+::
+++  home-emit
+  |=  [[=pin:gol mod=ship pid=@] =update:gol]
+  ^-  _core
+  =/  hom=home-update:gol  [[pin mod pid] update]
+  =.  store      (etch:etch pin ~[update])
+  =/  now=@      (unique-time now.bowl log)
+  =.  log.state  (put:log-orm log.state now [%updt hom])
+  (emit %give %fact ~[/goals] goal-home-update+!>(hom))
+::
+++  home-emil
+  |=  [[=pin:gol mod=ship pid=@] upds=(list update:gol)]
+  ^-  _core
+  ?~  upds  core
+  $(upds t.upds, core (home-emit:core [pin mod pid] i.upds))
+::
 ++  send-home-updates
-  |=  [cards=(list card) =pin:gol mod=ship pid=@ upds=(list update:gol)]
-  ^-  (quip card _state)
-  =/  idx  0
-  =|  home-cards=(list card)
-  |-
-  ?:  =(idx (lent upds))
-    ::
-    :: this approach using etch duplicates work updating the store
-    :: (but quickest and easiest way to concordantly update index;
-    ::  maybe should update eventually)
-    [(weld cards home-cards) state(store (etch:etch pin upds))]
-  =/  now=@  (unique-time now.bowl log)
-  =/  hom=home-update:gol  [[pin mod pid] (snag idx upds)]
-  %=  $
-    idx  +(idx)
-    log  (put:log-orm log now [%updt hom])
-    home-cards  [(fact:io goal-home-update+!>(hom) ~[/goals]) home-cards]
-  ==
+  |=  [cards=(list card) [=pin:gol mod=ship pid=@] upds=(list update:gol)]
+  ^-  _core
+  =.  core  (emil cards)
+  (home-emil:core [pin mod pid] upds)
+::
+++  away-emit
+  |=  [[=pin:gol mod=ship pid=@] =update:gol]
+  ^-  _core
+  =/  way=away-update:gol  [[mod pid] update]
+  =/  path  (en-pool-path pin)
+  =.  core  (home-emit [pin mod pid] update)
+  (emit:core %give %fact ~[path] goal-away-update+!>(way))
+::
+++  away-emil
+  |=  [[=pin:gol mod=ship pid=@] upds=(list update:gol)]
+  ^-  _core
+  ?~  upds  core
+  $(upds t.upds, core (away-emit:core [pin mod pid] i.upds))
 ::
 ++  send-away-updates
-  |=  [cards=(list card) =pin:gol mod=ship pid=@ pore=_em]
-  ^-  (quip card _state)
-  =+  abet:pore  :: exposes efx and pool
-  ::
-  :: send-home-updates performs state update
-  =^  home-cards  state  (send-home-updates cards pin mod pid efx)
-  :_  state
-  ;:  weld  cards  home-cards
-    ::
-    :: send away updates
-    ^-  (list card)
-    %+  turn  efx
-    |=  upd=update:gol
-    (fact:io goal-away-update+!>([[mod pid] upd]) ~[/[`@`+<.pin]/[`@`+>.pin]])
-  ==
+  |=  [cards=(list card) [=pin:gol mod=ship pid=@] upds=(list update:gol)]
+  ^-  _core
+  =.  core  (emil cards)
+  =.  core  (away-emil:core [pin mod pid] upds)
+  (kick-unwelcome:core pin)
+:: kick people without member perms
+::
+++  kick-unwelcome
+  |=  =pin:gol
+  ^-  _core
+  %-  emil
+  %+  murn  ~(val by sup.bowl)
+  |=  [=ship =path]
+  ?.  ?=([@ta @ta ~] path)  ~
+  =/  =pin:gol  (de-pool-path path)
+  =/  =pool:gol  (~(got by pools.store) pin)
+  ?:  (~(has by perms.pool) ship)  ~
+  (some [%give %kick ~[path] `ship])
 --

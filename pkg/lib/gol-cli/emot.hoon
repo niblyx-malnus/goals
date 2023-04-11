@@ -31,7 +31,6 @@
   |=  [old=_this upd=update:gol]
   ::
   :: confirm that applying update yields equivalent state
-  =.  old  old(trace.p trace.p)
   ?.  =(p.this p:(etch:old upd))
     ~|("non-equivalent-update" !!)
   (emit upd)
@@ -90,35 +89,7 @@
         ^-  [id:gol goal:gol]
         =/  =ngoal:gol  (~(got by goals.p) id)
         [id ngoal(nexus -.nux, trace +.nux)]
-      trace.p
-        =/  nex  ~(tap by nex)
-        |-
-        ?~  nex
-          trace.p
-        %=  $
-          nex  t.nex
-          trace.p  (nex-trace-update -.i.nex +.i.nex)
-        ==
     ==
-::
-++  nex-trace-update
-  |=  [=id:gol nus=goal-nexus:gol tar=goal-trace:gol]
-  ^-  pool-trace:gol
-  %=  trace.p
-    stock-map  (~(put by stock-map.trace.p) id stock.tar)
-    left-bounds  
-      %-  ~(gas by left-bounds.trace.p)
-      ~[[[%k id] left-bound.kickoff.nus] [[%d id] left-bound.deadline.nus]]
-    ryte-bounds
-      %-  ~(gas by ryte-bounds.trace.p)
-      ~[[[%k id] ryte-bound.kickoff.nus] [[%d id] ryte-bound.deadline.nus]]
-    left-plumbs
-      %-  ~(gas by left-plumbs.trace.p)
-      ~[[[%k id] left-plumb.kickoff.nus] [[%d id] left-plumb.deadline.nus]]
-    ryte-plumbs
-      %-  ~(gas by ryte-plumbs.trace.p)
-      ~[[[%k id] ryte-plumb.kickoff.nus] [[%d id] ryte-plumb.deadline.nus]]
-  ==
 ::
 :: ============================================================================
 :: 
@@ -481,6 +452,7 @@
   |=  upd=update:gol
   ^-  _this
   |^
+  =;  tore  (inflater:tore)
   ?+    +.upd  !!
     :: ------------------------------------------------------------------------
     :: spawn/trash

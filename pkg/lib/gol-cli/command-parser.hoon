@@ -3,7 +3,6 @@
 ++  command-parser
   |=  [now=@da =utc-offset:dates]
   ;~  pose
-    parse-invite
     parse-held-yoke                       
     parse-held-rend
     parse-nest-yoke                       
@@ -131,13 +130,6 @@
     (cold %prio-rend (jest '^pt'))
     (cook crip parse-handle)
     (cook crip parse-handle)
-  ==
-::
-++  parse-invite
-  ;~  (glue ace)
-    (cold %invite (jest 'invite'))
-    fed:ag
-    (cook crip parse-handle)  :: handle argument
   ==
 ::
 ++  parse-make-goal-captain

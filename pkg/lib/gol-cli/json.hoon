@@ -1,5 +1,5 @@
 /-  *goal
-/+  *gol-cli-util, group-store, metadata-store
+/+  *gol-cli-util
 |%
 ++  dejs-action
   =,  dejs:format
@@ -344,11 +344,6 @@
     %+  frond
       %updates
     a+(turn list.pyk enjs-logged)
-    ::
-    %groups  (frond %groups (initial:enjs:group-store [%initial groups.pyk]))
-    ::
-      %groups-metadata
-    (frond %metadata (associations:enjs:metadata-store metadata.pyk))
     ::
       %pool-keys
     %+  frond

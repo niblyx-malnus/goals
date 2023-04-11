@@ -1,10 +1,10 @@
-/-  *group, ms=metadata-store
+/-  *group, ms=metadata-store :: need to keep for historical reasons
 /+  *gol-cli-util
 |%
 ::
 ++  vzn  %5
 ::
-+$  state-5  [%5 =store:s5 =groups =log:s5]
++$  state-5  [%5 =store:s5 =log:s5]
 +$  state-4  [%4 =store:s4 =groups =log:s4]
 +$  state-3  [%3 =store:s3]
 +$  state-2  [%2 =store:s2]
@@ -129,6 +129,7 @@
   ::
   +$  goals  (map id goal)
   ::
+  +$  pool-perms   pool-perms:s4
   +$  pool-nexus
     $:  =goals
         cache=goals
@@ -136,7 +137,6 @@
         perms=pool-perms
         roots=(list id)
     ==
-  +$  pool-perms    pool-perms:s4
   +$  pool-froze    pool-froze:s4
   +$  pool-trace    pool-trace:s4
   ::
@@ -251,7 +251,6 @@
     +$  util-action
       $%  [%subscribe =pin]
           [%unsubscribe =pin]
-          [%kicker =ship =pin]
       ==
     ++  pool-action
       =<  pool-action
@@ -499,8 +498,6 @@
   +$  peek
     $%  [%initial =store]
         [%updates =(list logged)]
-        [%groups =groups]
-        [%groups-metadata metadata=associations:ms]
         [%pool-keys keys=(set pin)]
         [%all-goal-keys keys=(set id)]
         [%harvest harvest=(list id)]

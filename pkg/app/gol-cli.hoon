@@ -247,15 +247,6 @@
   =;  cards=(list card)
     [cards this]
   ?-    -.command
-      ::
-      ::  [%invite =pin ship]
-      %invite
-    =*  poke-our  ~(poke-our pass:io /mod-command/invite)
-    =+  [msg res]=(invalid-pool-error:prtr h.command)  ?.  =(~ msg)  msg
-    =/  pool  (got-pool:scry pin.res)
-    =.  perms.pool  (~(put by perms.pool) ship.command ~) 
-    ~[(poke-our %goal-store goal-action+!>([vzn now.bowl %update-pool-perms pin.res perms.pool]))]
-      ::
       %hide-completed
     =*  poke-self  ~(poke-self pass:io /view-command/hide-completed)
     ~[(poke-self view-action+!>([%hide-completed ~]))]
