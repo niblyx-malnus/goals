@@ -97,35 +97,30 @@
 ::
 :: ============================================================================
 ::
-++  fix-list
-  |=  [typ=?(%p %k %d) old=(list id:gol) new=(set id:gol)]
-  ^-  (list id:gol)
-  :: remove stale ids
-  =/  fix
-    |-  ^-  (list id:gol)
-    ?~  old  ~
-    ?.  (~(has in new) i.old)
-      $(old t.old)
-    [i.old $(old t.old)]
-  ::  add fresh ids to front and sort
-  %+  topological-sort:tv  typ
-  %+  weld
-    ~(tap in (~(dif in new) (sy old)))
-  fix
-::
 :: all of these should be O(nlogn) with size of the goals map
 :: if it starts taking real performance hits we can revisit this...
 ++  trace-update
   |.
+  =/  goals-roots  (root-goals:nd)
+  =/  cache-roots  (root-goals:nd):.(goals.p cache.p)
   ::
   :: make sure tracing both goals and cache
   =.  goals.p  (~(uni by goals.p) cache.p)
+  =/  d-k-precs  (precedents-map:tv %d %k)
+  =/  k-k-precs  (precedents-map:tv %k %k)
+  =/  d-d-precs  (precedents-map:tv %d %d)
   ::
   ^-  pool-trace:gol
   :*  stock-map=((chain:tv id:gol stock:gol) get-stocks:tv (bare-goals:nd) ~)
-      roots=(fix-list %p roots.p (sy (root-goals:nd)))
-      roots-by-kickoff=(fix-list %k roots.p (sy (root-goals:nd)))
-      roots-by-deadline=(fix-list %d roots.p (sy (root-goals:nd)))
+      roots=(fix-list:tv %p d-k-precs roots.trace.p (sy goals-roots))
+      roots-by-kickoff=(fix-list:tv %k k-k-precs roots.trace.p (sy goals-roots))
+      roots-by-deadline=(fix-list:tv %d d-d-precs roots.trace.p (sy goals-roots))
+      cache-roots=(fix-list:tv %p d-k-precs cache-roots.trace.p (sy cache-roots))
+      cache-roots-by-kickoff=(fix-list:tv %k k-k-precs cache-roots.trace.p (sy cache-roots))
+      cache-roots-by-deadline=(fix-list:tv %d d-d-precs cache-roots.trace.p (sy cache-roots))
+      d-k-precs
+      k-k-precs
+      d-d-precs
       ^=  left-bounds
         ((chain:tv nid:gol moment:gol) (get-bounds:tv %l) (root-nodes:nd) ~)
       ^=  ryte-bounds
@@ -145,9 +140,9 @@
   %=  goal
     stock               (~(got by stock-map.trace.p) id)
     ranks               (get-ranks:tv (~(got by stock-map.trace.p) id))
-    young               (fix-list %p young.goal (young:nd id))
-    young-by-kickoff    (fix-list %k young.goal (young:nd id))
-    young-by-deadline   (fix-list %d young.goal (young:nd id))
+    young               (en-virt id (fix-list:tv %p d-k-precs.trace.p (de-virt young.goal) (young:nd id)))
+    young-by-kickoff    (en-virt id (fix-list:tv %k k-k-precs.trace.p (de-virt young.goal) (young:nd id)))
+    young-by-deadline   (en-virt id (fix-list:tv %d d-d-precs.trace.p (de-virt young.goal) (young:nd id)))
     prio-left           (prio-left:nd id)
     prio-ryte           (prio-ryte:nd id)
     prec-left           (prec-left:nd id)
@@ -216,6 +211,20 @@
   =/  invite  ~(tap in (~(dif in ~(key by new)) ~(key by perms.p)))
   [remove invite]
 ::
+++  en-virt
+  |=  [par=id:gol ids=(list id:gol)]
+  ^-  (list [id:gol virtual=?])
+  %+  turn  ids
+  |=  =id:gol
+  =/  =goal:gol
+    (~(got by goals.p) par)
+  [id !(~(has in kids.goal) id)]
+::
+++  de-virt
+  |=  ids=(list [id:gol virtual=?])
+  ^-  (list id:gol)
+  (turn ids |=([=id:gol ?] id))
+::
 :: ============================================================================
 :: 
 :: UPDATES
@@ -230,7 +239,8 @@
   =/  gdiff  (full-diff goals.p goals.p.tore)
   =/  cdiff  (full-diff goals.p cache.p.tore)
   =/  nex  (~(uni by nex.gdiff) nex.cdiff)
-  (emot:tore this [vzn %cache-goal nex id ~(key by waz.gdiff)])
+  =/  =pex:gol  trace.p.tore
+  (emot:tore this [vzn %cache-goal pex nex id ~(key by waz.gdiff)])
 ::
 :: Restore goal from cache to main goals
 ++  renew-goal
@@ -238,7 +248,8 @@
   ^-  _this
   =/  tore  (apply renew-goal:(pore) id mod)
   =/  fd  (full-diff goals.p goals.p.tore)
-  (emot:tore this [vzn %renew-goal id pon.fd])
+  =/  =pex:gol  trace.p.tore
+  (emot:tore this [vzn %renew-goal pex id pon.fd])
 ::
 :: Permanently delete goal
 ++  trash-goal
@@ -247,17 +258,20 @@
   ?:  (~(has by goals.p) id)
     =/  tore  (apply waste-goal:(pore) id mod)
     =/  fd  (full-diff goals.p goals.p.tore)
-    (emot:tore this [vzn %waste-goal nex.fd id ~(key by waz.fd)])
+    =/  =pex:gol  trace.p.tore
+    (emot:tore this [vzn %waste-goal pex nex.fd id ~(key by waz.fd)])
   =/  tore  (apply trash-goal:(pore) id mod)
   =/  diff  (diff cache.p cache.p.tore)
-  (emot:tore this [vzn %trash-goal id hep.diff])
+  =/  =pex:gol  trace.p.tore
+  (emot:tore this [vzn %trash-goal pex id hep.diff])
 ::
 ++  move
   |=  [lid=id:gol urid=(unit id:gol) mod=ship]
   ^-  _this
   =/  tore  (apply move:(pore) lid urid mod)
   =/  fd  (full-diff goals.p goals.p.tore)
-  (emot:tore this [vzn %pool-nexus %yoke nex.fd])
+  =/  =pex:gol  trace.p.tore
+  (emot:tore this [vzn %pool-nexus %yoke pex nex.fd])
 ::
 :: sequence of composite yokes
 ++  plex-sequence
@@ -265,7 +279,8 @@
   ^-  _this
   =/  tore  (apply plex-sequence:(pore) plez mod)
   =/  fd  (full-diff goals.p goals.p.tore)
-  (emot:tore this [vzn %pool-nexus %yoke nex.fd])
+  =/  =pex:gol  trace.p.tore
+  (emot:tore this [vzn %pool-nexus %yoke pex nex.fd])
 ::
 ++  mark-actionable
   |=  [=id:gol mod=ship]
@@ -298,9 +313,11 @@
   ?>  (check-goal-edit-perm:(pore) id mod)
   ?>  =((sy young) (young:nd id))
   =/  goal  (~(got by goals.p) id)
-  =.  young.goal  (topological-sort:tv %p young)
+  =.  young.goal
+    (en-virt id (topological-sort:tv %p d-k-precs.trace.p young))
   =.  goals.p     (~(put by goals.p) id goal)
-  (emot old [vzn %goal-young id young.goal])
+  =/  fd  (full-diff goals.p goals.p.old)
+  (emot old [vzn %goal-young nex.fd])
 ::
 ++  reorder-roots
   |=  [roots=(list id:gol) mod=ship]
@@ -308,22 +325,25 @@
   =/  old  this
   ?>  (check-pool-edit-perm:(pore) mod)
   ?>  =((sy roots) (sy (root-goals:nd)))
-  =.  roots.p  (topological-sort:tv %p roots)
-  (emot old [vzn %goal-roots roots.p])
+  =.  roots.trace.p  (topological-sort:tv %p d-k-precs.trace.p roots)
+  =/  =pex:gol  trace.p
+  (emot old [vzn %goal-roots pex])
 ::
 ++  set-kickoff
   |=  [=id:gol =moment:gol mod=ship]
   ^-  _this
   =/  tore  (apply set-kickoff:(pore) id moment mod)
   =/  fd  (full-diff goals.p goals.p.tore)
-  (emot:tore this [vzn %goal-dates nex.fd])
+  =/  =pex:gol  trace.p.tore
+  (emot:tore this [vzn %goal-dates pex nex.fd])
 ::
 ++  set-deadline
   |=  [=id:gol =moment:gol mod=ship]
   ^-  _this
   =/  tore  (apply set-deadline:(pore) id moment mod)
   =/  fd  (full-diff goals.p goals.p.tore)
-  (emot:tore this [vzn %goal-dates nex.fd])
+  =/  =pex:gol  trace.p.tore
+  (emot:tore this [vzn %goal-dates pex nex.fd])
 ::
 ++  update-pool-perms
   |=  [new=pool-perms:gol mod=ship]
@@ -333,7 +353,8 @@
   |-
   ?~  upds
     =/  fd  (full-diff goals.p goals.p.tore)
-    (emot:tore this [vzn %pool-perms nex.fd perms.p.tore])
+    =/  =pex:gol  trace.p.tore
+    (emot:tore this [vzn %pool-perms pex nex.fd perms.p.tore])
   %=  $
     upds  t.upds
     tore  (apply set-pool-role:(pore.tore) ship.i.upds role.i.upds mod)
@@ -345,7 +366,8 @@
   =/  tore  (apply set-chief:(pore) id chief rec mod)
   =.  tore  (apply replace-spawn-set:(pore.tore) id spawn mod)
   =/  fd  (full-diff goals.p goals.p.tore)
-  (emot:tore this [vzn %goal-perms nex.fd])
+  =/  =pex:gol  trace.p.tore
+  (emot:tore this [vzn %goal-perms pex nex.fd])
 ::
 ++  edit-goal-desc
   |=  [=id:gol desc=@t mod=ship]
@@ -475,7 +497,8 @@
   =.  tore  (edit-goal-desc:tore id desc mod)
   =/  fd  (full-diff goals.p goals.p.tore)
   =/  goal  (~(got by goals.p.tore) id)
-  (emot:tore(efx efx) old [vzn %spawn-goal nex.fd id goal])
+  =/  =pex:gol  trace.p.tore
+  (emot:tore(efx efx) old [vzn %spawn-goal pex nex.fd id goal])
 ::
 :: ============================================================================
 :: 
@@ -545,14 +568,12 @@
     :: goal-young
     ::
       [%goal-young *]
-    =/  =goal:gol  (~(got by goals.p) id.upd)
-    =.  young.goal  young.upd
-    this(goals.p (~(put by goals.p) id.upd goal))
+    (apply-nex nex.upd)
     :: ------------------------------------------------------------------------
     :: goal-roots
     ::
       [%goal-roots *]
-    this(roots.p roots.upd)
+    this(trace.p pex.upd)
     :: ------------------------------------------------------------------------
     :: goal-hitch
     ::

@@ -54,6 +54,7 @@
 ::
 +$  nux           nux:s5
 +$  nex           nex:s5
++$  pex           pex:s5
 +$  update        update:s5
 +$  home-update   home-update:s5
 +$  away-update   away-update:s5
@@ -83,25 +84,16 @@
   +$  ranks         ranks:s4
   +$  moment        moment:s4
   ::
-  +$  goal-nexus
-    $:  par=(unit id)
-        kids=(set id)
-        kickoff=node
-        deadline=node
-        complete=_|
-        actionable=_|
-        chief=ship
-        spawn=(set ship)
-    ==
+  +$  goal-nexus    goal-nexus:s4
   +$  goal-froze    goal-froze:s4
   ::
   :: values implied by the data structure
   +$  goal-trace
     $:  =stock
         =ranks
-        young=(list id)
-        young-by-kickoff=(list id)
-        young-by-deadline=(list id)
+        young=(list [id virtual=?])
+        young-by-kickoff=(list [id virtual=?])
+        young-by-deadline=(list [id virtual=?])
         prio-left=(set id)
         prio-ryte=(set id)
         prec-left=(set id)
@@ -151,12 +143,12 @@
   +$  goals  (map id goal)
   ::
   +$  pool-perms   pool-perms:s4
+  :: goals have changed...
   +$  pool-nexus
     $:  =goals
         cache=goals
         owner=ship
         perms=pool-perms
-        roots=(list id)
     ==
   +$  pool-froze    pool-froze:s4
   ::
@@ -165,6 +157,12 @@
         roots=(list id)
         roots-by-kickoff=(list id)
         roots-by-deadline=(list id)
+        cache-roots=(list id)
+        cache-roots-by-kickoff=(list id)
+        cache-roots-by-deadline=(list id)
+        d-k-precs=(map id (set id))
+        k-k-precs=(map id (set id))
+        d-d-precs=(map id (set id))
         left-bounds=(map nid moment)
         ryte-bounds=(map nid moment)
         left-plumbs=(map nid @)
@@ -206,9 +204,10 @@
   ::
   +$  nux  [goal-nexus goal-trace]
   +$  nex  (map id nux)
+  +$  pex  pool-trace
   ::
   +$  pool-nexus-update
-    $%  [%yoke =nex]
+    $%  [%yoke =pex =nex]
     ==
   ::
   +$  pool-hitch-update
@@ -239,18 +238,18 @@
         [%renew-pool =pin =pool]
         [%waste-pool ~]
         [%trash-pool ~]
-        [%spawn-goal =nex =id =goal]
-        [%waste-goal =nex =id waz=(set id)]
-        [%cache-goal =nex =id cas=(set id)]
-        [%renew-goal =id ren=goals]
-        [%trash-goal =id tas=(set id)]
-        [%pool-perms =nex new=pool-perms]
+        [%spawn-goal =pex =nex =id =goal]
+        [%waste-goal =pex =nex =id waz=(set id)]
+        [%cache-goal =pex =nex =id cas=(set id)]
+        [%renew-goal =pex =id ren=goals]
+        [%trash-goal =pex =id tas=(set id)]
+        [%pool-perms =pex =nex new=pool-perms]
         [%pool-hitch pool-hitch-update]
         [%pool-nexus pool-nexus-update]
-        [%goal-dates =nex]
-        [%goal-perms =nex]
-        [%goal-roots roots=(list id)]
-        [%goal-young =id young=(list id)]
+        [%goal-dates =pex =nex]
+        [%goal-perms =pex =nex]
+        [%goal-roots =pex]
+        [%goal-young =nex]
         [%goal-hitch =id goal-hitch-update]
         [%goal-togls =id goal-togls-update]
         [%poke-error =tang]

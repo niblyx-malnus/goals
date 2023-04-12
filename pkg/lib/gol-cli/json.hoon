@@ -1,10 +1,5 @@
 /-  *goal
 /+  *gol-cli-util
-:: TODO:
-::  - send pex for pool trace
-::  - convert young to show virtual children
-::  - send all of young, young-by...etc (young update just send nex)
-::  - same for roots, roots-by...etc (just send pex)
 |%
 ++  dejs-action
   =,  dejs:format
@@ -269,14 +264,12 @@
         (enjs-nex nex.upd)
         ::
           %goal-young
-        %-  pairs
-        :~  [%id (enjs-id id.upd)]
-            [%young a+(turn young.upd enjs-id)]
-        ==
+        %+  frond  %nex
+        (enjs-nex nex.upd)
         ::
           %goal-roots
-        %+  frond  %roots
-        a+(turn roots.upd enjs-id)
+        %+  frond  %pex
+        (enjs-pex pex.upd)
         ::
           %goal-togls
         %-  pairs
@@ -533,14 +526,38 @@
       [%goal (enjs-goal goal)]
   ==
 ::
+++  enjs-pex
+  =,  enjs:format
+  |=  =pex
+  ^-  json
+  %-  pairs
+  :~  [%roots a+(turn roots.pex enjs-id)]
+      [%roots-by-kickoff a+(turn roots-by-kickoff.pex enjs-id)]
+      [%roots-by-deadline a+(turn roots-by-deadline.pex enjs-id)]
+      [%cache-roots a+(turn cache-roots.pex enjs-id)]
+      [%cache-roots-by-kickoff a+(turn cache-roots-by-kickoff.pex enjs-id)]
+      [%cache-roots-by-deadline a+(turn cache-roots-by-deadline.pex enjs-id)]
+  ==
+
+::
 ++  enjs-nex
   =,  enjs:format
   |=  =nex
+  ^-  json
   :-  %a  %+  turn  ~(tap by nex) 
   |=  [=id nexus=goal-nexus trace=goal-trace] 
   %-  pairs
   :~  [%id (enjs-id id)]
       [%goal (enjs-goal-nexus-trace nexus trace)]
+  ==
+::
+++  enjs-id-v
+  =,  enjs:format
+  |=  [=id v=?]
+  ^-  json
+  %-  pairs
+  :~  [%id (enjs-id id)]
+      [%virtual b+v]
   ==
 ::
 ++  enjs-goal-nexus-trace
@@ -565,9 +582,9 @@
       %+  turn  ~(tap by ranks.nexus)
       |=([chip=@p =id] (pairs ~[[%ship (ship chip)] [%id (enjs-id id)]]))
       ::
-      [%young a+(turn young.nexus enjs-id)]
-      [%young-by-kickoff a+(turn young.nexus enjs-id)]
-      [%young-by-deadline a+(turn young.nexus enjs-id)]
+      [%young a+(turn young.nexus enjs-id-v)]
+      [%young-by-kickoff a+(turn young-by-kickoff.nexus enjs-id-v)]
+      [%young-by-deadline a+(turn young-by-deadline.nexus enjs-id-v)]
       ::
       [%prio-left a+(turn ~(tap in prio-left.nexus) enjs-id)]
       [%prio-ryte a+(turn ~(tap in prio-ryte.nexus) enjs-id)]

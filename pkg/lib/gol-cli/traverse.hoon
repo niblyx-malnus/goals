@@ -318,14 +318,11 @@
 :: force a list of ids to be topologically sorted
 ::
 ++  topological-sort
-  |=  [typ=?(%p %k %d) ids=(list id:gol)]
+  |=  $:  typ=?(%p %k %d)
+          precs=(map id:gol (set id:gol))
+          ids=(list id:gol)
+      ==
   ^-  (list id:gol)
-  =/  precs
-    ?-  typ
-      %p  (precedents-map %d %k)
-      %d  (precedents-map %d %d)
-      %k  (precedents-map %k %k)
-    ==
   |^
   =.  precs  purge :: only keep ids in list
   |-  ^-  (list id:gol)
@@ -390,6 +387,29 @@
       %d  (d-lth id ac)
     ==
   --
+::
+++  fix-list
+  |=  $:  typ=?(%p %k %d)
+          precs=(map id:gol (set id:gol))
+          old=(list id:gol)
+          new=(set id:gol)
+      ==
+  ^-  (list id:gol)
+  :: remove stale ids
+  =/  fix
+    |-  ^-  (list id:gol)
+    ?~  old  ~
+    ?.  (~(has in new) i.old)
+      $(old t.old)
+    [i.old $(old t.old)]
+  ::  add fresh ids to front and sort
+  %:  topological-sort
+    typ
+    precs
+    %+  weld
+      ~(tap in (~(dif in new) (sy old)))
+    fix
+  ==
 ::
 :: get uncompleted leaf goals left of id
 ++  harvest
