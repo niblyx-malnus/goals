@@ -121,10 +121,8 @@
       d-k-precs
       k-k-precs
       d-d-precs
-      ^=  left-bounds
-        ((chain:tv nid:gol moment:gol) (get-bounds:tv %l) (root-nodes:nd) ~)
-      ^=  ryte-bounds
-        ((chain:tv nid:gol moment:gol) (get-bounds:tv %r) (leaf-nodes:nd) ~)
+      left-bounds=((chain:tv nid:gol moment:gol) (get-bounds:tv %l) (root-nodes:nd) ~)
+      ryte-bounds=((chain:tv nid:gol moment:gol) (get-bounds:tv %r) (leaf-nodes:nd) ~)
       left-plumbs=((chain:tv nid:gol @) (plomb:tv %l) (root-nodes:nd) ~)
       ryte-plumbs=((chain:tv nid:gol @) (plomb:tv %r) (leaf-nodes:nd) ~)
   ==
@@ -138,21 +136,21 @@
   ::
   =/  goal  (~(got by goals.p) id)
   %=  goal
-    stock               (~(got by stock-map.trace.p) id)
-    ranks               (get-ranks:tv (~(got by stock-map.trace.p) id))
-    young               (en-virt id (fix-list:tv %p d-k-precs.trace.p (de-virt young.goal) (young:nd id)))
-    young-by-kickoff    (en-virt id (fix-list:tv %k k-k-precs.trace.p (de-virt young.goal) (young:nd id)))
-    young-by-deadline   (en-virt id (fix-list:tv %d d-d-precs.trace.p (de-virt young.goal) (young:nd id)))
-    prio-left           (prio-left:nd id)
-    prio-ryte           (prio-ryte:nd id)
-    prec-left           (prec-left:nd id)
-    prec-ryte           (prec-ryte:nd id)
-    nest-left           (nest-left:nd id)
-    nest-ryte           (nest-ryte:nd id)
-    left-bound.kickoff  (~(got by left-bounds.trace.p) [%k id])
-    ryte-bound.kickoff  (~(got by ryte-bounds.trace.p) [%k id]) 
-    left-plumb.kickoff  (~(got by left-plumbs.trace.p) [%k id]) 
-    ryte-plumb.kickoff  (~(got by ryte-plumbs.trace.p) [%k id]) 
+    stock                (~(got by stock-map.trace.p) id)
+    ranks                (get-ranks:tv (~(got by stock-map.trace.p) id))
+    young                (en-virt id (fix-list:tv %p d-k-precs.trace.p (de-virt young.goal) (young:nd id)))
+    young-by-kickoff     (en-virt id (fix-list:tv %k k-k-precs.trace.p (de-virt young.goal) (young:nd id)))
+    young-by-deadline    (en-virt id (fix-list:tv %d d-d-precs.trace.p (de-virt young.goal) (young:nd id)))
+    prio-left            (prio-left:nd id)
+    prio-ryte            (prio-ryte:nd id)
+    prec-left            (prec-left:nd id)
+    prec-ryte            (prec-ryte:nd id)
+    nest-left            (nest-left:nd id)
+    nest-ryte            (nest-ryte:nd id)
+    left-bound.kickoff   (~(got by left-bounds.trace.p) [%k id])
+    ryte-bound.kickoff   (~(got by ryte-bounds.trace.p) [%k id]) 
+    left-plumb.kickoff   (~(got by left-plumbs.trace.p) [%k id]) 
+    ryte-plumb.kickoff   (~(got by ryte-plumbs.trace.p) [%k id]) 
     left-bound.deadline  (~(got by left-bounds.trace.p) [%d id]) 
     ryte-bound.deadline  (~(got by ryte-bounds.trace.p) [%d id]) 
     left-plumb.deadline  (~(got by left-plumbs.trace.p) [%d id]) 

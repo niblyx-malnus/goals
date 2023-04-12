@@ -106,9 +106,12 @@
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?>  =(src our):bowl
         ?>  (~(all in tags.pok) |=(=tag:gol private.tag)) 
-        =/  gl=goal-local:gol  (~(got by local.store) id.pok)
+        =/  gl=goal-local:gol
+          ?~  get=(~(get by goals.local.store) id.pok)
+            *goal-local:gol
+          u.get
         =.  tags.gl  tags.pok
-        :_  state(local.store (~(put by local.store) id.pok gl))
+        :_  state(goals.local.store (~(put by goals.local.store) id.pok gl))
         =/  hom=home-update:gol
           [[pin our.bowl pid] vzn %goal-hitch id.pok %put-tags tags.pok]
         [%give %fact ~[/goals] goal-home-update+!>(hom)]~
@@ -417,7 +420,7 @@
         %=    goal
             tags
          %-  ~(uni in tags.goal)
-         ?~  get=(~(get by local.store) id)
+         ?~  get=(~(get by goals.local.store) id)
            ~
          tags.u.get
         ==
@@ -564,6 +567,7 @@
     ?+    -.sign  (on-agent:def wire sign)
         %watch-ack
       ?~  p.sign  `this
+      :: TODO: purge goals from local
       =/  upd
         ?:  (~(has by pools) pin)
           (some [vzn %waste-pool ~])

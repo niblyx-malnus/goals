@@ -193,7 +193,10 @@
   +$  goal-local
     $:  tags=(set tag)
     ==
-  +$  local  (map id goal-local)
+  +$  local
+    $:  order=(list id)
+        goals=(map id goal-local)
+    ==
   ::
   +$  store  
     $:  =index
