@@ -286,15 +286,15 @@
           %goal-hitch
         %-  pairs
         :~  [%id (enjs-id id.upd)]
-            :-  +>-.upd
             ?-  +>-.upd
-              %desc  s+desc.upd
-              %note  s+note.upd
-              %add-tag  (enjs-tag tag.upd)
-              %del-tag  (enjs-tag tag.upd)
-              %put-tags  (frond %tags a+(turn ~(tap in tags.upd) enjs-tag))
-              %del-field-data  s+field.upd
+              %desc  [%desc s+desc.upd]
+              %note  [%note s+note.upd]
+              %add-tag  [%tag (enjs-tag tag.upd)]
+              %del-tag  [%tag (enjs-tag tag.upd)]
+              %put-tags  [%tags a+(turn ~(tap in tags.upd) enjs-tag)]
+              %del-field-data  [%del-field-data s+field.upd]
                 %add-field-data
+              :-  %add-field-data
               %-  pairs
               :~  [%field s+field.upd]
                   [%field-data (enjs-field-data field-data.upd)]
