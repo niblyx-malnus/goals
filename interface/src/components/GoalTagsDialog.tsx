@@ -19,6 +19,10 @@ import useStore from "../store";
 import api from "../api";
 import ChipsGroup from "./ChipsGroup";
 import { ChipData } from "../types/types";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
 
 export default function GoalTagsDialog() {
   const open = useStore((store: any) => store.goalTagsDialogOpen);
@@ -34,10 +38,16 @@ export default function GoalTagsDialog() {
   const [value, setValue] = useState<string>("");
 
   const [tags, setTags] = useState<ChipData[]>([]);
+  const [privateTags, setPrivateTags] = useState<ChipData[]>([]);
 
   const [pathErrorMessage, setPathErrorMessage] = useState<string>("");
   const [pathError, setPathError] = useState<boolean>(false);
 
+  const [tagType, setTagType] = useState("public");
+
+  const handleTagTypeChange = (event: SelectChangeEvent) => {
+    setTagType(event.target.value as string);
+  };
   const onClose = () => {
     toggleGoalTagsDialog(false, null);
     setInputValue("");
@@ -49,11 +59,14 @@ export default function GoalTagsDialog() {
 
     try {
       //create tags for our api from our chips
-      const apiTags = tags.map((tag: any) => {
-        return { text: tag.label, color: "" };
+      const apiPublicTags = tags.map((tag: any) => {
+        return { text: tag.label, color: "", private: false };
       });
-      const result = await api.putGoalTags(goalTagsDialogData.id, apiTags);
-      log("hanldeUpdateGoalTags result =>", result);
+      const apiPrivateTags = privateTags.map((tag: any) => {
+        return { text: tag.label, color: "", private: true };
+      });
+      await api.putGoalTags(goalTagsDialogData.id, apiPublicTags);
+      await api.putGoalPrivateTags(goalTagsDialogData.id, apiPrivateTags);
       toggleSnackBar(true, {
         message: "successfully updated goal's tags",
         severity: "success",
@@ -74,29 +87,41 @@ export default function GoalTagsDialog() {
 
     setTags((tags) => tags.filter((tag) => tag.label !== chipToDelete.label));
   };
+  const handleDeletePrivateTag = (chipToDelete: ChipData) => {
+    if (trying) return;
+
+    setPrivateTags((tags) =>
+      tags.filter((tag) => tag.label !== chipToDelete.label)
+    );
+  };
 
   const handleAdd = () => {
     if (trying) return;
     //reset error state
     setPathErrorMessage("");
     setPathError(false);
-    //check for duplication
-    const tagsMatch = tags.filter((tag: any) => tag.label === inputValue);
-    if (tagsMatch.length !== 0) {
+    //we either select public or private tags depending on the selected tag type
+    let selectTagType = tagType === "public" ? tags : privateTags;
+    //check for duplication in both private and public tags
+    const tagsMatchPublic = tags.filter((tag: any) => tag.label === inputValue);
+    const tagsMatchPrivate = privateTags.filter(
+      (tag: any) => tag.label === inputValue
+    );
+    if (tagsMatchPrivate.length !== 0 || tagsMatchPublic.length !== 0) {
       //throw duplication error
       setPathErrorMessage("This tag already exists");
       setPathError(true);
       return;
     }
-    const newTags: ChipData[] = [...tags];
+    const newTags: ChipData[] = [...selectTagType];
     //add new tag
     newTags.push({
       key: newTags.length + "",
       label: inputValue,
       canDelete: true,
     });
-
-    setTags(newTags);
+    //we update either public or private tags
+    tagType === "public" ? setTags(newTags) : setPrivateTags(newTags);
     setInputValue("");
   };
   const handleClose = () => {
@@ -104,12 +129,27 @@ export default function GoalTagsDialog() {
   };
   useEffect(() => {
     if (goalTagsDialogData) {
-      const newTags = goalTagsDialogData.tags?.map(
-        (item: any, index: number) => {
-          return { key: index.toString(), label: item.text, canDelete: true };
+      const newPrivateTags: any = [];
+      const newPublicTags: any = [];
+
+      goalTagsDialogData.tags?.forEach((item: any, index: number) => {
+        if (item.private) {
+          newPrivateTags.push({
+            key: index.toString() + "-private",
+            label: item.text,
+            canDelete: true,
+          });
+        } else {
+          newPublicTags.push({
+            key: index.toString() + "-public",
+            label: item.text,
+            canDelete: true,
+          });
         }
-      );
-      setTags(newTags);
+      });
+
+      setTags(newPublicTags);
+      setPrivateTags(newPrivateTags);
     }
   }, [goalTagsDialogData]);
   //if we dont have data we dont render
@@ -172,6 +212,21 @@ export default function GoalTagsDialog() {
               />
             )}
           />
+          <FormControl sx={{ width: 110 }}>
+            <InputLabel id="tag-type-select-label">Type</InputLabel>
+            <Select
+              size="small"
+              labelId="tag-type-select-label"
+              id="tag-select"
+              value={tagType}
+              label="Type"
+              onChange={handleTagTypeChange}
+            >
+              <MenuItem value={"public"}>Public</MenuItem>
+              <MenuItem value={"private"}>Private</MenuItem>
+            </Select>
+          </FormControl>
+
           <IconButton
             aria-label="add tag"
             size="small"
@@ -181,7 +236,16 @@ export default function GoalTagsDialog() {
             <AddIcon />
           </IconButton>
         </Stack>
-        <ChipsGroup title={"Tags"} data={tags} onDelete={handleDeleteTag} />
+        <ChipsGroup
+          title={"Public Tags"}
+          data={tags}
+          onDelete={handleDeleteTag}
+        />
+        <ChipsGroup
+          title={"Private Tags"}
+          data={privateTags}
+          onDelete={handleDeletePrivateTag}
+        />
       </DialogContent>
       <DialogActions>
         <Button

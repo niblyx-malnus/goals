@@ -8,7 +8,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Autocomplete from "@mui/material/Autocomplete";
 import Stack from "@mui/material/Stack";
-
 import useStore from "../store";
 
 export default function FilterTagsDialog() {
@@ -16,6 +15,7 @@ export default function FilterTagsDialog() {
   const toggleFilterTagsDialog = useStore(
     (store: any) => store.toggleFilterTagsDialog
   );
+
   const goalTagsDialogData = useStore((store: any) => store.goalTagsDialogData);
   const setTagFilterArray = useStore((store) => store.setTagFilterArray);
   const tagFilterArray = useStore((store) => store.tagFilterArray);

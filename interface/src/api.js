@@ -56,7 +56,7 @@ const api = {
     }
   },
   getGroupData: async () => {
-    return api.createApi().scry({ app: apiApp, path: "/groups" });
+    return api.createApi().scry({ app: "groups", path: "/groups" });
   },
   getData: async () => {
     //gets our main data we display (pools/goals)
@@ -230,6 +230,26 @@ const api = {
               "color":"0x00.defc"
             }
           ]*/,
+      },
+    };
+    return api.poke({
+      app: apiApp,
+      mark: apiMark,
+      json: goalToEdit,
+      pokeId: id.birth,
+    });
+  },
+  putGoalPrivateTags: async (id, tags) => {
+    const goalToEdit = {
+      "put-private-tags": {
+        id,
+        tags: tags /*[
+          {
+            text: "this is a tag!",
+            color: "0xab.cdef",
+            private: true,
+          },
+        ],*/,
       },
     };
     return api.poke({
