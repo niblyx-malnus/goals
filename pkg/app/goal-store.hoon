@@ -112,8 +112,10 @@
           u.get
         =.  tags.gl  tags.pok
         :_  state(goals.local.store (~(put by goals.local.store) id.pok gl))
+        =/  =pool:gol  (~(got by pools.store) pin)
+        =/  =goal:gol  (~(got by goals.pool) id.pok)
         =/  hom=home-update:gol
-          [[pin our.bowl pid] vzn %goal-hitch id.pok %put-tags tags.pok]
+          [[pin our.bowl pid] vzn %goal-hitch id.pok %put-tags (~(uni in tags.pok) tags.goal)]
         [%give %fact ~[/goals] goal-home-update+!>(hom)]~
         ::
           %add-field-type
@@ -637,7 +639,7 @@
   =/  =dock  [owner.pin dap.bowl]
   (emit %pass wire %agent dock %poke goal-action+!>(axn))
 ::
-++  apex-em  |=(=pin:gol (apex:em (~(got by pools.store) pin)))
+++  apex-em  |=(=pin:gol ~(. em (~(got by pools.store) pin) store))
 ::
 ++  etch-updt
   |=  [[=pin:gol mod=ship pid=@] =update:gol]

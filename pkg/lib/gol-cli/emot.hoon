@@ -2,7 +2,7 @@
 /+  *gol-cli-util, gol-cli-pool, gol-cli-node, gol-cli-traverse
 ::
 =|  efx=(list update:gol)
-|_  p=pool:gol
+|_  [p=pool:gol =store:gol]
 +*  this  .
     tv    ~(. gol-cli-traverse goals.p)
     nd    ~(. gol-cli-node goals.p)
@@ -412,6 +412,11 @@
   ?>  (check-goal-edit-perm:(pore) id mod)
   =/  goal  (~(got by goals.p) id)
   =.  goals.p  (~(put by goals.p) id goal(tags tags))
+  :: incorporate private tags into update...
+  =.  tags
+    ?~  get=(~(get by goals.local.store) id)
+      tags
+    (~(uni in tags) tags.u.get)
   (emot old [vzn %goal-hitch id %put-tags tags])
 ::
 ++  add-field-data
@@ -701,6 +706,11 @@
     ++  put-tags
       |=  [=id:gol tags=(set tag:gol)]
       ^-  _this
+      =.  tags
+        %-  ~(gas in *(set tag:gol))
+        %+  murn  ~(tap in tags)
+        |=  =tag:gol
+        ?:(private.tag ~ (some tag))
       =/  goal  (~(got by goals.p) id)
       %=    this
           goals.p
