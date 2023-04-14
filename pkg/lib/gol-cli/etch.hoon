@@ -1,5 +1,5 @@
 /-  gol=goal
-/+  pl=gol-cli-pool, em=gol-cli-emot, gol-cli-traverse
+/+  pl=gol-cli-pool, tv=gol-cli-traverse, *gol-cli-util
 :: apply (etch) updates received from foreign pools
 ::
 |_  =store:gol
@@ -7,14 +7,12 @@
   |=  [=pin:gol upds=(list update:gol)]
   ^-  store:gol
   |^
-  =/  idx  0
-  |-
-  ?:  =(idx (lent upds))
-    store
-  $(idx +(idx), store (etch pin (snag idx upds)))
+  |-  ?~  upds  store
+  $(upds t.upds, store (etch pin i.upds))
   ++  etch
     |=  [=pin:gol upd=update:gol]
     ^-  store:gol
+    =/  p=pool:gol  (~(got by (~(uni by pools.store) cache.store)) pin)
     ?-    +<.upd
       %poke-error  store  :: no-op on poke-error update
       %spawn-pool  (spawn-pool:life-cycle pin pool.upd)
@@ -24,28 +22,22 @@
       %trash-pool  (trash-pool:life-cycle pin)
         ::
         %spawn-goal
-      =/  pool  (~(got by pools.store) pin)
-      =/  pore  (apex:em pool)
       %=  store
         index  (put:idx-orm:gol index.store id.upd pin)
-        pools  (~(put by pools.store) pin pool:abet:(etch:pore upd))
+        pools  (~(put by pools.store) pin (pool-etch p upd))
       ==
       ::
         %waste-goal
-      =/  pool  (~(got by pools.store) pin)
-      =/  pore  (apex:em pool)
       %=  store
         index  (gus-idx-orm ~(tap in waz.upd))
-        pools  (~(put by pools.store) pin pool:abet:(etch:pore upd))
+        pools  (~(put by pools.store) pin (pool-etch p upd))
       ==
       ::
         %trash-goal
-      =/  pool  (~(got by pools.store) pin)
-      =/  pore  (apex:em pool)
-      =/  prog  ~(tap in (~(progeny gol-cli-traverse cache.pool) id.upd))
+      =/  prog  ~(tap in (~(progeny tv cache.p) id.upd))
       %=  store
         index  (gus-idx-orm prog)
-        pools  (~(put by pools.store) pin pool:abet:(etch:pore upd))
+        pools  (~(put by pools.store) pin (pool-etch p upd))
       ==
       ::
         $?  %cache-goal  %renew-goal
@@ -53,9 +45,7 @@
             %goal-perms  %goal-hitch  %goal-togls  %goal-dates
             %goal-young  %goal-roots
         ==
-      =/  pool  (~(got by pools.store) pin)
-      =/  pore  (apex:em pool)
-      store(pools (~(put by pools.store) pin pool:abet:(etch:pore upd)))
+      store(pools (~(put by pools.store) pin (pool-etch p upd)))
     ==
   ::
   ++  life-cycle
@@ -121,5 +111,260 @@
     ?:  =(idx (lent ids))
       index.store
     $(idx +(idx), index.store +:(del:idx-orm:gol index.store (snag idx ids)))
+  --
+::
+++  pool-etch
+  |=  [p=pool:gol upd=update:gol]
+  ^-  pool:gol
+  |^
+  ?+    +.upd  !!
+    :: ------------------------------------------------------------------------
+    :: spawn/trash
+    ::
+      [%spawn-goal *]
+    (spawn-goal:life-cycle [nex id goal]:upd)
+    ::
+      [%waste-goal *]
+    (waste-goal:life-cycle [nex id waz]:upd)
+    ::
+      [%cache-goal *]
+    (cache-goal:life-cycle [nex id cas]:upd)
+    ::
+      [%renew-goal *]
+    (renew-goal:life-cycle id.upd)
+    ::
+      [%trash-goal *]
+    (trash-goal:life-cycle id.upd)
+    :: ------------------------------------------------------------------------
+    :: pool-perms
+    ::
+      [%pool-perms *]
+    (pool-perms new.upd)
+    ::
+    :: ------------------------------------------------------------------------
+    :: pool-hitch
+    ::
+      [%pool-hitch %title *]
+    (title:pool-hitch title.upd)
+    ::
+      [%pool-hitch %note *]
+    (note:pool-hitch note.upd)
+    ::
+      [%pool-hitch %add-field-type *]
+    (add-field-type:pool-hitch [field field-type]:upd)
+    ::
+      [%pool-hitch %del-field-type *]
+    (del-field-type:pool-hitch field.upd)
+    :: ------------------------------------------------------------------------
+    :: pool-nexus
+    ::
+      [%pool-nexus %yoke *]
+    (apply-nex p nex.upd)
+    :: ------------------------------------------------------------------------
+    :: goal-dates
+    ::
+      [%goal-dates *]
+    (apply-nex p nex.upd)
+    :: ------------------------------------------------------------------------
+    :: goal-perms
+    ::
+      [%goal-perms *]
+    (apply-nex p nex.upd)
+    :: ------------------------------------------------------------------------
+    :: goal-young
+    ::
+      [%goal-young *]
+    (apply-nex p nex.upd)
+    :: ------------------------------------------------------------------------
+    :: goal-roots
+    ::
+      [%goal-roots *]
+    p(trace pex.upd)
+    :: ------------------------------------------------------------------------
+    :: goal-hitch
+    ::
+      [%goal-hitch id:gol %desc *]
+    (desc:goal-hitch [id desc]:upd)
+    ::
+      [%goal-hitch id:gol %note *]
+    (note:goal-hitch [id note]:upd)
+    ::
+      [%goal-hitch id:gol %add-tag *]
+    (add-tag:goal-hitch [id tag]:upd)
+    ::
+      [%goal-hitch id:gol %del-tag *]
+    (del-tag:goal-hitch [id tag]:upd)
+    ::
+      [%goal-hitch id:gol %put-tags *]
+    (put-tags:goal-hitch [id tags]:upd)
+    ::
+      [%goal-hitch id:gol %add-field-data *]
+    (add-field-data:goal-hitch [id field field-data]:upd)
+    ::
+      [%goal-hitch id:gol %del-field-data *]
+    (del-field-data:goal-hitch [id field]:upd)
+    :: ------------------------------------------------------------------------
+    :: goal-togls
+    ::
+      [%goal-togls id:gol %complete *]
+    (complete:goal-togls [id complete]:upd)
+    ::
+      [%goal-togls id:gol %actionable *]
+    (actionable:goal-togls [id actionable]:upd)
+  ==
+  ::
+  ++  apply-nex
+    |=  [=pool:gol =nex:gol]
+    ^-  pool:gol
+    %=  pool
+      goals
+        %-  ~(gas by goals.pool)
+        %+  turn  ~(tap by nex)
+        |=  [=id:gol =nux:gol]
+        ^-  [id:gol goal:gol]
+        =/  =ngoal:gol  (~(got by goals.pool) id)
+        [id ngoal(nexus -.nux, trace +.nux)]
+    ==
+  ::
+  ++  life-cycle
+    |%
+    ++  spawn-goal
+      |=  [=nex:gol =id:gol =goal:gol]
+      ^-  pool:gol
+      =.  goals.p  (~(put by goals.p) id goal)
+      (apply-nex p nex)
+    ::
+    ++  waste-goal
+      |=  [=nex:gol =id:gol waz=(set id:gol)]
+      ^-  pool:gol
+      =.  p  (apply-nex p nex)
+      p(goals (gus-by goals.p ~(tap in waz)))
+    ::
+    ++  cache-goal
+      |=  [=nex:gol =id:gol cas=(set id:gol)]
+      ^-  pool:gol
+      =.  p  (apply-nex p nex)
+      %=  p
+        goals  (gus-by goals.p ~(tap in cas))
+        cache
+          %-  ~(uni by cache.p)
+          `goals:gol`(gat-by goals.p ~(tap in cas))
+      ==
+    ::
+    ++  renew-goal
+      |=  =id:gol
+      ^-  pool:gol
+      =/  prog  ~(tap in (~(progeny tv cache.p) id))
+      %=  p
+        cache  (gus-by cache.p prog)
+        goals  (~(uni by goals.p) `goals:gol`(gat-by cache.p prog))
+      ==
+    ::
+    ++  trash-goal
+      |=  =id:gol
+      ^-  pool:gol
+      =/  prog  ~(tap in (~(progeny tv cache.p) id))
+      p(cache (gus-by cache.p prog))
+    --
+  ::
+  ++  pool-perms  |=(perms=pool-perms:gol `pool:gol`p(perms perms))
+  ::
+  ++  pool-hitch
+    |%
+    ++  note   |=(note=@t `pool:gol`p(note note))
+    ++  title  |=(title=@t `pool:gol`p(title title))
+    ++  add-field-type
+      |=  [field=@t =field-type:gol]
+      ^-  pool:gol
+      p(fields (~(put by fields.p) field field-type))
+    ++  del-field-type
+      |=  field=@t
+      ^-  pool:gol
+      ::
+      =.  goals.p
+        %-  ~(gas by *goals:gol)
+        %+  turn  ~(tap by goals.p)
+        |=  [=id:gol =goal:gol]
+        ^-  [id:gol goal:gol]
+        [id goal(fields (~(del by fields.goal) field))]
+      ::
+      p(fields (~(del by fields.p) field))
+    --
+  ::
+  ++  goal-hitch
+    |%
+    ++  note
+      |=  [=id:gol note=@t]
+      ^-  pool:gol
+      =/  goal  (~(got by goals.p) id)
+      p(goals (~(put by goals.p) id goal(note note)))
+    ++  desc
+      |=  [=id:gol desc=@t]
+      ^-  pool:gol
+      =/  goal  (~(got by goals.p) id)
+      p(goals (~(put by goals.p) id goal(desc desc)))
+    ++  add-tag
+      |=  [=id:gol =tag:gol]
+      ^-  pool:gol
+      =/  goal  (~(got by goals.p) id)
+      %=    p
+          goals
+        (~(put by goals.p) id goal(tags (~(put in tags.goal) tag)))
+      ==
+    ++  del-tag
+      |=  [=id:gol =tag:gol]
+      ^-  pool:gol
+      =/  goal  (~(got by goals.p) id)
+      %=    p
+          goals
+        (~(put by goals.p) id goal(tags (~(del in tags.goal) tag)))
+      ==
+    ++  put-tags
+      |=  [=id:gol tags=(set tag:gol)]
+      ^-  pool:gol
+      =.  tags
+        %-  ~(gas in *(set tag:gol))
+        %+  murn  ~(tap in tags)
+        |=  =tag:gol
+        ?:(private.tag ~ (some tag))
+      =/  goal  (~(got by goals.p) id)
+      %=    p
+          goals
+        (~(put by goals.p) id goal(tags tags))
+      ==
+    ++  add-field-data  
+      |=  [=id:gol field=@t =field-data:gol]
+      ^-  pool:gol
+      =/  goal  (~(got by goals.p) id)
+      %=    p
+          goals
+        %+  ~(put by goals.p)  id
+        goal(fields (~(put by fields.goal) field field-data))
+      ==
+    ++  del-field-data
+      |=  [=id:gol field=@t]
+      ^-  pool:gol
+      =/  goal  (~(got by goals.p) id)
+      %=    p
+          goals
+        %+  ~(put by goals.p)  id
+        goal(fields (~(del by fields.goal) field))
+      ==
+    --
+  ::
+  ++  goal-togls
+    |%
+    ++  complete
+      |=  [=id:gol complete=?(%.y %.n)]
+      ^-  pool:gol
+      =/  goal  (~(got by goals.p) id)
+      p(goals (~(put by goals.p) id goal(complete complete)))
+    ::
+    ++  actionable
+      |=  [=id:gol actionable=?(%.y %.n)]
+      ^-  pool:gol
+      =/  goal  (~(got by goals.p) id)
+      p(goals (~(put by goals.p) id goal(actionable actionable)))
+    --
   --
 --

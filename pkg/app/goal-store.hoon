@@ -1,7 +1,7 @@
 /-  gol=goal
 /+  dbug, default-agent, verb, agentio,
     pl=gol-cli-pool, gol-cli-goals, gol-cli-pools,
-    em=gol-cli-emot, gol-cli-node, gol-cli-traverse,
+    gol-cli-emot, gol-cli-node, gol-cli-traverse,
     gol-cli-etch,
 :: import during development to force compilation
 ::
@@ -50,6 +50,7 @@
     gols  ~(. gol-cli-goals store)
     puls  ~(. gol-cli-pools store)
     etch  ~(. gol-cli-etch store)
+    emot  ~(. gol-cli-emot store)
     index   index.store
     pools   pools.store
     cache   cache.store
@@ -72,10 +73,10 @@
     =.  old
       %=  old
         pools.store
-          %-  ~(run by pools.store.old)
-          |=  =pool:gol
-          ^-  pool:gol
-          pool:abet:(inflater:(apex:em pool))
+          %-  ~(gas by *pools:gol)
+          %+  turn  ~(tap by pools.store.old)
+          |=  [=pin:gol =pool:gol]
+          [pin pool:abet:(inflater:(apex:~(. gol-cli-emot store.old) pin))]
       ==
     =/  now=@  (unique-time now.bowl log)
     `this(state old(log (put:log-orm *log:gol now [%init store.old])))
@@ -604,6 +605,7 @@
 |_  [=bowl:gall cards=(list card)]
 +*  core  .
     etch  ~(. gol-cli-etch store)
+    emot  ~(. gol-cli-emot store)
 ++  abet  [(flop cards) state]
 ++  emit  |=(=card core(cards [card cards]))
 ++  emil  |=(cadz=(list card) core(cards (weld cadz cards)))
@@ -639,7 +641,7 @@
   =/  =dock  [owner.pin dap.bowl]
   (emit %pass wire %agent dock %poke goal-action+!>(axn))
 ::
-++  apex-em  |=(=pin:gol ~(. em (~(got by pools.store) pin) store))
+++  apex-em  |=(=pin:gol (apex:emot pin))
 ::
 ++  etch-updt
   |=  [[=pin:gol mod=ship pid=@] =update:gol]

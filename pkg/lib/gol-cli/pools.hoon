@@ -1,7 +1,8 @@
 /-  gol=goal
-/+  gol-cli-goals, pl=gol-cli-pool, em=gol-cli-emot
+/+  gol-cli-goals, pl=gol-cli-pool, gol-cli-emot
 |_  store:gol
 +*  gols  ~(. gol-cli-goals +<)
+    emot  ~(. gol-cli-emot +<)
 ::
 :: create unique pool id based on source ship and creation time
 ++  unique-pin
@@ -29,7 +30,7 @@
   =+  [pin pool]=(spawn-pool title own now)
   =.  pool  pool(creator owner.old-pin)
   =.  pool  pool(goals goals:(clone-goals:gols goals.old-pool own now))
-  [pin pool:abet:(inflater:(apex:em pool))]
+  [pin pool:abet:(inflater:(abex:emot pool))]
 ::
 ++  clone-goal
   |=  $:  =old=id:gol

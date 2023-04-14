@@ -1,19 +1,29 @@
 /-  gol=goal
-/+  *gol-cli-util, gol-cli-pool, gol-cli-node, gol-cli-traverse
+/+  *gol-cli-util, gol-cli-pool, gol-cli-node, gol-cli-traverse,
+    gol-cli-etch
+
 ::
 =|  efx=(list update:gol)
-|_  [p=pool:gol =store:gol]
+=|  p=pool:gol
+|_  =store:gol
 +*  this  .
     tv    ~(. gol-cli-traverse goals.p)
     nd    ~(. gol-cli-node goals.p)
+    etch  ~(. gol-cli-etch store)
     vzn   vzn:gol
 ::
 ++  pore  |.(~(. gol-cli-pool p))
 ::
-:: return this core with initial value
-++  apex
+++  abex
   |=  =pool:gol
   this(p pool)
+::
+++  apex
+  |=  =pin:gol
+  %=    this
+      p
+   (~(got by (~(uni by pools.store) cache.store)) pin)
+  ==
 ::
 :: return this core with final effects list
 ++  abet
@@ -31,7 +41,9 @@
   |=  [old=_this upd=update:gol]
   ::
   :: confirm that applying update yields equivalent state
-  ?.  =(p.this p:(etch:old upd))
+  =/  tore  this(p (pool-etch:etch p.old upd))
+  =.  tore  (inflater)
+  ?.  =(p.this p.tore)
     ~|("non-equivalent-update" !!)
   (emit upd)
 ::
@@ -77,19 +89,6 @@
   %+  turn  ~(tap in ids)
   |=  =id:gol
   [id [nexus trace]:`ngoal:gol`(~(got by goals) id)]
-::
-++  apply-nex
-  |=  =nex:gol
-  ^-  _this
-    %=  this
-      goals.p
-        %-  ~(gas by goals.p)
-        %+  turn  ~(tap by nex)
-        |=  [=id:gol =nux:gol]
-        ^-  [id:gol goal:gol]
-        =/  =ngoal:gol  (~(got by goals.p) id)
-        [id ngoal(nexus -.nux, trace +.nux)]
-    ==
 ::
 :: ============================================================================
 :: 
@@ -201,14 +200,6 @@
     ~(tap in (~(dif in ~(key by perms.p)) ~(key by new)))
   |=(=ship [ship ~])
 ::
-:: convert a new pool perms map to a list of ships to remove or invite
-++  pool-diff
-  |=  new=pool-perms:gol
-  ^-  [remove=(list ship) invite=(list ship)]
-  =/  remove  ~(tap in (~(dif in ~(key by perms.p)) ~(key by new)))
-  =/  invite  ~(tap in (~(dif in ~(key by new)) ~(key by perms.p)))
-  [remove invite]
-::
 ++  en-virt
   |=  [par=id:gol ids=(list id:gol)]
   ^-  (list [id:gol virtual=?])
@@ -228,6 +219,22 @@
 :: UPDATES
 ::
 :: ============================================================================
+::
+:: wit all da fixin's
+++  spawn-goal-fixns
+  |=  [=id:gol upid=(unit id:gol) desc=@t actionable=_| mod=ship]
+  ^-  _this
+  =/  old  this
+  =/  tore  (apply spawn-goal:(pore) id upid mod)
+  =.  tore
+    ?:  actionable
+      (apply:tore mark-actionable:(pore.tore) id mod)
+    (apply:tore unmark-actionable:(pore.tore) id mod)
+  =.  tore  (edit-goal-desc:tore id desc mod)
+  =/  fd  (full-diff goals.p goals.p.tore)
+  =/  goal  (~(got by goals.p.tore) id)
+  =/  =pex:gol  trace.p.tore
+  (emot:tore(efx efx) old [vzn %spawn-goal pex nex.fd id goal])
 ::
 :: Move goal and subgoals from main goals to cache
 ++  cache-goal
@@ -304,29 +311,6 @@
   =/  tore  (apply unmark-complete:(pore) id mod)
   (emot:tore this [vzn %goal-togls id %complete %.n])
 ::
-++  reorder-young
-  |=  [=id:gol young=(list id:gol) mod=ship]
-  ^-  _this
-  =/  old  this
-  ?>  (check-goal-edit-perm:(pore) id mod)
-  ?>  =((sy young) (young:nd id))
-  =/  goal  (~(got by goals.p) id)
-  =.  young.goal
-    (en-virt id (topological-sort:tv %p d-k-precs.trace.p young))
-  =.  goals.p     (~(put by goals.p) id goal)
-  =/  fd  (full-diff goals.p goals.p.old)
-  (emot old [vzn %goal-young nex.fd])
-::
-++  reorder-roots
-  |=  [roots=(list id:gol) mod=ship]
-  ^-  _this
-  =/  old  this
-  ?>  (check-pool-edit-perm:(pore) mod)
-  ?>  =((sy roots) (sy (root-goals:nd)))
-  =.  roots.trace.p  (topological-sort:tv %p d-k-precs.trace.p roots)
-  =/  =pex:gol  trace.p
-  (emot old [vzn %goal-roots pex])
-::
 ++  set-kickoff
   |=  [=id:gol =moment:gol mod=ship]
   ^-  _this
@@ -366,6 +350,29 @@
   =/  fd  (full-diff goals.p goals.p.tore)
   =/  =pex:gol  trace.p.tore
   (emot:tore this [vzn %goal-perms pex nex.fd])
+::
+++  reorder-young
+  |=  [=id:gol young=(list id:gol) mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-goal-edit-perm:(pore) id mod)
+  ?>  =((sy young) (young:nd id))
+  =/  goal  (~(got by goals.p) id)
+  =.  young.goal
+    (en-virt id (topological-sort:tv %p d-k-precs.trace.p young))
+  =.  goals.p     (~(put by goals.p) id goal)
+  =/  fd  (full-diff goals.p goals.p.old)
+  (emot old [vzn %goal-young nex.fd])
+::
+++  reorder-roots
+  |=  [roots=(list id:gol) mod=ship]
+  ^-  _this
+  =/  old  this
+  ?>  (check-pool-edit-perm:(pore) mod)
+  ?>  =((sy roots) (sy (root-goals:nd)))
+  =.  roots.trace.p  (topological-sort:tv %p d-k-precs.trace.p roots)
+  =/  =pex:gol  trace.p
+  (emot old [vzn %goal-roots pex])
 ::
 ++  edit-goal-desc
   |=  [=id:gol desc=@t mod=ship]
@@ -486,269 +493,4 @@
   ::
   =.  p  p(fields (~(del by fields.p) field))
   (emot old [vzn %pool-hitch %del-field-type field])
-::
-:: wit all da fixin's
-++  spawn-goal-fixns
-  |=  [=id:gol upid=(unit id:gol) desc=@t actionable=_| mod=ship]
-  ^-  _this
-  =/  old  this
-  =/  tore  (apply spawn-goal:(pore) id upid mod)
-  =.  tore
-    ?:  actionable
-      (apply:tore mark-actionable:(pore.tore) id mod)
-    (apply:tore unmark-actionable:(pore.tore) id mod)
-  =.  tore  (edit-goal-desc:tore id desc mod)
-  =/  fd  (full-diff goals.p goals.p.tore)
-  =/  goal  (~(got by goals.p.tore) id)
-  =/  =pex:gol  trace.p.tore
-  (emot:tore(efx efx) old [vzn %spawn-goal pex nex.fd id goal])
-::
-:: ============================================================================
-:: 
-:: ETCH CHANGES
-::
-:: ============================================================================
-::
-++  etch
-  |=  upd=update:gol
-  ^-  _this
-  |^
-  =;  tore  (inflater:tore)
-  ?+    +.upd  !!
-    :: ------------------------------------------------------------------------
-    :: spawn/trash
-    ::
-      [%spawn-goal *]
-    (spawn-goal:life-cycle [nex id goal]:upd)
-    ::
-      [%waste-goal *]
-    (waste-goal:life-cycle [nex id waz]:upd)
-    ::
-      [%cache-goal *]
-    (cache-goal:life-cycle [nex id cas]:upd)
-    ::
-      [%renew-goal *]
-    (renew-goal:life-cycle id.upd)
-    ::
-      [%trash-goal *]
-    (trash-goal:life-cycle id.upd)
-    :: ------------------------------------------------------------------------
-    :: pool-perms
-    ::
-      [%pool-perms *]
-    (pool-perms new.upd)
-    ::
-    :: ------------------------------------------------------------------------
-    :: pool-hitch
-    ::
-      [%pool-hitch %title *]
-    (title:pool-hitch title.upd)
-    ::
-      [%pool-hitch %note *]
-    (note:pool-hitch note.upd)
-    ::
-      [%pool-hitch %add-field-type *]
-    (add-field-type:pool-hitch [field field-type]:upd)
-    ::
-      [%pool-hitch %del-field-type *]
-    (del-field-type:pool-hitch field.upd)
-    :: ------------------------------------------------------------------------
-    :: pool-nexus
-    ::
-      [%pool-nexus %yoke *]
-    (apply-nex nex.upd)
-    :: ------------------------------------------------------------------------
-    :: goal-dates
-    ::
-      [%goal-dates *]
-    (apply-nex nex.upd)
-    :: ------------------------------------------------------------------------
-    :: goal-perms
-    ::
-      [%goal-perms *]
-    (apply-nex nex.upd)
-    :: ------------------------------------------------------------------------
-    :: goal-young
-    ::
-      [%goal-young *]
-    (apply-nex nex.upd)
-    :: ------------------------------------------------------------------------
-    :: goal-roots
-    ::
-      [%goal-roots *]
-    this(trace.p pex.upd)
-    :: ------------------------------------------------------------------------
-    :: goal-hitch
-    ::
-      [%goal-hitch id:gol %desc *]
-    (desc:goal-hitch [id desc]:upd)
-    ::
-      [%goal-hitch id:gol %note *]
-    (note:goal-hitch [id note]:upd)
-    ::
-      [%goal-hitch id:gol %add-tag *]
-    (add-tag:goal-hitch [id tag]:upd)
-    ::
-      [%goal-hitch id:gol %del-tag *]
-    (del-tag:goal-hitch [id tag]:upd)
-    ::
-      [%goal-hitch id:gol %put-tags *]
-    (put-tags:goal-hitch [id tags]:upd)
-    ::
-      [%goal-hitch id:gol %add-field-data *]
-    (add-field-data:goal-hitch [id field field-data]:upd)
-    ::
-      [%goal-hitch id:gol %del-field-data *]
-    (del-field-data:goal-hitch [id field]:upd)
-    :: ------------------------------------------------------------------------
-    :: goal-togls
-    ::
-      [%goal-togls id:gol %complete *]
-    (complete:goal-togls [id complete]:upd)
-    ::
-      [%goal-togls id:gol %actionable *]
-    (actionable:goal-togls [id actionable]:upd)
-  ==
-  ::
-  ++  life-cycle
-    |%
-    ++  spawn-goal
-      |=  [=nex:gol =id:gol =goal:gol]
-      ^-  _this
-      =.  goals.p  (~(put by goals.p) id goal)
-      (apply-nex nex)
-    ::
-    ++  waste-goal
-      |=  [=nex:gol =id:gol waz=(set id:gol)]
-      ^-  _this
-      =/  pore  (apply-nex nex)
-      pore(goals.p (gus-by goals.p.pore ~(tap in waz)))
-    ::
-    ++  cache-goal
-      |=  [=nex:gol =id:gol cas=(set id:gol)]
-      ^-  _this
-      =/  pore  (apply-nex nex)
-      %=  pore
-        goals.p  (gus-by goals.p.pore ~(tap in cas))
-        cache.p
-          %-  ~(uni by cache.p.pore)
-          `goals:gol`(gat-by goals.p.pore ~(tap in cas))
-      ==
-    ::
-    ++  renew-goal
-      |=  =id:gol
-      ^-  _this
-      =/  prog  ~(tap in (~(progeny gol-cli-traverse cache.p) id))
-      %=  this
-        cache.p  (gus-by cache.p prog)
-        goals.p  (~(uni by goals.p) `goals:gol`(gat-by cache.p prog))
-      ==
-    ::
-    ++  trash-goal
-      |=  =id:gol
-      ^-  _this
-      =/  prog  ~(tap in (~(progeny gol-cli-traverse cache.p) id))
-      this(cache.p (gus-by cache.p prog))
-    --
-  ::
-  ++  pool-perms  |=(perms=pool-perms:gol `_this`this(perms.p perms))
-  ::
-  ++  pool-hitch
-    |%
-    ++  note   |=(note=@t `_this`this(p p(note note)))
-    ++  title  |=(title=@t `_this`this(p p(title title)))
-    ++  add-field-type
-      |=  [field=@t =field-type:gol]
-      ^-  _this
-      this(p p(fields (~(put by fields.p) field field-type)))
-    ++  del-field-type
-      |=  field=@t
-      ^-  _this
-      ::
-      =.  goals.p
-        %-  ~(gas by *goals:gol)
-        %+  turn  ~(tap by goals.p)
-        |=  [=id:gol =goal:gol]
-        ^-  [id:gol goal:gol]
-        [id goal(fields (~(del by fields.goal) field))]
-      ::
-      this(p p(fields (~(del by fields.p) field)))
-    --
-  ::
-  ++  goal-hitch
-    |%
-    ++  note
-      |=  [=id:gol note=@t]
-      ^-  _this
-      =/  goal  (~(got by goals.p) id)
-      this(goals.p (~(put by goals.p) id goal(note note)))
-    ++  desc
-      |=  [=id:gol desc=@t]
-      ^-  _this
-      =/  goal  (~(got by goals.p) id)
-      this(goals.p (~(put by goals.p) id goal(desc desc)))
-    ++  add-tag
-      |=  [=id:gol =tag:gol]
-      ^-  _this
-      =/  goal  (~(got by goals.p) id)
-      %=    this
-          goals.p
-        (~(put by goals.p) id goal(tags (~(put in tags.goal) tag)))
-      ==
-    ++  del-tag
-      |=  [=id:gol =tag:gol]
-      ^-  _this
-      =/  goal  (~(got by goals.p) id)
-      %=    this
-          goals.p
-        (~(put by goals.p) id goal(tags (~(del in tags.goal) tag)))
-      ==
-    ++  put-tags
-      |=  [=id:gol tags=(set tag:gol)]
-      ^-  _this
-      =.  tags
-        %-  ~(gas in *(set tag:gol))
-        %+  murn  ~(tap in tags)
-        |=  =tag:gol
-        ?:(private.tag ~ (some tag))
-      =/  goal  (~(got by goals.p) id)
-      %=    this
-          goals.p
-        (~(put by goals.p) id goal(tags tags))
-      ==
-    ++  add-field-data  
-      |=  [=id:gol field=@t =field-data:gol]
-      ^-  _this
-      =/  goal  (~(got by goals.p) id)
-      %=    this
-          goals.p
-        %+  ~(put by goals.p)  id
-        goal(fields (~(put by fields.goal) field field-data))
-      ==
-    ++  del-field-data
-      |=  [=id:gol field=@t]
-      ^-  _this
-      =/  goal  (~(got by goals.p) id)
-      %=    this
-          goals.p
-        %+  ~(put by goals.p)  id
-        goal(fields (~(del by fields.goal) field))
-      ==
-    --
-  ::
-  ++  goal-togls
-    |%
-    ++  complete
-      |=  [=id:gol complete=?(%.y %.n)]
-      ^-  _this
-      =/  goal  (~(got by goals.p) id)
-      this(goals.p (~(put by goals.p) id goal(complete complete)))
-    ::
-    ++  actionable
-      |=  [=id:gol actionable=?(%.y %.n)]
-      ^-  _this
-      =/  goal  (~(got by goals.p) id)
-      this(goals.p (~(put by goals.p) id goal(actionable actionable)))
-    --
-  --
 --
