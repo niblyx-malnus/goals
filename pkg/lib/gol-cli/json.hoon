@@ -505,6 +505,7 @@
       :~  [%title s+title.pool]
           [%note s+note.pool]
       ==
+      [%trace (enjs-pool-trace trace.pool)]
   ==
 ::
 ++  enjs-yoke
@@ -526,17 +527,19 @@
       [%goal (enjs-goal goal)]
   ==
 ::
-++  enjs-pex
+++  enjs-pex  enjs-pool-trace
+::
+++  enjs-pool-trace
   =,  enjs:format
-  |=  =pex
+  |=  trace=pool-trace
   ^-  json
   %-  pairs
-  :~  [%roots a+(turn roots.pex enjs-id)]
-      [%roots-by-kickoff a+(turn roots-by-kickoff.pex enjs-id)]
-      [%roots-by-deadline a+(turn roots-by-deadline.pex enjs-id)]
-      [%cache-roots a+(turn cache-roots.pex enjs-id)]
-      [%cache-roots-by-kickoff a+(turn cache-roots-by-kickoff.pex enjs-id)]
-      [%cache-roots-by-deadline a+(turn cache-roots-by-deadline.pex enjs-id)]
+  :~  [%roots a+(turn roots.trace enjs-id)]
+      [%roots-by-kickoff a+(turn roots-by-kickoff.trace enjs-id)]
+      [%roots-by-deadline a+(turn roots-by-deadline.trace enjs-id)]
+      [%cache-roots a+(turn cache-roots.trace enjs-id)]
+      [%cache-roots-by-kickoff a+(turn cache-roots-by-kickoff.trace enjs-id)]
+      [%cache-roots-by-deadline a+(turn cache-roots-by-deadline.trace enjs-id)]
   ==
 
 ::
