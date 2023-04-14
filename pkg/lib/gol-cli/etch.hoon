@@ -9,10 +9,11 @@
   |^
   |-  ?~  upds  store
   $(upds t.upds, store (etch pin i.upds))
+  ++  cools  (~(uni by pools.store) cache.store)
+  ++  pile  |=(=pin:gol (~(got by cools) pin))
   ++  etch
     |=  [=pin:gol upd=update:gol]
     ^-  store:gol
-    =/  p=pool:gol  (~(got by (~(uni by pools.store) cache.store)) pin)
     ?-    +<.upd
       %poke-error  store  :: no-op on poke-error update
       %spawn-pool  (spawn-pool:life-cycle pin pool.upd)
@@ -22,18 +23,21 @@
       %trash-pool  (trash-pool:life-cycle pin)
         ::
         %spawn-goal
+      =/  p=pool:gol  (pile pin)
       %=  store
         index  (put:idx-orm:gol index.store id.upd pin)
         pools  (~(put by pools.store) pin (pool-etch p upd))
       ==
       ::
         %waste-goal
+      =/  p=pool:gol  (pile pin)
       %=  store
         index  (gus-idx-orm ~(tap in waz.upd))
         pools  (~(put by pools.store) pin (pool-etch p upd))
       ==
       ::
         %trash-goal
+      =/  p=pool:gol  (pile pin)
       =/  prog  ~(tap in (~(progeny tv cache.p) id.upd))
       %=  store
         index  (gus-idx-orm prog)
@@ -45,6 +49,7 @@
             %goal-perms  %goal-hitch  %goal-togls  %goal-dates
             %goal-young  %goal-roots
         ==
+      =/  p=pool:gol  (pile pin)
       store(pools (~(put by pools.store) pin (pool-etch p upd)))
     ==
   ::
