@@ -122,61 +122,61 @@
           %add-field-type
         ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
         =/  pore
-          %-  add-field-type:(apex-em:hc pin.pok)
-          [field.pok field-type.pok src.bowl]
+          %-  add-field-type:(apex:emot store)
+          [pin.pok field.pok field-type.pok src.bowl]
         abet:(send-away-updates:hc ~ [pin.pok src.bowl pid] efx:abet:pore)
         ::
           %del-field-type
         ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
-        =/  pore  (del-field-type:(apex-em:hc pin.pok) field.pok src.bowl)
+        =/  pore  (del-field-type:(apex:emot store) pin.pok field.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin.pok src.bowl pid] efx:abet:pore)
         ::
           %add-field-data
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         =/  pore
-          %-  add-field-data:(apex-em:hc pin)
+          %-  add-field-data:(apex:emot store)
           [id.pok field.pok field-data.pok src.bowl]
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
         ::
           %del-field-data
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (del-field-data:(apex-em:hc pin) id.pok field.pok src.bowl)
+        =/  pore  (del-field-data:(apex:emot store) id.pok field.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
         ::
           %add-goal-tag
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         ?<  private.tag.pok
-        =/  pore  (add-goal-tag:(apex-em:hc pin) id.pok tag.pok src.bowl)
+        =/  pore  (add-goal-tag:(apex:emot store) id.pok tag.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
         ::
           %del-goal-tag
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         ?<  private.tag.pok
-        =/  pore  (del-goal-tag:(apex-em:hc pin) id.pok tag.pok src.bowl)
+        =/  pore  (del-goal-tag:(apex:emot store) id.pok tag.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
         ::
           %put-goal-tags
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         ?>  (~(all in tags.pok) |=(=tag:gol !private.tag)) 
-        =/  pore  (put-goal-tags:(apex-em:hc pin) id.pok tags.pok src.bowl)
+        =/  pore  (put-goal-tags:(apex:emot store) id.pok tags.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           :: [%edit-goal-note =id note=@t]
           ::
           %edit-goal-note
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (edit-goal-note:(apex-em:hc pin) id.pok note.pok src.bowl)
+        =/  pore  (edit-goal-note:(apex:emot store) id.pok note.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           :: [%edit-pool-note =pin note=@t]
           ::
           %edit-pool-note
         ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
-        =/  pore  (edit-pool-note:(apex-em:hc pin.pok) note.pok src.bowl)
+        =/  pore  (edit-pool-note:(apex:emot store) pin.pok note.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin.pok src.bowl pid] efx:abet:pore)
           ::
           %spawn-pool
@@ -223,7 +223,8 @@
         ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
         =/  =id:gol  (unique-id:gols [our.bowl now.bowl])
         =/  pore
-          %:  spawn-goal-fixns:(apex-em:hc pin.pok)
+          %:  spawn-goal-fixns:(apex:emot store)
+            pin.pok
             id
             upid.pok
             desc.pok
@@ -236,89 +237,89 @@
           %cache-goal
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (cache-goal:(apex-em:hc pin) id.pok src.bowl)
+        =/  pore  (cache-goal:(apex:emot store) id.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%renew-goal =id]
           %renew-goal
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (renew-goal:(apex-em:hc pin) id.pok src.bowl)
+        =/  pore  (renew-goal:(apex:emot store) id.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%trash-goal =id]
           %trash-goal
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (trash-goal:(apex-em:hc pin) id.pok src.bowl)
+        =/  pore  (trash-goal:(apex:emot store) id.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%edit-goal-desc =id desc=@t]
           %edit-goal-desc
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (edit-goal-desc:(apex-em:hc pin) id.pok desc.pok src.bowl)
+        =/  pore  (edit-goal-desc:(apex:emot store) id.pok desc.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%edit-pool-title =pin title=@t]
           %edit-pool-title
         ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
-        =/  pore  (edit-pool-title:(apex-em:hc pin.pok) title.pok src.bowl)
+        =/  pore  (edit-pool-title:(apex:emot store) pin.pok title.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin.pok src.bowl pid] efx:abet:pore)
           ::
           :: [%yoke =pin yoks=(list plex)]
           %yoke
         ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
-        =/  pore  (plex-sequence:(apex-em:hc pin.pok) yoks.pok src.bowl)
+        =/  pore  (plex-sequence:(apex:emot store) pin.pok yoks.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin.pok src.bowl pid] efx:abet:pore)
           ::
           :: [%move cid=id upid=(unit id)]
           %move
         =/  pin  (got:idx-orm:gol index.store cid.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (move:(apex-em:hc pin) cid.pok upid.pok src.bowl)
+        =/  pore  (move:(apex:emot store) cid.pok upid.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%set-kickoff =id kickoff=(unit @da)]
           %set-kickoff
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (set-kickoff:(apex-em:hc pin) id.pok kickoff.pok src.bowl)
+        =/  pore  (set-kickoff:(apex:emot store) id.pok kickoff.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%set-deadline =id deadline=(unit @da)]
           %set-deadline
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (set-deadline:(apex-em:hc pin) id.pok deadline.pok src.bowl)
+        =/  pore  (set-deadline:(apex:emot store) id.pok deadline.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%mark-actionable =id]
           %mark-actionable
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (mark-actionable:(apex-em:hc pin) id.pok src.bowl)
+        =/  pore  (mark-actionable:(apex:emot store) id.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%unmark-actionable =id]
           %unmark-actionable
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (unmark-actionable:(apex-em:hc pin) id.pok src.bowl)
+        =/  pore  (unmark-actionable:(apex:emot store) id.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%mark-complete =id]
           %mark-complete
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (mark-complete:(apex-em:hc pin) id.pok src.bowl)
+        =/  pore  (mark-complete:(apex:emot store) id.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%unmark-complete =id]
           %unmark-complete
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (unmark-complete:(apex-em:hc pin) id.pok src.bowl)
+        =/  pore  (unmark-complete:(apex:emot store) id.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           :: [%update-goal-perms =id chief=ship rec=?(%.y %.n) spawn=(set ship)]
@@ -326,7 +327,7 @@
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
         =/  pore
-          %:  update-goal-perms:(apex-em:hc pin)
+          %:  update-goal-perms:(apex:emot store)
             id.pok
             chief.pok
             rec.pok
@@ -338,18 +339,18 @@
           %reorder-young
         =/  pin  (got:idx-orm:gol index.store id.pok)
         ?.  =(owner.pin our.bowl)  abet:(relay pin action)
-        =/  pore  (reorder-young:(apex-em:hc pin) id.pok young.pok src.bowl)
+        =/  pore  (reorder-young:(apex:emot store) id.pok young.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin src.bowl pid] efx:abet:pore)
           ::
           %reorder-roots
         ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
-        =/  pore  (reorder-roots:(apex-em:hc pin.pok) roots.pok src.bowl)
+        =/  pore  (reorder-roots:(apex:emot store) pin.pok roots.pok src.bowl)
         abet:(send-away-updates:hc ~ [pin.pok src.bowl pid] efx:abet:pore)
           ::
           :: [%update-pool-perms =pin new=pool-perms]
           %update-pool-perms
         ?.  =(owner.pin.pok our.bowl)  abet:(relay pin.pok action)
-        =/  pore  (update-pool-perms:(apex-em:hc pin.pok) new.pok src.bowl)
+        =/  pore  (update-pool-perms:(apex:emot store) pin.pok new.pok src.bowl)
         abet:(send-away-updates:hc cards [pin.pok src.bowl pid] efx:abet:pore)
           ::
           :: [%subscribe =pin]
@@ -640,8 +641,6 @@
   =/  =wire  (en-relay-wire pid.axn pin -.pok.axn)
   =/  =dock  [owner.pin dap.bowl]
   (emit %pass wire %agent dock %poke goal-action+!>(axn))
-::
-++  apex-em  |=(=pin:gol (apex:emot pin))
 ::
 ++  etch-updt
   |=  [[=pin:gol mod=ship pid=@] =update:gol]

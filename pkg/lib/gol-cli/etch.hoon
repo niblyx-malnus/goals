@@ -127,13 +127,13 @@
     :: spawn/trash
     ::
       [%spawn-goal *]
-    (spawn-goal:life-cycle [nex id goal]:upd)
+    (spawn-goal:life-cycle [pex nex id goal]:upd)
     ::
       [%waste-goal *]
-    (waste-goal:life-cycle [nex id waz]:upd)
+    (waste-goal:life-cycle [pex nex id waz]:upd)
     ::
       [%cache-goal *]
-    (cache-goal:life-cycle [nex id cas]:upd)
+    (cache-goal:life-cycle [pex nex id cas]:upd)
     ::
       [%renew-goal *]
     (renew-goal:life-cycle id.upd)
@@ -164,16 +164,19 @@
     :: pool-nexus
     ::
       [%pool-nexus %yoke *]
+    =.  p  p(trace pex.upd)
     (apply-nex p nex.upd)
     :: ------------------------------------------------------------------------
     :: goal-dates
     ::
       [%goal-dates *]
+    =.  p  p(trace pex.upd)
     (apply-nex p nex.upd)
     :: ------------------------------------------------------------------------
     :: goal-perms
     ::
       [%goal-perms *]
+    =.  p  p(trace pex.upd)
     (apply-nex p nex.upd)
     :: ------------------------------------------------------------------------
     :: goal-young
@@ -234,20 +237,23 @@
   ++  life-cycle
     |%
     ++  spawn-goal
-      |=  [=nex:gol =id:gol =goal:gol]
+      |=  [=pex:gol =nex:gol =id:gol =goal:gol]
       ^-  pool:gol
       =.  goals.p  (~(put by goals.p) id goal)
+      =.  p  p(trace pex)
       (apply-nex p nex)
     ::
     ++  waste-goal
-      |=  [=nex:gol =id:gol waz=(set id:gol)]
+      |=  [=pex:gol =nex:gol =id:gol waz=(set id:gol)]
       ^-  pool:gol
+      =.  p  p(trace pex)
       =.  p  (apply-nex p nex)
       p(goals (gus-by goals.p ~(tap in waz)))
     ::
     ++  cache-goal
-      |=  [=nex:gol =id:gol cas=(set id:gol)]
+      |=  [=pex:gol =nex:gol =id:gol cas=(set id:gol)]
       ^-  pool:gol
+      =.  p  p(trace pex)
       =.  p  (apply-nex p nex)
       %=  p
         goals  (gus-by goals.p ~(tap in cas))

@@ -1,8 +1,7 @@
 /-  gol=goal
-/+  gol-cli-goals, pl=gol-cli-pool, gol-cli-emot, fl=gol-cli-inflater
+/+  gol-cli-goals, pl=gol-cli-pool, fl=gol-cli-inflater
 |_  store:gol
 +*  gols  ~(. gol-cli-goals +<)
-    emot  ~(. gol-cli-emot +<)
 ::
 :: create unique pool id based on source ship and creation time
 ++  unique-pin
