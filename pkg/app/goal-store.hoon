@@ -2,7 +2,7 @@
 /+  dbug, default-agent, verb, agentio,
     pl=gol-cli-pool, gol-cli-goals, gol-cli-pools,
     gol-cli-emot, gol-cli-node, gol-cli-traverse,
-    gol-cli-etch,
+    gol-cli-etch, fl=gol-cli-inflater,
 :: import during development to force compilation
 ::
     gol-cli-json
@@ -76,7 +76,7 @@
           %-  ~(gas by *pools:gol)
           %+  turn  ~(tap by pools.store.old)
           |=  [=pin:gol =pool:gol]
-          [pin pool:abet:(inflater:(apex:~(. gol-cli-emot store.old) pin))]
+          [pin (inflate-pool:fl pool)]
       ==
     =/  now=@  (unique-time now.bowl log)
     `this(state old(log (put:log-orm *log:gol now [%init store.old])))

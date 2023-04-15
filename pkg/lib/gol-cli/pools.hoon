@@ -1,5 +1,5 @@
 /-  gol=goal
-/+  gol-cli-goals, pl=gol-cli-pool, gol-cli-emot
+/+  gol-cli-goals, pl=gol-cli-pool, gol-cli-emot, fl=gol-cli-inflater
 |_  store:gol
 +*  gols  ~(. gol-cli-goals +<)
     emot  ~(. gol-cli-emot +<)
@@ -30,7 +30,7 @@
   =+  [pin pool]=(spawn-pool title own now)
   =.  pool  pool(creator owner.old-pin)
   =.  pool  pool(goals goals:(clone-goals:gols goals.old-pool own now))
-  [pin pool:abet:(inflater:(abex:emot pool))]
+  [pin (inflate-pool:fl pool)]
 ::
 ++  clone-goal
   |=  $:  =old=id:gol

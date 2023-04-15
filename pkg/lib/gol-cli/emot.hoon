@@ -1,7 +1,6 @@
 /-  gol=goal
 /+  *gol-cli-util, gol-cli-pool, gol-cli-node, gol-cli-traverse,
-    gol-cli-etch
-
+    gol-cli-etch, fl=gol-cli-inflater
 ::
 =|  efx=(list update:gol)
 =|  p=pool:gol
@@ -42,7 +41,7 @@
   ::
   :: confirm that applying update yields equivalent state
   =/  tore  this(p (pool-etch:etch p.old upd))
-  =.  tore  (inflater)
+  =.  p.tore  (inflate-pool:fl p.tore)
   ?.  =(p.this p.tore)
     ~|("non-equivalent-update" !!)
   (emit upd)
@@ -90,93 +89,11 @@
   |=  =id:gol
   [id [nexus trace]:`ngoal:gol`(~(got by goals) id)]
 ::
-:: ============================================================================
-:: 
-:: GOAL INFLATION (UPDATE WITH REDUNDANT INFORMATION)
-::
-:: ============================================================================
-::
-:: all of these should be O(nlogn) with size of the goals map
-:: if it starts taking real performance hits we can revisit this...
-++  trace-update
-  |.
-  =/  goals-roots  (root-goals:nd)
-  =/  cache-roots  (root-goals:nd):.(goals.p cache.p)
-  ::
-  :: make sure tracing both goals and cache
-  =.  goals.p  (~(uni by goals.p) cache.p)
-  =/  d-k-precs  (precedents-map:tv %d %k)
-  =/  k-k-precs  (precedents-map:tv %k %k)
-  =/  d-d-precs  (precedents-map:tv %d %d)
-  ::
-  ^-  pool-trace:gol
-  :*  stock-map=((chain:tv id:gol stock:gol) get-stocks:tv (bare-goals:nd) ~)
-      roots=(fix-list:tv %p d-k-precs roots.trace.p (sy goals-roots))
-      roots-by-kickoff=(fix-list:tv %k k-k-precs roots.trace.p (sy goals-roots))
-      roots-by-deadline=(fix-list:tv %d d-d-precs roots.trace.p (sy goals-roots))
-      cache-roots=(fix-list:tv %p d-k-precs cache-roots.trace.p (sy cache-roots))
-      cache-roots-by-kickoff=(fix-list:tv %k k-k-precs cache-roots.trace.p (sy cache-roots))
-      cache-roots-by-deadline=(fix-list:tv %d d-d-precs cache-roots.trace.p (sy cache-roots))
-      d-k-precs
-      k-k-precs
-      d-d-precs
-      left-bounds=((chain:tv nid:gol moment:gol) (get-bounds:tv %l) (root-nodes:nd) ~)
-      ryte-bounds=((chain:tv nid:gol moment:gol) (get-bounds:tv %r) (leaf-nodes:nd) ~)
-      left-plumbs=((chain:tv nid:gol @) (plomb:tv %l) (root-nodes:nd) ~)
-      ryte-plumbs=((chain:tv nid:gol @) (plomb:tv %r) (leaf-nodes:nd) ~)
-  ==
-::
-++  inflate-goal
-  |=  =id:gol
-  ^-  goal:gol
-  ::
-  :: make sure inflating both goals and cache
-  =.  goals.p  (~(uni by goals.p) cache.p)
-  ::
-  =/  goal  (~(got by goals.p) id)
-  %=  goal
-    stock                (~(got by stock-map.trace.p) id)
-    ranks                (get-ranks:tv (~(got by stock-map.trace.p) id))
-    young                (en-virt id (fix-list:tv %p d-k-precs.trace.p (de-virt young.goal) (young:nd id)))
-    young-by-kickoff     (en-virt id (fix-list:tv %k k-k-precs.trace.p (de-virt young.goal) (young:nd id)))
-    young-by-deadline    (en-virt id (fix-list:tv %d d-d-precs.trace.p (de-virt young.goal) (young:nd id)))
-    prio-left            (prio-left:nd id)
-    prio-ryte            (prio-ryte:nd id)
-    prec-left            (prec-left:nd id)
-    prec-ryte            (prec-ryte:nd id)
-    nest-left            (nest-left:nd id)
-    nest-ryte            (nest-ryte:nd id)
-    left-bound.kickoff   (~(got by left-bounds.trace.p) [%k id])
-    ryte-bound.kickoff   (~(got by ryte-bounds.trace.p) [%k id]) 
-    left-plumb.kickoff   (~(got by left-plumbs.trace.p) [%k id]) 
-    ryte-plumb.kickoff   (~(got by ryte-plumbs.trace.p) [%k id]) 
-    left-bound.deadline  (~(got by left-bounds.trace.p) [%d id]) 
-    ryte-bound.deadline  (~(got by ryte-bounds.trace.p) [%d id]) 
-    left-plumb.deadline  (~(got by left-plumbs.trace.p) [%d id]) 
-    ryte-plumb.deadline  (~(got by ryte-plumbs.trace.p) [%d id]) 
-  ==
-::
-++  inflate-goals
-  |=  =goals:gol
-  ^-  goals:gol
-  %-  ~(gas by goals)
-  %+  turn
-    ~(tap in ~(key by goals))
-  |=(=id:gol [id (inflate-goal id)])
-::
-++  inflater
-  |.
-  ^-  _this
-  =.  trace.p  (trace-update)
-  =.  goals.p  (inflate-goals goals.p)
-  =.  cache.p  (inflate-goals cache.p)
-  this
-::
 ++  apply
   |*  [func=$-(* _(pore)) parm=*]
   ^-  _this
   =.  p  p:(func parm)
-  (inflater)
+  this(p (inflate-pool:fl p))
 ::
 :: ============================================================================
 :: 
@@ -199,20 +116,6 @@
   %+  turn
     ~(tap in (~(dif in ~(key by perms.p)) ~(key by new)))
   |=(=ship [ship ~])
-::
-++  en-virt
-  |=  [par=id:gol ids=(list id:gol)]
-  ^-  (list [id:gol virtual=?])
-  %+  turn  ids
-  |=  =id:gol
-  =/  =goal:gol
-    (~(got by goals.p) par)
-  [id !(~(has in kids.goal) id)]
-::
-++  de-virt
-  |=  ids=(list [id:gol virtual=?])
-  ^-  (list id:gol)
-  (turn ids |=([=id:gol ?] id))
 ::
 :: ============================================================================
 :: 
@@ -359,7 +262,7 @@
   ?>  =((sy young) (young:nd id))
   =/  goal  (~(got by goals.p) id)
   =.  young.goal
-    (en-virt id (topological-sort:tv %p d-k-precs.trace.p young))
+    (en-virt:fl goal (topological-sort:tv %p d-k-precs.trace.p young))
   =.  goals.p     (~(put by goals.p) id goal)
   =/  fd  (full-diff goals.p goals.p.old)
   (emot old [vzn %goal-young nex.fd])
