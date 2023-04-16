@@ -32,7 +32,7 @@
         %waste-goal
       =/  p=pool:gol  (pile pin)
       %=  store
-        index  (gus-idx-orm ~(tap in waz.upd))
+        index  (gus-idx-orm index.store ~(tap in waz.upd))
         pools  (~(put by pools.store) pin (pool-etch p upd))
       ==
       ::
@@ -40,7 +40,7 @@
       =/  p=pool:gol  (pile pin)
       =/  prog  ~(tap in (~(progeny tv cache.p) id.upd))
       %=  store
-        index  (gus-idx-orm prog)
+        index  (gus-idx-orm index.store prog)
         pools  (~(put by pools.store) pin (pool-etch p upd))
       ==
       ::
@@ -88,7 +88,7 @@
       |=  =pin:gol
       ^-  store:gol
       %=  store
-        index  (gus-idx-orm (coals pin))
+        index  (gus-idx-orm index.store (coals pin))
         pools  (~(del by pools.store) pin)
       ==
     ::
@@ -96,7 +96,7 @@
       |=  =pin:gol
       ^-  store:gol
       %=  store
-        index  (gus-idx-orm (coals pin))
+        index  (gus-idx-orm index.store (coals pin))
         cache  (~(del by cache.store) pin)
       ==
     --
@@ -108,14 +108,6 @@
     =/  cache-keys  ~(key by cache.pool)
     =/  goals-keys  ~(key by goals.pool)
     ~(tap in (~(uni in cache-keys) goals-keys))
-  ::
-  ++  gus-idx-orm
-    |=  ids=(list id:gol)
-    =/  idx  0
-    |-
-    ?:  =(idx (lent ids))
-      index.store
-    $(idx +(idx), index.store +:(del:idx-orm:gol index.store (snag idx ids)))
   --
 ::
 ++  pool-etch
@@ -378,4 +370,10 @@
       p(goals (~(put by goals.p) id goal(actionable actionable)))
     --
   --
+::
+++  gus-idx-orm
+  |=  [=index:gol ids=(list id:gol)]
+  ^-  index:gol
+  |-  ?~  ids  index
+  $(ids t.ids, index +:(del:idx-orm:gol index i.ids))
 --
