@@ -116,6 +116,27 @@
     [%pin own now]
   $(now (add now ~s0..0001))
 ::
+++  spawn-pool
+  |=  [title=@t own=ship now=@da]
+  ^-  [pin:gol pool:gol]
+  =/  pin  (unique-pin own now)
+  =|  =pool:gol
+  =:  owner.pool  owner.pin
+      birth.pool  birth.pin
+      title.pool  title
+      creator.pool  own
+    ==
+  [pin pool]
+::
+++  clone-pool
+  |=  [=old=pin:gol title=@t own=ship now=@da]
+  ^-  [pin:gol pool:gol]
+  =/  old-pool  (~(got by pools.store) old-pin)
+  =/  [=pin:gol =pool:gol]  (spawn-pool title own now)
+  =.  pool  pool(creator owner.old-pin)
+  =.  pool  pool(goals goals:(clone-goals:gols goals.old-pool own now))
+  [pin (inflate-pool:fl pool)]
+::
 :: ============================================================================
 :: 
 :: MANAGE UPDATES WITH NEX/NEXUS
@@ -186,7 +207,7 @@
   |=  axn=action:gol
   ^-  _this
   =/  mod  src.bowl
-  ?+    -.pok.axn  !!
+  ?-    -.pok.axn
       %spawn-goal
     =,  pok.axn
     ?.  =(owner.pin our.bowl)  (relay pin axn)
@@ -620,15 +641,64 @@
       %spawn-pool
     =,  pok.axn
     ?>  =(src our):bowl
-    =/  =pin:gol  (unique-pin src.bowl now.bowl)
-    =|  =pool:gol
-    =:  owner.pool    src.bowl
-        birth.pool    now.bowl
-        title.pool    title
-        creator.pool  src.bowl
-      ==
+    =/  [=pin:gol =pool:gol]  (spawn-pool title [src now]:bowl)
     =/  upd=update:gol  [vzn %spawn-pool pool]
     =.  pools.store  (~(put by pools.store) pin pool)
-    (send-home-update [pin mod pid.axn] upd)
+    (send-home-update [pin src.bowl pid.axn] upd)
+    ::
+      %clone-pool
+    =,  pok.axn
+    ?>  =(src our):bowl
+    =/  [=pin:gol =pool:gol]  (clone-pool pin title [src now]:bowl)
+    =/  upd=update:gol  [vzn %spawn-pool pool]
+    =.  pools.store  (~(put by pools.store) pin pool)
+    (send-home-update [pin src.bowl pid.axn] upd)
+    ::
+      %cache-pool
+    =,  pok.axn
+    ?>  =(src our):bowl
+    ?>  =(src.bowl owner.pin)
+    =.  this  (emit %give %kick ~[(en-pool-path pin)] ~)
+    =/  upd=update:gol  [vzn %cache-pool pin]
+    (send-home-update:this [pin src.bowl pid.axn] upd)
+    ::
+      %renew-pool
+    =,  pok.axn
+    ?>  =(src our):bowl
+    ?>  =(src.bowl owner.pin)
+    =/  pool  (~(got by cache.store) pin)
+    =/  upd=update:gol  [vzn %renew-pool pin pool]
+    (send-home-update [pin src.bowl pid.axn] upd)
+    ::
+      %trash-pool
+    :: TODO: purge locals; purge index; purge order
+    =,  pok.axn
+    ?>  =(src our):bowl
+    ?>  =(src.bowl owner.pin)
+    =.  this  (emit %give %kick ~[(en-pool-path pin)] ~)
+    =/  upd=update:gol
+      ?:  (~(has by pools.store) pin)  [vzn %waste-pool ~]
+      ?>  (~(has by cache.store) pin)  [vzn %trash-pool ~]
+    (send-home-update:this [pin src.bowl pid.axn] upd)
+    ::
+      %subscribe
+    =,  pok.axn
+    ?>  =(src our):bowl
+    ?<  =(src.bowl owner.pin)
+    =/  pite=wire  (en-pool-path pin)
+    =/  =dock  [owner.pin dap.bowl]
+    (emit %pass pite %agent dock %watch pite)
+    ::
+      %unsubscribe
+    =,  pok.axn
+    ?>  =(src our):bowl
+    ?<  =(src.bowl owner.pin)
+    =/  =wire  (en-pool-path pin)
+    =/  =dock  [owner.pin dap.bowl]
+    =.  this  (emit %pass wire %agent dock %leave ~)
+    =/  upd=update:gol
+      ?:  (~(has by cache.store) pin)  [vzn %trash-pool ~]
+      ?>  (~(has by pools.store) pin)  [vzn %waste-pool ~]
+    (send-home-update:this [pin src.bowl pid.axn] upd)
   ==
 --
