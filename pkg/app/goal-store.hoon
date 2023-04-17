@@ -206,11 +206,11 @@
       ``goal-peek+!>(full-harvest+(full-goals-harvest:tv order.local.store))
     ==
       [%harvest ~]
-    =/  tv  ~(. gol-cli-traverse all-goals:emot)
+    =/  tv  ~(. gol-cli-traverse all-goals:etch)
     ``goal-peek+!>(harvest+~(tap in (goals-harvest:tv)))
     ::
       [%full-harvest ~]
-    =/  tv  ~(. gol-cli-traverse all-goals:emot)
+    =/  tv  ~(. gol-cli-traverse all-goals:etch)
     ``goal-peek+!>(full-harvest+(full-goals-harvest:tv order.local.store))
   ==
 ::
@@ -219,36 +219,25 @@
   ^-  (quip card _this)
   ?+    wire  (on-agent:def wire sign)
       [%away @ @ @ *]
-    =/  [pid=@ =pin:gol =term]  (de-relay-wire:hc wire)
-    ?>  =(src.bowl owner.pin)
     ?+    -.sign  (on-agent:def wire sign)
         %poke-ack
       ?~  p.sign  `this
+      %-  (slog u.p.sign)
       =^  cards  state
-        %-  (slog u.p.sign)
-        =/  upds=(list update:gol)  [vzn %poke-error u.p.sign]~
-        abet:(send-home-updates:hc ~ [pin src.bowl pid] upds)
+        abet:(handle-relay-poke-nack:emot wire u.p.sign)
       [cards this]
     ==
     ::
       [@ @ ~] 
-    =/  =pin:gol  (de-pool-path wire)
+    =/  =pin:gol  (de-pool-path:emot wire)
     ?>  =(src.bowl owner.pin)
     ?+    -.sign  (on-agent:def wire sign)
         %watch-ack
       ?~  p.sign  `this
-      :: TODO: purge goals from local
-      =/  upd
-        ?:  (~(has by pools) pin)
-          (some [vzn %waste-pool ~])
-        ?:  (~(has by cache) pin)
-          (some [vzn %trash-pool ~])
-        ~
       %-  (slog 'Subscribe failure.' ~)
       %-  (slog u.p.sign)
-      ?~  upd  `this
       =^  cards  state
-        abet:(send-home-updates:hc ~ [pin our.bowl 0] [u.upd]~)
+        abet:(handle-pool-watch-nack:emot pin)
       [cards this]
       ::
         %kick
@@ -257,11 +246,9 @@
       ::
         %fact
       ?>  =(p.cage.sign %goal-away-update)
-      =/  [[mod=ship pid=@] =update:gol]  !<(away-update:gol q.cage.sign)
-      ?.  =(vzn -.update)  :: assert updates are correct version
-        ~|("incompatible version" !!)
+      =/  upd=away-update:gol  !<(away-update:gol q.cage.sign)
       =^  cards  state
-        abet:(send-home-updates:hc ~ [pin mod 0] [update]~)
+        abet:(handle-etch-pool-update:emot pin upd)
       [cards this]
     ==
   ==
@@ -275,101 +262,4 @@
 ++  abet  [(flop cards) state]
 ++  emit  |=(=card core(cards [card cards]))
 ++  emil  |=(cadz=(list card) core(cards (weld cadz cards)))
-::
-++  en-pool-path
-  |=(=pin:gol `path`/(scot %p owner.pin)/(scot %da birth.pin))
-::
-++  de-pool-path
-  |=  =path
-  ^-  pin:gol
-  ?>  ?=([@ta @ta ~] path)
-  [%pin (slav %p i.path) (slav %da i.t.path)]
-::
-++  en-relay-wire
-  |=  [pid=@ =pin:gol =term]
-  ^-  wire
-  /away/[pid]/(scot %p owner.pin)/(scot %da birth.pin)/[term]
-::
-++  de-relay-wire
-  |=  =wire
-  ^-  [@ pin:gol term]
-  ?>  ?=([%away @ @ta @ta @ta ~] wire)
-  :*  i.t.wire
-      [%pin (slav %p i.t.t.wire) (slav %da i.t.t.t.wire)] 
-      i.t.t.t.t.wire
-  ==
-::
-++  relay
-  |=  [=pin:gol axn=action:gol]
-  ^-  _core
-  ?>  =(src our):bowl
-  =/  =wire  (en-relay-wire pid.axn pin -.pok.axn)
-  =/  =dock  [owner.pin dap.bowl]
-  (emit %pass wire %agent dock %poke goal-action+!>(axn))
-::
-++  etch-updt
-  |=  [[=pin:gol mod=ship pid=@] =update:gol]
-  ^-  _core
-  core(store (etch:etch pin ~[update]))
-::
-++  etch-upds
-  |=  [[=pin:gol mod=ship pid=@] upds=(list update:gol)]
-  ^-  _core
-  ?~  upds  core
-  $(upds t.upds, core (etch-updt:core [pin mod pid] i.upds))
-::
-++  home-emit
-  |=  [[=pin:gol mod=ship pid=@] =update:gol]
-  ^-  _core
-  =/  hom=home-update:gol  [[pin mod pid] update]
-  =.  store      (etch:etch pin ~[update])
-  =/  now=@      (unique-time now.bowl log)
-  =.  log.state  (put:log-orm log.state now [%updt hom])
-  (emit %give %fact ~[/goals] goal-home-update+!>(hom))
-::
-++  home-emil
-  |=  [[=pin:gol mod=ship pid=@] upds=(list update:gol)]
-  ^-  _core
-  ?~  upds  core
-  $(upds t.upds, core (home-emit:core [pin mod pid] i.upds))
-::
-++  send-home-updates
-  |=  [cards=(list card) [=pin:gol mod=ship pid=@] upds=(list update:gol)]
-  ^-  _core
-  =.  core  (emil cards)
-  (home-emil:core [pin mod pid] upds)
-::
-++  away-emit
-  |=  [[=pin:gol mod=ship pid=@] =update:gol]
-  ^-  _core
-  =/  way=away-update:gol  [[mod pid] update]
-  =/  path  (en-pool-path pin)
-  =.  core  (home-emit [pin mod pid] update)
-  (emit:core %give %fact ~[path] goal-away-update+!>(way))
-::
-++  away-emil
-  |=  [[=pin:gol mod=ship pid=@] upds=(list update:gol)]
-  ^-  _core
-  ?~  upds  core
-  $(upds t.upds, core (away-emit:core [pin mod pid] i.upds))
-::
-++  send-away-updates
-  |=  [cards=(list card) [=pin:gol mod=ship pid=@] upds=(list update:gol)]
-  ^-  _core
-  =.  core  (emil cards)
-  =.  core  (away-emil:core [pin mod pid] upds)
-  (kick-unwelcome:core pin)
-:: kick people without member perms
-::
-++  kick-unwelcome
-  |=  =pin:gol
-  ^-  _core
-  %-  emil
-  %+  murn  ~(val by sup.bowl)
-  |=  [=ship =path]
-  ?.  ?=([@ta @ta ~] path)  ~
-  =/  =pin:gol  (de-pool-path path)
-  =/  =pool:gol  (~(got by pools.store) pin)
-  ?:  (~(has by perms.pool) ship)  ~
-  (some [%give %kick ~[path] `ship])
 --

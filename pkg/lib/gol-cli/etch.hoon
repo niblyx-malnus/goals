@@ -4,110 +4,109 @@
 ::
 |_  =store:gol
 ++  etch
-  |=  [=pin:gol upds=(list update:gol)]
+  |=  [=pin:gol upd=update:gol]
   ^-  store:gol
-  |^
-  |-  ?~  upds  store
-  $(upds t.upds, store (etch pin i.upds))
-  ++  cools  (~(uni by pools.store) cache.store)
-  ++  pile  |=(=pin:gol (~(got by cools) pin))
-  ++  etch
-    |=  [=pin:gol upd=update:gol]
+  ?-    +<.upd
+    %poke-error  store  :: no-op on poke-error update
+    %spawn-pool  (spawn-pool:life-cycle pin pool.upd)
+    %cache-pool  (cache-pool:life-cycle pin)
+    %renew-pool  (renew-pool:life-cycle pin)
+    %waste-pool  (waste-pool:life-cycle pin)
+    %trash-pool  (trash-pool:life-cycle pin)
+      ::
+      %spawn-goal
+    =/  p=pool:gol   (pile pin)
+    =.  index.store  (put:idx-orm:gol index.store id.upd pin)
+    =.  pools.store  (~(put by pools.store) pin (pool-etch p upd))
+    store(order.local fix-order)
+    ::
+      %waste-goal
+    =/  p=pool:gol   (pile pin)
+    =.  index.store  (gus-idx-orm index.store ~(tap in waz.upd))
+    =.  pools.store  (~(put by pools.store) pin (pool-etch p upd))
+    store(order.local fix-order)
+    ::
+      %trash-goal
+    =/  p=pool:gol   (pile pin)
+    =/  prog         ~(tap in (~(progeny tv cache.p) id.upd))
+    =.  index.store  (gus-idx-orm index.store prog)
+    =.  pools.store  (~(put by pools.store) pin (pool-etch p upd))
+    store(order.local fix-order)
+    ::
+      $?  %cache-goal  %renew-goal
+          %pool-perms  %pool-hitch  %pool-nexus
+          %goal-perms  %goal-hitch  %goal-togls  %goal-dates
+          %goal-young  %goal-roots
+      ==
+    =/  p=pool:gol  (pile pin)
+    store(pools (~(put by pools.store) pin (pool-etch p upd)))
+  ==
+++  cools  `pools:gol`(~(uni by pools.store) cache.store)
+++  pile   |=(=pin:gol `pool:gol`(~(got by cools) pin))
+++  coals
+  |=  =pin:gol
+  ^-  goals:gol
+  =/  =pool:gol  (~(got by cools) pin)
+  (~(uni by cache.pool) goals.pool)
+::
+++  coals-keys  |=(=pin:gol `(list id:gol)`~(tap in ~(key by (coals pin))))
+::
+++  all-goals  
+  ^-  goals:gol
+  =/  pools  ~(val by pools.store)
+  =|  =goals:gol
+  |-  ?~  pools  goals
+  %=  $
+    pools  t.pools
+    goals  (~(uni by goals) goals.i.pools)
+  ==
+::
+++  fix-order
+  ^-  (list id:gol)
+  =/  d-k-precs  (~(precedents-map tv all-goals) %d %k)
+  %-  ~(fix-list tv all-goals)
+  [%p d-k-precs order.local.store ~(key by all-goals)]
+::
+++  life-cycle
+  |%
+  ++  spawn-pool
+    |=  [=pin:gol =pool:gol]
     ^-  store:gol
-    ?-    +<.upd
-      %poke-error  store  :: no-op on poke-error update
-      %spawn-pool  (spawn-pool:life-cycle pin pool.upd)
-      %cache-pool  (cache-pool:life-cycle pin)
-      %renew-pool  (renew-pool:life-cycle pin)
-      %waste-pool  (waste-pool:life-cycle pin)
-      %trash-pool  (trash-pool:life-cycle pin)
-        ::
-        %spawn-goal
-      =/  p=pool:gol  (pile pin)
-      %=  store
-        index  (put:idx-orm:gol index.store id.upd pin)
-        pools  (~(put by pools.store) pin (pool-etch p upd))
-      ==
-      ::
-        %waste-goal
-      =/  p=pool:gol  (pile pin)
-      %=  store
-        index  (gus-idx-orm index.store ~(tap in waz.upd))
-        pools  (~(put by pools.store) pin (pool-etch p upd))
-      ==
-      ::
-        %trash-goal
-      =/  p=pool:gol  (pile pin)
-      =/  prog  ~(tap in (~(progeny tv cache.p) id.upd))
-      %=  store
-        index  (gus-idx-orm index.store prog)
-        pools  (~(put by pools.store) pin (pool-etch p upd))
-      ==
-      ::
-        $?  %cache-goal  %renew-goal
-            %pool-perms  %pool-hitch  %pool-nexus
-            %goal-perms  %goal-hitch  %goal-togls  %goal-dates
-            %goal-young  %goal-roots
-        ==
-      =/  p=pool:gol  (pile pin)
-      store(pools (~(put by pools.store) pin (pool-etch p upd)))
-    ==
+    =.  pools.store  (~(put by pools.store) pin pool)
+    =/  pinds=(list [id:gol pin:gol])
+      (turn (coals-keys pin) |=(=id:gol [id pin]))
+    =.  index.store  (gas:idx-orm:gol index.store pinds)
+    store(order.local fix-order)
   ::
-  ++  life-cycle
-    |%
-    ++  spawn-pool
-      |=  [=pin:gol =pool:gol]
-      ^-  store:gol
-      =.  pools.store  (~(put by pools.store) pin pool)
-      %=  store
-        index
-          %+  gas:idx-orm:gol
-            index.store
-          %+  turn
-            (coals pin)
-          |=(=id:gol [id pin])
-      ==
-    ::
-    ++  cache-pool
-      |=  =pin:gol
-      ^-  store:gol
-      %=  store
-        pools  (~(del by pools.store) pin)
-        cache  (~(put by cache.store) pin (~(got by pools.store) pin))
-      ==
-    ::
-    ++  renew-pool
-      |=  =pin:gol
-      ^-  store:gol
-      %=  store
-        pools  (~(put by pools.store) pin (~(got by cache.store) pin))
-        cache  (~(del by cache.store) pin)
-      ==
-    ::
-    ++  waste-pool
-      |=  =pin:gol
-      ^-  store:gol
-      %=  store
-        index  (gus-idx-orm index.store (coals pin))
-        pools  (~(del by pools.store) pin)
-      ==
-    ::
-    ++  trash-pool
-      |=  =pin:gol
-      ^-  store:gol
-      %=  store
-        index  (gus-idx-orm index.store (coals pin))
-        cache  (~(del by cache.store) pin)
-      ==
-    --
-  ::
-  ++  coals
+  ++  cache-pool
     |=  =pin:gol
-    ^-  (list id:gol)
-    =/  pool  (~(got by pools.store) pin)
-    =/  cache-keys  ~(key by cache.pool)
-    =/  goals-keys  ~(key by goals.pool)
-    ~(tap in (~(uni in cache-keys) goals-keys))
+    ^-  store:gol
+    =/  =pool:gol  (~(got by pools.store) pin)
+    =.  cache.store  (~(put by cache.store) pin pool)
+    =.  pools.store  (~(del by pools.store) pin)
+    store(order.local fix-order)
+  ::
+  ++  renew-pool
+    |=  =pin:gol
+    ^-  store:gol
+    =/  =pool:gol  (~(got by cache.store) pin)
+    =.  pools.store  (~(put by pools.store) pin pool)
+    =.  cache.store  (~(del by cache.store) pin)
+    store(order.local fix-order)
+  ::
+  ++  waste-pool
+    |=  =pin:gol
+    ^-  store:gol
+    =.  index.store  (gus-idx-orm index.store (coals-keys pin))
+    =.  pools.store  (~(del by pools.store) pin)
+    store(order.local fix-order)
+  ::
+  ++  trash-pool
+    |=  =pin:gol
+    ^-  store:gol
+    =.  index.store  (gus-idx-orm index.store (coals-keys pin))
+    =.  cache.store  (~(del by cache.store) pin)
+    store(order.local fix-order)
   --
 ::
 ++  pool-etch
