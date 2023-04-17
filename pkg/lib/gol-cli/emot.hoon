@@ -366,7 +366,16 @@
     =/  upd=update:gol  [vzn %goal-togls id %complete %.y]
     ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
-    (send-away-update [pin mod pid.axn] upd)
+    =.  this  (send-away-update [pin mod pid.axn] upd)
+    =/  par=(unit id:gol)  par:(~(got by goals.new) id)
+    ?~  par  this
+    ?.  %-  ~(all in (~(young nd goals.new) u.par))
+        |=(=id:gol complete:(~(got by goals.new) id))
+      this
+    :: owner responsible for resulting completions
+    =.  src.bowl  our.bowl
+    (handle-poke:this [vzn pid.axn %mark-complete u.par])
+
     ::
       %unmark-actionable
     =+  pok.axn
