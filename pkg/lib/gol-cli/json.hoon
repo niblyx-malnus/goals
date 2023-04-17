@@ -370,7 +370,13 @@
       %full-harvest
     %+  frond
       %full-harvest
-    (enjs-goals harvest.pyk)
+    :-  %a
+    %+  turn  harvest.pyk
+    |=  [=id =goal] 
+    %-  pairs
+    :~  [%id (enjs-id id)]
+        [%goal (enjs-goal goal)]
+    ==
     ::
       %get-goal
     %+  frond
@@ -443,6 +449,7 @@
   :~  [%index (enjs-index index.store)]
       [%pools (enjs-pools pools.store)]
       [%cache (enjs-pools cache.store)]
+      [%local a+(turn order.local.store enjs-id)]
   ==
 ::
 ++  enjs-logged

@@ -303,7 +303,8 @@
       exit  |=([=nid:gol vis=(map nid:gol (set id:gol))] vis)
     ==
   (((traverse nid:gol (set id:gol) (map nid:gol (set id:gol))) gine vis) nid)
-:: Get ids whose deadline comes before an id kickoff
+:: Get ids whose bef comes before an id aft
+:: (ie all ids whose deadlines precede an ids kickoff)
 ::
 ++  precedents-map
   |=  [bef=?(%k %d) aft=?(%k %d)]
@@ -411,13 +412,13 @@
     fix
   ==
 ::
-:: get uncompleted leaf goals left of id
-++  harvest
-  |=  =id:gol
-  ^-  (set id:gol)
-  =/  ginn  (ginn nid:gol (set id:gol))
-  =.  ginn
-    %=  ginn
+:: get uncompleted leaf goals whose deadlines are left of id
+++  harvests
+  |=  [=nid:gol vis=(map nid:gol (set id:gol))]
+  ^-  (map nid:gol (set id:gol))
+  =/  gine  (gine nid:gol (set id:gol) (map nid:gol (set id:gol)))
+  =.  gine
+    %=  gine
       ::
       :: incomplete inflow
       flow
@@ -446,16 +447,42 @@
         ?:  &(=(~ out) =(%d -.nid))
           (~(put in *(set id:gol)) id.nid)
         out
+      exit  |=([=nid:gol vis=(map nid:gol (set id:gol))] vis)
     ==
   ::
   :: work backwards from deadline
-  (((traverse nid:gol (set id:gol) (set id:gol)) ginn ~) [%d id])
+  (((traverse nid:gol (set id:gol) (map nid:gol (set id:gol))) gine ~) nid)
+::
+++  harvest
+  |=(=id:gol `(set id:gol)`(~(got by (harvests [%d id] ~)) [%d id]))
+::
+++  goals-harvest
+  |.
+  ^-  (set id:gol)
+  =/  root-nodes  (root-nodes:nd)
+  =/  vis  ((chain nid:gol (set id:gol)) harvests root-nodes ~)
+  =|  harvest=(set id:gol)
+  |-  ?~  root-nodes  harvest
+  %=  $
+    root-nodes  t.root-nodes
+    harvest     (~(uni in harvest) (~(got by vis) i.root-nodes))
+  ==
 ::
 :: harvest with full goals
 ++  full-harvest
-  |=  =id:gol
-  ^-  goals:gol
-  (gat-by goals (hi-to-lo ~(tap in (harvest id))))
+  |=  [=id:gol order=(list id:gol)]
+  ^-  (list [id:gol goal:gol])
+  %+  turn
+    (fix-list %p (precedents-map %d %k) order (harvest id))
+  |=(=id:gol [id (~(got by goals) id)])
+:: pool-harvest with full goals
+::
+++  full-goals-harvest
+  |=  order=(list id:gol)
+  ^-  (list [id:gol goal:gol])
+  %+  turn
+    (fix-list %p (precedents-map %d %k) order (goals-harvest))
+  |=(=id:gol [id (~(got by goals) id)])
 ::
 :: get priority of a given goal - highest priority is 0
 :: priority is the number of unique goals which must be started

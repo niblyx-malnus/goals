@@ -111,13 +111,9 @@
       [%goals ~]  ?>(=(src our):bowl `this)
       ::
       [@ @ ~]
-    =/  owner  `@p`i.path
-    =/  birth  `@da`i.t.path
-    =/  pin  `pin:gol`[%pin owner birth]
-    =/  pool  (~(got by pools) pin)
-    ?>  (~(has by perms.pool) src.bowl)
-    =/  way=away-update:gol  [[our.bowl 0] vzn spawn-pool+pool]
-    :_(this [%give %fact ~ goal-away-update+!>(way)]~)
+    =^  cards  state
+      abet:(handle-watch:emot path)
+    [cards this]
   ==
 ::
 ++  on-leave  on-leave:def
@@ -128,8 +124,8 @@
   ?+    path  (on-peek:def path)
       [%x %initial ~]
     |^
-    :-  ~  :-  ~  :-  %goal-peek
-    !>  :-  %initial
+    =;  init
+      ``goal-peek+!>([%initial init])
     %=  store
       pools  (unify-tags pools)
       cache  (unify-tags cache)
@@ -173,8 +169,8 @@
     ``goal-peek+!>(pool-keys+~(key by pools))
     ::
       [%x %all-goal-keys ~]
-    :-  ~  :-  ~  :-  %goal-peek
-    !>(all-goal-keys+(turn (tap:idx-orm:gol index) |=([=id:gol pin:gol] id)))
+    =;  keys  ``goal-peek+!>(all-goal-keys+keys)
+    (turn (tap:idx-orm:gol index) |=([=id:gol pin:gol] id))
     ::
       [%x %goal @ @ *]
     =/  owner  (slav %p i.t.t.path)
@@ -191,89 +187,31 @@
       =/  pin  (got:idx-orm:gol index id)
       =/  pool  (~(got by pools) pin)
       =/  tv  ~(. gol-cli-traverse goals.pool)
-      ``goal-peek+!>(full-harvest+(full-harvest:tv id))
+      ``goal-peek+!>(full-harvest+(full-harvest:tv id order.local.store))
       ::
-        [%get-goal ~]
-      =/  upin  (get:idx-orm:gol index id)
-      ?~  upin
-        ``goal-peek+!>(get-goal+~)
-      =/  pool  (~(got by pools) u.upin)
-      =/  goal  (~(got by goals.pool) id)
-      ``goal-peek+!>(get-goal+(~(get by goals.pool) id))
-      ::
-        [%get-pin ~]
-      ``goal-peek+!>(get-pin+(get:idx-orm:gol index id))
-      ::
-        [%yung *]
-      =/  pin  (got:idx-orm:gol index id)
-      =/  pool  (~(got by pools) pin)
-      =/  tv  ~(. gol-cli-traverse goals.pool)
-      =/  nd  ~(. gol-cli-node goals.pool)
-      ?+    t.t.t.t.t.path  (on-peek:def path)
-          ~
-        ``goal-peek+!>(yung+(hi-to-lo:tv (yung:nd id)))
-        ::
-          [%uncompleted ~]
-        :-  ~  :-  ~  :-  %goal-peek
-        !>  :-  %yung-uncompleted
-            (hi-to-lo:tv (incomplete:nd (yung:nd id)))
-        ::
-          [%virtual ~]
-        :-  ~  :-  ~  :-  %goal-peek
-        !>  :-  %yung-virtual
-            (hi-to-lo:tv (virt:nd id))
-      ==
-      ::
-        [%ryte-bound ~]
-      =/  pin  (got:idx-orm:gol index id)
-      =/  pool  (~(got by pools) pin)
-      =/  tv  ~(. gol-cli-traverse goals.pool)
-      ``goal-peek+!>(ryte-bound+(ryte-bound:tv [%d id]))
-      ::
-        [%plumb ~]
-      =/  pin  (got:idx-orm:gol index id)
-      =/  pool  (~(got by pools) pin)
-      =/  tv  ~(. gol-cli-traverse goals.pool)
-      ``goal-peek+!>(plumb+(plumb:tv id))
-      ::
-        [%priority ~]
-      =/  pin  (got:idx-orm:gol index id)
-      =/  pool  (~(got by pools) pin)
-      =/  tv  ~(. gol-cli-traverse goals.pool)
-      ``goal-peek+!>(priority+(priority:tv id))
     ==
       [%x %pool @ @ *]
     =/  owner  (slav %p i.t.t.path)
     =/  birth  (slav %da i.t.t.t.path)
     =/  pin  `pin:gol`[%pin owner birth]
     ?+    t.t.t.t.path  (on-peek:def path)
-        [%get-pool ~]
-      :-  ~  :-  ~  :-  %goal-peek
-      !>  :-  %get-pool
-      =/  gep  (~(get by pools) pin)
-      ?~  gep
-        (~(get by cache) pin)
-      gep
-      ::
-        [%anchor ~]
+        [%harvest ~]
       =/  pool  (~(got by pools) pin)
       =/  tv  ~(. gol-cli-traverse goals.pool)
-      ``goal-peek+!>(anchor+(anchor:tv))
+      ``goal-peek+!>(harvest+~(tap in (goals-harvest:tv)))
       ::
-        [%roots *]
+        [%full-harvest ~]
       =/  pool  (~(got by pools) pin)
       =/  tv  ~(. gol-cli-traverse goals.pool)
-      =/  nd  ~(. gol-cli-node goals.pool)
-      ?+    t.t.t.t.t.path  (on-peek:def path)
-          ~
-        ``goal-peek+!>(roots+(hi-to-lo:tv (root-goals:nd)))
-        ::
-          [%uncompleted ~]
-        :-  ~  :-  ~  :-  %goal-peek
-        !>  :-  %roots-uncompleted
-        (hi-to-lo:tv (incomplete:nd (root-goals:nd)))
-      ==
+      ``goal-peek+!>(full-harvest+(full-goals-harvest:tv order.local.store))
     ==
+      [%harvest ~]
+    =/  tv  ~(. gol-cli-traverse all-goals:emot)
+    ``goal-peek+!>(harvest+~(tap in (goals-harvest:tv)))
+    ::
+      [%full-harvest ~]
+    =/  tv  ~(. gol-cli-traverse all-goals:emot)
+    ``goal-peek+!>(full-harvest+(full-goals-harvest:tv order.local.store))
   ==
 ::
 ++  on-agent

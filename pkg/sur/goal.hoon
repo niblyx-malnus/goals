@@ -264,16 +264,26 @@
   +$  log           ((mop @ log-update) lth)
   +$  logged        (pair @ log-update)
   ::
-  +$  peek          :: underlying data structures have changed
-                    $%  [%initial =store] 
-                        [%updates =(list logged)]
-                        [%full-harvest harvest=goals]
-                        [%get-goal ugoal=(unit goal)]
-                        [%get-pool upool=(unit pool)]
-                        $<  %initial       $<  %updates
-                        $<  %full-harvest  $<  %get-goal
-                        $<(%get-pool peek:s4)
-                    ==
+  +$  peek
+    $%  [%initial =store]
+        [%updates =(list logged)]
+        [%pool-keys keys=(set pin)]
+        [%all-goal-keys keys=(set id)]
+        [%harvest harvest=(list id)]
+        [%full-harvest harvest=(list [id goal])]
+        [%get-goal ugoal=(unit goal)]
+        [%get-pin upin=(unit pin)]
+        [%get-pool upool=(unit pool)]
+        [%ryte-bound moment=(unit @da)]
+        [%plumb depth=@ud]
+        [%anchor depth=@ud]
+        [%priority priority=@ud]
+        [%yung yung=(list id)]
+        [%yung-uncompleted yung-uc=(list id)]
+        [%yung-virtual yung-vr=(list id)]
+        [%roots roots=(list id)]
+        [%roots-uncompleted roots-uc=(list id)]
+    ==
   ::
   +$  core-yoke     core-yoke:s4
   +$  exposed-yoke  exposed-yoke:s4
@@ -282,10 +292,14 @@
   ++  action
     =<  action
     |%
-    +$  action  [%5 pid=@ pok=$%(util-action pool-action goal-action)]
+    +$  action  [%5 pid=@ pok=$%(util-action pool-action goal-action local-action)]
     +$  util-action
       $%  [%subscribe =pin]
           [%unsubscribe =pin]
+      ==
+    +$  local-action
+      $%  [%slot-above dis=id dat=id]  :: slot dis above dat
+          [%slot-below dis=id dat=id]  :: slot dis below dat
       ==
     ++  pool-action
       =<  pool-action

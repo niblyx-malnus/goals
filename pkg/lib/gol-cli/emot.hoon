@@ -137,6 +137,22 @@
   =.  pool  pool(goals goals:(clone-goals:gols goals.old-pool own now))
   [pin (inflate-pool:fl pool)]
 ::
+++  all-goals  
+  ^-  goals:gol
+  =/  pools  ~(val by pools.store)
+  =|  =goals:gol
+  |-  ?~  pools  goals
+  %=  $
+    pools  t.pools
+    goals  (~(uni by goals) goals.i.pools)
+  ==
+::
+++  fix-order
+  ^-  (list id:gol)
+  =/  d-k-precs  (~(precedents-map tv all-goals) %d %k)
+  %-  ~(fix-list tv all-goals)
+  [%p d-k-precs order.local.store ~(key by all-goals)]
+::
 :: ============================================================================
 :: 
 :: MANAGE UPDATES WITH NEX/NEXUS
@@ -203,6 +219,15 @@
 ::
 :: ============================================================================
 ::
+++  handle-watch
+  |=  =path
+  ^-  _this
+  =/  =pin:gol  (de-pool-path path)
+  =/  pool      (~(got by pools.store) pin)
+  ?>  (~(has by perms.pool) src.bowl)
+  =/  way=away-update:gol  [[our.bowl 0] vzn spawn-pool+pool]
+  (emit %give %fact ~ goal-away-update+!>(way))
+::
 ++  handle-poke
   |=  axn=action:gol
   ^-  _this
@@ -225,8 +250,9 @@
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %spawn-goal pex nex.fd id goal]
     ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
-    =.  pools.store  (~(put by pools.store) pin new)
-    =.  index.store  (put:idx-orm:gol index.store id pin)
+    =.  pools.store        (~(put by pools.store) pin new)
+    =.  index.store        (put:idx-orm:gol index.store id pin)
+    =.  order.local.store  fix-order
     (send-away-update [pin mod pid.axn] upd)
     ::
       %cache-goal
@@ -268,17 +294,19 @@
       =/  =pex:gol  trace.new
       =/  upd=update:gol  [vzn %waste-goal pex nex.fd id ~(key by waz.fd)]
       ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
-      =.  pools.store  (~(put by pools.store) pin new)
-      =.  index.store  (gus-idx-orm:etch index.store ~(tap in ~(key by waz.fd)))
+      =.  pools.store        (~(put by pools.store) pin new)
+      =.  index.store        (gus-idx-orm:etch index.store ~(tap in ~(key by waz.fd)))
+      =.  order.local.store  fix-order
       (send-away-update [pin mod pid.axn] upd)
     =/  new=pool:gol  abet:(trash-goal:(apex:pl old) id mod)
     =/  diff  (diff cache.old cache.new)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %trash-goal pex id hep.diff]
     ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
-    =.  pools.store  (~(put by pools.store) pin new)
-    =/  prog  ~(tap in (~(progeny tv cache.old) id))
-    =.  index.store  (gus-idx-orm:etch index.store prog)
+    =.  pools.store        (~(put by pools.store) pin new)
+    =/  prog               ~(tap in (~(progeny tv cache.old) id))
+    =.  index.store        (gus-idx-orm:etch index.store prog)
+    =.  order.local.store  fix-order
     (send-away-update [pin mod pid.axn] upd)
     ::
       %move
@@ -291,7 +319,8 @@
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %pool-nexus %yoke pex nex.fd]
     ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
-    =.  pools.store  (~(put by pools.store) pin new)
+    =.  pools.store        (~(put by pools.store) pin new)
+    =.  order.local.store  fix-order
     (send-away-update [pin mod pid.axn] upd)
     ::
       %yoke
@@ -303,7 +332,8 @@
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %pool-nexus %yoke pex nex.fd]
     ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
-    =.  pools.store  (~(put by pools.store) pin new)
+    =.  pools.store        (~(put by pools.store) pin new)
+    =.  order.local.store  fix-order
     (send-away-update [pin mod pid.axn] upd)
     ::
       %mark-actionable
@@ -651,7 +681,8 @@
     ?>  =(src our):bowl
     =/  [=pin:gol =pool:gol]  (clone-pool pin title [src now]:bowl)
     =/  upd=update:gol  [vzn %spawn-pool pool]
-    =.  pools.store  (~(put by pools.store) pin pool)
+    =.  pools.store        (~(put by pools.store) pin pool)
+    =.  order.local.store  fix-order
     (send-home-update [pin src.bowl pid.axn] upd)
     ::
       %cache-pool
@@ -680,6 +711,22 @@
       ?:  (~(has by pools.store) pin)  [vzn %waste-pool ~]
       ?>  (~(has by cache.store) pin)  [vzn %trash-pool ~]
     (send-home-update:this [pin src.bowl pid.axn] upd)
+    ::
+      %slot-above
+    =,  pok.axn
+    ?~  idx=(find [dis]~ order.local.store)  !!
+    =.  order.local.store  (oust [u.idx 1] order.local.store)
+    ?~  idx=(find [dat]~ order.local.store)  !!
+    =.  order.local.store  (into order.local.store u.idx dis)
+    this(order.local.store fix-order)
+    ::
+      %slot-below
+    =,  pok.axn
+    ?~  idx=(find [dis]~ order.local.store)  !!
+    =.  order.local.store  (oust [u.idx 1] order.local.store)
+    ?~  idx=(find [dat]~ order.local.store)  !!
+    =.  order.local.store  (into order.local.store +(u.idx) dis)
+    this(order.local.store fix-order)
     ::
       %subscribe
     =,  pok.axn
