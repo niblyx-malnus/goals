@@ -84,7 +84,16 @@
   +$  ranks         ranks:s4
   +$  moment        moment:s4
   ::
-  +$  goal-nexus    goal-nexus:s4
+  +$  goal-nexus
+    $:  par=(unit id)
+        kids=(set id)
+        kickoff=node
+        deadline=node
+        complete=_|
+        actionable=?
+        chief=ship
+        spawn=(set ship)
+    ==
   +$  goal-froze    goal-froze:s4
   ::
   :: values implied by the data structure
@@ -607,7 +616,7 @@
         [%cache-pool =pin]
         [%renew-pool =pin]
         [%trash-pool =pin]
-        [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
+        [%spawn-goal =pin upid=(unit id) desc=@t actionable=?] :: actionable no longer used
         [%cache-goal =id]
         [%renew-goal =id]
         [%trash-goal =id]

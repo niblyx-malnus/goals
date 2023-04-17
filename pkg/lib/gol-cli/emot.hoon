@@ -245,15 +245,14 @@
   =/  mod  src.bowl
   ?-    -.pok.axn
       %spawn-goal
-    =,  pok.axn
+    =+  pok.axn
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
     =/  =id:gol  (unique-id:gols [our now]:bowl)
     =/  new=pool:gol
-      =/  pore  (spawn-goal:(apex:pl old) id upid mod)
-      ?:  actionable
-        abet:(mark-actionable:pore id mod)
-      abet:(unmark-actionable:pore id mod)
+      =;  pore  abet:(spawn-goal:pore id upid mod)
+      ?~  upid  (apex:pl old)
+      (unmark-actionable:(apex:pl old) u.upid mod)
     =/  =goal:gol  (~(got by goals.new) id)
     =.  goal  goal(desc desc)
     =.  goals.new  (~(put by goals.new) id goal)
@@ -267,7 +266,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %cache-goal
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -282,7 +281,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %renew-goal
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -295,7 +294,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %trash-goal
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -321,7 +320,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %move
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind cid)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -335,7 +334,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %yoke
-    =,  pok.axn
+    =+  pok.axn
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
     =/  new=pool:gol  abet:(plex-sequence:(apex:pl old) yoks mod)
@@ -348,7 +347,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %mark-actionable
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -359,7 +358,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %mark-complete
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -370,7 +369,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %unmark-actionable
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -381,7 +380,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %unmark-complete
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -392,7 +391,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %set-kickoff
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -405,7 +404,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %set-deadline
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -418,7 +417,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %update-pool-perms
-    =,  pok.axn
+    =+  pok.axn
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
     |^
@@ -453,7 +452,7 @@
     --
     ::
       %update-goal-perms
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -468,7 +467,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %reorder-young
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -485,7 +484,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %reorder-roots
-    =,  pok.axn
+    =+  pok.axn
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
     ?>  (check-pool-edit-perm:(apex:pl old) mod)
@@ -502,7 +501,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %edit-goal-desc
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -516,7 +515,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %edit-goal-note
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -529,7 +528,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %add-goal-tag
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -544,7 +543,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %del-goal-tag
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -559,7 +558,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %put-goal-tags
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -577,7 +576,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %put-private-tags
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?>  =(src our):bowl
     ?>  (~(all in tags) |=(=tag:gol private.tag)) 
@@ -595,7 +594,7 @@
     (home-emit:this [pin our.bowl pid.axn] upd)
     ::
       %add-field-data
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -612,7 +611,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %del-field-data
-    =,  pok.axn
+    =+  pok.axn
     =/  =pin:gol  (pind id)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
@@ -626,7 +625,7 @@
     (send-away-update [pin mod pid.axn] upd)
     :: 
       %edit-pool-title
-    =,  pok.axn
+    =+  pok.axn
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
     ?>  (check-pool-edit-perm:(apex:pl old) mod)
@@ -637,7 +636,7 @@
     (send-away-update [pin mod pid.axn] upd)
     :: 
       %edit-pool-note
-    =,  pok.axn
+    =+  pok.axn
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
     ?>  (check-pool-edit-perm:(apex:pl old) mod)
@@ -648,7 +647,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %add-field-type
-    =,  pok.axn
+    =+  pok.axn
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
     ?>  (check-pool-edit-perm:(apex:pl old) mod)
@@ -660,7 +659,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %del-field-type
-    =,  pok.axn
+    =+  pok.axn
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
     ?>  (check-pool-edit-perm:(apex:pl old) mod)
@@ -680,7 +679,7 @@
     (send-away-update [pin mod pid.axn] upd)
     ::
       %spawn-pool
-    =,  pok.axn
+    =+  pok.axn
     ?>  =(src our):bowl
     =/  [=pin:gol =pool:gol]  (spawn-pool title [src now]:bowl)
     =/  upd=update:gol        [vzn %spawn-pool pool]
@@ -688,7 +687,7 @@
     (send-home-update [pin src.bowl pid.axn] upd)
     ::
       %clone-pool
-    =,  pok.axn
+    =+  pok.axn
     ?>  =(src our):bowl
     =/  [=pin:gol =pool:gol]  (clone-pool pin title [src now]:bowl)
     =/  upd=update:gol        [vzn %spawn-pool pool]
@@ -696,7 +695,7 @@
     (send-home-update [pin src.bowl pid.axn] upd)
     ::
       %cache-pool
-    =,  pok.axn
+    =+  pok.axn
     ?>  =(src our):bowl
     ?>  =(src.bowl owner.pin)
     =.  this            (emit %give %kick ~[(en-pool-path pin)] ~)
@@ -705,7 +704,7 @@
     (send-home-update:this [pin src.bowl pid.axn] upd)
     ::
       %renew-pool
-    =,  pok.axn
+    =+  pok.axn
     ?>  =(src our):bowl
     ?>  =(src.bowl owner.pin)
     =/  =pool:gol       (~(got by cache.store) pin)
@@ -715,7 +714,7 @@
     ::
       %trash-pool
     :: TODO: purge locals; purge index; purge order
-    =,  pok.axn
+    =+  pok.axn
     ?>  =(src our):bowl
     ?>  =(src.bowl owner.pin)
     =.  this  (emit %give %kick ~[(en-pool-path pin)] ~)
@@ -729,7 +728,7 @@
     (send-home-update:this [pin src.bowl pid.axn] upd)
     ::
       %slot-above
-    =,  pok.axn
+    =+  pok.axn
     ?~  idx=(find [dis]~ order.local.store)  !!
     =.  order.local.store  (oust [u.idx 1] order.local.store)
     ?~  idx=(find [dat]~ order.local.store)  !!
@@ -737,7 +736,7 @@
     this(order.local.store fix-order:etch)
     ::
       %slot-below
-    =,  pok.axn
+    =+  pok.axn
     ?~  idx=(find [dis]~ order.local.store)  !!
     =.  order.local.store  (oust [u.idx 1] order.local.store)
     ?~  idx=(find [dat]~ order.local.store)  !!
@@ -745,7 +744,7 @@
     this(order.local.store fix-order:etch)
     ::
       %subscribe
-    =,  pok.axn
+    =+  pok.axn
     ?>  =(src our):bowl
     ?<  =(src.bowl owner.pin)
     =/  pite=wire  (en-pool-path pin)
@@ -753,7 +752,7 @@
     (emit %pass pite %agent dock %watch pite)
     ::
       %unsubscribe
-    =,  pok.axn
+    =+  pok.axn
     ?>  =(src our):bowl
     ?<  =(src.bowl owner.pin)
     =/  =wire  (en-pool-path pin)
