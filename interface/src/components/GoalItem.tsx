@@ -40,6 +40,7 @@ interface GoalItemProps {
   poolArchived?: boolean;
   note: string;
   tags?: any;
+  parentId: string | null;
 }
 
 const GoalItem = memo(
@@ -59,16 +60,26 @@ const GoalItem = memo(
     poolArchived = false,
     note = "this is a note",
     tags = [],
+    parentId,
   }: //inSelectMode
   GoalItemProps) => {
     const [{ isDragging }, drag] = useDrag(() => ({
       type: "goal",
-      item: { some: "data" },
+      item: { goalId: id },
       collect: (monitor: any) => ({
         isDragging: !!monitor.isDragging(),
       }),
     }));
+    const setDraggingParentId = useStore((store) => store.setDraggingParentId);
 
+    useEffect(() => {
+      if (isDragging) {
+          setDraggingParentId(parentId);
+        
+      } else {
+        setDraggingParentId(null);
+      }
+    }, [isDragging]);
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
     const [selected, setSelected] = useState(isSelected);
     const [yoking, setYoking] = useState<boolean>(false);

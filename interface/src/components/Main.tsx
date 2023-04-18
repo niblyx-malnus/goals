@@ -28,9 +28,8 @@ declare const window: Window &
 //TODO: make the highlighting grey?(drag and drop)
 //TODO: add tooltips to header buttons
 //TODO: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
-//TODO: add update for put tags
-//TODO: add private tagging
-//TODO: add private tags
+//TODO: fix groups scry
+
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -196,18 +195,20 @@ function Main() {
       const result = await api.getData();
       log("fetchInitial result => ", result);
       const resultProjects = result.initial.store.pools;
+      //add an alternate step (if selected, should be the default setting) order is decided
       //here we enforce asc order for pool to not confuse the users
-      const preOrderedPools = resultProjects.sort((aey: any, bee: any) => {
+      /*   const preOrderedPools = resultProjects.sort((aey: any, bee: any) => {
         return aey.pool.froze.birth - bee.pool.froze.birth;
       });
       const orderedPools = orderPools(preOrderedPools, order);
+      */
       //save the cached pools also in a seperate list
       setArchivedPools(
         result.initial.store.cache.map((poolItem: any) => {
           return { ...poolItem, pool: { ...poolItem.pool, isArchived: true } };
         })
       );
-      setFetchedPools(orderedPools);
+      setFetchedPools(resultProjects);
       if (result) {
         setLoading({ trying: false, success: true, error: false });
       } else {
@@ -246,6 +247,7 @@ function Main() {
     }
   };
   const createDataTree = (dataset: any) => {
+    //maybe here we don't just push to childNodes, we also make sure to push at a certain index childNodes[orderOfGoal] = hashTable[ID]
     const hashTable = Object.create(null);
     dataset.forEach((aData: any) => {
       const ID = aData.id.birth;
@@ -257,7 +259,20 @@ function Main() {
       const parentID = aData.goal.nexus?.par?.birth;
       const ID = aData.id.birth;
       if (parentID) {
-        hashTable[parentID].childNodes.push(hashTable[ID]);
+        if (hashTable[parentID]) {
+          /**
+           * get the young array into something we can easily use (apply indexOf to)
+           */
+
+          const youngins = hashTable[parentID].goal.nexus.young?.map(
+            (item: any) => {
+              return item.id.birth;
+            }
+          );
+          let indexOfChild = youngins.indexOf(ID);
+
+          hashTable[parentID].childNodes[indexOfChild] = hashTable[ID];
+        }
       } else dataTree.push(hashTable[ID]);
     });
     return dataTree;

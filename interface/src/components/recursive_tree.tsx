@@ -6,6 +6,7 @@ import { GoalItem } from "./";
 import { useDrag, useDrop } from "react-dnd";
 import { blue, orange, green, red, purple } from "@mui/material/colors";
 import { log } from "../helpers";
+import { reorderGoalsAction } from "../store/actions";
 export interface RecursiveTreeProps {
   readonly goalList: Tree;
   pin: PinId;
@@ -13,13 +14,27 @@ export interface RecursiveTreeProps {
   readonly onSelectCallback: (id: number) => void;
 }
 
-function DropContainer({ position, goalName }: any) {
+function DropContainer({ position, relativeGoalId, parentId, pin }: any) {
+  const draggingParentId = useStore((store) => store.draggingParentId);
+
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
       accept: "goal",
       drop: (data: any) => {
-        log(position + " this goal => ", goalName);
-        //perform some action
+        /**
+         * #1: the id of the goal we're moving
+         * #2: the id of the goal we're moving next to (reference goal)
+         * #3: the positiong (before or after)
+         * #4: parent goal Id
+         */
+        reorderGoalsAction(
+          data.goalId,
+          relativeGoalId,
+          parentId,
+          position,
+          pin
+        );
+     
       },
       collect: (monitor: any) => ({
         isOver: !!monitor.isOver(),
@@ -28,7 +43,8 @@ function DropContainer({ position, goalName }: any) {
     }),
     []
   );
-  //ref={drop}
+  //if we aren't both direct children of this, don't render the drop box
+  if (draggingParentId !== parentId?.birth) return null;
   if (position === "after") {
     return (
       <Box
@@ -38,7 +54,7 @@ function DropContainer({ position, goalName }: any) {
           width: 200,
           position: "absolute",
           bottom: -5,
-
+          zIndex: 1,
           left: 0,
           backgroundColor: isOver ? blue[100] : "transparent",
         }}
@@ -54,7 +70,7 @@ function DropContainer({ position, goalName }: any) {
           position: "absolute",
           top: -5,
           left: 0,
-          backgroundColor: isOver ? blue[100] : "transparent",
+          backgroundColor: isOver ? red[100] : "transparent",
         }}
       ></Box>
     );
@@ -84,7 +100,12 @@ const RecursiveTree = ({
 
     return (
       <Box position={"relative"}>
-        <DropContainer position="before" goalName={currentGoal.hitch.desc} />
+        <DropContainer
+          position="before"
+          relativeGoalId={currentGoalId}
+          parentId={currentGoal.nexus.par}
+          pin={pin}
+        />
         <GoalItem
           idObject={goal.id}
           id={currentGoalId}
@@ -100,6 +121,7 @@ const RecursiveTree = ({
           poolArchived={poolArchived}
           note={currentGoal.hitch.note}
           tags={currentGoal.hitch.tags}
+          parentId={currentGoal.nexus.par?.birth}
         >
           {childGoals.map((goal: any) => {
             const currentChildGoalId = goal.id.birth;
@@ -108,10 +130,16 @@ const RecursiveTree = ({
             );
           })}
         </GoalItem>
-        <DropContainer position="after" goalName={currentGoal.hitch.desc} />
+        <DropContainer
+          position="after"
+          relativeGoalId={currentGoalId}
+          parentId={currentGoal.nexus.par}
+          pin={pin}
+        />
       </Box>
     );
   };
+  log("goalList", goalList);
   return (
     <Box>
       {goalList.map((goal: any, index: number) => {

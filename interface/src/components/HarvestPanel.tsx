@@ -155,7 +155,8 @@ export default function HarvestPanel() {
             const currentGoalId = goal.id.birth;
             return (
               <GoalItem
-                children={[]}
+                parentId=""
+                children={[]} 
                 goal={currentGoal}
                 poolRole={harvestData.role}
                 id={currentGoalId}

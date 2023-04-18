@@ -4,6 +4,7 @@ import useStore from ".";
 import { GoalId, Order, PinId } from "../types/types";
 import cloneDeep from "lodash/cloneDeep";
 import { log } from "../helpers";
+import api from "../api";
 function deletePoolAction(toDeletePin: PinId) {
   const state = useStore.getState();
   const pools = state.pools;
@@ -529,7 +530,72 @@ function nexusListAction(pinId: PinId, nexusList: any) {
   }
   setPools(newPools);
 }
+function reorderGoalsAction(
+  targetGoalId: string,
+  referenceGoalId: string,
+  parentGoalId: GoalId,
+  position: "before" | "after",
+  pinId: PinId
+) {
+  const state = useStore.getState();
+  const pools = state.pools;
+  let youngs: any = [];
+  /*
+   */
+  //  #1 find the youngs of the parent
 
+  pools.forEach((poolItem: any, poolIndex: number) => {
+    const { pin } = poolItem;
+    if (pin.birth === pinId.birth) {
+      poolItem.pool.nexus.goals.forEach((goalItem: any, goalIndex: any) => {
+        //find the right goal
+        if (goalItem.id.birth === parentGoalId.birth) {
+          log(goalItem);
+          youngs = cloneDeep(goalItem.goal.nexus.young);
+        }
+      });
+    }
+  });
+
+  let youngsIdList = youngs?.map((item: any) => {
+    return item.id.birth;
+  });
+  //  #2 find index of target goal
+  let targetIndex = youngsIdList.indexOf(targetGoalId);
+  //  #3 find index of refernce goal
+
+  let referenceIndex = youngsIdList.indexOf(referenceGoalId);
+  //  #4 save target goal and remove it from the list
+  const targetYoung = youngs.splice(targetIndex, 1);
+
+  //  #5 offset position correctly
+  let finalTargetIndex;
+
+  if (position === "after") {
+    finalTargetIndex = referenceIndex;
+    if (referenceIndex === 0) finalTargetIndex = 1;
+  } else {
+    //position before
+    finalTargetIndex = referenceIndex - 1;
+    if (referenceIndex === 0) finalTargetIndex = 0;
+  }
+  log("finalTargetIndex", finalTargetIndex);
+  log("referenceIndex", referenceIndex);
+  //  #6 create a new list using the removed element and the offset position
+
+  let newYoungs = [
+    ...youngs.slice(0, finalTargetIndex),
+    ...targetYoung,
+    ...youngs.slice(finalTargetIndex),
+  ];
+
+  api.reorderGoals(
+    parentGoalId,
+    newYoungs.map((item: any) => {
+      return item.id;
+    })
+  );
+}
 //this is actually just a helper
 const orderPools = (pools: any, order: Order) => {
   //reorder the pools and then the goals, returns ordered pools
@@ -583,4 +649,5 @@ export {
   renewPoolAction,
   deleteArchivedPoolAction,
   nexusListAction,
+  reorderGoalsAction,
 };
