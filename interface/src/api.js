@@ -397,6 +397,43 @@ const api = {
       pokeId: id.birth,
     });
   },
+  reorderGoals: async (id, young) => {
+    const newOrder = {
+      "reorder-young": {
+        id, //id of the parent of the goals
+        young /*list of the new order of the sub-goals of the parent [
+          {
+            owner: "zod",
+            birth: "~2000.1.1",
+          },
+          {
+            owner: "zod",
+            birth: "~2000.1.1",
+          },
+        ],*/,
+      },
+    };
+    return api.poke({
+      app: apiApp,
+      mark: apiMark,
+      json: newOrder,
+      pokeId: id.birth,
+    });
+  },
+  setDeadline: async (id, date) => {
+    const newDeadline = {
+      "set-deadline": {
+        id,
+        deadline: date, //null or date
+      },
+    };
+    return api.poke({
+      app: apiApp,
+      mark: apiMark,
+      json: newDeadline,
+      pokeId: id.birth,
+    });
+  },
   setDeadline: async (id, date) => {
     const newDeadline = {
       "set-deadline": {

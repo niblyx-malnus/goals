@@ -144,6 +144,9 @@ interface Store {
 
   tagFilterArray: Array<string>;
   setTagFilterArray: (newTagFilterArray: Array<string>) => void;
+
+  draggingParentId: string | null; //the id if the parent's goal we're currently dragging
+  setDraggingParentId: (draggingParentId: string | null) => void;
 }
 
 /**
@@ -456,6 +459,10 @@ const useStore = create<Store>((set, get) => ({
   tagFilterArray: [],
   setTagFilterArray: (newTagFilterArray: Array<string>) =>
     set(() => ({ tagFilterArray: newTagFilterArray })),
+ 
+  draggingParentId: null,
+  setDraggingParentId: (draggingParentId: string | null) =>
+    set(() => ({ draggingParentId })),
 }));
 
 export default useStore;
