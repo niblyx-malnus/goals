@@ -197,6 +197,51 @@
     ==
   (~(has in set) d)
 ::
+++  check-equivalence
+  |=  [a=pool:gol b=pool:gol]
+  ^-  ?
+  ?:  =(a b)  &
+  ~&  stock-map+=(stock-map.trace.a stock-map.trace.b)
+  ~&  roots+=(roots.trace.a roots.trace.b)
+  ~&  roots-by-kickoff+=(roots-by-kickoff.trace.a roots-by-kickoff.trace.b)
+  ~&  roots-by-deadline+=(roots-by-deadline.trace.a roots-by-deadline.trace.b)
+  ~&  d-k-precs+=(d-k-precs.trace.a d-k-precs.trace.b)
+  ~&  k-k-precs+=(k-k-precs.trace.a k-k-precs.trace.b)
+  ~&  d-d-precs+=(d-d-precs.trace.a d-d-precs.trace.b)
+  ~&  left-bounds+=(left-bounds.trace.a left-bounds.trace.b)
+  ~&  ryte-bounds+=(ryte-bounds.trace.a ryte-bounds.trace.b)
+  ~&  left-plumbs+=(left-plumbs.trace.a left-plumbs.trace.b)
+  ~&  ryte-plumbs+=(ryte-plumbs.trace.a ryte-plumbs.trace.b)
+  ~&  same-ids+=(~(key by goals.a) ~(key by goals.b))
+  ?>  =(~(key by goals.a) ~(key by goals.b))
+  =/  ids=(list id:gol)  ~(tap in ~(key by goals.a))
+  |-  ?~  ids  |
+  ~&  '================================='
+  =/  a=goal:gol  (~(got by goals.a) i.ids)
+  =/  b=goal:gol  (~(got by goals.b) i.ids)
+  ~&  stock+=(stock.a stock.b)
+  ~&  ranks+=(ranks.a ranks.b)
+  ~&  young+=(young.a young.b)
+  ~&  young-by-kickoff+=(young-by-kickoff.a young-by-kickoff.b)
+  ~&  young-by-deadline+=(young-by-deadline.a young-by-deadline.b)
+  ~&  progress+=(progress.a progress.b)
+  ~&  [a+progress.a b+progress.b]
+  ~&  prio-left+=(prio-left.a prio-left.b)
+  ~&  prio-ryte+=(prio-ryte.a prio-ryte.b)
+  ~&  prec-left+=(prec-left.a prec-left.b)
+  ~&  prec-ryte+=(prec-ryte.a prec-ryte.b)
+  ~&  nest-left+=(nest-left.a nest-left.b)
+  ~&  nest-ryte+=(nest-ryte.a nest-ryte.b)
+  ~&  left-bound-kickoff+=(left-bound.kickoff.a left-bound.kickoff.b)
+  ~&  ryte-bound-kickoff+=(ryte-bound.kickoff.a ryte-bound.kickoff.b)
+  ~&  left-plumb-kickoff+=(left-plumb.kickoff.a left-plumb.kickoff.b)
+  ~&  ryte-plumb-kickoff+=(ryte-plumb.kickoff.a ryte-plumb.kickoff.b)
+  ~&  left-bound-deadline+=(left-bound.deadline.a left-bound.deadline.b)
+  ~&  ryte-bound-deadline+=(ryte-bound.deadline.a ryte-bound.deadline.b)
+  ~&  left-plumb-deadline+=(left-plumb.deadline.a left-plumb.deadline.b)
+  ~&  ryte-plumb-deadline+=(ryte-plumb.deadline.a ryte-plumb.deadline.b)
+  $(ids t.ids)
+::
 :: ============================================================================
 :: 
 :: UPDATES
@@ -259,7 +304,7 @@
     =/  fd  (full-diff goals.old goals.new)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %spawn-goal pex nex.fd id goal]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store        (~(put by pools.store) pin new)
     =.  index.store        (put:idx-orm:gol index.store id pin)
     =.  order.local.store  fix-order:etch
@@ -276,7 +321,7 @@
     =/  nex  (~(uni by nex.gdiff) nex.cdiff)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %cache-goal pex nex id ~(key by waz.gdiff)]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -289,7 +334,7 @@
     =/  fd  (full-diff goals.old goals.new)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %renew-goal pex id pon.fd]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -303,7 +348,7 @@
       =/  fd  (full-diff goals.old goals.new)
       =/  =pex:gol  trace.new
       =/  upd=update:gol  [vzn %waste-goal pex nex.fd id ~(key by waz.fd)]
-      ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+      ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
       =.  pools.store        (~(put by pools.store) pin new)
       =.  index.store        (gus-idx-orm:etch index.store ~(tap in ~(key by waz.fd)))
       =.  order.local.store  fix-order:etch
@@ -312,7 +357,7 @@
     =/  diff  (diff cache.old cache.new)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %trash-goal pex id hep.diff]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store        (~(put by pools.store) pin new)
     =/  prog               ~(tap in (~(progeny tv cache.old) id))
     =.  index.store        (gus-idx-orm:etch index.store prog)
@@ -328,7 +373,7 @@
     =/  fd  (full-diff goals.old goals.new)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %pool-nexus %yoke pex nex.fd]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store        (~(put by pools.store) pin new)
     =.  order.local.store  fix-order:etch
     (send-away-update [pin mod pid.axn] upd)
@@ -341,7 +386,7 @@
     =/  fd  (full-diff goals.old goals.new)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %pool-nexus %yoke pex nex.fd]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store        (~(put by pools.store) pin new)
     =.  order.local.store  fix-order:etch
     (send-away-update [pin mod pid.axn] upd)
@@ -353,7 +398,7 @@
     =/  old=pool:gol  (pile pin)
     =/  new=pool:gol  abet:(mark-actionable:(apex:pl old) id mod)
     =/  upd=update:gol  [vzn %goal-togls id %actionable %.y]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -364,7 +409,7 @@
     =/  old=pool:gol  (pile pin)
     =/  new=pool:gol  abet:(mark-complete:(apex:pl old) id mod)
     =/  upd=update:gol  [vzn %goal-togls id %complete %.y]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     =.  this  (send-away-update [pin mod pid.axn] upd)
     =/  par=(unit id:gol)  par:(~(got by goals.new) id)
@@ -384,7 +429,7 @@
     =/  old=pool:gol  (pile pin)
     =/  new=pool:gol  abet:(unmark-actionable:(apex:pl old) id mod)
     =/  upd=update:gol  [vzn %goal-togls id %actionable %.n]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -395,7 +440,7 @@
     =/  old=pool:gol  (pile pin)
     =/  new=pool:gol  abet:(unmark-complete:(apex:pl old) id mod)
     =/  upd=update:gol  [vzn %goal-togls id %complete %.n]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -408,7 +453,7 @@
     =/  fd  (full-diff goals.old goals.new)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %goal-dates pex nex.fd]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -421,7 +466,7 @@
     =/  fd  (full-diff goals.old goals.new)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %goal-dates pex nex.fd]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -441,7 +486,7 @@
     =/  fd  (full-diff goals.old goals.new)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %pool-perms pex nex.fd perms.new]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ++  perms-to-upds
@@ -471,7 +516,7 @@
     =/  fd  (full-diff goals.old goals.new)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %goal-perms pex nex.fd]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -488,7 +533,7 @@
     =/  new=pool:gol  old(goals (~(put by goals.old) id goal))
     =/  fd  (full-diff goals.old goals.new)
     =/  upd=update:gol  [vzn %goal-young nex.fd]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -505,7 +550,7 @@
       ==
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %goal-roots pex]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -519,7 +564,7 @@
     =/  goal  (~(got by goals.old) id)
     =/  new=pool:gol  old(goals (~(put by goals.old) id goal(desc desc)))
     =/  upd=update:gol  [vzn %goal-hitch id %desc desc]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -532,7 +577,7 @@
     =/  goal  (~(got by goals.old) id)
     =/  new=pool:gol  old(goals (~(put by goals.old) id goal(note note)))
     =/  upd=update:gol  [vzn %goal-hitch id %note note]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -547,7 +592,7 @@
     =.  tags.goal  (~(put in tags.goal) tag)
     =/  new=pool:gol  old(goals (~(put by goals.old) id goal))
     =/  upd=update:gol  [vzn %goal-hitch id %add-tag tag]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -562,7 +607,7 @@
     =.  tags.goal  (~(del in tags.goal) tag)
     =/  new=pool:gol  old(goals (~(put by goals.old) id goal))
     =/  upd=update:gol  [vzn %goal-hitch id %del-tag tag]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -580,7 +625,7 @@
       ?~(get=(~(get by goals.local.store) id) ~ tags.u.get)
     =/  upd=update:gol
       [vzn %goal-hitch id %put-tags (~(uni in tags) local-tags)]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -615,7 +660,7 @@
     =.  fields.goal  (~(put by fields.goal) field field-data)
     =/  new=pool:gol  old(goals (~(put by goals.old) id goal))
     =/  upd=update:gol  [vzn %goal-hitch id %add-field-data field field-data]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -629,7 +674,7 @@
     =.  fields.goal  (~(del by fields.goal) field)
     =/  new=pool:gol  old(goals (~(put by goals.old) id goal))
     =/  upd=update:gol  [vzn %goal-hitch id %del-field-data field]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     :: 
@@ -640,7 +685,7 @@
     ?>  (check-pool-edit-perm:(apex:pl old) mod)
     =/  new=pool:gol  old(title title)
     =/  upd=update:gol  [vzn %pool-hitch %title title]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     :: 
@@ -651,7 +696,7 @@
     ?>  (check-pool-edit-perm:(apex:pl old) mod)
     =/  new=pool:gol  old(note note)
     =/  upd=update:gol  [vzn %pool-hitch %note note]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -663,7 +708,7 @@
     ?<  (~(has by fields.old) field) 
     =/  new=pool:gol  old(fields (~(put by fields.old) field field-type))
     =/  upd=update:gol  [vzn %pool-hitch %add-field-type field field-type]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::
@@ -683,7 +728,7 @@
         [id goal(fields (~(del by fields.goal) field))]
       ==
     =/  upd=update:gol  [vzn %pool-hitch %del-field-type field]
-    ?.  =(new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
+    ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
     ::

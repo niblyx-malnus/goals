@@ -1,5 +1,6 @@
 /-  gol=goal
-/+  pl=gol-cli-pool, tv=gol-cli-traverse, *gol-cli-util
+/+  pl=gol-cli-pool, tv=gol-cli-traverse, *gol-cli-util,
+    fl=gol-cli-inflater
 :: apply (etch) updates received from foreign pools
 ::
 |_  =store:gol
@@ -360,7 +361,8 @@
       |=  [=id:gol complete=?(%.y %.n)]
       ^-  pool:gol
       =/  goal  (~(got by goals.p) id)
-      p(goals (~(put by goals.p) id goal(complete complete)))
+      =.  goals.p  (~(put by goals.p) id goal(complete complete))
+      (inflate-pool:fl p)  :: keeping track of complete/total
     ::
     ++  actionable
       |=  [=id:gol actionable=?(%.y %.n)]

@@ -60,22 +60,31 @@
     cache  (~(rut by cache.p) inflate-goal)
   ==
   ::
+  ++  coals  (~(uni by goals.p) cache.p)
+  ++  tv  ~(. gol-cli-traverse coals)
+  ++  nd  ~(. gol-cli-node coals)
+  ++  progress
+    |=  =id:gol
+    ^-  [complete=@ total=@]
+    =/  prog=(list id:gol)  ~(tap in (progeny:tv id))
+    =/  able=(list id:gol)
+      %+  murn  prog
+      |=(=id:gol ?.(actionable:(~(got by coals) id) ~ (some id)))
+    =/  comp=(list id:gol)
+      %+  murn  able
+      |=(=id:gol ?.(complete:(~(got by coals) id) ~ (some id)))
+    [(lent comp) (lent able)]
+  ::
   ++  inflate-goal
     |=  [=id:gol =goal:gol]
     ^-  goal:gol
-    ::
-    :: make sure inflating both goals and cache
-    =/  coals  (~(uni by goals.p) cache.p)
-    ::
-    =/  tv  ~(. gol-cli-traverse coals)
-    =/  nd  ~(. gol-cli-node coals)
-    ::
     %=  goal
       stock                (~(got by stock-map.trace.p) id)
       ranks                (get-ranks:tv (~(got by stock-map.trace.p) id))
       young                (en-virt goal (fix-list:tv %p d-k-precs.trace.p (de-virt young.goal) (young:nd id)))
       young-by-kickoff     (en-virt goal (fix-list:tv %k k-k-precs.trace.p (de-virt young.goal) (young:nd id)))
       young-by-deadline    (en-virt goal (fix-list:tv %d d-d-precs.trace.p (de-virt young.goal) (young:nd id)))
+      progress             (progress id)
       prio-left            (prio-left:nd id)
       prio-ryte            (prio-ryte:nd id)
       prec-left            (prec-left:nd id)
