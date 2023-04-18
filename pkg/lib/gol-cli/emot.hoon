@@ -201,45 +201,48 @@
   |=  [a=pool:gol b=pool:gol]
   ^-  ?
   ?:  =(a b)  &
-  ~&  stock-map+=(stock-map.trace.a stock-map.trace.b)
-  ~&  roots+=(roots.trace.a roots.trace.b)
-  ~&  roots-by-kickoff+=(roots-by-kickoff.trace.a roots-by-kickoff.trace.b)
-  ~&  roots-by-deadline+=(roots-by-deadline.trace.a roots-by-deadline.trace.b)
-  ~&  d-k-precs+=(d-k-precs.trace.a d-k-precs.trace.b)
-  ~&  k-k-precs+=(k-k-precs.trace.a k-k-precs.trace.b)
-  ~&  d-d-precs+=(d-d-precs.trace.a d-d-precs.trace.b)
-  ~&  left-bounds+=(left-bounds.trace.a left-bounds.trace.b)
-  ~&  ryte-bounds+=(ryte-bounds.trace.a ryte-bounds.trace.b)
-  ~&  left-plumbs+=(left-plumbs.trace.a left-plumbs.trace.b)
-  ~&  ryte-plumbs+=(ryte-plumbs.trace.a ryte-plumbs.trace.b)
-  ~&  same-ids+=(~(key by goals.a) ~(key by goals.b))
+  =|  err=(list ?(term [term id:gol]))
+  =?  err  !=(stock-map.trace.a stock-map.trace.b)  [%stock-map err]
+  =?  err  !=(roots.trace.a roots.trace.b)  [%roots err]
+  ~&  [a+roots.trace.a b+roots.trace.b]
+  =?  err  !=(roots-by-kickoff.trace.a roots-by-kickoff.trace.b)  [%roots-by-kickoff err]
+  =?  err  !=(roots-by-deadline.trace.a roots-by-deadline.trace.b)  [%roots-by-deadline err]
+  =?  err  !=(cache-roots.trace.a cache-roots.trace.b)  [%cache-roots err]
+  =?  err  !=(cache-roots-by-kickoff.trace.a cache-roots-by-kickoff.trace.b)  [%cache-roots-by-kickoff err]
+  =?  err  !=(cache-roots-by-deadline.trace.a cache-roots-by-deadline.trace.b)  [%cache-roots-by-deadline err]
+  =?  err  !=(d-k-precs.trace.a d-k-precs.trace.b)  [%d-k-precs err]
+  =?  err  !=(k-k-precs.trace.a k-k-precs.trace.b)  [%k-k-precs err]
+  =?  err  !=(d-d-precs.trace.a d-d-precs.trace.b)  [%d-d-precs err]
+  =?  err  !=(left-bounds.trace.a left-bounds.trace.b)  [%left-bounds err]
+  =?  err  !=(ryte-bounds.trace.a ryte-bounds.trace.b)  [%ryte-bounds err]
+  =?  err  !=(left-plumbs.trace.a left-plumbs.trace.b)  [%left-plumbs err]
+  =?  err  !=(ryte-plumbs.trace.a ryte-plumbs.trace.b)  [%ryte-plumbs err]
+  =?  err  !=(~(key by goals.a) ~(key by goals.b))  [%not-same-ids err]
   ?>  =(~(key by goals.a) ~(key by goals.b))
   =/  ids=(list id:gol)  ~(tap in ~(key by goals.a))
-  |-  ?~  ids  |
-  ~&  '================================='
+  |-  ?~  ids  ~&((flop err) |)
   =/  a=goal:gol  (~(got by goals.a) i.ids)
   =/  b=goal:gol  (~(got by goals.b) i.ids)
-  ~&  stock+=(stock.a stock.b)
-  ~&  ranks+=(ranks.a ranks.b)
-  ~&  young+=(young.a young.b)
-  ~&  young-by-kickoff+=(young-by-kickoff.a young-by-kickoff.b)
-  ~&  young-by-deadline+=(young-by-deadline.a young-by-deadline.b)
-  ~&  progress+=(progress.a progress.b)
-  ~&  [a+progress.a b+progress.b]
-  ~&  prio-left+=(prio-left.a prio-left.b)
-  ~&  prio-ryte+=(prio-ryte.a prio-ryte.b)
-  ~&  prec-left+=(prec-left.a prec-left.b)
-  ~&  prec-ryte+=(prec-ryte.a prec-ryte.b)
-  ~&  nest-left+=(nest-left.a nest-left.b)
-  ~&  nest-ryte+=(nest-ryte.a nest-ryte.b)
-  ~&  left-bound-kickoff+=(left-bound.kickoff.a left-bound.kickoff.b)
-  ~&  ryte-bound-kickoff+=(ryte-bound.kickoff.a ryte-bound.kickoff.b)
-  ~&  left-plumb-kickoff+=(left-plumb.kickoff.a left-plumb.kickoff.b)
-  ~&  ryte-plumb-kickoff+=(ryte-plumb.kickoff.a ryte-plumb.kickoff.b)
-  ~&  left-bound-deadline+=(left-bound.deadline.a left-bound.deadline.b)
-  ~&  ryte-bound-deadline+=(ryte-bound.deadline.a ryte-bound.deadline.b)
-  ~&  left-plumb-deadline+=(left-plumb.deadline.a left-plumb.deadline.b)
-  ~&  ryte-plumb-deadline+=(ryte-plumb.deadline.a ryte-plumb.deadline.b)
+  =?  err  !=(stock.a stock.b)  [stock+i.ids err]
+  =?  err  !=(ranks.a ranks.b)  [ranks+i.ids err]
+  =?  err  !=(young.a young.b)  [young+i.ids err]
+  =?  err  !=(young-by-kickoff.a young-by-kickoff.b)  [young-by-kickoff+i.ids err]
+  =?  err  !=(young-by-deadline.a young-by-deadline.b)  [young-by-deadline+i.ids err]
+  =?  err  !=(progress.a progress.b)  [progress+i.ids err]
+  =?  err  !=(prio-left.a prio-left.b)  [prio-left+i.ids err]
+  =?  err  !=(prio-ryte.a prio-ryte.b)  [prio-ryte+i.ids err]
+  =?  err  !=(prec-left.a prec-left.b)  [prec-left+i.ids err]
+  =?  err  !=(prec-ryte.a prec-ryte.b)  [prec-ryte+i.ids err]
+  =?  err  !=(nest-left.a nest-left.b)  [nest-left+i.ids err]
+  =?  err  !=(nest-ryte.a nest-ryte.b)  [nest-ryte+i.ids err]
+  =?  err  !=(left-bound.kickoff.a left-bound.kickoff.b)  [left-bound-kickoff+i.ids err]
+  =?  err  !=(ryte-bound.kickoff.a ryte-bound.kickoff.b)  [ryte-bound-kickoff+i.ids err]
+  =?  err  !=(left-plumb.kickoff.a left-plumb.kickoff.b)  [left-plumb-kickoff+i.ids err]
+  =?  err  !=(ryte-plumb.kickoff.a ryte-plumb.kickoff.b)  [ryte-plumb-kickoff+i.ids err]
+  =?  err  !=(left-bound.deadline.a left-bound.deadline.b)  [left-bound-deadline+i.ids err]
+  =?  err  !=(ryte-bound.deadline.a ryte-bound.deadline.b)  [ryte-bound-deadline+i.ids err]
+  =?  err  !=(left-plumb.deadline.a left-plumb.deadline.b)  [left-plumb-deadline+i.ids err]
+  =?  err  !=(ryte-plumb.deadline.a ryte-plumb.deadline.b)  [ryte-plumb-deadline+i.ids err]
   $(ids t.ids)
 ::
 :: ============================================================================
