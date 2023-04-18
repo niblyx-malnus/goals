@@ -372,7 +372,10 @@
     =/  =pin:gol  (pind cid)
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
-    =/  new=pool:gol  abet:(move:(apex:pl old) cid upid mod)
+    =/  new=pool:gol
+      =;  pore  abet:(move:pore cid upid mod)
+      ?~  upid  (apex:pl old)
+      (unmark-actionable:(apex:pl old) u.upid mod)
     =/  fd  (full-diff goals.old goals.new)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %pool-nexus %yoke pex nex.fd]
