@@ -311,7 +311,6 @@
   =.  inflow.node2  (~(put in inflow.node2) n1)
   =.  goals.p  (update-node:nd n1 node1)
   =.  goals.p  (update-node:nd n2 node2)
-  :: update bounds, plumbs, and other redundant/explicit information
   this
 ::
 ++  dag-rend
@@ -328,11 +327,12 @@
   :: Cannot unrelate goal from itself
   ?:  =(id.n1 id.n2)  ~|("same-goal" !!)
   ::
+  :: THIS SEEMS UNNECESSARILY STRICT:
   :: Cannot break relationship between completed goals
-  ?:  ?&  complete:(~(got by goals.p) id.n1)
-          complete:(~(got by goals.p) id.n2)
-      ==
-    ~|("completed-goals" !!)
+  :: ?:  ?&  complete:(~(got by goals.p) id.n1)
+  ::         complete:(~(got by goals.p) id.n2)
+  ::     ==
+  ::   ~|("completed-goals" !!)
   ::
   :: Cannot destroy containment of an owned goal
   =/  l  (~(got by goals.p) id.n1)
