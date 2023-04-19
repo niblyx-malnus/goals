@@ -34,7 +34,6 @@ function DropContainer({ position, relativeGoalId, parentId, pin }: any) {
           position,
           pin
         );
-     
       },
       collect: (monitor: any) => ({
         isOver: !!monitor.isOver(),
@@ -139,7 +138,6 @@ const RecursiveTree = ({
       </Box>
     );
   };
-  log("goalList", goalList);
   return (
     <Box>
       {goalList.map((goal: any, index: number) => {
