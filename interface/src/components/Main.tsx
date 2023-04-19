@@ -174,10 +174,12 @@ function Main() {
       });
       //create our nested data structure we use for rendering (createDataTree)
       //merge the current pool's goals with virtual children if any
-      const newNestedGoals = createDataTree([
-        ...pool.nexus.goals,
-        ...virtualChildren,
-      ]);
+      const newNestedGoals = createDataTree(
+        [...pool.nexus.goals, ...virtualChildren],
+        poolItem.pool.trace.roots.map((item: any) => {
+          return item.birth;
+        })
+      );
       return {
         ...poolItem,
         pool: { ...pool, nexus: { goals: newNestedGoals } },
@@ -246,7 +248,7 @@ function Main() {
       log("fetchPals error => ", e);
     }
   };
-  const createDataTree = (dataset: any) => {
+  const createDataTree = (dataset: any, rootins: any) => {
     //maybe here we don't just push to childNodes, we also make sure to push at a certain index childNodes[orderOfGoal] = hashTable[ID]
     const hashTable = Object.create(null);
     dataset.forEach((aData: any) => {
@@ -260,20 +262,21 @@ function Main() {
       const ID = aData.id.birth;
       if (parentID) {
         if (hashTable[parentID]) {
-          /**
-           * get the young array into something we can easily use (apply indexOf to)
-           */
-
+          //get the young array into something we can easily use (apply indexOf to)
           const youngins = hashTable[parentID].goal.nexus.young?.map(
             (item: any) => {
               return item.id.birth;
             }
           );
           let indexOfChild = youngins.indexOf(ID);
-
+          //add the child at the index it appears in in youngs
           hashTable[parentID].childNodes[indexOfChild] = hashTable[ID];
         }
-      } else dataTree.push(hashTable[ID]);
+      } else {
+        //add at the correct index according to rootins
+        let indexOfRoot = rootins.indexOf(ID);
+        dataTree[indexOfRoot] = hashTable[ID];
+      }
     });
     return dataTree;
   };

@@ -533,7 +533,7 @@ function nexusListAction(pinId: PinId, nexusList: any) {
 function reorderGoalsAction(
   targetGoalId: string,
   referenceGoalId: string,
-  parentGoalId: GoalId,
+  parentGoalId: GoalId | null,
   position: "before" | "after",
   pinId: PinId
 ) {
@@ -543,22 +543,24 @@ function reorderGoalsAction(
   /*
    */
   //  #1 find the youngs of the parent
-
   pools.forEach((poolItem: any, poolIndex: number) => {
     const { pin } = poolItem;
     if (pin.birth === pinId.birth) {
-      poolItem.pool.nexus.goals.forEach((goalItem: any, goalIndex: any) => {
-        //find the right goal
-        if (goalItem.id.birth === parentGoalId.birth) {
-          log(goalItem);
-          youngs = cloneDeep(goalItem.goal.nexus.young);
-        }
-      });
+      if (parentGoalId === null) {
+        //we don't have a parent goal, we have a parent pool, so we use this pool's trace
+        youngs = cloneDeep(poolItem.pool.trace.roots);
+      } else {
+        poolItem.pool.nexus.goals.forEach((goalItem: any, goalIndex: any) => {
+          //find the right goal
+          if (goalItem.id.birth === parentGoalId?.birth) {
+            youngs = cloneDeep(goalItem.goal.nexus.young);
+          }
+        });
+      }
     }
   });
-
   let youngsIdList = youngs?.map((item: any) => {
-    return item.id.birth;
+    return parentGoalId === null ? item.birth : item.id.birth;
   });
   //  #2 find index of target goal
   let targetIndex = youngsIdList.indexOf(targetGoalId);
@@ -579,8 +581,7 @@ function reorderGoalsAction(
     finalTargetIndex = referenceIndex - 1;
     if (referenceIndex === 0) finalTargetIndex = 0;
   }
-  log("finalTargetIndex", finalTargetIndex);
-  log("referenceIndex", referenceIndex);
+
   //  #6 create a new list using the removed element and the offset position
 
   let newYoungs = [
@@ -588,13 +589,16 @@ function reorderGoalsAction(
     ...targetYoung,
     ...youngs.slice(finalTargetIndex),
   ];
-
-  api.reorderGoals(
-    parentGoalId,
-    newYoungs.map((item: any) => {
-      return item.id;
-    })
-  );
+  if (parentGoalId === null) {
+    api.reorderRoots(pinId, newYoungs);
+  } else {
+    api.reorderGoals(
+      parentGoalId,
+      newYoungs.map((item: any) => {
+        return item.id;
+      })
+    );
+  }
 }
 //this is actually just a helper
 const orderPools = (pools: any, order: Order) => {
@@ -630,6 +634,7 @@ const orderPools = (pools: any, order: Order) => {
   });
   return orderedPoolsAndGoals;
 };
+
 
 export {
   deletePoolAction,

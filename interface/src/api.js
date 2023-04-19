@@ -420,6 +420,30 @@ const api = {
       pokeId: id.birth,
     });
   },
+  reorderRoots: async (pin, roots) => {
+    //same as reorder goals but for root goals
+    const newOrder = {
+      "reorder-roots": {
+        pin,
+        roots /*[
+          {
+            owner: "zod",
+            birth: "~2000.1.1",
+          },
+          {
+            owner: "zod",
+            birth: "~2000.1.1",
+          },
+        ],*/,
+      },
+    };
+    return api.poke({
+      app: apiApp,
+      mark: apiMark,
+      json: newOrder,
+      pokeId: pin.birth,
+    });
+  },
   setDeadline: async (id, date) => {
     const newDeadline = {
       "set-deadline": {
