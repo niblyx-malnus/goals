@@ -180,6 +180,7 @@
           %spawn-goal
         %-  pairs
         :~  [%pin (enjs-pin pin.hom)]
+            [%pex (enjs-pex pex.upd)]
             [%nex (enjs-nex nex.upd)]
             [%id (enjs-id id.upd)]
             [%goal (enjs-goal goal.upd)]
@@ -188,6 +189,7 @@
           %waste-goal
         %-  pairs
         :~  [%pin (enjs-pin pin.hom)]
+            [%pex (enjs-pex pex.upd)]
             [%nex (enjs-nex nex.upd)]
             [%id (enjs-id id.upd)]
             [%waz a+(turn ~(tap in waz.upd) enjs-id)]
@@ -196,6 +198,7 @@
           %cache-goal
         %-  pairs
         :~  [%pin (enjs-pin pin.hom)]
+            [%pex (enjs-pex pex.upd)]
             [%nex (enjs-nex nex.upd)]
             [%id (enjs-id id.upd)]
             [%cas a+(turn ~(tap in cas.upd) enjs-id)]
@@ -204,6 +207,7 @@
         %renew-goal  
         %-  pairs
         :~  [%pin (enjs-pin pin.hom)]
+            [%pex (enjs-pex pex.upd)]
             [%id (enjs-id id.upd)]
             [%ren (enjs-goals ren.upd)]
         ==
@@ -211,6 +215,7 @@
         %trash-goal
         %-  pairs
         :~  [%pin (enjs-pin pin.hom)]
+            [%pex (enjs-pex pex.upd)]
             [%id (enjs-id id.upd)]
             [%tas a+(turn ~(tap in tas.upd) enjs-id)]
         ==
@@ -251,17 +256,22 @@
             %yoke
           %+  frond  +<.upd
           %-  pairs
-          :~  [%nex (enjs-nex nex.upd)]
+          :~  pex+(enjs-pex pex.upd)
+              nex+(enjs-nex nex.upd)
           ==
         ==
         ::
           %goal-dates
-        %+  frond  %nex
-        (enjs-nex nex.upd)
+        %-  pairs
+        :~  pex+(enjs-pex pex.upd)
+            nex+(enjs-nex nex.upd)
+        ==
         ::
           %goal-perms
-        %+  frond  %nex
-        (enjs-nex nex.upd)
+        %-  pairs
+        :~  pex+(enjs-pex pex.upd)
+            nex+(enjs-nex nex.upd)
+        ==
         ::
           %goal-young
         %+  frond  %nex
