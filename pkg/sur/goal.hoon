@@ -103,6 +103,7 @@
         young=(list [id virtual=?])
         young-by-kickoff=(list [id virtual=?])
         young-by-deadline=(list [id virtual=?])
+        progress=[complete=@ total=@]
         prio-left=(set id)
         prio-ryte=(set id)
         prec-left=(set id)

@@ -1,5 +1,6 @@
 /-  gol=goal
-/+  pl=gol-cli-pool, tv=gol-cli-traverse, *gol-cli-util
+/+  pl=gol-cli-pool, tv=gol-cli-traverse, *gol-cli-util,
+    fl=gol-cli-inflater
 :: apply (etch) updates received from foreign pools
 ::
 |_  =store:gol
@@ -127,15 +128,15 @@
     (cache-goal:life-cycle [pex nex id cas]:upd)
     ::
       [%renew-goal *]
-    (renew-goal:life-cycle id.upd)
+    (renew-goal:life-cycle [pex id]:upd)
     ::
       [%trash-goal *]
-    (trash-goal:life-cycle id.upd)
+    (trash-goal:life-cycle [pex id]:upd)
     :: ------------------------------------------------------------------------
     :: pool-perms
     ::
       [%pool-perms *]
-    (pool-perms new.upd)
+    (pool-perms [pex nex new]:upd)
     ::
     :: ------------------------------------------------------------------------
     :: pool-hitch
@@ -244,9 +245,9 @@
     ++  cache-goal
       |=  [=pex:gol =nex:gol =id:gol cas=(set id:gol)]
       ^-  pool:gol
-      =.  p  p(trace pex)
       =.  p  (apply-nex p nex)
       %=  p
+        trace  pex
         goals  (gus-by goals.p ~(tap in cas))
         cache
           %-  ~(uni by cache.p)
@@ -254,22 +255,30 @@
       ==
     ::
     ++  renew-goal
-      |=  =id:gol
+      |=  [=pex:gol =id:gol]
       ^-  pool:gol
       =/  prog  ~(tap in (~(progeny tv cache.p) id))
       %=  p
+        trace  pex
         cache  (gus-by cache.p prog)
         goals  (~(uni by goals.p) `goals:gol`(gat-by cache.p prog))
       ==
     ::
     ++  trash-goal
-      |=  =id:gol
+      |=  [=pex:gol =id:gol]
       ^-  pool:gol
       =/  prog  ~(tap in (~(progeny tv cache.p) id))
-      p(cache (gus-by cache.p prog))
+      p(trace pex, cache (gus-by cache.p prog))
     --
   ::
-  ++  pool-perms  |=(perms=pool-perms:gol `pool:gol`p(perms perms))
+  ++  pool-perms
+    |=  [=pex:gol =nex:gol perms=pool-perms:gol]
+    ^-  pool:gol
+    =.  p  (apply-nex p nex)
+    %=  p
+      trace  pex
+      perms  perms
+    ==
   ::
   ++  pool-hitch
     |%
@@ -360,7 +369,8 @@
       |=  [=id:gol complete=?(%.y %.n)]
       ^-  pool:gol
       =/  goal  (~(got by goals.p) id)
-      p(goals (~(put by goals.p) id goal(complete complete)))
+      =.  goals.p  (~(put by goals.p) id goal(complete complete))
+      (inflate-pool:fl p)  :: keeping track of complete/total
     ::
     ++  actionable
       |=  [=id:gol actionable=?(%.y %.n)]

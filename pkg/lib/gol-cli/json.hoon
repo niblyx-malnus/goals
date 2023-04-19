@@ -596,6 +596,12 @@
       [%young-by-kickoff a+(turn young-by-kickoff.nexus enjs-id-v)]
       [%young-by-deadline a+(turn young-by-deadline.nexus enjs-id-v)]
       ::
+      :-  %progress
+      %-  pairs
+      :~  [%complete (numb complete.progress.nexus)]
+          [%total (numb total.progress.nexus)]
+      ==
+      ::
       [%prio-left a+(turn ~(tap in prio-left.nexus) enjs-id)]
       [%prio-ryte a+(turn ~(tap in prio-ryte.nexus) enjs-id)]
       [%prec-left a+(turn ~(tap in prec-left.nexus) enjs-id)]
