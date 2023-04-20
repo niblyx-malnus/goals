@@ -29,6 +29,7 @@ declare const window: Window &
 //TODO: add tooltips to header buttons
 //TODO: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
 //TODO: fix groups scry
+//TODO: add loading state to reordering
 
 interface Loading {
   trying: boolean;

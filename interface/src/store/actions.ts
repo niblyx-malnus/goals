@@ -204,6 +204,43 @@ function renewGoalAction(toRenewList: GoalId[], pinId: PinId) {
   });
   setPools(newPools);
 }
+function updateGoalYoung(pinId: PinId, goalId: GoalId, young: any) {
+  const state = useStore.getState();
+  const pools = state.pools;
+  const setPools = state.setPools;
+
+  //select the project using pin
+  //update the appropriate goal's young
+
+  const newPools = pools.map((poolItem: any, poolIndex: number) => {
+    const { pin } = poolItem;
+    if (pin.birth === pinId.birth) {
+      //filter our existing cached goals in goals (in case of showing archive => true)
+      let newGoals = poolItem.pool.nexus.goals.map((goalItem: any) => {
+        if (goalItem.id.birth === goalId.birth) {
+          return {
+            ...goalItem,
+            goal: {
+              ...goalItem.goal,
+              nexus: { ...goalItem.goal.nexus, young },
+            },
+          };
+        }
+        return goalItem;
+      });
+
+      return {
+        ...poolItem,
+        pool: {
+          ...poolItem.pool,
+          nexus: { ...poolItem.pool.nexus, goals: newGoals },
+        },
+      };
+    }
+    return poolItem;
+  });
+  setPools(newPools);
+}
 function deleteArchivedPoolAction(poolToDelete: PinId) {
   //remove from poolList and from the cachedPools(store)
   const state = useStore.getState();
@@ -592,6 +629,7 @@ function reorderGoalsAction(
 
   if (position === "after") {
     finalTargetIndex = referenceIndex;
+    if (targetIndex > referenceIndex) finalTargetIndex = referenceIndex + 1; //TODO: figure out why this is the case
     if (referenceIndex === 0) finalTargetIndex = 1;
   } else {
     //position before
@@ -606,7 +644,6 @@ function reorderGoalsAction(
     ...targetYoung,
     ...youngs.slice(finalTargetIndex),
   ];
-  
   if (parentGoalId === null) {
     api.reorderRoots(pinId, newYoungs);
   } else {
@@ -672,5 +709,6 @@ export {
   deleteArchivedPoolAction,
   nexusListAction,
   reorderGoalsAction,
-  updatePoolPax
+  updatePoolPax,
+  updateGoalYoung,
 };

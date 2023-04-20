@@ -69,7 +69,8 @@ function DropContainer({ position, relativeGoalId, parentId, pin }: any) {
           position: "absolute",
           top: -5,
           left: 0,
-          backgroundColor: isOver ? red[100] : "transparent",
+
+          backgroundColor: isOver ? blue[100] : "transparent",
         }}
       ></Box>
     );

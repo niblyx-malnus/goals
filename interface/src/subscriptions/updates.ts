@@ -18,6 +18,7 @@ import {
   deleteArchivedPoolAction,
   nexusListAction,
   updatePoolPax,
+  updateGoalYoung
 } from "../store/actions";
 const setLogList = useStore.getState().setLogList;
 
@@ -184,6 +185,14 @@ const updateHandler = (update: any) => {
         let { pex }: any = update.tel[actionName];
 
         updatePoolPax(hed.pin, pex);
+
+        break;
+      }
+      case "goal-young": {
+        const hed: any = update.hed;
+        let { young, id }: any = update.tel[actionName];
+
+        updateGoalYoung(hed.pin, id, young);
 
         break;
       }
