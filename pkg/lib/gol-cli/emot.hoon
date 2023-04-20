@@ -546,7 +546,7 @@
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
     ?>  (check-pool-edit-perm:(apex:pl old) mod)
-    ?>  =((sy roots) (sy (~(root-goals nd goals.old))))
+    ?>  =((sy roots) (sy (~(waif-goals nd goals.old))))
     =/  new=pool:gol  old(roots.trace roots)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %goal-roots pex]
