@@ -528,10 +528,15 @@
     ?>  (check-goal-edit-perm:(apex:pl old) id mod)
     ?>  =((sy young) (~(young nd goals.old) id))
     =/  goal  (~(got by goals.old) id)
-    =.  young.goal
-      (en-virt:fl goal (~(topological-sort tv goals.old) %p d-k-precs.trace.old young))
+    =.  young.goal  (en-virt:fl goal young)
     =/  new=pool:gol  old(goals (~(put by goals.old) id goal))
-    =/  upd=update:gol  [vzn %goal-young id young.goal]
+    =/  upd=update:gol
+      :*  vzn  %goal-young  id
+          young.goal
+          young-by-precedence.goal
+          young-by-kickoff.goal
+          young-by-deadline.goal
+      ==
     ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
@@ -542,11 +547,7 @@
     =/  old=pool:gol  (pile pin)
     ?>  (check-pool-edit-perm:(apex:pl old) mod)
     ?>  =((sy roots) (sy (~(root-goals nd goals.old))))
-    =/  new=pool:gol
-      %=  old
-          roots.trace
-        (~(topological-sort tv goals.old) %p d-k-precs.trace.old roots)
-      ==
+    =/  new=pool:gol  old(roots.trace roots)
     =/  =pex:gol  trace.new
     =/  upd=update:gol  [vzn %goal-roots pex]
     ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)

@@ -390,27 +390,30 @@
   --
 ::
 ++  fix-list
+  |=  [old=(list id:gol) new=(set id:gol)]
+  ^-  (list id:gol)
+  %+  weld
+    :: add fresh ids to front
+    ~(tap in (~(dif in new) (sy old)))
+  :: remove stale ids
+  |-  ^-  (list id:gol)
+  ?~  old  ~
+  ?.  (~(has in new) i.old)
+    $(old t.old)
+  [i.old $(old t.old)]
+::
+++  fix-list-and-sort
   |=  $:  typ=?(%p %k %d)
           precs=(map id:gol (set id:gol))
           old=(list id:gol)
           new=(set id:gol)
       ==
   ^-  (list id:gol)
-  :: remove stale ids
-  =/  fix
-    |-  ^-  (list id:gol)
-    ?~  old  ~
-    ?.  (~(has in new) i.old)
-      $(old t.old)
-    [i.old $(old t.old)]
   ::  add fresh ids to front and sort
-  %:  topological-sort
-    typ
+  %^    topological-sort
+      typ
     precs
-    %+  weld
-      ~(tap in (~(dif in new) (sy old)))
-    fix
-  ==
+  (fix-list old new)
 ::
 :: get uncompleted leaf goals whose deadlines are left of id
 ++  harvests
@@ -473,7 +476,7 @@
   |=  [=id:gol order=(list id:gol)]
   ^-  (list [id:gol goal:gol])
   %+  turn
-    (fix-list %p (precedents-map %d %k) order (harvest id))
+    (fix-list-and-sort %p (precedents-map %d %k) order (harvest id))
   |=(=id:gol [id (~(got by goals) id)])
 :: pool-harvest with full goals
 ::
@@ -481,7 +484,7 @@
   |=  order=(list id:gol)
   ^-  (list [id:gol goal:gol])
   %+  turn
-    (fix-list %p (precedents-map %d %k) order (goals-harvest))
+    (fix-list-and-sort %p (precedents-map %d %k) order (goals-harvest))
   |=(=id:gol [id (~(got by goals) id)])
 ::
 :: get priority of a given goal - highest priority is 0

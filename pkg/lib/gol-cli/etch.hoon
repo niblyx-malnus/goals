@@ -64,9 +64,7 @@
 ::
 ++  fix-order
   ^-  (list id:gol)
-  =/  d-k-precs  (~(precedents-map tv all-goals) %d %k)
-  %-  ~(fix-list tv all-goals)
-  [%p d-k-precs order.local.store ~(key by all-goals)]
+  (~(fix-list tv all-goals) order.local.store ~(key by all-goals))
 ::
 ++  life-cycle
   |%
@@ -175,7 +173,11 @@
     ::
       [%goal-young *]
     =/  =goal:gol  (~(got by goals.p) id.upd)
-    =.  goal  goal(young young.upd)
+    =:  young.goal                young.upd
+        young-by-precedence.goal  young-by-precedence.upd
+        young-by-kickoff.goal     young-by-kickoff.upd
+        young-by-deadline.goal    young-by-deadline.upd
+      ==
     p(goals (~(put by goals.p) id.upd goal))
     :: ------------------------------------------------------------------------
     :: goal-roots

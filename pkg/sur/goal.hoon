@@ -101,6 +101,7 @@
     $:  =stock
         =ranks
         young=(list [id virtual=?])
+        young-by-precedence=(list [id virtual=?])
         young-by-kickoff=(list [id virtual=?])
         young-by-deadline=(list [id virtual=?])
         progress=[complete=@ total=@]
@@ -165,9 +166,11 @@
   +$  pool-trace
     $:  stock-map=(map id stock)
         roots=(list id)
+        roots-by-precedence=(list id)
         roots-by-kickoff=(list id)
         roots-by-deadline=(list id)
         cache-roots=(list id)
+        cache-roots-by-precedence=(list id)
         cache-roots-by-kickoff=(list id)
         cache-roots-by-deadline=(list id)
         d-k-precs=(map id (set id))
@@ -262,7 +265,12 @@
         [%goal-dates =pex =nex]
         [%goal-perms =pex =nex]
         [%goal-roots =pex]
-        [%goal-young =id young=(list [id virtual=?])]
+        $:  %goal-young  =id
+            young=(list [id virtual=?])
+            young-by-precedence=(list [id virtual=?])
+            young-by-kickoff=(list [id virtual=?])
+            young-by-deadline=(list [id virtual=?])
+        ==
         [%goal-hitch =id goal-hitch-update]
         [%goal-togls =id goal-togls-update]
         [%poke-error =tang]

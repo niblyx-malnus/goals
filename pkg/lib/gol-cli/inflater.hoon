@@ -20,8 +20,10 @@
 ++  trace-update
   |=  p=pool:gol
   ^-  pool:gol
-  =/  goals-roots  (~(root-goals gol-cli-node goals.p))
-  =/  cache-roots  (~(root-goals gol-cli-node cache.p))
+  :: can be waif-goals or root-goals, it's a matter of taste really
+  ::
+  =/  goals-roots  (~(waif-goals gol-cli-node goals.p))
+  =/  cache-roots  (~(waif-goals gol-cli-node cache.p))
   ::
   :: make sure tracing both goals and cache
   =/  coals  (~(uni by goals.p) cache.p)
@@ -36,12 +38,14 @@
   %=    p
       trace
     :*  stock-map=((chain:tv id:gol stock:gol) get-stocks:tv (bare-goals:nd) ~)
-        roots=(fix-list:tv %p d-k-precs roots.trace.p (sy goals-roots))
-        roots-by-kickoff=(fix-list:tv %k k-k-precs roots.trace.p (sy goals-roots))
-        roots-by-deadline=(fix-list:tv %d d-d-precs roots.trace.p (sy goals-roots))
-        cache-roots=(fix-list:tv %p d-k-precs cache-roots.trace.p (sy cache-roots))
-        cache-roots-by-kickoff=(fix-list:tv %k k-k-precs cache-roots.trace.p (sy cache-roots))
-        cache-roots-by-deadline=(fix-list:tv %d d-d-precs cache-roots.trace.p (sy cache-roots))
+        roots=(fix-list:tv roots.trace.p (sy goals-roots))
+        roots-by-precedence=(fix-list-and-sort:tv %p d-k-precs roots.trace.p (sy goals-roots))
+        roots-by-kickoff=(fix-list-and-sort:tv %k k-k-precs roots.trace.p (sy goals-roots))
+        roots-by-deadline=(fix-list-and-sort:tv %d d-d-precs roots.trace.p (sy goals-roots))
+        cache-roots=(fix-list:tv cache-roots.trace.p (sy cache-roots))
+        cache-roots-by-precedence=(fix-list-and-sort:tv %p d-k-precs cache-roots.trace.p (sy cache-roots))
+        cache-roots-by-kickoff=(fix-list-and-sort:tv %k k-k-precs cache-roots.trace.p (sy cache-roots))
+        cache-roots-by-deadline=(fix-list-and-sort:tv %d d-d-precs cache-roots.trace.p (sy cache-roots))
         d-k-precs
         k-k-precs
         d-d-precs
@@ -81,9 +85,10 @@
     %=  goal
       stock                (~(got by stock-map.trace.p) id)
       ranks                (get-ranks:tv (~(got by stock-map.trace.p) id))
-      young                (en-virt goal (fix-list:tv %p d-k-precs.trace.p (de-virt young.goal) (young:nd id)))
-      young-by-kickoff     (en-virt goal (fix-list:tv %k k-k-precs.trace.p (de-virt young.goal) (young:nd id)))
-      young-by-deadline    (en-virt goal (fix-list:tv %d d-d-precs.trace.p (de-virt young.goal) (young:nd id)))
+      young                (en-virt goal (fix-list:tv (de-virt young.goal) (young:nd id)))
+      young-by-precedence  (en-virt goal (fix-list-and-sort:tv %p d-k-precs.trace.p (de-virt young.goal) (young:nd id)))
+      young-by-kickoff     (en-virt goal (fix-list-and-sort:tv %k k-k-precs.trace.p (de-virt young.goal) (young:nd id)))
+      young-by-deadline    (en-virt goal (fix-list-and-sort:tv %d d-d-precs.trace.p (de-virt young.goal) (young:nd id)))
       progress             (progress id)
       prio-left            (prio-left:nd id)
       prio-ryte            (prio-ryte:nd id)

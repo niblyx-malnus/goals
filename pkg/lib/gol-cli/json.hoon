@@ -554,9 +554,11 @@
   ^-  json
   %-  pairs
   :~  [%roots a+(turn roots.trace enjs-id)]
+      [%roots-by-precedence a+(turn roots-by-precedence.trace enjs-id)]
       [%roots-by-kickoff a+(turn roots-by-kickoff.trace enjs-id)]
       [%roots-by-deadline a+(turn roots-by-deadline.trace enjs-id)]
       [%cache-roots a+(turn cache-roots.trace enjs-id)]
+      [%cache-roots-by-precedence a+(turn cache-roots-by-precedence.trace enjs-id)]
       [%cache-roots-by-kickoff a+(turn cache-roots-by-kickoff.trace enjs-id)]
       [%cache-roots-by-deadline a+(turn cache-roots-by-deadline.trace enjs-id)]
   ==
@@ -605,6 +607,7 @@
       |=([chip=@p =id] (pairs ~[[%ship (ship chip)] [%id (enjs-id id)]]))
       ::
       [%young a+(turn young.nexus enjs-id-v)]
+      [%young-by-precedence a+(turn young-by-precedence.nexus enjs-id-v)]
       [%young-by-kickoff a+(turn young-by-kickoff.nexus enjs-id-v)]
       [%young-by-deadline a+(turn young-by-deadline.nexus enjs-id-v)]
       ::
