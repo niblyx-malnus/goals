@@ -98,7 +98,7 @@ const RecursiveTree = ({
       return null;
 
     return (
-      <Box position={"relative"}>
+      <Box position={"relative"} key={currentGoalId}>
         <DropContainer
           position="before"
           relativeGoalId={currentGoalId}
@@ -108,7 +108,6 @@ const RecursiveTree = ({
         <GoalItem
           idObject={goal.id}
           id={currentGoalId}
-          key={currentGoalId}
           isSelected={currentGoal.selected}
           label={currentGoal.hitch.desc}
           goal={currentGoal}

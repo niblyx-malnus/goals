@@ -17,6 +17,7 @@ import {
   renewPoolAction,
   deleteArchivedPoolAction,
   nexusListAction,
+  updatePoolPax,
 } from "../store/actions";
 const setLogList = useStore.getState().setLogList;
 
@@ -42,9 +43,10 @@ const updateHandler = (update: any) => {
   if (actionName) {
     switch (actionName) {
       case "spawn-goal": {
-        const { goal, id, nex }: any = update.tel[actionName];
+        const { goal, id, nex, pex }: any = update.tel[actionName];
         const hed: any = update.hed;
         newGoalAction(id, hed.pin, goal, nex);
+        updatePoolPax(hed.pin, pex);
         break;
       }
       case "spawn-pool": {
@@ -55,31 +57,39 @@ const updateHandler = (update: any) => {
         break;
       }
       case "waste-goal": {
-        let { waz, nex }: any = update.tel[actionName];
+        let { waz, nex, pex }: any = update.tel[actionName];
         const hed: any = update.hed;
 
         deleteGoalAction(waz, nex, hed.pin);
+        updatePoolPax(hed.pin, pex);
+
         break;
       }
       case "cache-goal": {
-        let { cas, nex }: any = update.tel[actionName];
+        let { cas, nex, pex }: any = update.tel[actionName];
         const hed: any = update.hed;
 
         archiveGoalAction(cas, nex, hed.pin);
+        updatePoolPax(hed.pin, pex);
+
         break;
       }
       case "renew-goal": {
-        let { ren }: any = update.tel[actionName];
+        let { ren, pex }: any = update.tel[actionName];
         const hed: any = update.hed;
 
         renewGoalAction(ren, hed.pin);
+        updatePoolPax(hed.pin, pex);
+
         break;
       }
       case "trash-goal": {
-        let { tas }: any = update.tel[actionName];
+        let { tas, pex }: any = update.tel[actionName];
         const hed: any = update.hed;
 
         deleteArchivedGoalAction(tas, hed.pin);
+        updatePoolPax(hed.pin, pex);
+
         break;
       }
       case "trash-pool": {
@@ -135,30 +145,46 @@ const updateHandler = (update: any) => {
       }
       case "pool-perms": {
         const hed: any = update.hed;
+        let { pex }: any = update.tel[actionName];
 
         updatePoolPermsAction(hed.pin, update.tel[actionName]);
+        updatePoolPax(hed.pin, pex);
 
         break;
       }
       case "goal-perms": {
         const hed: any = update.hed;
-        let { nex }: any = update.tel[actionName];
+        let { nex, pex }: any = update.tel[actionName];
 
         nexusListAction(hed.pin, nex);
+        updatePoolPax(hed.pin, pex);
 
         break;
       }
       case "pool-nexus": {
         const hed: any = update.hed;
-        let { yoke }: any = update.tel[actionName];
+        let { yoke, pex }: any = update.tel[actionName];
+
         nexusListAction(hed.pin, yoke.nex);
+        updatePoolPax(hed.pin, pex);
+
         break;
       }
       case "goal-dates": {
         const hed: any = update.hed;
-        let { nex }: any = update.tel[actionName];
+        let { nex, pex }: any = update.tel[actionName];
 
         nexusListAction(hed.pin, nex);
+        updatePoolPax(hed.pin, pex);
+
+        break;
+      }
+      case "goal-roots": {
+        const hed: any = update.hed;
+        let { pex }: any = update.tel[actionName];
+
+        updatePoolPax(hed.pin, pex);
+
         break;
       }
       /* case "goal-nexus": {

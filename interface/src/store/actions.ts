@@ -64,6 +64,23 @@ function updatePoolTitleAction(toUpdatePin: PinId, newHitch: any) {
   });
   setPools(newPools);
 }
+function updatePoolPax(toUpdatePin: PinId, newPax: any) {
+  const state = useStore.getState();
+  const pools = state.pools;
+  const setPools = state.setPools;
+  //go through our pools updating the pax of appropriate pool
+  const newPools = pools.map((poolItem: any, index: number) => {
+    const { pin, pool } = poolItem;
+    if (pin.birth === toUpdatePin.birth) {
+      return {
+        ...poolItem,
+        pool: { ...pool, trace: { ...pool.trace, ...newPax } },
+      };
+    }
+    return poolItem;
+  });
+  setPools(newPools);
+}
 function deleteGoalAction(
   toDeleteList: GoalId[],
   toUpdateNexusList: any,
@@ -589,6 +606,7 @@ function reorderGoalsAction(
     ...targetYoung,
     ...youngs.slice(finalTargetIndex),
   ];
+  
   if (parentGoalId === null) {
     api.reorderRoots(pinId, newYoungs);
   } else {
@@ -635,7 +653,6 @@ const orderPools = (pools: any, order: Order) => {
   return orderedPoolsAndGoals;
 };
 
-
 export {
   deletePoolAction,
   deleteGoalAction,
@@ -655,4 +672,5 @@ export {
   deleteArchivedPoolAction,
   nexusListAction,
   reorderGoalsAction,
+  updatePoolPax
 };
