@@ -288,12 +288,17 @@
       ==
     ~|("completed-goal" !!)
   ::
-  :: Cannot create relationship with the deadline of the right id
-  :: if the right id is an actionable goal
-  ?:  ?&  =(-.n2 %d)
-          actionable:(~(got by goals.p) id.n2)
-      ==
-    ~|("right-actionable" !!)
+  :: :: Cannot create relationship with the deadline of the right id
+  :: :: if the right id is an actionable goal
+  :: ?:  ?&  =(-.n2 %d)
+  ::         actionable:(~(got by goals.p) id.n2)
+  ::     ==
+  ::   ~|("right-actionable" !!)
+  :: If the right id is an actionable goal
+  :: and we are relating the left id deadline to the right id deadline,
+  :: unmark the right goal actionable
+  =?  this  &(=(-.n1 %d) =(-.n2 %d) actionable:(~(got by goals.p) id.n2))
+    (unmark-actionable id.n2 mod)
   ::
   :: n2 must not come before n1
   ?:  (check-path:tv n2 n1 %r)  ~|("before-n2-n1" !!)
