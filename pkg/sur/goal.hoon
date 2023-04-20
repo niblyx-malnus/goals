@@ -262,7 +262,7 @@
         [%goal-dates =pex =nex]
         [%goal-perms =pex =nex]
         [%goal-roots =pex]
-        [%goal-young =nex]
+        [%goal-young =id young=(list [id virtual=?])]
         [%goal-hitch =id goal-hitch-update]
         [%goal-togls =id goal-togls-update]
         [%poke-error =tang]

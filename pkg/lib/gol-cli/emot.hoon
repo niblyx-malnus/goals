@@ -537,8 +537,7 @@
     =.  young.goal
       (en-virt:fl goal (~(topological-sort tv goals.old) %p d-k-precs.trace.old young))
     =/  new=pool:gol  old(goals (~(put by goals.old) id goal))
-    =/  fd  (full-diff goals.old goals.new)
-    =/  upd=update:gol  [vzn %goal-young nex.fd]
+    =/  upd=update:gol  [vzn %goal-young id young.goal]
     ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)

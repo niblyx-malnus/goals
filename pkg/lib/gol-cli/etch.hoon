@@ -174,7 +174,9 @@
     :: goal-young
     ::
       [%goal-young *]
-    (apply-nex p nex.upd)
+    =/  =goal:gol  (~(got by goals.p) id.upd)
+    =.  goal  goal(young young.upd)
+    p(goals (~(put by goals.p) id.upd goal))
     :: ------------------------------------------------------------------------
     :: goal-roots
     ::

@@ -274,8 +274,10 @@
         ==
         ::
           %goal-young
-        %+  frond  %nex
-        (enjs-nex nex.upd)
+        %-  pairs
+        :~  [%id (enjs-id id.upd)]
+            [%young a+(turn young.upd enjs-id-v)]
+        ==
         ::
           %goal-roots
         %+  frond  %pex
