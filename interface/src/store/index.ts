@@ -196,7 +196,7 @@ const useStore = create<Store>((set, get) => ({
       leaveDialogData: newLeaveDialogData,
     })),
 
-  order: "dsc",
+  order: "default",
   setOrder: (newOrder: Order) =>
     set(() => ({
       order: newOrder,
@@ -459,7 +459,7 @@ const useStore = create<Store>((set, get) => ({
   tagFilterArray: [],
   setTagFilterArray: (newTagFilterArray: Array<string>) =>
     set(() => ({ tagFilterArray: newTagFilterArray })),
- 
+
   draggingParentId: null,
   setDraggingParentId: (draggingParentId: string | null) =>
     set(() => ({ draggingParentId })),

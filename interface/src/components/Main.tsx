@@ -3,10 +3,9 @@ import RecursiveTree from "./recursive_tree";
 import api from "../api";
 import Container from "@mui/material/Container";
 import useStore from "../store";
-import { log, shipName } from "../helpers";
+import { log, shipName , selectOrderList} from "../helpers";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
-import { orderPools } from "../store/actions";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
@@ -30,6 +29,7 @@ declare const window: Window &
 //TODO: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
 //TODO: fix groups scry
 //TODO: add loading state to reordering
+
 
 interface Loading {
   trying: boolean;
@@ -143,6 +143,7 @@ function Main() {
          * so we make a copy of the goal assicoated with them
          *  and make the needed changes to the data structure
          */
+
         shallowGoal.goal.nexus["nest-left"].map((item: any) => {
           //fetch the goal assosicated with this id from our map
           const saGoal = goalsMap.get(item.birth);
@@ -173,11 +174,13 @@ function Main() {
           }
         });
       });
+    
       //create our nested data structure we use for rendering (createDataTree)
       //merge the current pool's goals with virtual children if any
+
       const newNestedGoals = createDataTree(
         [...pool.nexus.goals, ...virtualChildren],
-        poolItem.pool.trace.roots.map((item: any) => {
+        selectOrderList(order, poolItem.pool.trace, true).map((item: any) => {
           return item.birth;
         })
       );
@@ -190,7 +193,7 @@ function Main() {
     setPools(newProjects);
     setRoleMap(roleMap);
     setAllTags(allTagsSet);
-  }, [fetchedPools]);
+  }, [fetchedPools, order]);
 
   const fetchInitial = async () => {
     setLoading({ trying: true, success: false, error: false });
@@ -264,11 +267,13 @@ function Main() {
       if (parentID) {
         if (hashTable[parentID]) {
           //get the young array into something we can easily use (apply indexOf to)
-          const youngins = hashTable[parentID].goal.nexus.young?.map(
-            (item: any) => {
-              return item.id.birth;
-            }
-          );
+          const youngins = selectOrderList(
+            order,
+            hashTable[parentID].goal.nexus,
+            false
+          )?.map((item: any) => {
+            return item.id.birth;
+          });
           let indexOfChild = youngins.indexOf(ID);
           //add the child at the index it appears in in youngs
           hashTable[parentID].childNodes[indexOfChild] = hashTable[ID];

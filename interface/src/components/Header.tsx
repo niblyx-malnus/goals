@@ -12,7 +12,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { ChipData, Order } from "../types/types";
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
-import { orderPoolsAction } from "../store/actions";
 import Stack from "@mui/material/Stack";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -60,6 +59,8 @@ export default function Header() {
   const [filterValue, setFilterValue] = React.useState<string | null>(null);
 
   const order = useStore((store) => store.order);
+  const setOrder = useStore((store) => store.setOrder);
+  
   const selectionMode = useStore((store) => store.selectionMode);
 
   const setFilterGoals = useStore((store) => store.setFilterGoals);
@@ -111,7 +112,7 @@ export default function Header() {
   };
 
   const handleOrderChange = (event: SelectChangeEvent) => {
-    orderPoolsAction(event.target.value as Order);
+    setOrder(event.target.value as Order);
   };
   const handleShowArchived = () => {
     toggleShowArchived();
@@ -231,8 +232,10 @@ export default function Header() {
               label="Sorting"
               onChange={handleOrderChange}
             >
-              <MenuItem value={"dsc"}>Newest First </MenuItem>
-              <MenuItem value={"asc"}>Oldest First</MenuItem>
+              <MenuItem value={"default"}>Default </MenuItem>
+              <MenuItem value={"by-kickoff"}>By Kickoff Date </MenuItem>
+              <MenuItem value={"by-deadline"}>By Deadline Date</MenuItem>
+              <MenuItem value={"by-precedence"}>By Precedence Date</MenuItem>
               {/* <MenuItem value={"prio"}>By Priority</MenuItem> */}
             </Select>
           </FormControl>

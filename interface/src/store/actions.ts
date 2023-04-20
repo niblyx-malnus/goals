@@ -453,7 +453,6 @@ function newGoalAction(
 ) {
   const state = useStore.getState();
   const pools = state.pools;
-  const order = state.order;
   const setPools = state.setPools;
   //select project using pinId and then add the goal to the goal list, we also update all the goal's in the given nexus list
   const nexusMap = new Map();
@@ -478,11 +477,7 @@ function newGoalAction(
         }
         return goalItem;
       });
-      if (order === "asc") {
-        newGoals.push({ goal: newGoal, id: newGoalId });
-      } else {
-        newGoals.unshift({ goal: newGoal, id: newGoalId });
-      }
+      newGoals.push({ goal: newGoal, id: newGoalId });
       return {
         ...poolItem,
         pool: {
@@ -505,17 +500,7 @@ function newPoolAction(newPool: any) {
   newPools.push(newPool);
   setPools(newPools);
 }
-function orderPoolsAction(newOrder: Order) {
-  const state = useStore.getState();
-  const pools = state.pools;
-  const setPools = state.setPools;
-  const setOrder = state.setOrder;
-  //reorder the goals using the helper
-  const newPools = orderPools(pools, newOrder);
 
-  setPools(newPools);
-  setOrder(newOrder);
-}
 function updatePoolPermsAction(toUpdatePin: PinId, newPerms: any) {
   const state = useStore.getState();
   const pools = state.pools;
@@ -539,7 +524,6 @@ function nexusListAction(pinId: PinId, nexusList: any) {
   const state = useStore.getState();
   const pools = state.pools;
   const setPools = state.setPools;
-  const order = state.order;
   //go through pools select our pool, and update the goals (their nexus) that need to be update
   //create a map for ease of interaction
   const nexusMap = new Map();
@@ -577,11 +561,7 @@ function nexusListAction(pinId: PinId, nexusList: any) {
     }
     return poolItem;
   });
-  //since left-plumb changes, we have to reoreder the goals (if sorting prio)
-  //TODO: this could happen everytime a list of nexus patches in (add elsewhere, maybe actions?)
-  if (order === "prio") {
-    newPools = orderPools(newPools, order);
-  }
+
   setPools(newPools);
 }
 function reorderGoalsAction(
@@ -655,40 +635,7 @@ function reorderGoalsAction(
     );
   }
 }
-//this is actually just a helper
-const orderPools = (pools: any, order: Order) => {
-  //reorder the pools and then the goals, returns ordered pools
-  function prioCompare(aey: any, bee: any) {
-    const plumbLeftA = aey.goal.nexus.kickoff["left-plumb"];
-    const plumbLeftB = bee.goal.nexus.kickoff["left-plumb"];
 
-    if (plumbLeftA < plumbLeftB) {
-      return -1;
-    }
-    var order = "asc";
-    //will order youngest (higher birth) first
-    return birthCompare(aey, bee);
-  }
-  function birthCompare(aey: any, bee: any) {
-    const birthA = aey.goal.froze.birth;
-    const birthB = bee.goal.froze.birth;
-
-    if (order === "asc") return birthA - birthB;
-    return birthB - birthA;
-  }
-  const compareFoo = order === "prio" ? prioCompare : birthCompare;
-  const orderedPoolsAndGoals = pools.map((poolItem: any) => {
-    const reorderedGoal = poolItem.pool.nexus.goals.sort(compareFoo);
-    return {
-      ...poolItem,
-      pool: {
-        ...poolItem.pool,
-        nexus: { ...poolItem.pool.nexus, goals: reorderedGoal },
-      },
-    };
-  });
-  return orderedPoolsAndGoals;
-};
 
 export {
   deletePoolAction,
@@ -698,8 +645,7 @@ export {
   updateGoalDescAction,
   newGoalAction,
   newPoolAction,
-  orderPoolsAction,
-  orderPools,
+  
   updatePoolPermsAction,
   archiveGoalAction,
   archivePoolAction,
