@@ -390,67 +390,10 @@
         [%goal (enjs-goal goal)]
     ==
     ::
-      %get-goal
-    %+  frond
-      %goal
-    ?~(ugoal.pyk ~ (enjs-goal u.ugoal.pyk))
-    ::
-      %get-pin
-    %+  frond
-      %pin
-    ?~(upin.pyk ~ (enjs-pin u.upin.pyk))
-    ::
-      %get-pool
-    %+  frond
-      %pool
-    ?~(upool.pyk ~ (enjs-pool u.upool.pyk))
-    ::
-    %ryte-bound  (frond %moment ?~(moment.pyk ~ s+(scot %da u.moment.pyk)))
-    ::
-      %plumb
-    %+  frond
-      %depth
-    (numb depth.pyk)
-    ::
-      %anchor
-    %+  frond
-      %depth
-    (numb depth.pyk)
-    ::
-      %priority
-    %+  frond
-      %priority
-    (numb priority.pyk)
-    ::
-    ::   %seniority
-    :: %+  frond
-    ::   %senior
-    :: ?~(u-senior.pyk ~ (enjs-id u.u-senior.pyk))
-    ::
-      %yung
-    %+  frond
-      %yung
-    a+(turn yung.pyk enjs-id)
-    ::
-      %yung-uncompleted
-    %+  frond
-      %yung-uncompleted
-    a+(turn yung-uc.pyk enjs-id)
-    ::
-      %yung-virtual
-    %+  frond
-      %yung-virtual
-    a+(turn yung-vr.pyk enjs-id)
-    ::
-      %roots
-    %+  frond
-      %roots
-    a+(turn roots.pyk enjs-id)
-    ::
-      %roots-uncompleted
-    %+  frond
-      %roots-uncompleted
-    a+(turn roots-uc.pyk enjs-id)
+    %pool   (frond pool+(enjs-pool pool.pyk))
+    %goals  (frond goals+(enjs-goals goals.pyk))
+    %pool-hitch  (frond pool-hitch+(enjs-pool-hitch ph.pyk))
+    %goal-hitch  (frond goal-hitch+(enjs-goal-hitch gh.pyk))
   ==
 ::
 ++  enjs-store
@@ -519,13 +462,25 @@
       :~  [%goals (enjs-goals goals.pool)]
           [%cache (enjs-goals cache.pool)]
       ==
-      :-  %hitch
-      %-  pairs
-      :~  [%title s+title.pool]
-          [%note s+note.pool]
-      ==
+      [%hitch (enjs-pool-hitch hitch:`npool`pool)]
       [%trace (enjs-pool-trace trace.pool)]
   ==
+::
+++  enjs-pool-hitch
+  =,  enjs:format
+  |=  ph=pool-hitch
+  ^-  json
+  %-  pairs
+  :~  [%title s+title.ph]
+      [%note s+note.ph]
+      :-  %fields
+      %-  pairs
+      %+  turn  ~(tap by fields.ph)
+      |=  [field=@t =field-type]
+      ^-  [@t json]
+      [field (enjs-field-type field-type)]
+  ==
+
 ::
 ++  enjs-yoke
   =,  enjs:format
@@ -637,12 +592,23 @@
           [%author (ship author.goal)]
       ==
       [%nexus (enjs-goal-nexus-trace [nexus trace]:`ngoal`goal)]
-      :-  %hitch
+      [%hitch (enjs-goal-hitch hitch:`ngoal`goal)]
+  ==
+::
+++  enjs-goal-hitch
+  =,  enjs:format
+  |=  gh=goal-hitch
+  ^-  json
+  %-  pairs
+  :~  [%desc s+desc.gh]
+      [%note s+note.gh]
+      [%tags a+(turn ~(tap in tags.gh) enjs-tag)]
+      :-  %fields
       %-  pairs
-      :~  [%desc s+desc.goal]
-          [%note s+note.goal]
-          [%tags a+(turn ~(tap in tags.goal) enjs-tag)]
-      ==
+      %+  turn  ~(tap by fields.gh)
+      |=  [field=@t =field-data]
+      ^-  [@t json]
+      [field (enjs-field-data field-data)]
   ==
 ::
 ++  enjs-node

@@ -664,6 +664,19 @@
     ==
   (((traverse id:gol (set id:gol) (set id:gol)) ginn ~) id)
 ::
+:: all descendents including self
+++  virtual-progeny
+  |=  =id:gol
+  ^-  (set id:gol)
+  =/  ginn  (ginn id:gol (set id:gol))
+  =.  ginn
+    %=  ginn
+      flow  |=(=id:gol ~(tap in (young:nd id)))
+      init  |=(=id:gol (~(put in *(set id:gol)) id))
+      meld  |=([id:gol id:gol a=(set id:gol) b=(set id:gol)] (~(uni in a) b))
+    ==
+  (((traverse id:gol (set id:gol) (set id:gol)) ginn ~) id)
+::
 ++  replace-chief
   |=  [kick=(set ship) owner=ship]
   |=  [=id:gol vis=(map id:gol ship)]

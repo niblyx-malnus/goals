@@ -289,18 +289,10 @@
         [%all-goal-keys keys=(set id)]
         [%harvest harvest=(list id)]
         [%full-harvest harvest=(list [id goal])]
-        [%get-goal ugoal=(unit goal)]
-        [%get-pin upin=(unit pin)]
-        [%get-pool upool=(unit pool)]
-        [%ryte-bound moment=(unit @da)]
-        [%plumb depth=@ud]
-        [%anchor depth=@ud]
-        [%priority priority=@ud]
-        [%yung yung=(list id)]
-        [%yung-uncompleted yung-uc=(list id)]
-        [%yung-virtual yung-vr=(list id)]
-        [%roots roots=(list id)]
-        [%roots-uncompleted roots-uc=(list id)]
+        [%pool =pool]
+        [%goals =goals]
+        [%pool-hitch ph=pool-hitch]
+        [%goal-hitch gh=goal-hitch]
     ==
   ::
   +$  core-yoke     core-yoke:s4

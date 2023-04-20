@@ -177,6 +177,26 @@
     =/  birth  (slav %da i.t.t.t.path)
     =/  id  `id:gol`[owner birth]
     ?+    t.t.t.t.path  (on-peek:def path)
+        [%descendents ~] :: includes nested
+      =/  =pin:gol    (got:idx-orm:gol index id)
+      =/  =pool:gol   (~(got by pools) pin)
+      =/  tv  ~(. gol-cli-traverse goals.pool)
+      =/  descendents=(set id:gol)  (virtual-progeny:tv id)
+      =/  =goals:gol
+         %-  ~(gas by *goals:gol)
+         %+  murn  ~(tap by goals.pool)
+         |=  [=id:gol =goal:gol]
+         ?.  (~(has in descendents) id)
+           ~
+         (some [id goal])
+      ``goal-peek+!>(goals+goals)
+      ::
+        [%hitch ~]
+      =/  =pin:gol    (got:idx-orm:gol index id)
+      =/  =pool:gol   (~(got by pools) pin)
+      =/  =ngoal:gol  (~(got by goals.pool) id)
+      ``goal-peek+!>(goal-hitch+hitch.ngoal)
+      ::
         [%harvest ~]
       =/  pin  (got:idx-orm:gol index id)
       =/  pool  (~(got by pools) pin)
@@ -195,6 +215,11 @@
     =/  birth  (slav %da i.t.t.t.path)
     =/  pin  `pin:gol`[%pin owner birth]
     ?+    t.t.t.t.path  (on-peek:def path)
+      ~  ``goal-peek+!>(pool+(~(got by pools) pin))
+      ::
+        [%hitch ~]
+      ``goal-peek+!>(pool-hitch+hitch:`npool:gol`(~(got by pools) pin))
+      ::
         [%harvest ~]
       =/  pool  (~(got by pools) pin)
       =/  tv  ~(. gol-cli-traverse goals.pool)
