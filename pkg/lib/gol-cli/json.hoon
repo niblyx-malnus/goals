@@ -392,6 +392,7 @@
     ::
     %pool   (frond pool+(enjs-pool pool.pyk))
     %goals  (frond goals+(enjs-goals goals.pyk))
+    %pools  (frond pools+(enjs-pools pools.pyk))
     %pool-hitch  (frond pool-hitch+(enjs-pool-hitch ph.pyk))
     %goal-hitch  (frond goal-hitch+(enjs-goal-hitch gh.pyk))
   ==

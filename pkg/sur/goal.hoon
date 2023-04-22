@@ -291,6 +291,7 @@
         [%full-harvest harvest=(list [id goal])]
         [%pool =pool]
         [%goals =goals]
+        [%pools =pools]
         [%pool-hitch ph=pool-hitch]
         [%goal-hitch gh=goal-hitch]
     ==

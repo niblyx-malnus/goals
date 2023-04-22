@@ -189,7 +189,8 @@
          ?.  (~(has in descendents) id)
            ~
          (some [id goal])
-      ``goal-peek+!>(goals+goals)
+      =;  =pools:gol  ``goal-peek+!>(pools+pools)
+      (~(put by *pools:gol) pin pool(goals goals))
       ::
         [%hitch ~]
       =/  =pin:gol    (got:idx-orm:gol index id)
@@ -215,7 +216,9 @@
     =/  birth  (slav %da i.t.t.t.path)
     =/  pin  `pin:gol`[%pin owner birth]
     ?+    t.t.t.t.path  (on-peek:def path)
-      ~  ``goal-peek+!>(pool+(~(got by pools) pin))
+        ~
+      =;  =pools:gol  ``goal-peek+!>(pools+pools)
+      (~(put by *pools:gol) pin (~(got by pools) pin))
       ::
         [%hitch ~]
       ``goal-peek+!>(pool-hitch+hitch:`npool:gol`(~(got by pools) pin))
