@@ -70,7 +70,11 @@ const createDataTree = (dataset: any, rootins: any, order: Order) => {
         )?.map((item: any) => {
           return item.id.birth;
         });
-        let indexOfChild = youngins.indexOf(ID);
+        const isVirtual = aData.goal.isVirtual;
+
+        let indexOfChild = youngins.indexOf(
+          isVirtual ? aData.goal.virtualId.birth : ID //if a goal is virtual we don't use ID we use the virtualId we have in it
+        );
         //add the child at the index it appears in in youngs
         hashTable[parentID].childNodes[indexOfChild] = hashTable[ID];
       }
@@ -82,4 +86,12 @@ const createDataTree = (dataset: any, rootins: any, order: Order) => {
   });
   return dataTree;
 };
-export { log, isDev, shipName, getRoleTitle, uuid, selectOrderList , createDataTree};
+export {
+  log,
+  isDev,
+  shipName,
+  getRoleTitle,
+  uuid,
+  selectOrderList,
+  createDataTree,
+};

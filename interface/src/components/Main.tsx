@@ -149,8 +149,7 @@ function Main({ fetchInitialCallback }: any) {
                 nexus: {
                   ...saGoal.goal.nexus,
                   par: {
-                    ...saGoal.goal.nexus.par,
-                    birth: shallowGoal.id.birth,
+                    ...shallowGoal.id,
                   },
                 },
               },

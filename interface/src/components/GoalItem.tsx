@@ -41,6 +41,7 @@ interface GoalItemProps {
   note: string;
   tags?: any;
   parentId: string | null;
+  virtualId?: string;
 }
 
 const GoalItem = memo(
@@ -61,11 +62,12 @@ const GoalItem = memo(
     note = "this is a note",
     tags = [],
     parentId,
+    virtualId,
   }: //inSelectMode
   GoalItemProps) => {
     const [{ isDragging }, drag] = useDrag(() => ({
       type: "goal",
-      item: { goalId: id },
+      item: { goalId: virtualId ? virtualId : id },
       collect: (monitor: any) => ({
         isDragging: !!monitor.isDragging(),
       }),

@@ -102,7 +102,9 @@ const RecursiveTree = ({
       <Box position={"relative"} key={currentGoalId}>
         <DropContainer
           position="before"
-          relativeGoalId={currentGoalId}
+          relativeGoalId={
+            currentGoal.isVirtual ? currentGoal.virtualId.birth : currentGoalId
+          }
           parentId={currentGoal.nexus.par}
           pin={pin}
         />
@@ -121,6 +123,7 @@ const RecursiveTree = ({
           note={currentGoal.hitch.note}
           tags={currentGoal.hitch.tags}
           parentId={currentGoal.nexus.par?.birth}
+          virtualId={currentGoal.virtualId?.birth} //we use this for actions if our goal is virtual
         >
           {childGoals.map((goal: any) => {
             const currentChildGoalId = goal.id.birth;
@@ -131,7 +134,9 @@ const RecursiveTree = ({
         </GoalItem>
         <DropContainer
           position="after"
-          relativeGoalId={currentGoalId}
+          relativeGoalId={
+            currentGoal.isVirtual ? currentGoal.virtualId.birth : currentGoalId
+          }
           parentId={currentGoal.nexus.par}
           pin={pin}
         />
