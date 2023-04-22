@@ -48,4 +48,38 @@ function selectOrderList(order: Order, options: any, isPool = true) {
     return options[prefix];
   }
 }
-export { log, isDev, shipName, getRoleTitle, uuid, selectOrderList };
+const createDataTree = (dataset: any, rootins: any, order: Order) => {
+  //maybe here we don't just push to childNodes, we also make sure to push at a certain index childNodes[orderOfGoal] = hashTable[ID]
+  const hashTable = Object.create(null);
+  dataset.forEach((aData: any) => {
+    const ID = aData.id.birth;
+    hashTable[ID] = { ...aData, childNodes: [] };
+  });
+
+  const dataTree: any = [];
+  dataset.forEach((aData: any) => {
+    const parentID = aData.goal.nexus?.par?.birth;
+    const ID = aData.id.birth;
+    if (parentID) {
+      if (hashTable[parentID]) {
+        //get the young array into something we can easily use (apply indexOf to)
+        const youngins = selectOrderList(
+          order,
+          hashTable[parentID].goal.nexus,
+          false
+        )?.map((item: any) => {
+          return item.id.birth;
+        });
+        let indexOfChild = youngins.indexOf(ID);
+        //add the child at the index it appears in in youngs
+        hashTable[parentID].childNodes[indexOfChild] = hashTable[ID];
+      }
+    } else {
+      //add at the correct index according to rootins
+      let indexOfRoot = rootins.indexOf(ID);
+      dataTree[indexOfRoot] = hashTable[ID];
+    }
+  });
+  return dataTree;
+};
+export { log, isDev, shipName, getRoleTitle, uuid, selectOrderList , createDataTree};

@@ -12,15 +12,19 @@ export interface PinId {
   birth: string;
   owner: string;
 }
+export interface Loading {
+  trying: boolean;
+  success: boolean;
+  error: boolean;
+}
+export interface ChipData {
+  key: string;
+  label: string;
+  canDelete: boolean;
+}
 export type Yoke = "move" | "prioritize" | "precede";
 export type SnackBarData = { message: string; severity: string } | null;
 export type FilterGoals = null | "complete" | "incomplete" | "actionable";
 export type Order = "default" | "by-kickoff" | "by-deadline" | "by-precedence";
 
 export type Tree = ReadonlyArray<TreeBranch>;
-
-export interface ChipData {
-  key: string;
-  label: string;
-  canDelete: boolean;
-}

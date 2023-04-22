@@ -74,8 +74,7 @@ const GoalItem = memo(
 
     useEffect(() => {
       if (isDragging) {
-          setDraggingParentId(parentId);
-        
+        setDraggingParentId(parentId);
       } else {
         setDraggingParentId(null);
       }
@@ -261,7 +260,7 @@ const GoalItem = memo(
           return blue[200];
         }
       }
-      if (goal.nexus.actionable) return orange[50];
+      if (goal.nexus.actionable) return "auto"; //orange[50];
       return "auto";
     };
     const renderArchivedTag = () => {

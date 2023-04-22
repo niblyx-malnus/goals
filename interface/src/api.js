@@ -524,5 +524,28 @@ const api = {
   getPals: async () => {
     return api.createApi().scry({ app: "pals", path: "/json" });
   },
+  /*
+
+
+  ~/scry/goal-store/goal/~zod/~2000.1.1/hitch.json
+  GOAL notes, comments, etc (no comments yet)
+
+  ~/scry/goal-store/pool/~zod/~2000.1.1/hitch.json
+  POOL notes, comments, etc (no comments yet)
+  */
+  getPool: async (poolId) => {
+    return api
+      .createApi()
+      .scry({ app: apiApp, path: `/pool/${poolId.owner}/${poolId.birth}` });
+  },
+  getGoal: async (goalId) => {
+    //  (all real and virtual descendents, with both id and goal)
+    return api
+      .createApi()
+      .scry({
+        app: apiApp,
+        path: `/goal/${goalId.owner}/${goalId.birth}/descendents`,
+      });
+  },
 };
 export default api;

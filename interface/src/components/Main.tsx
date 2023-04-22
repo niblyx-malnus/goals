@@ -3,7 +3,7 @@ import RecursiveTree from "./recursive_tree";
 import api from "../api";
 import Container from "@mui/material/Container";
 import useStore from "../store";
-import { log, shipName , selectOrderList} from "../helpers";
+import { log, shipName, selectOrderList, createDataTree } from "../helpers";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
@@ -13,12 +13,8 @@ import { Header, Project } from "./";
 import { v4 as uuidv4 } from "uuid";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-declare const window: Window &
-  typeof globalThis & {
-    scry: any;
-    poke: any;
-    ship: any;
-  };
+import { Loading } from "../types/types";
+
 //TODO: handle sub kick/error
 //TODO: order the virtual children
 //TODO: add relay to edit inputs also and test the other pokes
@@ -29,31 +25,22 @@ declare const window: Window &
 //TODO: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
 //TODO: fix groups scry
 //TODO: add loading state to reordering
+//TODO: add loading state for initial as part of the store to be used in different pages
 
-
-interface Loading {
-  trying: boolean;
-  success: boolean;
-  error: boolean;
-}
 function Main() {
   const order = useStore((store) => store.order);
   const setRoleMap = useStore((store) => store.setRoleMap);
   const fetchedPools = useStore((store) => store.pools);
-  const setFetchedPools = useStore((store) => store.setPools);
-  const setGroupsData = useStore((store) => store.setGroupsData);
-  const setPals = useStore((store) => store.setPals);
 
   const tryingMap: any = useStore((store) => store.tryingMap);
   const setTryingMap = useStore((store) => store.setTryingMap);
 
   const setAllTags = useStore((store) => store.setAllTags);
 
-  const setArchivedPools = useStore((store) => store.setArchivedPools);
   const [pools, setPools] = useState([]);
   const [loading, setLoading] = useState<Loading>({
-    trying: true,
-    success: false,
+    trying: false,
+    success: true,
     error: false,
   });
   const currShip = shipName();
@@ -174,7 +161,7 @@ function Main() {
           }
         });
       });
-    
+
       //create our nested data structure we use for rendering (createDataTree)
       //merge the current pool's goals with virtual children if any
 
@@ -182,7 +169,8 @@ function Main() {
         [...pool.nexus.goals, ...virtualChildren],
         selectOrderList(order, poolItem.pool.trace, true).map((item: any) => {
           return item.birth;
-        })
+        }),
+        order
       );
       return {
         ...poolItem,
@@ -194,105 +182,6 @@ function Main() {
     setRoleMap(roleMap);
     setAllTags(allTagsSet);
   }, [fetchedPools, order]);
-
-  const fetchInitial = async () => {
-    setLoading({ trying: true, success: false, error: false });
-    try {
-      const result = await api.getData();
-      log("fetchInitial result => ", result);
-      const resultProjects = result.initial.store.pools;
-      //add an alternate step (if selected, should be the default setting) order is decided
-      //here we enforce asc order for pool to not confuse the users
-      /*   const preOrderedPools = resultProjects.sort((aey: any, bee: any) => {
-        return aey.pool.froze.birth - bee.pool.froze.birth;
-      });
-      const orderedPools = orderPools(preOrderedPools, order);
-      */
-      //save the cached pools also in a seperate list
-      setArchivedPools(
-        result.initial.store.cache.map((poolItem: any) => {
-          return { ...poolItem, pool: { ...poolItem.pool, isArchived: true } };
-        })
-      );
-      setFetchedPools(resultProjects);
-      if (result) {
-        setLoading({ trying: false, success: true, error: false });
-      } else {
-        setLoading({ trying: false, success: false, error: true });
-      }
-    } catch (e) {
-      log("fetchInitial error => ", e);
-      setLoading({ trying: false, success: false, error: true });
-    }
-  };
-  const fetchGroups = async () => {
-    try {
-      const results = await api.getGroupData();
-      const groupsMap = new Map(Object.entries(results.groups));
-      const groupsList = Object.entries(results.groups).map((group: any) => {
-        return { name: group[0], memberCount: group[1].members.length };
-      });
-
-      setGroupsData(groupsMap, groupsList);
-    } catch (e) {
-      log("fetchGroups error => ", e);
-    }
-  };
-  const fetchPals = async () => {
-    try {
-      const results = await api.getPals();
-      log("fetchPals results =>", results);
-      if (results) {
-        const newPals = Object.entries(results.outgoing).map(
-          (item) => "~" + item[0]
-        );
-        setPals(newPals);
-      }
-    } catch (e) {
-      log("fetchPals error => ", e);
-    }
-  };
-  const createDataTree = (dataset: any, rootins: any) => {
-    //maybe here we don't just push to childNodes, we also make sure to push at a certain index childNodes[orderOfGoal] = hashTable[ID]
-    const hashTable = Object.create(null);
-    dataset.forEach((aData: any) => {
-      const ID = aData.id.birth;
-      hashTable[ID] = { ...aData, childNodes: [] };
-    });
-
-    const dataTree: any = [];
-    dataset.forEach((aData: any) => {
-      const parentID = aData.goal.nexus?.par?.birth;
-      const ID = aData.id.birth;
-      if (parentID) {
-        if (hashTable[parentID]) {
-          //get the young array into something we can easily use (apply indexOf to)
-          const youngins = selectOrderList(
-            order,
-            hashTable[parentID].goal.nexus,
-            false
-          )?.map((item: any) => {
-            return item.id.birth;
-          });
-          let indexOfChild = youngins.indexOf(ID);
-          //add the child at the index it appears in in youngs
-          hashTable[parentID].childNodes[indexOfChild] = hashTable[ID];
-        }
-      } else {
-        //add at the correct index according to rootins
-        let indexOfRoot = rootins.indexOf(ID);
-        dataTree[indexOfRoot] = hashTable[ID];
-      }
-    });
-    return dataTree;
-  };
-  useEffect(() => {
-    fetchInitial();
-    fetchGroups();
-    fetchPals();
-    window["scry"] = api.scry;
-    window["poke"] = api.poke;
-  }, []);
 
   const roleMap = useStore((store: any) => store.roleMap);
   const selectionMode = useStore((store) => store.selectionMode);
@@ -363,7 +252,9 @@ function Main() {
           })
         )}
 
-        {loading.error && <ErrorAlert onRetry={fetchInitial} />}
+        {
+          //loading.error && <ErrorAlert onRetry={fetchInitial} />
+        }
       </DndProvider>
     </Container>
   );

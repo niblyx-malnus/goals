@@ -5,6 +5,8 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { Main } from "./components";
 import useStore from "./store";
 import { grey } from "@mui/material/colors";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { Details, Home } from "./pages";
 
 //add tooltip to new button in header
 //add feedback to note requests
@@ -50,7 +52,17 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Main />
+      <Router>
+        {/* A <Routes > looks through its children <Route>s and
+        renders the first one that matches the current URL. */}
+        <Routes>
+          <Route path="/apps/gol-cli" element={<Home />} />
+          <Route
+            path="/apps/gol-cli/:type/:owner/:birth"
+            element={<Details />}
+          />
+        </Routes>
+      </Router>
     </ThemeProvider>
   );
 }
