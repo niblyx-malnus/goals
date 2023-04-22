@@ -5,6 +5,7 @@ import { log } from "../helpers";
 import {
   FilterGoals,
   GoalId,
+  Loading,
   Order,
   PinId,
   SnackBarData,
@@ -147,6 +148,9 @@ interface Store {
 
   draggingParentId: string | null; //the id if the parent's goal we're currently dragging
   setDraggingParentId: (draggingParentId: string | null) => void;
+
+  mainLoading: Loading;
+  setMainLoading: (mainLoading: Loading) => void;
 }
 
 /**
@@ -463,6 +467,13 @@ const useStore = create<Store>((set, get) => ({
   draggingParentId: null,
   setDraggingParentId: (draggingParentId: string | null) =>
     set(() => ({ draggingParentId })),
+
+  mainLoading: {
+    trying: true,
+    success: false,
+    error: false,
+  },
+  setMainLoading: (mainLoading: Loading) => set(() => ({ mainLoading })),
 }));
 
 export default useStore;

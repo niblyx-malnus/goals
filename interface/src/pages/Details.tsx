@@ -8,8 +8,8 @@ import { Main } from "../components";
 export default function Details({}) {
   let { type, owner, birth } = useParams();
   const [id, setId] = useState<null | { birth: string; owner: string }>(null);
-  const [goalList, setGoalList] = useState<any>([]);
   const setFetchedPools = useStore((store) => store.setPools);
+  const setMainLoading = useStore((store) => store.setMainLoading);
 
   useEffect(() => {
     if (type && owner && birth) {
@@ -27,15 +27,24 @@ export default function Details({}) {
   }, [id]);
   const getDetailsData = async () => {
     //either fetch goal or pool data depending on type
+    setMainLoading({ trying: true, success: false, error: false });
+
     try {
       const result =
         type === "pool" ? await api.getPool(id) : await api.getGoal(id);
       log("getDetailsData result => ", result);
+      if (result) {
+        setMainLoading({ trying: false, success: true, error: false });
+      } else {
+        setMainLoading({ trying: false, success: false, error: true });
+      }
+
       setFetchedPools([{ pool: result, id: result.id }]);
     } catch (e) {
       log("getDetailsData error => ", e);
+      setMainLoading({ trying: false, success: false, error: true });
     }
   };
 
-  return <Main />;
+  return <Main fetchInitialCallback={getDetailsData} />;
 }

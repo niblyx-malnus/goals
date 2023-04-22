@@ -17,16 +17,11 @@ declare const window: Window &
   };
 export default function Home({}) {
   const setFetchedPools = useStore((store) => store.setPools);
-  const setGroupsData = useStore((store) => store.setGroupsData);
-  const setPals = useStore((store) => store.setPals);
   const setArchivedPools = useStore((store) => store.setArchivedPools);
-  const [loading, setLoading] = useState<Loading>({
-    trying: true,
-    success: false,
-    error: false,
-  });
+  const setMainLoading = useStore((store) => store.setMainLoading);
+
   const fetchInitial = async () => {
-    setLoading({ trying: true, success: false, error: false });
+    setMainLoading({ trying: true, success: false, error: false });
     try {
       const result = await api.getData();
       // {author: 'zod', birth: 1682115616821, owner: 'zod'}
@@ -48,50 +43,21 @@ export default function Home({}) {
       );
       setFetchedPools(resultProjects);
       if (result) {
-        setLoading({ trying: false, success: true, error: false });
+        setMainLoading({ trying: false, success: true, error: false });
       } else {
-        setLoading({ trying: false, success: false, error: true });
+        setMainLoading({ trying: false, success: false, error: true });
       }
     } catch (e) {
       log("fetchInitial error => ", e);
-      setLoading({ trying: false, success: false, error: true });
-    }
-  };
-  const fetchGroups = async () => {
-    try {
-      const results = await api.getGroupData();
-      const groupsMap = new Map(Object.entries(results.groups));
-      const groupsList = Object.entries(results.groups).map((group: any) => {
-        return { name: group[0], memberCount: group[1].members.length };
-      });
-
-      setGroupsData(groupsMap, groupsList);
-    } catch (e) {
-      log("fetchGroups error => ", e);
-    }
-  };
-  const fetchPals = async () => {
-    try {
-      const results = await api.getPals();
-      log("fetchPals results =>", results);
-      if (results) {
-        const newPals = Object.entries(results.outgoing).map(
-          (item) => "~" + item[0]
-        );
-        setPals(newPals);
-      }
-    } catch (e) {
-      log("fetchPals error => ", e);
+      setMainLoading({ trying: false, success: false, error: true });
     }
   };
 
   useEffect(() => {
     fetchInitial();
-    fetchGroups();
-    fetchPals();
     window["scry"] = api.scry;
     window["poke"] = api.poke;
   }, []);
 
-  return <Main />;
+  return <Main fetchInitialCallback={fetchInitial} />;
 }

@@ -25,12 +25,14 @@ import { Loading } from "../types/types";
 //TODO: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
 //TODO: fix groups scry
 //TODO: add loading state to reordering
-//TODO: add loading state for initial as part of the store to be used in different pages
 
-function Main() {
+function Main({ fetchInitialCallback }: any) {
   const order = useStore((store) => store.order);
   const setRoleMap = useStore((store) => store.setRoleMap);
   const fetchedPools = useStore((store) => store.pools);
+
+  const setGroupsData = useStore((store) => store.setGroupsData);
+  const setPals = useStore((store) => store.setPals);
 
   const tryingMap: any = useStore((store) => store.tryingMap);
   const setTryingMap = useStore((store) => store.setTryingMap);
@@ -38,11 +40,9 @@ function Main() {
   const setAllTags = useStore((store) => store.setAllTags);
 
   const [pools, setPools] = useState([]);
-  const [loading, setLoading] = useState<Loading>({
-    trying: false,
-    success: true,
-    error: false,
-  });
+
+  const mainLoading = useStore((store) => store.mainLoading);
+
   const currShip = shipName();
 
   const onSelect = (id: number) => {
@@ -188,12 +188,42 @@ function Main() {
   const selectionModeYokeData = useStore(
     (store) => store.selectionModeYokeData
   );
+  const fetchGroups = async () => {
+    try {
+      const results = await api.getGroupData();
+      const groupsMap = new Map(Object.entries(results.groups));
+      const groupsList = Object.entries(results.groups).map((group: any) => {
+        return { name: group[0], memberCount: group[1].members.length };
+      });
 
+      setGroupsData(groupsMap, groupsList);
+    } catch (e) {
+      log("fetchGroups error => ", e);
+    }
+  };
+  const fetchPals = async () => {
+    try {
+      const results = await api.getPals();
+      log("fetchPals results =>", results);
+      if (results) {
+        const newPals = Object.entries(results.outgoing).map(
+          (item) => "~" + item[0]
+        );
+        setPals(newPals);
+      }
+    } catch (e) {
+      log("fetchPals error => ", e);
+    }
+  };
+  useEffect(() => {
+    fetchGroups();
+    fetchPals();
+  }, []);
   return (
     <Container sx={{ paddingBottom: 10 }}>
       <DndProvider backend={HTML5Backend}>
         <Header />
-        {loading.trying && (
+        {mainLoading.trying && (
           <Stack flexDirection="row" alignItems="center">
             <CircularProgress size={28} />
             <Typography sx={{ marginLeft: 2 }} variant="h6" fontWeight={"bold"}>
@@ -201,7 +231,7 @@ function Main() {
             </Typography>
           </Stack>
         )}
-        {loading.success && pools.length === 0 ? (
+        {mainLoading.success && pools.length === 0 ? (
           <Typography variant="h6" fontWeight={"bold"}>
             Add a pool to get started
           </Typography>
@@ -252,9 +282,7 @@ function Main() {
           })
         )}
 
-        {
-          //loading.error && <ErrorAlert onRetry={fetchInitial} />
-        }
+        {mainLoading.error && <ErrorAlert onRetry={fetchInitialCallback} />}
       </DndProvider>
     </Container>
   );
