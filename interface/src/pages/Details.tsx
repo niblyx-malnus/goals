@@ -39,7 +39,7 @@ export default function Details({}) {
         setMainLoading({ trying: false, success: false, error: true });
       }
 
-      setFetchedPools([{ pool: result, id: result.id }]);
+      setFetchedPools(result.pools);
     } catch (e) {
       log("getDetailsData error => ", e);
       setMainLoading({ trying: false, success: false, error: true });
