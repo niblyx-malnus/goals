@@ -22,6 +22,7 @@ import { blue, orange, green, red, purple } from "@mui/material/colors";
 import api from "../api";
 import { useDrag, useDrop } from "react-dnd";
 import QuickActions from "./QuickActions";
+import { useNavigate } from "react-router-dom";
 
 //TODO: make some components to simplify the logic of this component
 interface GoalItemProps {
@@ -73,7 +74,7 @@ const GoalItem = memo(
       }),
     }));
     const setDraggingParentId = useStore((store) => store.setDraggingParentId);
-
+    const navigate = useNavigate();
     useEffect(() => {
       if (isDragging) {
         setDraggingParentId(parentId);
@@ -454,7 +455,19 @@ const GoalItem = memo(
                 )}
               </Box>
             )}
-            <Box ref={drag}>{renderTitle()}</Box>
+            <Box
+              ref={drag}
+              onClick={() => {
+                navigate(
+                  "/apps/gol-cli/goal/~" +
+                    idObject?.owner +
+                    "/" +
+                    idObject?.birth
+                );
+              }}
+            >
+              {renderTitle()}
+            </Box>
             {tags.map((tag: any) => {
               return (
                 <Chip

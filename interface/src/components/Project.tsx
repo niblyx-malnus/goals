@@ -20,6 +20,8 @@ import Stack from "@mui/material/Stack";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
 import QuickActions from "./QuickActions";
+import { useNavigate } from "react-router-dom";
+
 const Project = memo(
   ({
     title,
@@ -43,6 +45,8 @@ const Project = memo(
     note: string;
   }) => {
     //TODO: add the store type
+    const navigate = useNavigate();
+
     const collapseAll = useStore((store: any) => store.collapseAll);
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
@@ -255,7 +259,13 @@ const Project = memo(
               )}
             </Box>
           )}
-          {renderTitle()}
+          <Box
+            onClick={() => {
+              navigate("/apps/gol-cli/pool/~" + pin?.owner + "/" + pin?.birth);
+            }}
+          >
+            {renderTitle()}
+          </Box>
           {renderArchivedTag()}
           {renderIconMenu()}
           {renderAddButton()}
