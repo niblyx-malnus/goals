@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Loading } from "../types/types";
+import { useNavigate } from "react-router-dom";
 
 //TODO: handle sub kick/error
 //TODO: order the virtual children
@@ -218,6 +219,8 @@ function Main({ fetchInitialCallback }: any) {
     fetchGroups();
     fetchPals();
   }, []);
+  const navigate = useNavigate();
+
   return (
     <Container sx={{ paddingBottom: 10 }}>
       <DndProvider backend={HTML5Backend}>
@@ -230,6 +233,14 @@ function Main({ fetchInitialCallback }: any) {
             </Typography>
           </Stack>
         )}
+        <Button
+          onClick={() => {
+            navigate("/apps/gol-cli");
+          }}
+        >
+          {" "}
+          Navigate Home
+        </Button>
         {mainLoading.success && pools.length === 0 ? (
           <Typography variant="h6" fontWeight={"bold"}>
             Add a pool to get started

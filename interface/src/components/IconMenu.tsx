@@ -18,7 +18,7 @@ import OpenWithOutlinedIcon from "@mui/icons-material/OpenWithOutlined";
 import LinkOutlinedIcon from "@mui/icons-material/LinkOutlined";
 import RestoreOutlinedIcon from "@mui/icons-material/RestoreOutlined";
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
-
+import { useNavigate } from "react-router-dom";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import { GoalId, PinId } from "../types/types";
@@ -104,6 +104,7 @@ export default function IconMenu({
   onEditPoolNote?: Function;
   onEditGoalNote?: Function;
 }) {
+  const navigate = useNavigate();
   const id = isVirtual ? virtualId : goalId;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -443,10 +444,19 @@ export default function IconMenu({
         <MenuItem
           onClick={() => {
             handleClose();
+            navigate("/apps/gol-cli/goal/~" + id?.owner + "/" + id?.birth);
+          }}
+          disableRipple
+        >
+          Go to page
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
             toggleGoalTagsDialog(true, {
               title: currentGoal.hitch.desc,
               id,
-              tags: currentGoal.hitch.tags
+              tags: currentGoal.hitch.tags,
             });
           }}
           disableRipple
@@ -581,6 +591,18 @@ export default function IconMenu({
       <div>
         {(role === "owner" || role === "admin") && (
           <>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                navigate(
+                  "/apps/gol-cli/pool/~" + pin?.owner + "/" + pin?.birth
+                );
+              }}
+              disableRipple
+            >
+              <PeopleAltOutlinedIcon fontSize="small" />
+              go to page{" "}
+            </MenuItem>
             <MenuItem
               onClick={() => {
                 handleClose();
