@@ -429,6 +429,8 @@ const GoalItem = memo(
               },
             },
           }}
+          direction={"row"}
+          flexWrap={"wrap"}
         >
           <>
             {!trying && (
@@ -488,14 +490,10 @@ const GoalItem = memo(
             {renderQuickActions()}
           </>
           {!editingTitle && !harvestGoal && (
-            <Stack
-              direction={"row"}
-              alignItems="center"
-              className="show-on-hover"
-              spacing={1}
-              sx={{ opacity: 0 }}
-            >
+            <>
               <Chip
+                className="show-on-hover"
+                sx={{ opacity: 0 }}
                 size="small"
                 avatar={
                   <Badge
@@ -530,6 +528,8 @@ const GoalItem = memo(
               {/*current ship's role on goal*/}
               {goalRole && (
                 <Chip
+                  className="show-on-hover"
+                  sx={{ opacity: 0 }}
                   size="small"
                   label={
                     <Typography fontWeight={"bold"}>{goalRole}</Typography>
@@ -538,7 +538,7 @@ const GoalItem = memo(
                   variant="outlined"
                 />
               )}
-            </Stack>
+            </>
           )}
         </StyledTreeItem>
         {editingNote && (
@@ -628,7 +628,7 @@ const StyledLabel = styled(Box)({
     cursor: "pointer",
   },
 });
-const StyledTreeItem = styled(Box)({
+const StyledTreeItem = styled(Stack)({
   display: "flex",
   flexDirection: "row",
   alignItems: "center",

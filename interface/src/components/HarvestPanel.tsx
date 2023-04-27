@@ -16,8 +16,6 @@ import AgricultureIcon from "@mui/icons-material/Agriculture";
 import api from "../api";
 import Tooltip from "@mui/material/Tooltip";
 
-const drawerWidth = 300;
-
 export default function HarvestPanel() {
   const open = useStore((store: any) => store.harvestPanelOpen);
   const [harvestGoals, setHarvestGoals] = useState([]);
@@ -89,98 +87,58 @@ export default function HarvestPanel() {
     }
   };
   return (
-    <Box
-      sx={{
-        display: "flex",
-      }}
-    >
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open}
-      >
-        <Stack
-          direction="row"
-          alignItems={"center"}
-          justifyContent="space-between"
-          margin={1}
+    <Stack direction={"column"}>
+      <Stack direction="row" alignItems={"center"} flexWrap="wrap">
+        <Typography
+          color={"text.primary"}
+          variant="h6"
+          sx={{
+            wordWrap: "break-word",
+            width: "100%",
+          }}
         >
-          <Typography color={"text.primary"} variant="h6">
-            Harvest Panel
-          </Typography>
-          <IconButton onClick={handleDrawerClose}>
-            <ClearIcon />
-          </IconButton>
-        </Stack>
-        <Divider />
-        <Stack
-          direction="row"
-          alignItems={"center"}
-          padding={1}
-          flexWrap="wrap"
-        >
-          <Typography
-            color={"text.primary"}
-            variant="h6"
-            sx={{
-              wordWrap: "break-word",
-              width: "100%",
-            }}
+          {startGoalTile}
+          <Tooltip
+            title="Click to refresh harvested goals"
+            placement="right"
+            arrow
           >
-            {startGoalTile}
-            <Tooltip
-              title="Click to refresh harvested goals"
-              placement="right"
-              arrow
-            >
-              <IconButton onClick={() => handleHarvestGoal()} color="primary">
-                <AgricultureIcon />
-              </IconButton>
-            </Tooltip>
+            <IconButton onClick={() => handleHarvestGoal()} color="primary">
+              <AgricultureIcon />
+            </IconButton>
+          </Tooltip>
+        </Typography>
+      </Stack>
+      <Stack direction={"column"}>
+        {harvestGoals?.map((goal: any) => {
+          const currentGoal = goal.goal;
+          const currentGoalId = goal.id.birth;
+          return (
+            <GoalItem
+              parentId=""
+              children={[]}
+              goal={currentGoal}
+              poolRole={harvestData.role}
+              id={currentGoalId}
+              isSelected={currentGoal.selected}
+              key={"harvest-" + currentGoalId}
+              idObject={goal.id}
+              label={currentGoal.hitch.desc}
+              disabled={true}
+              inSelectionMode={false}
+              pin={harvestData.pin}
+              harvestGoal={true}
+              yokingGoalId={"not in selection mode, so I wont use this"}
+              note=""
+            />
+          );
+        })}
+        {harvestGoals?.length === 0 && (
+          <Typography color={"text.primary"} variant="h6">
+            Nothing to harvest
           </Typography>
-        </Stack>
-        <Divider />
-        <Stack margin={1} direction={"column"}>
-          {harvestGoals?.map((goal: any) => {
-            const currentGoal = goal.goal;
-            const currentGoalId = goal.id.birth;
-            return (
-              <GoalItem
-                parentId=""
-                children={[]} 
-                goal={currentGoal}
-                poolRole={harvestData.role}
-                id={currentGoalId}
-                isSelected={currentGoal.selected}
-                key={"harvest-" + currentGoalId}
-                idObject={goal.id}
-                label={currentGoal.hitch.desc}
-                disabled={true}
-                inSelectionMode={false}
-                pin={harvestData.pin}
-                harvestGoal={true}
-                yokingGoalId={"not in selection mode, so I wont use this"}
-                note="placeholder note in harvest panel"
-              />
-            );
-          })}
-          {harvestGoals?.length === 0 && (
-            <Typography color={"text.primary"} variant="h6">
-              Nothing to harvest
-            </Typography>
-          )}
-        </Stack>
-        <Divider />
-      </Drawer>
-    </Box>
+        )}
+      </Stack>
+    </Stack>
   );
 }

@@ -59,5 +59,5 @@ export default function Home({}) {
     window["poke"] = api.poke;
   }, []);
 
-  return <Main fetchInitialCallback={fetchInitial} />;
+  return <Main fetchInitialCallback={fetchInitial} displayPools={true} />;
 }

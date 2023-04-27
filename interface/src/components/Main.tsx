@@ -9,12 +9,15 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
-import { Header, Project } from "./";
+import { HarvestPanel, Header, Project } from "./";
 import { v4 as uuidv4 } from "uuid";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Loading } from "../types/types";
 import { useNavigate } from "react-router-dom";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
 
 //TODO: handle sub kick/error
 //TODO: order the virtual children
@@ -26,8 +29,15 @@ import { useNavigate } from "react-router-dom";
 //TODO: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
 //TODO: fix groups scry
 //TODO: add loading state to reordering
+//TODO: fix virtual kids rerendering
 
-function Main({ fetchInitialCallback }: any) {
+function Main({ fetchInitialCallback, displayPools, disableAddPool }: any) {
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
   const order = useStore((store) => store.order);
   const setRoleMap = useStore((store) => store.setRoleMap);
   const fetchedPools = useStore((store) => store.pools);
@@ -224,7 +234,7 @@ function Main({ fetchInitialCallback }: any) {
   return (
     <Container sx={{ paddingBottom: 10 }}>
       <DndProvider backend={HTML5Backend}>
-        <Header />
+        <Header disableAddPool={disableAddPool} />
         {mainLoading.trying && (
           <Stack flexDirection="row" alignItems="center">
             <CircularProgress size={28} />
@@ -241,58 +251,93 @@ function Main({ fetchInitialCallback }: any) {
           {" "}
           Navigate Home
         </Button>
-        {mainLoading.success && pools.length === 0 ? (
-          <Typography variant="h6" fontWeight={"bold"}>
-            Add a pool to get started
-          </Typography>
-        ) : (
-          pools.map((pool: any, index: any) => {
-            const poolTitle = pool.pool.hitch.title;
-            const poolNote = pool.pool.hitch.note;
-            const poolId = pool.pin.birth;
-            const poolOwner = pool.pin.owner;
-            const goalList = pool.pool.nexus.goals;
-            const permList = pool.pool.perms;
-            const role = roleMap?.get(poolId);
-            let inSelectionMode = false;
-            let disabled = false;
-            //we toggle into selection mode or disable the pool (disabling is a TODO)
-            if (selectionMode) {
-              //does the yoke selection stem from one of my goals?
-              if (selectionModeYokeData?.poolId.birth === poolId) {
-                inSelectionMode = true;
-              } else {
-                disabled = true;
-              }
-            }
-            return (
-              <Project
-                title={poolTitle}
-                note={poolNote}
-                poolOwner={poolOwner}
-                key={poolId}
-                pin={pool.pin}
-                goalsLength={goalList?.length}
-                permList={permList}
-                role={role}
-                isArchived={pool.pool.isArchived}
-              >
-                <RecursiveTree
-                  goalList={goalList}
-                  onSelectCallback={onSelect}
-                  pin={pool.pin}
-                  poolRole={role}
-                  inSelectionMode={inSelectionMode}
-                  disabled={disabled}
-                  yokingGoalId={selectionModeYokeData?.goalId.birth}
-                  poolArchived={pool.pool.isArchived}
-                />
-              </Project>
-            );
-          })
-        )}
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label="basic tabs example"
+          >
+            <Tab label="Tree View" {...a11yProps(0)} />
+            <Tab label="Harvest View" {...a11yProps(1)} />
+            <Tab label="List View" {...a11yProps(2)} />
+          </Tabs>
+        </Box>
 
-        {mainLoading.error && <ErrorAlert onRetry={fetchInitialCallback} />}
+        <TabPanel value={value} index={1}>
+          <HarvestPanel />
+        </TabPanel>
+        <TabPanel value={value} index={2}>
+          Item Three
+        </TabPanel>
+        <TabPanel value={value} index={0} key={0}>
+          {mainLoading.success && pools.length === 0 ? (
+            <Typography variant="h6" fontWeight={"bold"}>
+              Add a pool to get started
+            </Typography>
+          ) : (
+            pools.map((pool: any, index: any) => {
+              const poolTitle = pool.pool.hitch.title;
+              const poolNote = pool.pool.hitch.note;
+              const poolId = pool.pin.birth;
+              const poolOwner = pool.pin.owner;
+              const goalList = pool.pool.nexus.goals;
+              const permList = pool.pool.perms;
+              const role = roleMap?.get(poolId);
+              let inSelectionMode = false;
+              let disabled = false;
+              //we toggle into selection mode or disable the pool (disabling is a TODO)
+              if (selectionMode) {
+                //does the yoke selection stem from one of my goals?
+                if (selectionModeYokeData?.poolId.birth === poolId) {
+                  inSelectionMode = true;
+                } else {
+                  disabled = true;
+                }
+              }
+              if (displayPools) {
+                return (
+                  <Project
+                    title={poolTitle}
+                    note={poolNote}
+                    poolOwner={poolOwner}
+                    key={poolId}
+                    pin={pool.pin}
+                    goalsLength={goalList?.length}
+                    permList={permList}
+                    role={role}
+                    isArchived={pool.pool.isArchived}
+                  >
+                    <RecursiveTree
+                      goalList={goalList}
+                      onSelectCallback={onSelect}
+                      pin={pool.pin}
+                      poolRole={role}
+                      inSelectionMode={inSelectionMode}
+                      disabled={disabled}
+                      yokingGoalId={selectionModeYokeData?.goalId.birth}
+                      poolArchived={pool.pool.isArchived}
+                    />
+                  </Project>
+                );
+              } else {
+                return (
+                  <RecursiveTree
+                    goalList={goalList}
+                    onSelectCallback={onSelect}
+                    pin={pool.pin}
+                    poolRole={role}
+                    inSelectionMode={inSelectionMode}
+                    disabled={disabled}
+                    yokingGoalId={selectionModeYokeData?.goalId.birth}
+                    poolArchived={pool.pool.isArchived}
+                  />
+                );
+              }
+            })
+          )}
+
+          {mainLoading.error && <ErrorAlert onRetry={fetchInitialCallback} />}
+        </TabPanel>
       </DndProvider>
     </Container>
   );
@@ -314,4 +359,33 @@ function ErrorAlert({ onRetry }: { onRetry: Function }) {
   );
 }
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+      style={{ display: value === index ? "inline-block" : "none" }}
+    >
+      <Box sx={{ p: 3 }}>{children}</Box>
+    </div>
+  );
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
 export default Main;

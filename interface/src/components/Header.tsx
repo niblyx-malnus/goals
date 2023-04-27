@@ -50,7 +50,11 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 const filterOptions = () => ["Complete", "Incomplete", "Actionable"];
 
-export default function Header() {
+export default function Header({
+  disableAddPool = false,
+}: {
+  disableAddPool: boolean;
+}) {
   const theme = useTheme();
   const setColorMode = useStore((store) => store.setColorMode);
 
@@ -60,7 +64,7 @@ export default function Header() {
 
   const order = useStore((store) => store.order);
   const setOrder = useStore((store) => store.setOrder);
-  
+
   const selectionMode = useStore((store) => store.selectionMode);
 
   const setFilterGoals = useStore((store) => store.setFilterGoals);
@@ -177,12 +181,14 @@ export default function Header() {
         top: 0,
         paddingTop: 2,
         marginBottom: 2,
+        backgroundColor: "background.default",
       }}
       zIndex={1}
+      direction={"row"}
+      flexWrap={"wrap"}
     >
       <ShareDialog />
       {selectionMode ? <YokingActionBar /> : <Log />}
-      <HarvestPanel />
       <DeletionDialog />
       <LeaveDialog />
       <TimelineDialog />
@@ -194,33 +200,35 @@ export default function Header() {
       <GoalTagsDialog />
       <FilterTagsDialog />
       <Snackie />
-      <Stack direction="row" alignItems="center" spacing={1}>
-        <OutlinedInput
-          id="add-new-pool"
-          placeholder="Add Pool"
-          value={newProjectTitle}
-          onChange={handleChange}
-          size={"small"}
-          type={"text"}
-          disabled={trying}
-          onKeyDown={handleKeyDown}
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="toggle password visibility"
-                onClick={addNewPool}
-                edge="end"
-                disabled={trying || newProjectTitle?.length === 0}
-              >
-                {trying ? (
-                  <CircularProgress size={24} style={{ padding: 1 }} />
-                ) : (
-                  <AddIcon />
-                )}
-              </IconButton>
-            </InputAdornment>
-          }
-        />
+      <Stack direction="row" alignItems="center" spacing={1} flexWrap={"wrap"}>
+        {!disableAddPool && (
+          <OutlinedInput
+            id="add-new-pool"
+            placeholder="Add Pool"
+            value={newProjectTitle}
+            onChange={handleChange}
+            size={"small"}
+            type={"text"}
+            disabled={trying}
+            onKeyDown={handleKeyDown}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={addNewPool}
+                  edge="end"
+                  disabled={trying || newProjectTitle?.length === 0}
+                >
+                  {trying ? (
+                    <CircularProgress size={24} style={{ padding: 1 }} />
+                  ) : (
+                    <AddIcon />
+                  )}
+                </IconButton>
+              </InputAdornment>
+            }
+          />
+        )}
         <Box sx={{ width: 160 }}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Sorting</InputLabel>
@@ -255,25 +263,25 @@ export default function Header() {
             )}
           />
         </Box>
-        <FormControlLabel
-          sx={{ height: 36.5 }}
-          label="Show Archived"
-          control={
-            <Checkbox
-              sx={{ padding: 0.75 }}
-              checked={showArchived}
-              onChange={handleShowArchived}
-            />
-          }
-        />
-        <Stack flexDirection="row" justifyContent="flex-start">
-          <IconButton onClick={() => setCollapseAll(true)}>
-            <KeyboardDoubleArrowDownIcon />
-          </IconButton>
-          <IconButton onClick={() => setCollapseAll(false)}>
-            <KeyboardDoubleArrowUpIcon />
-          </IconButton>
-        </Stack>
+        <Box sx={{ width: 160 }}>
+          <FormControlLabel
+            sx={{ height: 36.5 }}
+            label="Show Archived"
+            control={
+              <Checkbox
+                sx={{ padding: 0.75 }}
+                checked={showArchived}
+                onChange={handleShowArchived}
+              />
+            }
+          />
+        </Box>
+        <IconButton onClick={() => setCollapseAll(true)}>
+          <KeyboardDoubleArrowDownIcon />
+        </IconButton>
+        <IconButton onClick={() => setCollapseAll(false)}>
+          <KeyboardDoubleArrowUpIcon />
+        </IconButton>
         <Tooltip title="Join a pool using a link" placement="right" arrow>
           <IconButton
             aria-label="toggle password visibility"
@@ -285,26 +293,19 @@ export default function Header() {
             <LoginOutlinedIcon />
           </IconButton>
         </Tooltip>
-        <Box
-          sx={{
-            bgcolor: "background.default",
-            color: "text.primary",
+
+        <IconButton
+          onClick={() => {
+            setColorMode(theme.palette.mode === "dark" ? "light" : "dark");
           }}
+          color="inherit"
         >
-          <IconButton
-            onClick={() => {
-              setColorMode(theme.palette.mode === "dark" ? "light" : "dark");
-              log("hehehehe");
-            }}
-            color="inherit"
-          >
-            {theme.palette.mode === "dark" ? (
-              <Brightness7Icon />
-            ) : (
-              <Brightness4Icon />
-            )}
-          </IconButton>
-        </Box>
+          {theme.palette.mode === "dark" ? (
+            <Brightness7Icon />
+          ) : (
+            <Brightness4Icon />
+          )}
+        </IconButton>
         <IconButton
           onClick={() => {
             toggleFilterTagsDialog(true);

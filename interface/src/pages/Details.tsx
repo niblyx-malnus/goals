@@ -46,5 +46,11 @@ export default function Details({}) {
     }
   };
 
-  return <Main fetchInitialCallback={getDetailsData} />;
+  return (
+    <Main
+      fetchInitialCallback={getDetailsData}
+      displayPools={type === "pool"}
+      disableAddPool={true}
+    />
+  );
 }

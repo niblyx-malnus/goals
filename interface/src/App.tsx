@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import {
+  createTheme,
+  ThemeProvider,
+  responsiveFontSizes,
+} from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Main } from "./components";
 import useStore from "./store";
@@ -44,11 +48,12 @@ function App() {
     }
   }, [prefersDarkMode]);
 
-  const theme = React.useMemo(
+  let theme = React.useMemo(
     () => createTheme(getDesignTokens(colorMode)),
     [colorMode]
   );
 
+  theme = responsiveFontSizes(theme);
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
