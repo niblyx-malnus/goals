@@ -415,7 +415,7 @@
     precs
   (fix-list old new)
 ::
-:: get uncompleted leaf goals whose deadlines are left of id
+:: get uncompleted leaf goals whose deadlines are left of nid
 ++  harvests
   |=  [=nid:gol vis=(map nid:gol (set id:gol))]
   ^-  (map nid:gol (set id:gol))
@@ -454,7 +454,7 @@
     ==
   ::
   :: work backwards from deadline
-  (((traverse nid:gol (set id:gol) (map nid:gol (set id:gol))) gine ~) nid)
+  (((traverse nid:gol (set id:gol) (map nid:gol (set id:gol))) gine vis) nid)
 ::
 ++  harvest
   |=(=id:gol `(set id:gol)`(~(got by (harvests [%d id] ~)) [%d id]))
@@ -463,7 +463,8 @@
   |.
   ^-  (set id:gol)
   =/  root-nodes  (root-nodes:nd)
-  =/  vis  ((chain nid:gol (set id:gol)) harvests root-nodes ~)
+  =/  vis=(map nid:gol (set id:gol))
+    ((chain nid:gol (set id:gol)) harvests root-nodes ~)
   =|  harvest=(set id:gol)
   |-  ?~  root-nodes  harvest
   %=  $

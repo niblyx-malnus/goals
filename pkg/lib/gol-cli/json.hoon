@@ -1,6 +1,54 @@
 /-  *goal
 /+  *gol-cli-util
 |%
+++  dejs-ask
+  =,  dejs:format
+  |^  ^-  $-(json ask)
+  %-  of
+  :~  :-  %harvest
+      %-  ot
+      :~  type+dejs-harvest-type
+      ==
+      :-  %list-view
+      %-  ot
+      :~  type+dejs-list-view-type
+          first-gen-only+bo
+          actionable-only+bo
+          =/  cuk  |=(=@t ;;(?(%any %all) t))
+          =/  par  ;~(pose (jest 'any') (jest 'all'))
+          method+(su (cook cuk par))
+          tags+(as dejs-tag)
+      ==
+  ==
+  ++  dejs-harvest-type
+    %-  of
+    :~  main+|=(jon=json ?>(?=(~ jon) ~))
+        pool+dejs-pin
+        goal+dejs-id
+    ==
+  ++  dejs-list-view-type
+    %-  of
+    :~  main+|=(jon=json ?>(?=(~ jon) ~))
+        pool+dejs-pin
+        goal+(ot ~[id+dejs-id ignore-virtual+bo])
+    ==
+--
+::
+++  enjs-say
+  =,  enjs:format
+  |=  =say
+  |^  ^-  json
+  %-  pairs
+  :~  [%goals-list a+(turn goals.say enjs-id-goal)]
+  ==
+  ++  enjs-id-goal
+    |=  [=id =goal]
+    %-  pairs
+    :~  [%id (enjs-id id)]
+        [%goal (enjs-goal goal)]
+    ==
+  --
+::
 ++  dejs-action
   =,  dejs:format
   |=  jon=json
@@ -353,8 +401,12 @@
   |=  pyk=peek
   ^-  json
   ?-    -.pyk
-      %initial
+      %store
     %+  frond
+      %store
+    %-  pairs
+    :~  [%store (enjs-store store.pyk)]
+    ==
       %initial
     %-  pairs
     :~  [%store (enjs-store store.pyk)]

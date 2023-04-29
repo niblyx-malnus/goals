@@ -62,6 +62,8 @@
 +$  logged        logged:s5
 +$  log           log:s5
 ::
++$  ask           ask:s5
++$  say           say:s5
 +$  peek          peek:s5
 ::
 +$  core-yoke     core-yoke:s5
@@ -284,6 +286,7 @@
   ::
   +$  peek
     $%  [%initial =store]
+        [%store =store]
         [%updates =(list logged)]
         [%pool-keys keys=(set pin)]
         [%all-goal-keys keys=(set id)]
@@ -294,6 +297,28 @@
         [%pools =pools]
         [%pool-hitch ph=pool-hitch]
         [%goal-hitch gh=goal-hitch]
+    ==
+  ::
+  +$  ask
+    $%  $:  %harvest
+            type=?([%main ~] [%pool =pin] [%goal =id])
+        ==
+        $:  %list-view
+            type=list-view-type
+            first-gen-only=_|
+            actionable-only=_|
+            method=?(%any %all)
+            tags=(set tag)
+        ==
+    ==
+  +$  list-view-type
+    $%  [%main ~]
+        [%pool =pin]
+        [%goal =id ignore-virtual=_|]
+    ==
+  ::
+  +$  say
+    $%  [%goals-list goals=(list [id goal])]
     ==
   ::
   +$  core-yoke     core-yoke:s4

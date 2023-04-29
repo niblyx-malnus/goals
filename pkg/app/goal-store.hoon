@@ -6,6 +6,7 @@
 :: import during development to force compilation
 ::
     gol-cli-json
+/=  ga-  /gen/gol-cli/ask
 |%
 +$  state-0  state-0:gol
 +$  state-1  state-1:gol  
@@ -58,7 +59,9 @@
 ++  on-init   
   ^-  (quip card _this)
   =/  now=@  (unique-time now.bowl log)
-  `this(log (put:log-orm *log:gol now [%init store]))
+  :_  this(log (put:log-orm *log:gol now [%init store]))
+  =/  =path  /apps/gol-cli/gen/ask
+  [%pass /bind-ask %arvo %e %serve `path %gol-cli /gen/gol-cli/ask/hoon ~]~
 ::
 ++  on-save   !>(state)
 ::
@@ -79,7 +82,10 @@
           [pin (inflate-pool:fl pool)]
       ==
     =/  now=@  (unique-time now.bowl log)
-    `this(state old(log (put:log-orm *log:gol now [%init store.old])))
+    :_  this(state old(log (put:log-orm *log:gol now [%init store.old])))
+    =/  =path  /apps/gol-cli/gen/ask
+    [%pass /bind-ask %arvo %e %serve `path %gol-cli /gen/gol-cli/ask/hoon ~]~
+    ::
       %4
     $(old (convert-4-to-5:gol old))
       %3
@@ -119,9 +125,11 @@
 ++  on-leave  on-leave:def
 ::
 ++  on-peek
-  |=  =path
+  |=  =(pole knot)
   ^-  (unit (unit cage))
-  ?+    path  (on-peek:def path)
+  ?+    pole  (on-peek:def pole)
+    [%x %store ~]  ``goal-peek+!>([%store store])
+
       [%x %initial ~]
     |^
     =;  init
@@ -155,13 +163,13 @@
       ==
     --
     ::
-      [%x %updates *]
-    ?+    t.t.path  (on-peek:def path)
+      [%x %updates rest=*]
+    ?+    rest.pole  (on-peek:def pole)
         [%all ~]
       ``goal-peek+!>(updates+(tap:log-orm log))
       ::
-        [%since @ ~]
-      =/  since=@  (rash i.t.t.t.path dem)
+        [%since s=@ ~]
+      =/  since=@  (rash s.rest.pole dem)
       ``goal-peek+!>(updates+(tap:log-orm (lot:log-orm log `since ~)))
     ==
     ::
@@ -172,11 +180,11 @@
     =;  keys  ``goal-peek+!>(all-goal-keys+keys)
     (turn (tap:idx-orm:gol index) |=([=id:gol pin:gol] id))
     ::
-      [%x %goal @ @ *]
-    =/  owner  (slav %p i.t.t.path)
-    =/  birth  (slav %da i.t.t.t.path)
+      [%x %goal p=@ da=@ rest=*]
+    =/  owner  (slav %p p.pole)
+    =/  birth  (slav %da da.pole)
     =/  id  `id:gol`[owner birth]
-    ?+    t.t.t.t.path  (on-peek:def path)
+    ?+    rest.pole  (on-peek:def pole)
         [%descendents ~] :: includes nested
       =/  =pin:gol    (got:idx-orm:gol index id)
       =/  =pool:gol   (~(got by pools) pin)
@@ -211,11 +219,11 @@
       ``goal-peek+!>(full-harvest+(full-harvest:tv id order.local.store))
       ::
     ==
-      [%x %pool @ @ *]
-    =/  owner  (slav %p i.t.t.path)
-    =/  birth  (slav %da i.t.t.t.path)
+      [%x %pool p=@ da=@ rest=*]
+    =/  owner  (slav %p p.pole)
+    =/  birth  (slav %da da.pole)
     =/  pin  `pin:gol`[%pin owner birth]
-    ?+    t.t.t.t.path  (on-peek:def path)
+    ?+    rest.pole  (on-peek:def pole)
         ~
       =;  =pools:gol  ``goal-peek+!>(pools+pools)
       (~(put by *pools:gol) pin (~(got by pools) pin))
@@ -281,7 +289,13 @@
     ==
   ==
 ::
-++  on-arvo   on-arvo:def
+++  on-arvo
+  |=  [=wire =sign-arvo]
+  ^-  (quip card _this)
+  ?+  wire  (on-arvo:def wire sign-arvo)
+    [%bind-ask ~]  ?>(?=([%eyre %bound %.y *] sign-arvo) `this)
+  ==
+::
 ++  on-fail   on-fail:def
 --
 |_  [=bowl:gall cards=(list card)]
