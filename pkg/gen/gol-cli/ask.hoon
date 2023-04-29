@@ -15,6 +15,8 @@
 =/  =store:gol  +:.^([%store store:gol] %gx (en-beam bec(q %goal-store) /store/goal-peek))
 =*  etch  ~(. gol-cli-etch store)
 ::
+?>  authenticated :: this can change if e.g. we want to display public pools
+::
 ?-    -.ask
     %harvest
   ?-    -.type.ask
