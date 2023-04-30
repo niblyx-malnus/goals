@@ -8,18 +8,22 @@
   :~  :-  %harvest
       %-  ot
       :~  type+dejs-harvest-type
+          method+dejs-method
+          tags+(as dejs-tag)
       ==
       :-  %list-view
       %-  ot
       :~  type+dejs-list-view-type
           first-gen-only+bo
           actionable-only+bo
-          =/  cuk  |=(=@t ;;(?(%any %all) t))
-          =/  par  ;~(pose (jest 'any') (jest 'all'))
-          method+(su (cook cuk par))
+          method+dejs-method
           tags+(as dejs-tag)
       ==
   ==
+  ++  dejs-method
+    =/  cuk  |=(=@t ;;(?(%any %all) t))
+    =/  par  ;~(pose (jest 'any') (jest 'all'))
+    (su (cook cuk par))
   ++  dejs-harvest-type
     %-  of
     :~  main+|=(jon=json ?>(?=(~ jon) ~))

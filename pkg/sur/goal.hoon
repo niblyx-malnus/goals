@@ -302,6 +302,8 @@
   +$  ask
     $%  $:  %harvest
             type=?([%main ~] [%pool =pin] [%goal =id])
+            method=?(%any %all)
+            tags=(set tag)
         ==
         $:  %list-view
             type=list-view-type

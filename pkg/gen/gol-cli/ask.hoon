@@ -17,29 +17,90 @@
 ::
 ?>  authenticated :: this can change if e.g. we want to display public pools
 ::
+|^
 ?-    -.ask
     %harvest
   ?-    -.type.ask
       %main
-    =/  tv  ~(. gol-cli-traverse all-goals:etch)
+    =/  all-goals  (unify-tags all-goals:etch)
+    =/  tv  ~(. gol-cli-traverse all-goals)
     =/  goals=(list [id:gol goal:gol])
       (full-goals-harvest:tv order.local.store)
-    goals-list+(full-goals-harvest:tv order.local.store)
+    :: filter tags
+    ::
+    =.  goals
+      %+  murn  goals
+      |=  [=id:gol =goal:gol]
+      ?-    method.ask
+          %any
+        ?:  =(~ (~(int in tags.ask) tags.goal))
+          ~
+        (some [id goal])
+        ::
+          %all
+        ?.  =(tags.ask (~(int in tags.ask) tags.goal))
+          ~
+        (some [id goal])
+      ==
+    :: order according to order.local.store
+    ::
+    [%goals-list goals]
     ::
       %pool
     =/  pool  (~(got by pools.store) pin.type.ask)
+    =.  goals.pool  (unify-tags goals.pool)
     =/  tv  ~(. gol-cli-traverse goals.pool)
-    goals-list+(full-goals-harvest:tv order.local.store)
+    =/  goals=(list [id:gol goal:gol])
+      (full-goals-harvest:tv order.local.store)
+    :: filter tags
+    ::
+    =.  goals
+      %+  murn  goals
+      |=  [=id:gol =goal:gol]
+      ?-    method.ask
+          %any
+        ?:  =(~ (~(int in tags.ask) tags.goal))
+          ~
+        (some [id goal])
+        ::
+          %all
+        ?.  =(tags.ask (~(int in tags.ask) tags.goal))
+          ~
+        (some [id goal])
+      ==
+    :: order according to order.local.store
+    ::
+    [%goals-list goals]
     ::
       %goal
     =/  =pin:gol  (got:idx-orm:gol index.store id.type.ask)
     =/  pool  (~(got by pools.store) pin)
+    =.  goals.pool  (unify-tags goals.pool)
     =/  tv  ~(. gol-cli-traverse goals.pool)
-    goals-list+(full-harvest:tv id.type.ask order.local.store)
+    =/  goals=(list [id:gol goal:gol])
+      (full-harvest:tv id.type.ask order.local.store)
+    :: filter tags
+    ::
+    =.  goals
+      %+  murn  goals
+      |=  [=id:gol =goal:gol]
+      ?-    method.ask
+          %any
+        ?:  =(~ (~(int in tags.ask) tags.goal))
+          ~
+        (some [id goal])
+        ::
+          %all
+        ?.  =(tags.ask (~(int in tags.ask) tags.goal))
+          ~
+        (some [id goal])
+      ==
+    :: order according to order.local.store
+    ::
+    [%goals-list goals]
   ==
   ::
     %list-view
-  |^
   ?-    -.type.ask
       %main
     =/  all-goals  (unify-tags all-goals:etch)
@@ -168,20 +229,20 @@
     ::
     [%goals-list goals]
   ==
-  ++  unify-tags
-    |=  =goals:gol
-    ^-  goals:gol
-    %-  ~(gas by *goals:gol)
-    %+  turn  ~(tap by goals)
-    |=  [=id:gol =goal:gol]
-    ^-  [id:gol goal:gol]
-    :-  id
-    %=    goal
-        tags
-     %-  ~(uni in tags.goal)
-     ?~  get=(~(get by goals.local.store) id)
-       ~
-     tags.u.get
-    ==
-  --
 ==
+++  unify-tags
+  |=  =goals:gol
+  ^-  goals:gol
+  %-  ~(gas by *goals:gol)
+  %+  turn  ~(tap by goals)
+  |=  [=id:gol =goal:gol]
+  ^-  [id:gol goal:gol]
+  :-  id
+  %=    goal
+      tags
+   %-  ~(uni in tags.goal)
+   ?~  get=(~(get by goals.local.store) id)
+     ~
+   tags.u.get
+  ==
+--
