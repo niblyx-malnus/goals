@@ -380,7 +380,8 @@
       |=  [=id:gol actionable=?(%.y %.n)]
       ^-  pool:gol
       =/  goal  (~(got by goals.p) id)
-      p(goals (~(put by goals.p) id goal(actionable actionable)))
+      =.  goals.p  (~(put by goals.p) id goal(actionable actionable))
+      (inflate-pool:fl p)  :: keeping track of complete/total
     --
   --
 ::
