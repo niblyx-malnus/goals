@@ -3,21 +3,28 @@
 |%
 ++  dejs-ask
   =,  dejs:format
-  |^  ^-  $-(json ask)
-  %-  of
-  :~  :-  %harvest
-      %-  ot
-      :~  type+dejs-harvest-type
-          method+dejs-method
-          tags+(as dejs-tag)
-      ==
-      :-  %list-view
-      %-  ot
-      :~  type+dejs-list-view-type
-          first-gen-only+bo
-          actionable-only+bo
-          method+dejs-method
-          tags+(as dejs-tag)
+  |=  jon=json
+  |^  ^-  ask
+  :-  vzn
+  %.  jon
+  %-  ot
+  :~  pid+so
+      :-  %pok
+      %-  of
+      :~  :-  %harvest
+          %-  ot
+          :~  type+dejs-harvest-type
+              method+dejs-method
+              tags+(as dejs-tag)
+          ==
+          :-  %list-view
+          %-  ot
+          :~  type+dejs-list-view-type
+              first-gen-only+bo
+              actionable-only+bo
+              method+dejs-method
+              tags+(as dejs-tag)
+          ==
       ==
   ==
   ++  dejs-method

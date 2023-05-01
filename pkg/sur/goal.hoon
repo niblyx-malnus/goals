@@ -299,25 +299,30 @@
         [%goal-hitch gh=goal-hitch]
     ==
   ::
-  +$  ask
-    $%  $:  %harvest
-            type=?([%main ~] [%pool =pin] [%goal =id])
-            method=?(%any %all)
-            tags=(set tag)
-        ==
-        $:  %list-view
-            type=list-view-type
-            first-gen-only=_|
-            actionable-only=_|
-            method=?(%any %all)
-            tags=(set tag)
-        ==
-    ==
-  +$  list-view-type
-    $%  [%main ~]
-        [%pool =pin]
-        [%goal =id ignore-virtual=_|]
-    ==
+  ++  ask
+    =<  ask
+    |%
+    +$  ask  [%5 pid=@ pok=unver-ask]
+    +$  unver-ask
+      $%  $:  %harvest
+              type=?([%main ~] [%pool =pin] [%goal =id])
+              method=?(%any %all)
+              tags=(set tag)
+          ==
+          $:  %list-view
+              type=list-view-type
+              first-gen-only=_|
+              actionable-only=_|
+              method=?(%any %all)
+              tags=(set tag)
+          ==
+      ==
+    +$  list-view-type
+      $%  [%main ~]
+          [%pool =pin]
+          [%goal =id ignore-virtual=_|]
+      ==
+    --
   ::
   +$  say
     $%  [%goals-list goals=(list [id goal])]

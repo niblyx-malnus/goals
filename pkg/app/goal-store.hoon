@@ -101,6 +101,8 @@
   ?+    mark  (on-poke:def mark vase)
       %goal-ask
     =/  =ask:gol  !<(ask:gol vase)
+    ?.  =(vzn -.ask)
+      ~|("incompatible version" !!)
     =^  cards  state
       abet:(handle-ask:hc ask)
     [cards this]
@@ -312,9 +314,9 @@
 ++  handle-ask
   |=  =ask:gol
   ^-  _core
-  ?-    -.ask
+  ?-    -.pok.ask
       %harvest
-    ?-    -.type.ask
+    ?-    -.type.pok.ask
         %main
       =/  all-goals  (unify-tags all-goals:etch)
       =/  tv  ~(. gol-cli-traverse all-goals)
@@ -322,17 +324,17 @@
         (full-goals-harvest:tv order.local.store)
       :: filter tags
       ::
-      =?  goals  !=(~ tags.ask)
+      =?  goals  !=(~ tags.pok.ask)
         %+  murn  goals
         |=  [=id:gol =goal:gol]
-        ?-    method.ask
+        ?-    method.pok.ask
             %any
-          ?:  =(~ (~(int in tags.ask) tags.goal))
+          ?:  =(~ (~(int in tags.pok.ask) tags.goal))
             ~
           (some [id goal])
           ::
             %all
-          ?.  =(tags.ask (~(int in tags.ask) tags.goal))
+          ?.  =(tags.pok.ask (~(int in tags.pok.ask) tags.goal))
             ~
           (some [id goal])
         ==
@@ -341,24 +343,24 @@
       (emit %give %fact ~[/ask] goal-say+!>([%goals-list goals]))
       ::
         %pool
-      =/  pool  (~(got by pools.store) pin.type.ask)
+      =/  pool  (~(got by pools.store) pin.type.pok.ask)
       =.  goals.pool  (unify-tags goals.pool)
       =/  tv  ~(. gol-cli-traverse goals.pool)
       =/  goals=(list [id:gol goal:gol])
         (full-goals-harvest:tv order.local.store)
       :: filter tags
       ::
-      =?  goals  !=(~ tags.ask)
+      =?  goals  !=(~ tags.pok.ask)
         %+  murn  goals
         |=  [=id:gol =goal:gol]
-        ?-    method.ask
+        ?-    method.pok.ask
             %any
-          ?:  =(~ (~(int in tags.ask) tags.goal))
+          ?:  =(~ (~(int in tags.pok.ask) tags.goal))
             ~
           (some [id goal])
           ::
             %all
-          ?.  =(tags.ask (~(int in tags.ask) tags.goal))
+          ?.  =(tags.pok.ask (~(int in tags.pok.ask) tags.goal))
             ~
           (some [id goal])
         ==
@@ -367,25 +369,25 @@
       (emit %give %fact ~[/ask] goal-say+!>([%goals-list goals]))
       ::
         %goal
-      =/  =pin:gol  (got:idx-orm:gol index.store id.type.ask)
+      =/  =pin:gol  (got:idx-orm:gol index.store id.type.pok.ask)
       =/  pool  (~(got by pools.store) pin)
       =.  goals.pool  (unify-tags goals.pool)
       =/  tv  ~(. gol-cli-traverse goals.pool)
       =/  goals=(list [id:gol goal:gol])
-        (full-harvest:tv id.type.ask order.local.store)
+        (full-harvest:tv id.type.pok.ask order.local.store)
       :: filter tags
       ::
-      =?  goals  !=(~ tags.ask)
+      =?  goals  !=(~ tags.pok.ask)
         %+  murn  goals
         |=  [=id:gol =goal:gol]
-        ?-    method.ask
+        ?-    method.pok.ask
             %any
-          ?:  =(~ (~(int in tags.ask) tags.goal))
+          ?:  =(~ (~(int in tags.pok.ask) tags.goal))
             ~
           (some [id goal])
           ::
             %all
-          ?.  =(tags.ask (~(int in tags.ask) tags.goal))
+          ?.  =(tags.pok.ask (~(int in tags.pok.ask) tags.goal))
             ~
           (some [id goal])
         ==
@@ -395,7 +397,7 @@
     ==
     ::
       %list-view
-    ?-    -.type.ask
+    ?-    -.type.pok.ask
         %main
       =/  all-goals  (unify-tags all-goals:etch)
       =/  tv  ~(. gol-cli-traverse all-goals)
@@ -404,30 +406,30 @@
       =/  goals=(list [id:gol goal:gol])
         :: first-gen-only?
         ::
-        ?:  first-gen-only.ask
+        ?:  first-gen-only.pok.ask
           %+  turn  (waif-goals:nd)
           |=  =id:gol
           [id (~(got by all-goals) id)]
         ~(tap by all-goals)
       :: actionable-only?
       ::
-      =?  goals  actionable-only.ask
+      =?  goals  actionable-only.pok.ask
         %+  murn  goals
         |=  [=id:gol =goal:gol]
         ?.(actionable.goal ~ (some +<))
       :: filter tags
       ::
-      =?  goals  !=(~ tags.ask)
+      =?  goals  !=(~ tags.pok.ask)
         %+  murn  goals
         |=  [=id:gol =goal:gol]
-        ?-    method.ask
+        ?-    method.pok.ask
             %any
-          ?:  =(~ (~(int in tags.ask) tags.goal))
+          ?:  =(~ (~(int in tags.pok.ask) tags.goal))
             ~
           (some [id goal])
           ::
             %all
-          ?.  =(tags.ask (~(int in tags.ask) tags.goal))
+          ?.  =(tags.pok.ask (~(int in tags.pok.ask) tags.goal))
             ~
           (some [id goal])
         ==
@@ -436,7 +438,7 @@
       (emit %give %fact ~[/ask] goal-say+!>([%goals-list goals]))
       ::
         %pool
-      =/  pool  (~(got by pools.store) pin.type.ask)
+      =/  pool  (~(got by pools.store) pin.type.pok.ask)
       =.  goals.pool  (unify-tags goals.pool)
       =/  tv  ~(. gol-cli-traverse goals.pool)
       =/  nd  ~(. gol-cli-node goals.pool)
@@ -444,30 +446,30 @@
       =/  goals=(list [id:gol goal:gol])
         :: first-gen-only?
         ::
-        ?:  first-gen-only.ask
+        ?:  first-gen-only.pok.ask
           %+  turn  (waif-goals:nd)
           |=  =id:gol
           [id (~(got by goals.pool) id)]
         ~(tap by goals.pool)
       :: actionable-only?
       ::
-      =?  goals  actionable-only.ask
+      =?  goals  actionable-only.pok.ask
         %+  murn  goals
         |=  [=id:gol =goal:gol]
         ?.(actionable.goal ~ (some +<))
       :: filter tags
       ::
-      =?  goals  !=(~ tags.ask)
+      =?  goals  !=(~ tags.pok.ask)
         %+  murn  goals
         |=  [=id:gol =goal:gol]
-        ?-    method.ask
+        ?-    method.pok.ask
             %any
-          ?:  =(~ (~(int in tags.ask) tags.goal))
+          ?:  =(~ (~(int in tags.pok.ask) tags.goal))
             ~
           (some [id goal])
           ::
             %all
-          ?.  =(tags.ask (~(int in tags.ask) tags.goal))
+          ?.  =(tags.pok.ask (~(int in tags.pok.ask) tags.goal))
             ~
           (some [id goal])
         ==
@@ -476,7 +478,7 @@
       (emit %give %fact ~[/ask] goal-say+!>([%goals-list goals]))
       ::
         %goal
-      =/  =pin:gol  (got:idx-orm:gol index.store id.type.ask)
+      =/  =pin:gol  (got:idx-orm:gol index.store id.type.pok.ask)
       =/  pool  (~(got by pools.store) pin)
       =.  goals.pool  (unify-tags goals.pool)
       =/  tv  ~(. gol-cli-traverse goals.pool)
@@ -489,33 +491,33 @@
           [id (~(got by goals.pool) id)]
         :: first-gen-only? ignore-virtual?
         ::
-        ?:  =([& &] [first-gen-only ignore-virtual.type]:ask)
-          kids:(~(got by goals.pool) id.type.ask)
-        ?:  =([& |] [first-gen-only ignore-virtual.type]:ask)
-          (young:nd id.type.ask)
-        ?:  =([| &] [first-gen-only ignore-virtual.type]:ask)
-          (progeny:tv id.type.ask)
-        ?>  =([| |] [first-gen-only ignore-virtual.type]:ask)
-        (virtual-progeny:tv id.type.ask)
+        ?:  =([& &] [first-gen-only ignore-virtual.type]:pok.ask)
+          kids:(~(got by goals.pool) id.type.pok.ask)
+        ?:  =([& |] [first-gen-only ignore-virtual.type]:pok.ask)
+          (young:nd id.type.pok.ask)
+        ?:  =([| &] [first-gen-only ignore-virtual.type]:pok.ask)
+          (progeny:tv id.type.pok.ask)
+        ?>  =([| |] [first-gen-only ignore-virtual.type]:pok.ask)
+        (virtual-progeny:tv id.type.pok.ask)
       :: actionable-only?
       ::
-      =?  goals  actionable-only.ask
+      =?  goals  actionable-only.pok.ask
         %+  murn  goals
         |=  [=id:gol =goal:gol]
         ?.(actionable.goal ~ (some +<))
       :: filter tags
       ::
-      =?  goals  !=(~ tags.ask)
+      =?  goals  !=(~ tags.pok.ask)
         %+  murn  goals
         |=  [=id:gol =goal:gol]
-        ?-    method.ask
+        ?-    method.pok.ask
             %any
-          ?:  =(~ (~(int in tags.ask) tags.goal))
+          ?:  =(~ (~(int in tags.pok.ask) tags.goal))
             ~
           (some [id goal])
           ::
             %all
-          ?.  =(tags.ask (~(int in tags.ask) tags.goal))
+          ?.  =(tags.pok.ask (~(int in tags.pok.ask) tags.goal))
             ~
           (some [id goal])
         ==
