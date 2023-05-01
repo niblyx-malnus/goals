@@ -322,7 +322,7 @@
         (full-goals-harvest:tv order.local.store)
       :: filter tags
       ::
-      =.  goals
+      =?  goals  !=(~ tags.ask)
         %+  murn  goals
         |=  [=id:gol =goal:gol]
         ?-    method.ask
@@ -348,7 +348,7 @@
         (full-goals-harvest:tv order.local.store)
       :: filter tags
       ::
-      =.  goals
+      =?  goals  !=(~ tags.ask)
         %+  murn  goals
         |=  [=id:gol =goal:gol]
         ?-    method.ask
@@ -375,7 +375,7 @@
         (full-harvest:tv id.type.ask order.local.store)
       :: filter tags
       ::
-      =.  goals
+      =?  goals  !=(~ tags.ask)
         %+  murn  goals
         |=  [=id:gol =goal:gol]
         ?-    method.ask
@@ -417,7 +417,7 @@
         ?.(actionable.goal ~ (some +<))
       :: filter tags
       ::
-      =.  goals
+      =?  goals  !=(~ tags.ask)
         %+  murn  goals
         |=  [=id:gol =goal:gol]
         ?-    method.ask
@@ -457,7 +457,7 @@
         ?.(actionable.goal ~ (some +<))
       :: filter tags
       ::
-      =.  goals
+      =?  goals  !=(~ tags.ask)
         %+  murn  goals
         |=  [=id:gol =goal:gol]
         ?-    method.ask
@@ -505,7 +505,7 @@
         ?.(actionable.goal ~ (some +<))
       :: filter tags
       ::
-      =.  goals
+      =?  goals  !=(~ tags.ask)
         %+  murn  goals
         |=  [=id:gol =goal:gol]
         ?-    method.ask
