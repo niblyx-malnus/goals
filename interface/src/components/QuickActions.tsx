@@ -92,7 +92,7 @@ export default function QuickActions({
   const roleMap = useStore((store: any) => store.roleMap);
   const role = roleMap.get(pin?.birth);
 
-  const setHarvestData = useStore((store: any) => store.setHarvestData);
+  const setHarvestGoals = useStore((store: any) => store.setHarvestGoals);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -367,28 +367,7 @@ export default function QuickActions({
       setParentTrying(false);
     }
   };
-  const handleHarvestGoal = async () => {
-    handleClose();
 
-    try {
-      if (!id) throw Error("no id provided");
-      const result = await api.harvest(id.owner, id.birth);
-      //update the harvest data in our store
-      setHarvestData(true, {
-        startGoalId: id,
-        goals: result["full-harvest"],
-        pin,
-        role,
-        idList: result["full-harvest"]?.map(
-          (goalItem: any) => goalItem.id.birth
-        ),
-      });
-
-      log("handleHarvestGoal result =>", result);
-    } catch (e) {
-      log("handleHarvestGoal error =>", e);
-    }
-  };
   const renderGoalMenu = () => {
     if (isArchived)
       return (

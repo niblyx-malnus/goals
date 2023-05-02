@@ -8,21 +8,25 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { PageType } from "../types/types";
 import useStore from "../store";
-import { GoalItem } from "./";
+import { GoalItem } from ".";
 import { log } from "../helpers";
 
 import Tooltip from "@mui/material/Tooltip";
 import { harvestAskAction } from "../store/actions";
 
-function HarvestPanel({
+function HarvestView({
   pageType,
   pageId,
 }: {
   pageType: PageType;
   pageId: any;
 }) {
-  const harvestData = useStore((store) => store.harvestData);
-
+  const harvestGoals = useStore((store) => store.harvestGoals);
+  const tagFilterArray = useStore((store) => store.tagFilterArray);
+  useEffect(() => {
+    //everytime we get a new filter set we ask for new data
+    harvestAskAction(pageType, pageId);
+  }, [tagFilterArray, pageType, pageId]);
   return (
     <Stack direction={"column"}>
       <Stack direction="row" alignItems={"center"} flexWrap="wrap">
@@ -41,7 +45,7 @@ function HarvestPanel({
         </Tooltip>
       </Stack>
       <Stack direction={"column"}>
-        {harvestData?.map((goal: any) => {
+        {harvestGoals?.map((goal: any) => {
           const currentGoal = goal.goal;
           const currentGoalId = goal.id.birth;
           return (
@@ -49,7 +53,7 @@ function HarvestPanel({
               parentId=""
               children={[]}
               goal={currentGoal}
-              poolRole={harvestData.role}
+              poolRole={harvestGoals.role}
               id={currentGoalId}
               isSelected={currentGoal.selected}
               key={"harvest-" + currentGoalId}
@@ -57,14 +61,15 @@ function HarvestPanel({
               label={currentGoal.hitch.desc}
               disabled={true}
               inSelectionMode={false}
-              pin={harvestData.pin}
+              pin={harvestGoals.pin}
               harvestGoal={true}
               yokingGoalId={"not in selection mode, so I wont use this"}
-              note=""
+              note={currentGoal.hitch.note} 
+              tags={currentGoal.hitch.tags}
             />
           );
         })}
-        {harvestData?.length === 0 && (
+        {harvestGoals?.length === 0 && (
           <Typography color={"text.primary"} variant="h6">
             Nothing to harvest
           </Typography>
@@ -73,4 +78,4 @@ function HarvestPanel({
     </Stack>
   );
 }
-export default HarvestPanel;
+export default HarvestView;

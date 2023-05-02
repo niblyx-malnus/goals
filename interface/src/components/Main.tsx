@@ -9,7 +9,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
-import { HarvestPanel, Header, Project } from "./";
+import { HarvestView, Header, Project, ListView } from "./";
 import { v4 as uuidv4 } from "uuid";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -36,9 +36,9 @@ import Box from "@mui/material/Box";
 //TODO: use built in filter on list viewu
 //TODO: improve navigation (remove flickering and interruption)
 //TODO: mobile exp (reduce indentation, hide somethings all together, improve header spacing when broken down...)
-//TODO: remove event log
 //TODO: remember user's choice of theme
 //TODO: add go to parent button on goals
+//TODO: sort and filter (complete...) harvest and list view
 function Main({
   fetchInitialCallback,
   displayPools,
@@ -283,12 +283,12 @@ function Main({
             <Tab label="List View" {...a11yProps(2)} />
           </Tabs>
         </Box>
-
+  
         <TabPanel value={value} index={1}>
-          <HarvestPanel pageType={pageType} pageId={pageId} />
+          <HarvestView pageType={pageType} pageId={pageId} />
         </TabPanel>
         <TabPanel value={value} index={2}>
-          Item Three
+          <ListView pageType={pageType} pageId={pageId} />
         </TabPanel>
         <TabPanel value={value} index={0} key={0}>
           {mainLoading.success && pools.length === 0 ? (

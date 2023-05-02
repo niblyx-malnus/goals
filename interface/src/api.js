@@ -526,15 +526,7 @@ const api = {
   getPals: async () => {
     return api.createApi().scry({ app: "pals", path: "/json" });
   },
-  /*
 
-
-  ~/scry/goal-store/goal/~zod/~2000.1.1/hitch.json
-  GOAL notes, comments, etc (no comments yet)
-
-  ~/scry/goal-store/pool/~zod/~2000.1.1/hitch.json
-  POOL notes, comments, etc (no comments yet)
-  */
   getPool: async (poolId) => {
     return api
       .createApi()
@@ -574,65 +566,8 @@ const api = {
       pokeId: "12345",
     });
   },
-  listViewAsk: async (type = "main", id, tags = []) => {
-    /*
-  {
-  "list-view": {
-    "type": {
-      "main":null
-    },
-    "first-gen-only":false,
-    "actionable-only":false,
-    "method":"any" // can be "any" or "all"
-    "tags": [
-      {"text":"tag1", "color":"", "private":false},
-      {"text":"tag2", "color":"", "private":true},
-    ]
-  }
-}
-
-OR
-
-
-{
-  "list-view": {
-    "type": {
-      "pool": {
-        "owner": "zod",
-        "birth": "~2000.1.1"
-      }
-    "first-gen-only":false,
-    "actionable-only":false,
-    "method":"any" // can be "any" or "all"
-    "tags": [
-      {"text":"tag1", "color":"", "private":false},
-      {"text":"tag2", "color":"", "private":true},
-    ]
-  }
-}
-
-OR
-
-{
-  "list-view": {
-    "type": {
-      "goal": {
-        "id": {
-          "owner": "zod",
-          "birth": "~2000.1.1"
-        },
-        "ignore-virtual":false
-      }
-    "first-gen-only":false,
-    "actionable-only":false,
-    "method":"any" // can be "any" or "all"
-    "tags": [
-      {"text":"tag1", "color":"", "private":false},
-      {"text":"tag2", "color":"", "private":true},
-    ]
-  }
-}
-  */
+  listAsk: async (type = "main", id, tags = []) => {
+    log("type", type);
     let bodyType;
     if (type === "main") {
       bodyType = { main: null };

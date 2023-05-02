@@ -645,6 +645,16 @@ function harvestAskAction(type: "main" | "pool" | "goal", id: any) {
   }
   api.harvestAsk(type, newId, tagFilterArray);
 }
+function listAskAction(type: "main" | "pool" | "goal", id: any) {
+  const state = useStore.getState();
+  //get tags if any and pass them along
+  const tagFilterArray = state.tagFilterArray;
+  let newId;
+  if (type !== "main") {
+    newId = { owner: id.owner.substring(1), birth: id.birth }; //we have to cut off the first character ~ from the owner
+  }
+  api.listAsk(type, newId, tagFilterArray);
+}
 
 export {
   deletePoolAction,
@@ -666,4 +676,5 @@ export {
   updatePoolPax,
   updateGoalYoung,
   harvestAskAction,
+  listAskAction
 };

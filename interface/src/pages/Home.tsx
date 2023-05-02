@@ -4,7 +4,7 @@ import { Main } from "../components";
 import useStore from "../store";
 import api from "../api";
 import { log } from "../helpers";
-import { harvestAskAction } from "../store/actions";
+import { harvestAskAction, listAskAction } from "../store/actions";
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -29,6 +29,8 @@ export default function Home({}) {
 
       // {author: 'zod', birth: 1682115616821, owner: 'zod'}
       harvestAskAction("main", null);
+      listAskAction("main", null);
+
       //  const listView = await api.listViewAsk();
 
       //  log("listView", listView);

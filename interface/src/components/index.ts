@@ -11,7 +11,7 @@ import CopyPoolDialog from "./CopyPoolDialog";
 import YokingActionBar from "./YokingActionBar";
 import GroupsShareDialog from "./GroupsShareDialog";
 import Header from "./Header";
-import HarvestPanel from "./HarvestPanel";
+import HarvestView from "./HarvestView";
 import GoalItem from "./GoalItem";
 import ArchiveDialog from "./ArchiveDialog";
 import GoalPermsDialog from "./GoalPermsDialog";
@@ -22,6 +22,7 @@ import Project from "./Project";
 import GoalTagsDialog from "./GoalTagsDialog";
 import ChipsGroup from "./ChipsGroup";
 import FilterTagsDialog from "./FilterTagsDialog";
+import ListView from "./ListView";
 
 export {
   EditInput,
@@ -37,7 +38,7 @@ export {
   YokingActionBar,
   GroupsShareDialog,
   Header,
-  HarvestPanel,
+  HarvestView,
   GoalItem,
   ArchiveDialog,
   GoalPermsDialog,
@@ -47,5 +48,6 @@ export {
   Project,
   GoalTagsDialog,
   ChipsGroup,
-  FilterTagsDialog
+  FilterTagsDialog,
+  ListView
 };

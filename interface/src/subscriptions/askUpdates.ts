@@ -3,7 +3,8 @@ import { log } from "../helpers";
 import useStore from "../store";
 import { newGoalAction, updatePoolPax } from "../store/actions";
 const setLogList = useStore.getState().setLogList;
-const setHarvestData = useStore.getState().setHarvestData;
+const setListGoals = useStore.getState().setListGoals;
+const setHarvestGoals = useStore.getState().setHarvestGoals;
 
 const updateHandler = (update: any) => {
   log("update", update);
@@ -13,9 +14,13 @@ const updateHandler = (update: any) => {
 
   if (actionName) {
     switch (actionName) {
-      case "goals-list": {
-        log('update',update[actionName])
-        setHarvestData(true, update[actionName]);
+      case "harvest": {
+        setHarvestGoals(update[actionName]);
+        break;
+      }
+      case "list-view": {
+        setListGoals(update[actionName]);
+        break;
       }
     }
   }

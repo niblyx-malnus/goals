@@ -29,7 +29,7 @@ import {
   CopyPoolDialog,
   YokingActionBar,
   GroupsShareDialog,
-  HarvestPanel,
+  HarvestView,
   ArchiveDialog,
   GoalPermsDialog,
   JoinPoolDialog,

@@ -5,7 +5,7 @@ import api from "../api";
 import Recursive_tree from "../components/recursive_tree";
 import useStore from "../store";
 import { Main } from "../components";
-import { harvestAskAction } from "../store/actions";
+import { harvestAskAction, listAskAction } from "../store/actions";
 export default function Details({}) {
   let { type, owner, birth }: any = useParams();
   const [id, setId] = useState<null | { birth: string; owner: string }>(null);
@@ -33,6 +33,7 @@ export default function Details({}) {
 
     try {
       harvestAskAction(type, id);
+      listAskAction(type, id);
       const result =
         type === "pool" ? await api.getPool(id) : await api.getGoal(id);
       log("getDetailsData result => ", result);
