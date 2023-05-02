@@ -349,6 +349,7 @@
         (filter-tags method.pok.ask tags.pok.ask goals)
       :: order according to order.local.store
       ::
+      ~&  %sending-harvest
       (emit %give %fact ~[/ask] goal-say+!>([%harvest goals]))
       ::
         %pool
@@ -365,6 +366,7 @@
         (filter-tags method.pok.ask tags.pok.ask goals)
       :: order according to order.local.store
       ::
+      ~&  %sending-harvest
       (emit %give %fact ~[/ask] goal-say+!>([%harvest goals]))
       ::
         %goal
@@ -382,6 +384,7 @@
         (filter-tags method.pok.ask tags.pok.ask goals)
       :: order according to order.local.store
       ::
+      ~&  %sending-harvest
       (emit %give %fact ~[/ask] goal-say+!>([%harvest goals]))
     ==
     ::
@@ -413,6 +416,7 @@
         (filter-tags method.pok.ask tags.pok.ask goals)
       :: order according to order.local.store
       ::
+      ~&  %list-view
       (emit %give %fact ~[/ask] goal-say+!>([%list-view goals]))
       ::
         %pool
@@ -442,6 +446,7 @@
         (filter-tags method.pok.ask tags.pok.ask goals)
       :: order according to order.local.store
       ::
+      ~&  %list-view
       (emit %give %fact ~[/ask] goal-say+!>([%list-view goals]))
       ::
         %goal
@@ -477,6 +482,7 @@
         (filter-tags method.pok.ask tags.pok.ask goals)
       :: order according to order.local.store
       ::
+      ~&  %list-view
       (emit %give %fact ~[/ask] goal-say+!>([%list-view goals]))
     ==
   ==
