@@ -99,6 +99,20 @@
   |=  [=mark =vase]
   ^-  (quip card _this)
   ?+    mark  (on-poke:def mark vase)
+      %noun
+    ?>  =(our src):bowl
+    ?+    q.vase  (on-poke:def mark vase)
+        %print-subs
+      =;  [gsub=(list ship) asub=(list ship)]
+        ~&([goals+gsub ask+asub] `this)
+      :-  %+  murn  ~(tap by sup.bowl)
+          |=  [duct =ship =path]
+          ?.(?=([%goals ~] path) ~ (some ship))
+      %+  murn  ~(tap by sup.bowl)
+      |=  [duct =ship =path]
+      ?.(?=([%goals ~] path) ~ (some ship))
+    ==
+    ::
       %goal-ask
     =/  =ask:gol  !<(ask:gol vase)
     ?.  =(vzn -.ask)
@@ -120,8 +134,8 @@
   |=  =path
   ^-  (quip card _this)
   ?+    path  (on-watch:def path)
-      [%ask ~]    ?>(=(src our):bowl `this) :: one-off ui requests
-      [%goals ~]  ?>(=(src our):bowl `this)
+      [%ask ~]    ~&(%watching-ask ?>(=(src our):bowl `this)) :: one-off ui requests
+      [%goals ~]  ~&(%watching-goals ?>(=(src our):bowl `this))
       ::
       [@ @ ~]
     =^  cards  state
@@ -129,7 +143,12 @@
     [cards this]
   ==
 ::
-++  on-leave  on-leave:def
+++  on-leave
+  |=  =path
+  ?+    path  (on-leave:def path)
+      [%ask ~]    ~&(%leaving-ask `this) :: one-off ui requests
+      [%goals ~]  ~&(%leaving-goals `this)
+  ==
 ::
 ++  on-peek
   |=  =(pole knot)
