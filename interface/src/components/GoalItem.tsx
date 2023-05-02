@@ -22,7 +22,7 @@ import { blue, orange, green, red, purple } from "@mui/material/colors";
 import api from "../api";
 import { useDrag, useDrop } from "react-dnd";
 import QuickActions from "./QuickActions";
-
+import LockIcon from "@mui/icons-material/Lock";
 //TODO: make some components to simplify the logic of this component
 interface GoalItemProps {
   readonly id: string;
@@ -468,17 +468,23 @@ const GoalItem = memo(
               </Box>
             )}
             <Box ref={drag}>{renderTitle()}</Box>
+
             {tags.map((tag: any) => {
               return (
                 <Chip
                   size="small"
                   label={
-                    <Typography fontWeight={"bold"}>
-                      {tag.private && "p-- "}
-                      {tag.text}
-                    </Typography>
+                    <Typography fontWeight={"bold"}>{tag.text}</Typography>
                   }
                   variant="outlined"
+                  sx={{
+                    marginLeft: .5,
+                    "& .MuiChip-iconSmall	": {
+                      fontSize: 14,
+                      marginLeft: 0.5,
+                    },
+                  }}
+                  icon={tag.private && <LockIcon />}
                 />
               );
             })}

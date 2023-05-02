@@ -32,9 +32,13 @@ import Box from "@mui/material/Box";
 //TODO: Important: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
 //TODO: add a refresh button to list view
 //TODO: only action on harvest should be complete and go to
-//TODO: only action on list view should be go to
+//TODO: only action on list view should be go to (or should we add other stuff?)
 //TODO: use built in filter on list viewu
 //TODO: improve navigation (remove flickering and interruption)
+//TODO: mobile exp (reduce indentation, hide somethings all together, improve header spacing when broken down...)
+//TODO: remove event log
+//TODO: remember user's choice of theme
+//TODO: add go to parent button on goals
 function Main({
   fetchInitialCallback,
   displayPools,
@@ -77,6 +81,8 @@ function Main({
     const roleMap = new Map();
     const newTryingMap: any = new Map();
     const allTags: any = [];
+    const allTagsSet: Set<string> = new Set(); // use this to keep track of the tags to prevent duplication in all tags array
+
     const newProjects = fetchedPools.map((poolItem: any, id: any) => {
       //update the perms here, in case they do change
       const { pin, pool } = poolItem;
@@ -103,7 +109,11 @@ function Main({
       pool.nexus.goals.forEach((item: any) => {
         goalsMap.set(item.id.birth, item);
         item.goal.hitch.tags?.forEach((element: any) => {
-          allTags.push(element);
+          if (!allTagsSet.has(element.text)) {
+            //don't allow for duplication
+            allTagsSet.add(element.text);
+            allTags.push(element);
+          }
         });
         newTryingMap.set(item.id.birth, {
           trying: tryingMap.has(item.id.birth) //make sure to check the previous tryingMap for this value

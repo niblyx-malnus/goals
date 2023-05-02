@@ -37,6 +37,7 @@ import {
   FilterTagsDialog,
 } from "./";
 import Tooltip from "@mui/material/Tooltip";
+import LockIcon from "@mui/icons-material/Lock";
 
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -188,7 +189,7 @@ export default function Header({
       flexWrap={"wrap"}
     >
       <ShareDialog />
-      {selectionMode ? <YokingActionBar /> : <Log />}
+      {selectionMode && <YokingActionBar />}
       <DeletionDialog />
       <LeaveDialog />
       <TimelineDialog />
@@ -325,21 +326,34 @@ function FilterChips() {
   useEffect(() => {
     const newChips: ChipData[] = tagFilterArray.map(
       (item: any, index: number) => {
-        return { key: index.toString(), label: item.text, canDelete: false };
+        return {
+          key: index.toString(),
+          label: item.text,
+          canDelete: false,
+          private: item.private,
+        };
       }
     );
     setChips(newChips);
   }, [tagFilterArray]);
   if (tagFilterArray.length === 0) return null;
   return (
-    <Stack direction={"row"} spacing={1} marginTop={2}>
-      <Typography variant="body1">Filtering Harvested Goals By: </Typography>
+    <Stack direction={"row"} spacing={0.5} marginTop={2}>
+      <Typography variant="body1">Filtering goals by: </Typography>
       {chips.map((tag: any) => {
         return (
           <Chip
             size="small"
             label={<Typography fontWeight={"bold"}>{tag.label}</Typography>}
             variant="outlined"
+            sx={{
+              marginLeft: 0.5,
+              "& .MuiChip-iconSmall	": {
+                fontSize: 14,
+                marginLeft: 0.5,
+              },
+            }}
+            icon={tag.private && <LockIcon />}
           />
         );
       })}

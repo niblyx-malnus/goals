@@ -3,7 +3,6 @@ import React, { memo } from "react";
 import Stack from "@mui/material/Stack";
 
 import { styled } from "@mui/material/styles";
-
 import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 
