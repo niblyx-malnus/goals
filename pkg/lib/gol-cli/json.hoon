@@ -49,9 +49,9 @@
   =,  enjs:format
   |=  =say
   |^  ^-  json
-  %-  pairs
-  :~  [%harvest a+(turn goals.say enjs-id-pin-goal)]
-      [%list-view a+(turn goals.say enjs-id-pin-goal)]
+  ?-    -.say
+    %harvest    (frond %harvest a+(turn goals.say enjs-id-pin-goal))
+    %list-view  (frond %list-view a+(turn goals.say enjs-id-pin-goal))
   ==
   ++  enjs-id-pin-goal
     |=  [=id =pin =goal]
