@@ -19,6 +19,7 @@ function ListView({ pageType, pageId }: { pageType: PageType; pageId: any }) {
   const tagFilterArray = useStore((store) => store.tagFilterArray);
   useEffect(() => {
     //everytime we get a new filter set we ask for new data
+    if (pageId !== "main" && !pageId) return;
     listAskAction(pageType, pageId);
   }, [tagFilterArray, pageType, pageId]);
   return (

@@ -35,10 +35,11 @@ import Box from "@mui/material/Box";
 //TODO: only action on list view should be go to (or should we add other stuff?)
 //TODO: use built in filter on list viewu
 //TODO: improve navigation (remove flickering and interruption)
-//TODO: mobile exp (reduce indentation, hide somethings all together, improve header spacing when broken down...)
+//TODO: mobile exp (add edit goal/pool title, reduce indentation, hide somethings all together, improve header spacing when broken down...)
 //TODO: remember user's choice of theme
 //TODO: add go to parent button on goals
 //TODO: sort and filter (complete...) harvest and list view
+//TODO: display loading/error states in harvest/list views
 function Main({
   fetchInitialCallback,
   displayPools,
@@ -346,6 +347,7 @@ function Main({
                     goalList={goalList}
                     onSelectCallback={onSelect}
                     pin={pool.pin}
+                    key={123}
                     poolRole={role}
                     inSelectionMode={inSelectionMode}
                     disabled={disabled}

@@ -574,7 +574,7 @@ const api = {
     } else if (type === "pool") {
       bodyType = { pool: id };
     } else if (type === "goal") {
-      bodyType = { goal: id };
+      bodyType = { goal: { id }, "ignore-virtual": false };
     }
     const json = {
       "list-view": {

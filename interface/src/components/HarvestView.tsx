@@ -25,6 +25,7 @@ function HarvestView({
   const tagFilterArray = useStore((store) => store.tagFilterArray);
   useEffect(() => {
     //everytime we get a new filter set we ask for new data
+    if (pageId !== "main" && !pageId) return;
     harvestAskAction(pageType, pageId);
   }, [tagFilterArray, pageType, pageId]);
   return (
@@ -64,7 +65,7 @@ function HarvestView({
               pin={harvestGoals.pin}
               harvestGoal={true}
               yokingGoalId={"not in selection mode, so I wont use this"}
-              note={currentGoal.hitch.note} 
+              note={currentGoal.hitch.note}
               tags={currentGoal.hitch.tags}
             />
           );
