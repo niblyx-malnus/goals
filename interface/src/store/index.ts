@@ -140,8 +140,8 @@ interface Store {
   filterTagsDialogOpen: boolean;
   toggleFilterTagsDialog: (newStatus: boolean) => void;
 
-  allTags: Set<string>;
-  setAllTags: (newAllTags: Set<string>) => void;
+  allTags: any;
+  setAllTags: (newAllTags: any) => void;
 
   tagFilterArray: Array<string>;
   setTagFilterArray: (newTagFilterArray: Array<string>) => void;
@@ -405,7 +405,7 @@ const useStore = create<Store>((set, get) => ({
     })),
 
   harvestPanelOpen: false,
-  harvestData: {},
+  harvestData: [],
   setHarvestData: (newHarvestPanelState: boolean, newHarvestData: any) =>
     set(() => ({
       harvestData: newHarvestData,
@@ -457,8 +457,8 @@ const useStore = create<Store>((set, get) => ({
       filterTagsDialogOpen: newStatus,
     })),
 
-  allTags: new Set(),
-  setAllTags: (newAllTags: Set<string>) => set(() => ({ allTags: newAllTags })),
+  allTags: [],
+  setAllTags: (newAllTags: any) => set(() => ({ allTags: newAllTags })),
 
   tagFilterArray: [],
   setTagFilterArray: (newTagFilterArray: Array<string>) =>

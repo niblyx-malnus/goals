@@ -325,7 +325,7 @@ function FilterChips() {
   useEffect(() => {
     const newChips: ChipData[] = tagFilterArray.map(
       (item: any, index: number) => {
-        return { key: index.toString(), label: item, canDelete: false };
+        return { key: index.toString(), label: item.text, canDelete: false };
       }
     );
     setChips(newChips);

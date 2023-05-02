@@ -635,7 +635,16 @@ function reorderGoalsAction(
     );
   }
 }
-
+function harvestAskAction(type: "main" | "pool" | "goal", id: any) {
+  const state = useStore.getState();
+  //get tags if any and pass them along
+  const tagFilterArray = state.tagFilterArray;
+  let newId;
+  if (type !== "main") {
+    newId = { owner: id.owner.substring(1), birth: id.birth }; //we have to cut off the first character ~ from the owner
+  }
+  api.harvestAsk(type, newId, tagFilterArray);
+}
 
 export {
   deletePoolAction,
@@ -645,7 +654,6 @@ export {
   updateGoalDescAction,
   newGoalAction,
   newPoolAction,
-  
   updatePoolPermsAction,
   archiveGoalAction,
   archivePoolAction,
@@ -657,4 +665,5 @@ export {
   reorderGoalsAction,
   updatePoolPax,
   updateGoalYoung,
+  harvestAskAction,
 };

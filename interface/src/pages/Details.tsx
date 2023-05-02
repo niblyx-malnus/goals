@@ -5,12 +5,13 @@ import api from "../api";
 import Recursive_tree from "../components/recursive_tree";
 import useStore from "../store";
 import { Main } from "../components";
+import { harvestAskAction } from "../store/actions";
 export default function Details({}) {
-  let { type, owner, birth } = useParams();
+  let { type, owner, birth }: any = useParams();
   const [id, setId] = useState<null | { birth: string; owner: string }>(null);
   const setFetchedPools = useStore((store) => store.setPools);
   const setMainLoading = useStore((store) => store.setMainLoading);
-
+  log("id", id);
   useEffect(() => {
     if (type && owner && birth) {
       setId({ birth, owner });
@@ -25,11 +26,13 @@ export default function Details({}) {
       getDetailsData();
     }
   }, [id]);
+
   const getDetailsData = async () => {
     //either fetch goal or pool data depending on type
     setMainLoading({ trying: true, success: false, error: false });
 
     try {
+      harvestAskAction(type, id);
       const result =
         type === "pool" ? await api.getPool(id) : await api.getGoal(id);
       log("getDetailsData result => ", result);
@@ -51,6 +54,9 @@ export default function Details({}) {
       fetchInitialCallback={getDetailsData}
       displayPools={type === "pool"}
       disableAddPool={true}
+      //we need these for the ask (page type and id if any)
+      pageType={type}
+      pageId={id}
     />
   );
 }

@@ -22,7 +22,6 @@ import { blue, orange, green, red, purple } from "@mui/material/colors";
 import api from "../api";
 import { useDrag, useDrop } from "react-dnd";
 import QuickActions from "./QuickActions";
-import { useNavigate } from "react-router-dom";
 
 //TODO: make some components to simplify the logic of this component
 interface GoalItemProps {
@@ -74,7 +73,6 @@ const GoalItem = memo(
       }),
     }));
     const setDraggingParentId = useStore((store) => store.setDraggingParentId);
-    const navigate = useNavigate();
     useEffect(() => {
       if (isDragging) {
         setDraggingParentId(parentId);
@@ -408,6 +406,18 @@ const GoalItem = memo(
         />
       );
     };
+    const renderProgress = () => {
+      return (
+        <Typography
+          className="show-on-hover"
+          sx={{ opacity: 0 }}
+          marginLeft={1}
+          fontWeight={"bold"}
+        >
+          ({goal.nexus.progress.complete} / {goal.nexus.progress.total})
+        </Typography>
+      );
+    };
 
     return (
       <Box
@@ -457,25 +467,16 @@ const GoalItem = memo(
                 )}
               </Box>
             )}
-            <Box
-              ref={drag}
-              onClick={() => {
-                navigate(
-                  "/apps/gol-cli/goal/~" +
-                    idObject?.owner +
-                    "/" +
-                    idObject?.birth
-                );
-              }}
-            >
-              {renderTitle()}
-            </Box>
+            <Box ref={drag}>{renderTitle()}</Box>
             {tags.map((tag: any) => {
               return (
                 <Chip
                   size="small"
                   label={
-                    <Typography fontWeight={"bold"}>{tag.text}</Typography>
+                    <Typography fontWeight={"bold"}>
+                      {tag.private && "p-- "}
+                      {tag.text}
+                    </Typography>
                   }
                   variant="outlined"
                 />
@@ -484,16 +485,21 @@ const GoalItem = memo(
             {renderArchivedTag()}
 
             {renderVirtualTag()}
+
             {renderTimeline()}
+
             {renderIconMenu()}
+
             {renderAddButton()}
+            {renderProgress()}
+
             {renderQuickActions()}
           </>
           {!editingTitle && !harvestGoal && (
             <>
               <Chip
                 className="show-on-hover"
-                sx={{ opacity: 0 }}
+                sx={{ opacity: 0, marginLeft: 1 }}
                 size="small"
                 avatar={
                   <Badge
@@ -529,7 +535,7 @@ const GoalItem = memo(
               {goalRole && (
                 <Chip
                   className="show-on-hover"
-                  sx={{ opacity: 0 }}
+                  sx={{ opacity: 0, marginLeft: 1 }}
                   size="small"
                   label={
                     <Typography fontWeight={"bold"}>{goalRole}</Typography>

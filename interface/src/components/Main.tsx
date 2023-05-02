@@ -20,18 +20,28 @@ import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 
 //TODO: handle sub kick/error
-//TODO: order the virtual children
 //TODO: add relay to edit inputs also and test the other pokes
 //TODO: Don't allow to drop goal over itself
-//TODO: add API to ordering goals among themselves and related frontend logic
 //TODO: make the highlighting grey?(drag and drop)
 //TODO: add tooltips to header buttons
-//TODO: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
 //TODO: fix groups scry
 //TODO: add loading state to reordering
 //TODO: fix virtual kids rerendering
-
-function Main({ fetchInitialCallback, displayPools, disableAddPool }: any) {
+//TODO: move click navigation to ctrl + click
+//TODO: quick actions should contain complete(if applicable)/archive/go to page
+//TODO: Important: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
+//TODO: add a refresh button to list view
+//TODO: only action on harvest should be complete and go to
+//TODO: only action on list view should be go to
+//TODO: use built in filter on list viewu
+//TODO: improve navigation (remove flickering and interruption)
+function Main({
+  fetchInitialCallback,
+  displayPools,
+  disableAddPool,
+  pageType,
+  pageId,
+}: any) {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -66,7 +76,7 @@ function Main({ fetchInitialCallback, displayPools, disableAddPool }: any) {
     //make our role map
     const roleMap = new Map();
     const newTryingMap: any = new Map();
-    const allTagsSet: Set<string> = new Set();
+    const allTags: any = [];
     const newProjects = fetchedPools.map((poolItem: any, id: any) => {
       //update the perms here, in case they do change
       const { pin, pool } = poolItem;
@@ -93,7 +103,7 @@ function Main({ fetchInitialCallback, displayPools, disableAddPool }: any) {
       pool.nexus.goals.forEach((item: any) => {
         goalsMap.set(item.id.birth, item);
         item.goal.hitch.tags?.forEach((element: any) => {
-          allTagsSet.add(element.text);
+          allTags.push(element);
         });
         newTryingMap.set(item.id.birth, {
           trying: tryingMap.has(item.id.birth) //make sure to check the previous tryingMap for this value
@@ -190,7 +200,7 @@ function Main({ fetchInitialCallback, displayPools, disableAddPool }: any) {
     setTryingMap(newTryingMap);
     setPools(newProjects);
     setRoleMap(roleMap);
-    setAllTags(allTagsSet);
+    setAllTags(allTags);
   }, [fetchedPools, order]);
 
   const roleMap = useStore((store: any) => store.roleMap);
@@ -201,6 +211,7 @@ function Main({ fetchInitialCallback, displayPools, disableAddPool }: any) {
   const fetchGroups = async () => {
     try {
       const results = await api.getGroupData();
+
       const groupsMap = new Map(Object.entries(results.groups));
       const groupsList = Object.entries(results.groups).map((group: any) => {
         return { name: group[0], memberCount: group[1].members.length };
@@ -264,7 +275,7 @@ function Main({ fetchInitialCallback, displayPools, disableAddPool }: any) {
         </Box>
 
         <TabPanel value={value} index={1}>
-          <HarvestPanel />
+          <HarvestPanel pageType={pageType} pageId={pageId} />
         </TabPanel>
         <TabPanel value={value} index={2}>
           Item Three

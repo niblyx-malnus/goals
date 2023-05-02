@@ -9,6 +9,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Autocomplete from "@mui/material/Autocomplete";
 import Stack from "@mui/material/Stack";
 import useStore from "../store";
+import { log } from "../helpers";
 
 export default function FilterTagsDialog() {
   const open = useStore((store: any) => store.filterTagsDialogOpen);
@@ -32,7 +33,9 @@ export default function FilterTagsDialog() {
   };
 
   const handleUpdateFilterTags = async () => {
-    const newfilterValues = filterValues.map((item: any) => item.title);
+    const newfilterValues = filterValues.map((item: any) => {
+      return { text: item.text, private: item.private, color: item.color };
+    });
     setTagFilterArray(newfilterValues);
     handleClose();
   };
@@ -43,15 +46,17 @@ export default function FilterTagsDialog() {
   useEffect(() => {
     if (open) {
       //make the list of chips ready tags
-      const newTags = Array.from(allTags)?.map((item: any, index: number) => {
+      const newTags = allTags.map((item: any, index: number) => {
         return {
           key: index.toString(),
-          title: item,
+          title: item.text,
+          ...item,
         };
       });
+
       //make sure the selected values reflect the values in the store
       const newfilterValues = tagFilterArray.map((item: any, index: number) => {
-        return { key: index.toString(), title: item };
+        return { key: index.toString(), title: item.text, ...item };
       });
       setTags(newTags);
       setFilterValues(newfilterValues);

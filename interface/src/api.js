@@ -2,6 +2,7 @@ import memoize from "lodash/memoize";
 import Urbit from "@urbit/http-api";
 import { isDev, log } from "./helpers";
 import updates from "./subscriptions/updates";
+import askUpdates from "./subscriptions/askUpdates";
 const apiApp = process.env.REACT_APP_APP;
 const apiMark = process.env.REACT_APP_MARK;
 const api = {
@@ -25,6 +26,7 @@ const api = {
     urb.onRetry = () => log("urbit onRetry");
     //sub to our frontend updates
     urb.subscribe(updates);
+    urb.subscribe(askUpdates);
     urb.connect();
 
     return urb;
@@ -540,12 +542,120 @@ const api = {
   },
   getGoal: async (goalId) => {
     //  (all real and virtual descendents, with both id and goal)
-    return api
-      .createApi()
-      .scry({
-        app: apiApp,
-        path: `/goal/${goalId.owner}/${goalId.birth}/descendents`,
-      });
+    return api.createApi().scry({
+      app: apiApp,
+      path: `/goal/${goalId.owner}/${goalId.birth}/descendents`,
+    });
+  },
+
+  harvestAsk: async (type = "main", id, tags = []) => {
+    let bodyType;
+    if (type === "main") {
+      bodyType = { main: null };
+    } else if (type === "pool") {
+      bodyType = { pool: id };
+    } else if (type === "goal") {
+      bodyType = { goal: id };
+    }
+    const json = {
+      harvest: {
+        type: bodyType,
+        method: "any", // can be "any" or "all"
+        tags /*[
+          { text: "tag1", color: "", private: false },
+          { text: "tag2", color: "", private: true },
+        ],*/,
+      },
+    };
+    return api.poke({
+      app: apiApp,
+      mark: "goal-ask",
+      json,
+      pokeId: "12345",
+    });
+  },
+  listViewAsk: async (type = "main", id, tags = []) => {
+    /*
+  {
+  "list-view": {
+    "type": {
+      "main":null
+    },
+    "first-gen-only":false,
+    "actionable-only":false,
+    "method":"any" // can be "any" or "all"
+    "tags": [
+      {"text":"tag1", "color":"", "private":false},
+      {"text":"tag2", "color":"", "private":true},
+    ]
+  }
+}
+
+OR
+
+
+{
+  "list-view": {
+    "type": {
+      "pool": {
+        "owner": "zod",
+        "birth": "~2000.1.1"
+      }
+    "first-gen-only":false,
+    "actionable-only":false,
+    "method":"any" // can be "any" or "all"
+    "tags": [
+      {"text":"tag1", "color":"", "private":false},
+      {"text":"tag2", "color":"", "private":true},
+    ]
+  }
+}
+
+OR
+
+{
+  "list-view": {
+    "type": {
+      "goal": {
+        "id": {
+          "owner": "zod",
+          "birth": "~2000.1.1"
+        },
+        "ignore-virtual":false
+      }
+    "first-gen-only":false,
+    "actionable-only":false,
+    "method":"any" // can be "any" or "all"
+    "tags": [
+      {"text":"tag1", "color":"", "private":false},
+      {"text":"tag2", "color":"", "private":true},
+    ]
+  }
+}
+  */
+    let bodyType;
+    if (type === "main") {
+      bodyType = { main: null };
+    } else if (type === "pool") {
+      bodyType = { pool: id };
+    } else if (type === "goal") {
+      bodyType = { goal: id };
+    }
+    const json = {
+      "list-view": {
+        type: bodyType,
+        "first-gen-only": false,
+        "actionable-only": false,
+        method: "any", // can be "any" or "all"
+        tags,
+      },
+    };
+    return api.poke({
+      app: apiApp,
+      mark: "goal-ask",
+      json,
+      pokeId: "12345",
+    });
   },
 };
 export default api;

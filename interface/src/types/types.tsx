@@ -22,6 +22,8 @@ export interface ChipData {
   label: string;
   canDelete: boolean;
 }
+
+export type PageType = "main" | "pool" | "goal";
 export type Yoke = "move" | "prioritize" | "precede";
 export type SnackBarData = { message: string; severity: string } | null;
 export type FilterGoals = null | "complete" | "incomplete" | "actionable";

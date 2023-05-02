@@ -4,6 +4,7 @@ import { Main } from "../components";
 import useStore from "../store";
 import api from "../api";
 import { log } from "../helpers";
+import { harvestAskAction } from "../store/actions";
 interface Loading {
   trying: boolean;
   success: boolean;
@@ -24,10 +25,14 @@ export default function Home({}) {
     setMainLoading({ trying: true, success: false, error: false });
     try {
       const result = await api.getData();
-      // {author: 'zod', birth: 1682115616821, owner: 'zod'}
-
       log("fetchInitial result => ", result);
-      const resultProjects = result.initial.store.pools;
+
+      // {author: 'zod', birth: 1682115616821, owner: 'zod'}
+      harvestAskAction("main", null);
+      //  const listView = await api.listViewAsk();
+
+      //  log("listView", listView);
+      const resultProjects = result.store.pools;
       //add an alternate step (if selected, should be the default setting) order is decided
       //here we enforce asc order for pool to not confuse the users
       /*   const preOrderedPools = resultProjects.sort((aey: any, bee: any) => {
@@ -37,7 +42,7 @@ export default function Home({}) {
       */
       //save the cached pools also in a seperate list
       setArchivedPools(
-        result.initial.store.cache.map((poolItem: any) => {
+        result.store.cache.map((poolItem: any) => {
           return { ...poolItem, pool: { ...poolItem.pool, isArchived: true } };
         })
       );
@@ -59,5 +64,13 @@ export default function Home({}) {
     window["poke"] = api.poke;
   }, []);
 
-  return <Main fetchInitialCallback={fetchInitial} displayPools={true} />;
+  return (
+    <Main
+      fetchInitialCallback={fetchInitial}
+      displayPools={true}
+      //we need these for the ask (page type and id if any)
+      pageType="main"
+      pageId={null}
+    />
+  );
 }

@@ -122,6 +122,7 @@ const Project = memo(
     const ctrlPressed = useStore((store) => store.ctrlPressed);
 
     const renderQuickActions = () => {
+      
       if (!ctrlPressed) return;
       if (trying) return;
       if (!disableActions) {
@@ -259,13 +260,7 @@ const Project = memo(
               )}
             </Box>
           )}
-          <Box
-            onClick={() => {
-              navigate("/apps/gol-cli/pool/~" + pin?.owner + "/" + pin?.birth);
-            }}
-          >
-            {renderTitle()}
-          </Box>
+      {renderTitle()}
           {renderArchivedTag()}
           {renderIconMenu()}
           {renderAddButton()}

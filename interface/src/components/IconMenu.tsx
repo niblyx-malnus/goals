@@ -159,6 +159,7 @@ export default function IconMenu({
         severity: "error",
       });
       log("markComplete error => ", e);
+      setParentTrying(false);
     }
   };
   const unmarkComplete = async () => {
@@ -173,6 +174,7 @@ export default function IconMenu({
         severity: "error",
       });
       log("unmarkComplete error => ", e);
+      setParentTrying(false);
     }
   };
   const deletePool = async () => {
@@ -192,6 +194,7 @@ export default function IconMenu({
         severity: "error",
       });
       log("deletePool error => ", e);
+      setParentTrying(false);
     }
   };
   const archivePool = async () => {
@@ -211,6 +214,7 @@ export default function IconMenu({
         severity: "error",
       });
       log("archivePool error => ", e);
+      setParentTrying(false);
     }
   };
   const renewPool = async () => {
@@ -230,6 +234,7 @@ export default function IconMenu({
         severity: "error",
       });
       log("renewPool error => ", e);
+      setParentTrying(false);
     }
   };
   const leavePool = async () => {
@@ -249,6 +254,7 @@ export default function IconMenu({
         severity: "error",
       });
       log("leavePool error => ", e);
+      setParentTrying(false);
     }
   };
   const deleteGoal = async () => {
@@ -264,6 +270,7 @@ export default function IconMenu({
         severity: "error",
       });
       log("deleteGoal error => ", e);
+      setParentTrying(false);
     }
   };
   const archiveGoal = async () => {
@@ -279,6 +286,7 @@ export default function IconMenu({
         severity: "error",
       });
       log("archiveGoal error => ", e);
+      setParentTrying(false);
     }
   };
   const renewGoal = async () => {
@@ -298,6 +306,7 @@ export default function IconMenu({
         severity: "error",
       });
       log("archiveGoal error => ", e);
+      setParentTrying(false);
     }
   };
   const markActionable = async () => {
@@ -312,6 +321,7 @@ export default function IconMenu({
         severity: "error",
       });
       log("markActionable error => ", e);
+      setParentTrying(false);
     }
   };
   const unmarkActionable = async () => {
@@ -326,6 +336,7 @@ export default function IconMenu({
         severity: "error",
       });
       log("unmarkActionable error => ", e);
+      setParentTrying(false);
     }
   };
   const handleTimeline = () => {
@@ -400,6 +411,7 @@ export default function IconMenu({
         message: "failed to move goal",
         severity: "error",
       });
+      setParentTrying(false);
     }
   };
   const handleHarvestGoal = async () => {

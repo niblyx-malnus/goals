@@ -16,12 +16,13 @@ import OpenWithOutlinedIcon from "@mui/icons-material/OpenWithOutlined";
 import LinkOutlinedIcon from "@mui/icons-material/LinkOutlined";
 import RestoreOutlinedIcon from "@mui/icons-material/RestoreOutlined";
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
-
+import LaunchIcon from "@mui/icons-material/Launch";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import { GoalId, PinId } from "../types/types";
 import { log, uuid } from "../helpers";
 import api from "../api";
+import { useNavigate } from "react-router-dom";
 
 import useStore from "../store";
 
@@ -59,6 +60,8 @@ export default function QuickActions({
   onEditPoolNote?: Function;
   onEditGoalNote?: Function;
 }) {
+  const navigate = useNavigate();
+
   const id = isVirtual ? virtualId : goalId;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -109,6 +112,7 @@ export default function QuickActions({
         severity: "error",
       });
       log("markComplete error => ", e);
+      setParentTrying(false);
     }
   };
   const unmarkComplete = async () => {
@@ -123,6 +127,7 @@ export default function QuickActions({
         severity: "error",
       });
       log("unmarkComplete error => ", e);
+      setParentTrying(false);
     }
   };
   const deletePool = async () => {
@@ -142,6 +147,7 @@ export default function QuickActions({
         severity: "error",
       });
       log("deletePool error => ", e);
+      setParentTrying(false);
     }
   };
   const archivePool = async () => {
@@ -161,6 +167,7 @@ export default function QuickActions({
         severity: "error",
       });
       log("archivePool error => ", e);
+      setParentTrying(false);
     }
   };
   const renewPool = async () => {
@@ -180,6 +187,7 @@ export default function QuickActions({
         severity: "error",
       });
       log("renewPool error => ", e);
+      setParentTrying(false);
     }
   };
   const leavePool = async () => {
@@ -199,6 +207,7 @@ export default function QuickActions({
         severity: "error",
       });
       log("leavePool error => ", e);
+      setParentTrying(false);
     }
   };
   const deleteGoal = async () => {
@@ -214,6 +223,7 @@ export default function QuickActions({
         severity: "error",
       });
       log("deleteGoal error => ", e);
+      setParentTrying(false);
     }
   };
   const archiveGoal = async () => {
@@ -229,6 +239,7 @@ export default function QuickActions({
         severity: "error",
       });
       log("archiveGoal error => ", e);
+      setParentTrying(false);
     }
   };
   const renewGoal = async () => {
@@ -248,6 +259,7 @@ export default function QuickActions({
         severity: "error",
       });
       log("archiveGoal error => ", e);
+      setParentTrying(false);
     }
   };
   const markActionable = async () => {
@@ -262,6 +274,7 @@ export default function QuickActions({
         severity: "error",
       });
       log("markActionable error => ", e);
+      setParentTrying(false);
     }
   };
   const unmarkActionable = async () => {
@@ -276,6 +289,7 @@ export default function QuickActions({
         severity: "error",
       });
       log("unmarkActionable error => ", e);
+      setParentTrying(false);
     }
   };
   const handleTimeline = () => {
@@ -350,6 +364,7 @@ export default function QuickActions({
         message: "failed to move goal",
         severity: "error",
       });
+      setParentTrying(false);
     }
   };
   const handleHarvestGoal = async () => {
@@ -400,15 +415,6 @@ export default function QuickActions({
 
     return (
       <>
-        <IconButton
-          // sx={{ position: "absolute", right: 35 }}
-          aria-label="add goal note"
-          size="small"
-          onClick={() => {
-            handleClose();
-            onEditGoalNote && onEditGoalNote();
-          }}
-        ></IconButton>
         {complete ? (
           <IconButton
             // sx={{ position: "absolute", right: 35 }}
@@ -428,101 +434,18 @@ export default function QuickActions({
             <CheckIcon fontSize="small" />
           </IconButton>
         )}
-        {actionable ? (
-          <IconButton
-            // sx={{ position: "absolute", right: 35 }}
-            aria-label="unmark goal actionable"
-            size="small"
-            onClick={unmarkActionable}
-          >
-            <PlayForWorkIcon fontSize="small" />
-          </IconButton>
-        ) : (
-          <IconButton
-            // sx={{ position: "absolute", right: 35 }}
-            aria-label="mark goal actionable"
-            size="small"
-            onClick={markActionable}
-          >
-            <PlayForWorkIcon fontSize="small" />
-          </IconButton>
-        )}
-        <Divider />
         <IconButton
           // sx={{ position: "absolute", right: 35 }}
-          aria-label="manage goal's participants"
+          aria-label="go to goal page"
           size="small"
           onClick={() => {
-            handleClose();
-            toggleGoalPermsDialog(true, {
-              pin,
-              id,
-              title: currentGoal.hitch.desc,
-              chief: currentGoal.nexus.chief,
-              ranks: currentGoal.nexus.ranks,
-              spawn: currentGoal.nexus.spawn,
-            });
+            navigate(
+              "/apps/gol-cli/goal/~" + goalId?.owner + "/" + goalId?.birth
+            );
           }}
         >
-          <PeopleAltOutlinedIcon fontSize="small" />
+          <LaunchIcon fontSize="small" />
         </IconButton>
-        <IconButton
-          // sx={{ position: "absolute", right: 35 }}
-          aria-label="manage goal's timeline"
-          size="small"
-          onClick={handleTimeline}
-        >
-          <CalendarMonthOutlinedIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          // sx={{ position: "absolute", right: 35 }}
-          aria-label="harvest this goal"
-          size="small"
-          onClick={handleHarvestGoal}
-        >
-          <AgricultureOutlinedIcon fontSize="small" />
-        </IconButton>
-
-        {/* We hide these from harvest panel */}
-        {!harvestGoal && (
-          <>
-            <Divider />
-            <IconButton
-              // sx={{ position: "absolute", right: 35 }}
-              aria-label="move goal"
-              size="small"
-              onClick={handleMove}
-            >
-              <OpenWithOutlinedIcon fontSize="small" />
-            </IconButton>
-            <IconButton
-              // sx={{ position: "absolute", right: 35 }}
-              aria-label="move goal to root"
-              size="small"
-              onClick={moveGoalToRoot}
-            >
-              <OpenWithOutlinedIcon fontSize="small" />
-            </IconButton>
-            <Divider />
-            {/* <MenuItem onClick={handlePriortize} disableRipple>
-              <LinkOutlinedIcon fontSize="small" />
-              prioritize
-            </MenuItem>
-            <MenuItem onClick={handlePrecede} disableRipple>
-              <LinkOutlinedIcon fontSize="small" />
-              precede
-        </MenuItem>*/}
-            <IconButton
-              // sx={{ position: "absolute", right: 35 }}
-              aria-label="virtually nest this goal"
-              size="small"
-              onClick={handleNest}
-            >
-              <LinkOutlinedIcon fontSize="small" />
-            </IconButton>
-          </>
-        )}
-        <Divider />
         <IconButton
           // sx={{ position: "absolute", right: 35 }}
           aria-label="archive goal"
@@ -531,16 +454,6 @@ export default function QuickActions({
         >
           <DeleteOutlineOutlinedIcon fontSize="small" />
         </IconButton>
-        {(role === "owner" || role === "admin") && (
-          <IconButton
-            aria-label="delete goal"
-            size="small"
-            onClick={deleteGoal}
-            disableRipple
-          >
-            <DeleteOutlineOutlinedIcon fontSize="small" />
-          </IconButton>
-        )}
       </>
     );
   };
@@ -582,54 +495,8 @@ export default function QuickActions({
             >
               <PeopleAltOutlinedIcon fontSize="small" />
             </IconButton>
-            <IconButton
-              aria-label="share pool with groups"
-              size="small"
-              onClick={() => {
-                handleClose();
-                toggleGroupsShareDialog(true, {
-                  title: poolData.title,
-                  participants: poolData,
-                  pin,
-                });
-              }}
-              disableRipple
-            >
-              <PeopleAltOutlinedIcon fontSize="small" />
-            </IconButton>
           </>
         )}
-        {role !== "owner" && (
-          <IconButton
-            aria-label="leave pool"
-            size="small"
-            onClick={() => {
-              handleClose();
-              toggleLeaveDialog(true, {
-                title: poolData.title,
-                callback: leavePool,
-              });
-            }}
-          >
-            <LogoutIcon fontSize="small" />
-          </IconButton>
-        )}
-        <Divider />
-
-        <IconButton
-          aria-label="duplicate pool"
-          size="small"
-          onClick={() => {
-            handleClose();
-            toggleCopyPoolDialog(true, {
-              title: poolData.title,
-              pin,
-            });
-          }}
-          disableRipple
-        >
-          <FolderCopyOutlinedIcon fontSize="small" />
-        </IconButton>
 
         <IconButton
           aria-label="get pool's link"
@@ -652,21 +519,19 @@ export default function QuickActions({
           disableRipple
         >
           <ContentCopyOutlinedIcon fontSize="small" />
+          <IconButton
+            aria-label="go to pool page"
+            size="small"
+            onClick={() => {
+              navigate("/apps/gol-cli/pool/~" + pin?.owner + "/" + pin?.birth);
+            }}
+            disableRipple
+          >
+            <LaunchIcon fontSize="small" />
+          </IconButton>
         </IconButton>
         {role === "owner" && (
           <>
-            <Divider />
-
-            <IconButton
-              aria-label="add note to pool"
-              size="small"
-              onClick={() => {
-                handleClose();
-                onEditPoolNote && onEditPoolNote();
-              }}
-              disableRipple
-            ></IconButton>
-
             <IconButton
               aria-label="archive pool"
               size="small"
@@ -681,27 +546,18 @@ export default function QuickActions({
             >
               <DeleteOutlineOutlinedIcon fontSize="small" />
             </IconButton>
-
-            <IconButton
-              aria-label="delete pool"
-              size="small"
-              onClick={() => {
-                handleClose();
-                toggleDeleteDialog(true, {
-                  title: poolData.title,
-                  callback: deletePool,
-                });
-              }}
-            >
-              <DeleteOutlineOutlinedIcon fontSize="small" />
-            </IconButton>
           </>
         )}
       </>
     );
   };
   return (
-    <Stack direction="row" className="show-on-hover" sx={{ opacity: 0 }}>
+    <Stack
+      direction="row"
+      className="show-on-hover"
+      sx={{ opacity: 0 }}
+      marginLeft={1}
+    >
       {type === "goal" ? renderGoalMenu() : renderPoolMenu()}
     </Stack>
   );
