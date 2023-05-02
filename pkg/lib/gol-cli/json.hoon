@@ -50,12 +50,14 @@
   |=  =say
   |^  ^-  json
   %-  pairs
-  :~  [%goals-list a+(turn goals.say enjs-id-goal)]
+  :~  [%harvest a+(turn goals.say enjs-id-pin-goal)]
+      [%list-view a+(turn goals.say enjs-id-pin-goal)]
   ==
-  ++  enjs-id-goal
-    |=  [=id =goal]
+  ++  enjs-id-pin-goal
+    |=  [=id =pin =goal]
     %-  pairs
     :~  [%id (enjs-id id)]
+        [%pin (enjs-pin pin)]
         [%goal (enjs-goal goal)]
     ==
   --

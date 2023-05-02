@@ -325,7 +325,8 @@
     --
   ::
   +$  say
-    $%  [%goals-list goals=(list [id goal])]
+    $%  [%harvest goals=(list [id pin goal])]
+        [%list-view goals=(list [id pin goal])]
     ==
   ::
   +$  core-yoke     core-yoke:s4
