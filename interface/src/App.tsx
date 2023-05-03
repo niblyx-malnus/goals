@@ -23,7 +23,7 @@ const getDesignTokens = (mode: any) => ({
           // palette values for light mode
           divider: grey[400],
           background: {
-            default: "#e8e8e8",
+            default: "#F8F8F8",
           },
         }
       : {

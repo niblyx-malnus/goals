@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Loading } from "../types/types";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
@@ -31,8 +31,8 @@ import Box from "@mui/material/Box";
 //TODO: quick actions should contain complete(if applicable)/archive/go to page
 //TODO: Important: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
 //TODO: mobile exp (add edit goal/pool title, reduce indentation, hide somethings all together, improve header spacing when broken down...)
-//TODO: remember user's choice of theme
 //TODO: display loading/error states in harvest/list views
+//TODO: move scrollbar inside views?
 //Waiting on Thomas:
 //TODO: sort and filter (complete...) harvest and list view
 //TODO: fix perm issues in harvest/list views (pool perm not found)
@@ -44,6 +44,11 @@ function Main({
   pageId,
 }: any) {
   const [value, setValue] = React.useState(0);
+  const location = useLocation();
+  useEffect(() => {
+    //clear the pools in the store to prevent flickering when navigating
+    setPoolStore([]);
+  }, [location.pathname]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -257,8 +262,6 @@ function Main({
 
         <Button
           onClick={() => {
-            //clear the pools in the store to prevent flickering when navigating
-            setPoolStore([]);
             navigate("/apps/gol-cli");
           }}
           sx={{ fontWeight: "bold" }}

@@ -420,8 +420,6 @@ export default function IconMenu({
     }
   };
   const goTo = (destination: string) => {
-    //clear the pools in the store to prevent flickering when navigating
-    setPools([]);
     navigate(destination);
   };
   const renderTreeGoalMenu = () => {
