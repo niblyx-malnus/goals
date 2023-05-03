@@ -40,6 +40,7 @@ function HarvestView({
             onClick={() => {
               harvestAskAction(pageType, pageId);
             }}
+            sx={{ fontWeight: "bold" }}
           >
             Refresh
           </Button>

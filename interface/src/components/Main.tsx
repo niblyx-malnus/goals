@@ -30,11 +30,12 @@ import Box from "@mui/material/Box";
 //TODO: move click navigation to ctrl + click
 //TODO: quick actions should contain complete(if applicable)/archive/go to page
 //TODO: Important: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
-//TODO: improve navigation (remove flickering and interruption)
 //TODO: mobile exp (add edit goal/pool title, reduce indentation, hide somethings all together, improve header spacing when broken down...)
 //TODO: remember user's choice of theme
-//TODO: sort and filter (complete...) harvest and list view
 //TODO: display loading/error states in harvest/list views
+//Waiting on Thomas:
+//TODO: sort and filter (complete...) harvest and list view
+//TODO: fix perm issues in harvest/list views (pool perm not found)
 function Main({
   fetchInitialCallback,
   displayPools,
@@ -260,6 +261,7 @@ function Main({
             setPoolStore([]);
             navigate("/apps/gol-cli");
           }}
+          sx={{ fontWeight: "bold" }}
         >
           {" "}
           Navigate Home
@@ -270,9 +272,21 @@ function Main({
             onChange={handleChange}
             aria-label="basic tabs example"
           >
-            <Tab label="Tree View" {...a11yProps(0)} />
-            <Tab label="Harvest View" {...a11yProps(1)} />
-            <Tab label="List View" {...a11yProps(2)} />
+            <Tab
+              sx={{ fontWeight: "bold" }}
+              label="Tree View"
+              {...a11yProps(0)}
+            />
+            <Tab
+              sx={{ fontWeight: "bold" }}
+              label="Harvest View"
+              {...a11yProps(1)}
+            />
+            <Tab
+              sx={{ fontWeight: "bold" }}
+              label="List View"
+              {...a11yProps(2)}
+            />
           </Tabs>
         </Box>
 
@@ -308,6 +322,7 @@ function Main({
               const goalList = pool.pool.nexus.goals;
               const permList = pool.pool.perms;
               const role = roleMap?.get(poolId);
+
               let inSelectionMode = false;
               let disabled = false;
               //we toggle into selection mode or disable the pool (disabling is a TODO)

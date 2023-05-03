@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {
   createTheme,
@@ -11,6 +11,7 @@ import useStore from "./store";
 import { grey } from "@mui/material/colors";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { Details, Home } from "./pages";
+import { log } from "./helpers";
 
 //add tooltip to new button in header
 //add feedback to note requests
@@ -22,7 +23,7 @@ const getDesignTokens = (mode: any) => ({
           // palette values for light mode
           divider: grey[400],
           background: {
-            default: "#F8F8F8",
+            default: "#e8e8e8",
           },
         }
       : {
@@ -41,10 +42,21 @@ function App() {
   const colorMode = useStore((store) => store.colorMode);
 
   useEffect(() => {
-    if (prefersDarkMode) {
-      setColorMode("dark");
+    //do this if no value saved for theme currently
+    const selectedTheme: null | string = localStorage.getItem("theme");
+    if (
+      selectedTheme &&
+      (selectedTheme === "light" || selectedTheme === "dark")
+    ) {
+      setColorMode(selectedTheme);
     } else {
-      setColorMode("light");
+      if (prefersDarkMode) {
+        setColorMode("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        setColorMode("light");
+        localStorage.setItem("theme", "light");
+      }
     }
   }, [prefersDarkMode]);
 

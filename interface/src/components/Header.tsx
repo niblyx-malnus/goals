@@ -297,7 +297,10 @@ export default function Header({
 
         <IconButton
           onClick={() => {
-            setColorMode(theme.palette.mode === "dark" ? "light" : "dark");
+            const newColorMode =
+              theme.palette.mode === "dark" ? "light" : "dark";
+            setColorMode(newColorMode);
+            localStorage.setItem("theme", newColorMode);
           }}
           color="inherit"
         >

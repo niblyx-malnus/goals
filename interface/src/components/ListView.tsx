@@ -34,6 +34,7 @@ function ListView({ pageType, pageId }: { pageType: PageType; pageId: any }) {
             onClick={() => {
               listAskAction(pageType, pageId);
             }}
+            sx={{ fontWeight: "bold" }}
           >
             Refresh
           </Button>
