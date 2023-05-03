@@ -61,6 +61,7 @@ function ListView({ pageType, pageId }: { pageType: PageType; pageId: any }) {
               yokingGoalId={"not in selection mode, so I wont use this"}
               note={currentGoal.hitch.note}
               tags={currentGoal.hitch.tags}
+              view="list"
             />
           );
         })}

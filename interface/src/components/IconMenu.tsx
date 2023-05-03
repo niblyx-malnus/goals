@@ -85,6 +85,7 @@ export default function IconMenu({
   harvestGoal = false,
   onEditPoolNote,
   onEditGoalNote,
+  view = "main",
 }: {
   actionable?: any;
   complete?: boolean;
@@ -103,6 +104,8 @@ export default function IconMenu({
 
   onEditPoolNote?: Function;
   onEditGoalNote?: Function;
+
+  view?: "main" | "harvest" | "list";
 }) {
   const navigate = useNavigate();
   const id = isVirtual ? virtualId : goalId;
@@ -414,8 +417,7 @@ export default function IconMenu({
       setParentTrying(false);
     }
   };
-
-  const renderGoalMenu = () => {
+  const renderTreeGoalMenu = () => {
     if (isArchived)
       return (
         <div>
@@ -439,7 +441,7 @@ export default function IconMenu({
           }}
           disableRipple
         >
-          Go to page
+          go to page
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -522,13 +524,13 @@ export default function IconMenu({
             </MenuItem>
             <Divider />
             {/* <MenuItem onClick={handlePriortize} disableRipple>
-              <LinkOutlinedIcon fontSize="small" />
-              prioritize
-            </MenuItem>
-            <MenuItem onClick={handlePrecede} disableRipple>
-              <LinkOutlinedIcon fontSize="small" />
-              precede
-        </MenuItem>*/}
+        <LinkOutlinedIcon fontSize="small" />
+        prioritize
+      </MenuItem>
+      <MenuItem onClick={handlePrecede} disableRipple>
+        <LinkOutlinedIcon fontSize="small" />
+        precede
+  </MenuItem>*/}
             <MenuItem onClick={handleNest} disableRipple>
               <LinkOutlinedIcon fontSize="small" />
               virtually nest
@@ -548,6 +550,85 @@ export default function IconMenu({
         )}
       </div>
     );
+  };
+  const renderAltViewGoalMenu = () => {
+    return (
+      <div>
+        {currentGoal?.nexus.par && (
+          <MenuItem
+            onClick={() => {
+              //navigate to parent goal if any
+              navigate(
+                "/apps/gol-cli/goal/~" +
+                  currentGoal?.nexus.par?.owner +
+                  "/" +
+                  currentGoal?.nexus.par?.birth
+              );
+            }}
+            disableRipple
+          >
+            go to parent goal
+          </MenuItem>
+        )}
+
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            navigate("/apps/gol-cli/goal/~" + id?.owner + "/" + id?.birth);
+          }}
+          disableRipple
+        >
+          go to page
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            toggleGoalTagsDialog(true, {
+              title: currentGoal.hitch.desc,
+              id,
+              tags: currentGoal.hitch.tags,
+            });
+          }}
+          disableRipple
+        >
+          manage tags
+        </MenuItem>
+        <Divider />
+
+        {complete ? (
+          <MenuItem onClick={unmarkComplete} disableRipple>
+            incomplete
+          </MenuItem>
+        ) : (
+          <MenuItem onClick={markComplete} disableRipple>
+            complete
+          </MenuItem>
+        )}
+        {actionable ? (
+          <MenuItem onClick={unmarkActionable} disableRipple>
+            remove actionable
+          </MenuItem>
+        ) : (
+          <MenuItem onClick={markActionable} disableRipple>
+            make actionable
+          </MenuItem>
+        )}
+        <Divider />
+        <MenuItem onClick={archiveGoal} disableRipple>
+          archive
+        </MenuItem>
+        {(role === "owner" || role === "admin") && (
+          <MenuItem onClick={deleteGoal} disableRipple>
+            delete
+          </MenuItem>
+        )}
+      </div>
+    );
+  };
+  const renderGoalMenu = () => {
+    if (view === "main") return renderTreeGoalMenu();
+    else if (view === "harvest" || view === "list")
+      return renderAltViewGoalMenu();
   };
   const renderPoolMenu = () => {
     if (isArchived) {

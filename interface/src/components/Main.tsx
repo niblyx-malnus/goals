@@ -30,14 +30,9 @@ import Box from "@mui/material/Box";
 //TODO: move click navigation to ctrl + click
 //TODO: quick actions should contain complete(if applicable)/archive/go to page
 //TODO: Important: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
-//TODO: add a refresh button to list view
-//TODO: only action on harvest should be complete and go to
-//TODO: only action on list view should be go to (or should we add other stuff?)
-//TODO: use built in filter on list viewu
 //TODO: improve navigation (remove flickering and interruption)
 //TODO: mobile exp (add edit goal/pool title, reduce indentation, hide somethings all together, improve header spacing when broken down...)
 //TODO: remember user's choice of theme
-//TODO: add go to parent button on goals
 //TODO: sort and filter (complete...) harvest and list view
 //TODO: display loading/error states in harvest/list views
 function Main({
@@ -284,7 +279,7 @@ function Main({
             <Tab label="List View" {...a11yProps(2)} />
           </Tabs>
         </Box>
-  
+
         <TabPanel value={value} index={1}>
           <HarvestView pageType={pageType} pageId={pageId} />
         </TabPanel>
@@ -347,8 +342,8 @@ function Main({
                     goalList={goalList}
                     onSelectCallback={onSelect}
                     pin={pool.pin}
-                    key={123}
                     poolRole={role}
+                    key={"recursive-tree-" + index}
                     inSelectionMode={inSelectionMode}
                     disabled={disabled}
                     yokingGoalId={selectionModeYokeData?.goalId.birth}

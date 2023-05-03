@@ -42,6 +42,7 @@ interface GoalItemProps {
   tags?: any;
   parentId: string | null;
   virtualId?: string;
+  view?: "main" | "harvest" | "list";
 }
 
 const GoalItem = memo(
@@ -63,6 +64,7 @@ const GoalItem = memo(
     tags = [],
     parentId,
     virtualId,
+    view = "main",
   }: //inSelectMode
   GoalItemProps) => {
     const [{ isDragging }, drag] = useDrag(() => ({
@@ -218,6 +220,7 @@ const GoalItem = memo(
               setEditingNote(!editingNote);
               setNoteValue("note");
             }}
+            view={view}
           />
         );
       }
@@ -478,7 +481,7 @@ const GoalItem = memo(
                   }
                   variant="outlined"
                   sx={{
-                    marginLeft: .5,
+                    marginLeft: 0.5,
                     "& .MuiChip-iconSmall	": {
                       fontSize: 14,
                       marginLeft: 0.5,
