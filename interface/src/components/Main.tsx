@@ -51,6 +51,7 @@ function Main({
   const order = useStore((store) => store.order);
   const setRoleMap = useStore((store) => store.setRoleMap);
   const fetchedPools = useStore((store) => store.pools);
+  const setPoolStore = useStore((store: any) => store.setPools);
 
   const setGroupsData = useStore((store) => store.setGroupsData);
   const setPals = useStore((store) => store.setPals);
@@ -252,16 +253,11 @@ function Main({
     <Container sx={{ paddingBottom: 10 }}>
       <DndProvider backend={HTML5Backend}>
         <Header disableAddPool={disableAddPool} />
-        {mainLoading.trying && (
-          <Stack flexDirection="row" alignItems="center">
-            <CircularProgress size={28} />
-            <Typography sx={{ marginLeft: 2 }} variant="h6" fontWeight={"bold"}>
-              Loading pools...
-            </Typography>
-          </Stack>
-        )}
+
         <Button
           onClick={() => {
+            //clear the pools in the store to prevent flickering when navigating
+            setPoolStore([]);
             navigate("/apps/gol-cli");
           }}
         >
@@ -287,6 +283,18 @@ function Main({
           <ListView pageType={pageType} pageId={pageId} />
         </TabPanel>
         <TabPanel value={value} index={0} key={0}>
+          {mainLoading.trying && (
+            <Stack flexDirection="row" alignItems="center">
+              <CircularProgress size={28} />
+              <Typography
+                sx={{ marginLeft: 2 }}
+                variant="h6"
+                fontWeight={"bold"}
+              >
+                Loading pools...
+              </Typography>
+            </Stack>
+          )}
           {mainLoading.success && pools.length === 0 ? (
             <Typography variant="h6" fontWeight={"bold"}>
               Add a pool to get started

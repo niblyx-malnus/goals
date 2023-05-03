@@ -108,6 +108,8 @@ export default function IconMenu({
   view?: "main" | "harvest" | "list";
 }) {
   const navigate = useNavigate();
+  const setPools = useStore((store: any) => store.setPools);
+
   const id = isVirtual ? virtualId : goalId;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -417,6 +419,11 @@ export default function IconMenu({
       setParentTrying(false);
     }
   };
+  const goTo = (destination: string) => {
+    //clear the pools in the store to prevent flickering when navigating
+    setPools([]);
+    navigate(destination);
+  };
   const renderTreeGoalMenu = () => {
     if (isArchived)
       return (
@@ -437,7 +444,7 @@ export default function IconMenu({
         <MenuItem
           onClick={() => {
             handleClose();
-            navigate("/apps/gol-cli/goal/~" + id?.owner + "/" + id?.birth);
+            goTo("/apps/gol-cli/goal/~" + id?.owner + "/" + id?.birth);
           }}
           disableRipple
         >
@@ -558,7 +565,7 @@ export default function IconMenu({
           <MenuItem
             onClick={() => {
               //navigate to parent goal if any
-              navigate(
+              goTo(
                 "/apps/gol-cli/goal/~" +
                   currentGoal?.nexus.par?.owner +
                   "/" +
@@ -574,12 +581,14 @@ export default function IconMenu({
         <MenuItem
           onClick={() => {
             handleClose();
-            navigate("/apps/gol-cli/goal/~" + id?.owner + "/" + id?.birth);
+            goTo("/apps/gol-cli/goal/~" + id?.owner + "/" + id?.birth);
           }}
           disableRipple
         >
           go to page
         </MenuItem>
+        <Divider />
+
         <MenuItem
           onClick={() => {
             handleClose();
@@ -662,9 +671,7 @@ export default function IconMenu({
             <MenuItem
               onClick={() => {
                 handleClose();
-                navigate(
-                  "/apps/gol-cli/pool/~" + pin?.owner + "/" + pin?.birth
-                );
+                goTo("/apps/gol-cli/pool/~" + pin?.owner + "/" + pin?.birth);
               }}
               disableRipple
             >
