@@ -101,6 +101,7 @@ const GoalItem = memo(
 
     const [noteValue, setNoteValue] = useState<string>("");
     const [editingNote, setEditingNote] = useState<boolean>(false);
+    const [hovering, setHovering] = useState<boolean>(false);
     const onNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       setNoteValue(event.target.value);
     };
@@ -227,13 +228,12 @@ const GoalItem = memo(
       }
     };
     const renderQuickActions = () => {
-      if (!ctrlPressed) return;
       if ((poolRole === "spawn" || poolRole === null) && !isChief) return;
       if (poolRole !== "owner" && poolRole !== "admin" && goal.isArchived)
         return;
       if (trying) return;
 
-      if (!disableActions) {
+      if (!disableActions && ctrlPressed && hovering) {
         return (
           <QuickActions
             type="goal"
@@ -469,6 +469,8 @@ const GoalItem = memo(
         }}
       >
         <StyledTreeItem
+          onMouseOver={() => setHovering(true)}
+          onMouseOut={() => setHovering(false)}
           sx={{
             "&:hover": {
               cursor: "pointer",
