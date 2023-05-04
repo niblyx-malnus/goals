@@ -185,7 +185,7 @@ export default function Header({
         backgroundColor: "background.default",
       }}
       zIndex={1}
-      direction={"row"}
+      direction={"column"}
       flexWrap={"wrap"}
     >
       <ShareDialog />
@@ -201,125 +201,137 @@ export default function Header({
       <GoalTagsDialog />
       <FilterTagsDialog />
       <Snackie />
-      <Stack direction="row" alignItems="center" spacing={1} flexWrap={"wrap"}>
-        {!disableAddPool && (
-          <OutlinedInput
-            id="add-new-pool"
-            placeholder="Add Pool"
-            value={newProjectTitle}
-            onChange={handleChange}
-            size={"small"}
-            type={"text"}
-            disabled={trying}
-            onKeyDown={handleKeyDown}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={addNewPool}
-                  edge="end"
-                  disabled={trying || newProjectTitle?.length === 0}
-                >
-                  {trying ? (
-                    <CircularProgress size={24} style={{ padding: 1 }} />
-                  ) : (
-                    <AddIcon />
-                  )}
-                </IconButton>
-              </InputAdornment>
-            }
-          />
-        )}
-        <Box sx={{ width: 160 }}>
-          <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">Sorting</InputLabel>
-            <Select
+      <Stack
+        alignItems={{ sm: "flex-start", md: "center" }}
+        flexWrap={"wrap"}
+        spacing={{ xs: 1.5, md: 1 }}
+        direction={{xs:'column', sm: "row", md: "row" }}
+      >
+        <Stack direction="row" spacing={1}>
+          {!disableAddPool && (
+            <OutlinedInput
+              id="add-new-pool"
+              placeholder="Add Pool"
+              value={newProjectTitle}
+              onChange={handleChange}
+              size={"small"}
+              type={"text"}
+              disabled={trying}
+              onKeyDown={handleKeyDown}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={addNewPool}
+                    edge="end"
+                    disabled={trying || newProjectTitle?.length === 0}
+                  >
+                    {trying ? (
+                      <CircularProgress size={24} style={{ padding: 1 }} />
+                    ) : (
+                      <AddIcon />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+          )}
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          <Box>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Sorting</InputLabel>
+              <Select
+                size="small"
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={order}
+                label="Sorting"
+                onChange={handleOrderChange}
+              >
+                <MenuItem value={"default"}>Default </MenuItem>
+                <MenuItem value={"by-kickoff"}>Kickoff </MenuItem>
+                <MenuItem value={"by-deadline"}>Deadline</MenuItem>
+                <MenuItem value={"by-precedence"}>Precedence</MenuItem>
+                {/* <MenuItem value={"prio"}>By Priority</MenuItem> */}
+              </Select>
+            </FormControl>
+          </Box>
+          <Box sx={{ width: 160 }}>
+            <Autocomplete
               size="small"
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={order}
-              label="Sorting"
-              onChange={handleOrderChange}
-            >
-              <MenuItem value={"default"}>Default </MenuItem>
-              <MenuItem value={"by-kickoff"}>By Kickoff Date </MenuItem>
-              <MenuItem value={"by-deadline"}>By Deadline Date</MenuItem>
-              <MenuItem value={"by-precedence"}>By Precedence Date</MenuItem>
-              {/* <MenuItem value={"prio"}>By Priority</MenuItem> */}
-            </Select>
-          </FormControl>
-        </Box>
-        <Box sx={{ width: 160 }}>
-          <Autocomplete
-            size="small"
-            disablePortal
-            value={filterValue}
-            onChange={(event: any, newValue: string | null) => {
-              handleFilterUpdate(newValue);
-            }}
-            id="filter-goals-autocomplete-select"
-            options={filterOptions()}
-            renderInput={(params) => (
-              <TextField {...params} label="Filter By" />
-            )}
-          />
-        </Box>
-        <Box sx={{ width: 160 }}>
-          <FormControlLabel
-            sx={{ height: 36.5 }}
-            label="Show Archived"
-            control={
-              <Checkbox
-                sx={{ padding: 0.75 }}
-                checked={showArchived}
-                onChange={handleShowArchived}
-              />
-            }
-          />
-        </Box>
-        <IconButton onClick={() => setCollapseAll(true)}>
-          <KeyboardDoubleArrowDownIcon />
-        </IconButton>
-        <IconButton onClick={() => setCollapseAll(false)}>
-          <KeyboardDoubleArrowUpIcon />
-        </IconButton>
-        <Tooltip title="Join a pool using a link" placement="right" arrow>
+              disablePortal
+              value={filterValue}
+              onChange={(event: any, newValue: string | null) => {
+                handleFilterUpdate(newValue);
+              }}
+              id="filter-goals-autocomplete-select"
+              options={filterOptions()}
+              renderInput={(params) => (
+                <TextField {...params} label="Filter By" />
+              )}
+            />
+          </Box>
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          <IconButton onClick={() => setCollapseAll(true)}>
+            <KeyboardDoubleArrowDownIcon />
+          </IconButton>
+          <IconButton onClick={() => setCollapseAll(false)}>
+            <KeyboardDoubleArrowUpIcon />
+          </IconButton>
           <IconButton
             aria-label="toggle password visibility"
             onClick={() => {
               toggleJoinPoolDialogOpen(true);
             }}
-            edge="end"
           >
             <LoginOutlinedIcon />
           </IconButton>
-        </Tooltip>
 
-        <IconButton
-          onClick={() => {
-            const newColorMode =
-              theme.palette.mode === "dark" ? "light" : "dark";
-            setColorMode(newColorMode);
-            localStorage.setItem("theme", newColorMode);
-          }}
-          color="inherit"
-        >
-          {theme.palette.mode === "dark" ? (
-            <Brightness7Icon />
-          ) : (
-            <Brightness4Icon />
-          )}
-        </IconButton>
-        <IconButton
-          onClick={() => {
-            toggleFilterTagsDialog(true);
-          }}
-        >
-          <FilterAltOutlinedIcon />
-        </IconButton>
+          <IconButton
+            onClick={() => {
+              const newColorMode =
+                theme.palette.mode === "dark" ? "light" : "dark";
+              setColorMode(newColorMode);
+              localStorage.setItem("theme", newColorMode);
+            }}
+            color="inherit"
+          >
+            {theme.palette.mode === "dark" ? (
+              <Brightness7Icon />
+            ) : (
+              <Brightness4Icon />
+            )}
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              toggleFilterTagsDialog(true);
+            }}
+          >
+            <FilterAltOutlinedIcon />
+          </IconButton>
+          <Stack
+            alignItems={"center"}
+            justifyContent={"center"}
+            textAlign={"center"}
+          >
+            <FormControlLabel
+              sx={{ height: 36.5 }}
+              label="Archived"
+              control={
+                <Checkbox
+                  sx={{ padding: 0.75 }}
+                  checked={showArchived}
+                  onChange={handleShowArchived}
+                />
+              }
+            />
+          </Stack>
+        </Stack>
       </Stack>
       <FilterChips />
-      <Divider sx={{ paddingTop: 2 }} />
+      <Divider sx={{ width: "100%", marginTop: 2 }} />
     </Stack>
   );
 }
@@ -342,7 +354,9 @@ function FilterChips() {
   if (tagFilterArray.length === 0) return null;
   return (
     <Stack direction={"row"} spacing={0.5} marginTop={2}>
-      <Typography variant="body1">Filtering goals by: </Typography>
+      <Typography fontWeight={"bold"} variant="body1">
+        Filtering goals by:{" "}
+      </Typography>
       {chips.map((tag: any) => {
         return (
           <Chip

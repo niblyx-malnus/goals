@@ -115,6 +115,7 @@ const Project = memo(
               setEditingNote(!editingNote);
               setNoteValue(note);
             }}
+            editTitleCb={() => setEditingTitle(true)}
           />
         );
       }
@@ -122,7 +123,6 @@ const Project = memo(
     const ctrlPressed = useStore((store) => store.ctrlPressed);
 
     const renderQuickActions = () => {
-      
       if (!ctrlPressed) return;
       if (trying) return;
       if (!disableActions) {
@@ -260,7 +260,7 @@ const Project = memo(
               )}
             </Box>
           )}
-      {renderTitle()}
+          {renderTitle()}
           {renderArchivedTag()}
           {renderIconMenu()}
           {renderAddButton()}
@@ -347,7 +347,7 @@ const Project = memo(
           </Stack>
         )}
         <Box
-          sx={{ paddingLeft: 4 }}
+          sx={{ paddingLeft: { xs: "18px", sm: "24px", md: "24px" } }}
           style={{
             height: !isOpen ? "0px" : "auto",
             overflow: !isOpen ? "hidden" : "visible",

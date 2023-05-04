@@ -86,6 +86,7 @@ export default function IconMenu({
   onEditPoolNote,
   onEditGoalNote,
   view = "main",
+  editTitleCb,
 }: {
   actionable?: any;
   complete?: boolean;
@@ -106,6 +107,7 @@ export default function IconMenu({
   onEditGoalNote?: Function;
 
   view?: "main" | "harvest" | "list";
+  editTitleCb?: Function | undefined;
 }) {
   const navigate = useNavigate();
   const setPools = useStore((store: any) => store.setPools);
@@ -451,6 +453,15 @@ export default function IconMenu({
         <MenuItem
           onClick={() => {
             handleClose();
+            editTitleCb && setTimeout(() => editTitleCb(), 200);
+          }}
+          disableRipple
+        >
+          edit
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
             toggleGoalTagsDialog(true, {
               title: currentGoal.hitch.desc,
               id,
@@ -675,6 +686,15 @@ export default function IconMenu({
             >
               <PeopleAltOutlinedIcon fontSize="small" />
               go to page{" "}
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                editTitleCb && setTimeout(() => editTitleCb(), 200);
+              }}
+              disableRipple
+            >
+              edit
             </MenuItem>
             <MenuItem
               onClick={() => {
