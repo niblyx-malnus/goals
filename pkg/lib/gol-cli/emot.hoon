@@ -29,7 +29,7 @@
   $(unix-ms (add unix-ms 1))
 ::
 ++  en-pool-path
-  |=(=pin:gol `path`/(scot %p owner.pin)/(scot %da birth.pin))
+  |=(=pin:gol `path`/pool/(scot %p owner.pin)/(scot %da birth.pin))
 ::
 ++  de-pool-path
   |=  =path
@@ -65,10 +65,34 @@
   =/  now=@  (unique-time now.bowl log)
   this(log (put:log-orm log.state now [%updt [[pin mod pid] upd]]))
 ::
+++  view-diff
+  |=  $:  =parm:views:gol
+          =data:views:gol 
+          =update:gol
+      ==
+  ^-  diff:views:gol
+  [%tree ~]
+::
+++  views-emit
+  |=  upd=update:gol
+  =/  view-list=(list [=vid:views:gol =parm:views:gol =data:views:gol])
+    ~(tap by views)
+  |-  ?~  view-list  this
+  %=    $
+      view-list  t.view-list
+      this
+    =/  =diff:views:gol
+      (view-diff parm.i.view-list data.i.view-list upd)
+    =/  =path  /view/(scot %uv vid.i.view-list)
+    ~&  [%emitting-diff path diff]
+    (emit %give %fact ~[path] goal-view-send+!>(diff))
+  ==
+::
 ++  home-emit
   |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
   ^-  _this
-  (emit %give %fact ~[/goals] goal-home-update+!>([[pin mod pid] upd]))
+  =.  this  (views-emit upd)
+  (emit:this %give %fact ~[/goals] goal-home-update+!>([[pin mod pid] upd]))
 ::
 ++  away-emit
   |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
@@ -287,7 +311,7 @@
   =.  store  (etch:etch pin upd)
   (send-home-update [pin mod 0] upd)
 ::
-++  handle-poke
+++  handle-action
   |=  axn=action:gol
   ^-  _this
   =/  mod  src.bowl
@@ -419,8 +443,7 @@
       this
     :: owner responsible for resulting completions
     =.  src.bowl  our.bowl
-    (handle-poke:this [vzn pid.axn %mark-complete u.par])
-
+    (handle-action:this [vzn pid.axn %mark-complete u.par])
     ::
       %unmark-actionable
     =+  pok.axn

@@ -8,7 +8,8 @@
     gol-cli-json
 /=  mak-  /mar/goal/ask
 /=  mgs-  /mar/goal/say
-
+/=  mvs-  /mar/goal/view-send
+::
 |%
 +$  state-0  state-0:gol
 +$  state-1  state-1:gol  
@@ -72,7 +73,8 @@
   |-
   ?-    -.old
       %5
-    :: TODO: Reload subscriptions according to new format
+    :: TODO: Reload pool subpaths according to new format
+    :: TODO: Clear out views and view-related subpaths
     =.  old
       %=  old
         pools.store
@@ -126,26 +128,31 @@
     ?.  =(vzn -.axn)
       ~|("incompatible version" !!)
     =^  cards  state
-      abet:(handle-poke:emot axn)
+      abet:(handle-action:emot axn)
     [cards this]
   ==
 ::
 ++  on-watch
-  |=  =path
+  |=  =(pole knot)
   ^-  (quip card _this)
-  ?+    path  (on-watch:def path)
+  ?+    pole  (on-watch:def pole)
       [%ask ~]    ~&(%watching-ask ?>(=(src our):bowl `this)) :: one-off ui requests
       [%goals ~]  ~&(%watching-goals ?>(=(src our):bowl `this))
       ::
-      [@ @ ~]
+      [%pool @ @ ~]
     =^  cards  state
-      abet:(handle-watch:emot path)
+      abet:(handle-watch:emot pole)
     [cards this]
+      ::
+      [%view v=@ ~]
+    ?>  =(src our):bowl
+    ?>  (~(has by views) (slav %uv v.pole))
+    `this
   ==
 ::
 ++  on-leave
-  |=  =path
-  ?+    path  (on-leave:def path)
+  |=  =(pole knot)
+  ?+    pole  (on-leave:def pole)
       [%ask ~]    ~&(%leaving-ask `this) :: one-off ui requests
       [%goals ~]  ~&(%leaving-goals `this)
   ==
@@ -155,7 +162,8 @@
   ^-  (unit (unit cage))
   ?+    pole  (on-peek:def pole)
     [%x %store ~]  ``goal-peek+!>([%store store])
-
+    [%x %views ~]  ``goal-peek+!>([%views views])
+    ::
       [%x %initial ~]
     |^
     =;  init
@@ -333,7 +341,42 @@
 ++  handle-ask
   |=  =ask:gol
   ^-  _core
+  =/  =vid:views:gol  (sham [now eny]:bowl)
+  =/  =path  /view/(scot %uv vid)
+  =;  =data:views:gol
+    =.  views  (~(put by views) vid [pok.ask data])
+    (emit %give %fact ~[/ask] goal-say+!>([path data]))
   ?-    -.pok.ask
+      %tree
+    ?-    -.type.pok.ask
+      %main  ~&(%sending-tree [%tree pools.store])
+      ::
+        %pool
+      =/  =pools:gol
+        %+  ~(put by *pools:gol)
+          pin.type.pok.ask
+        (~(got by pools.store) pin.type.pok.ask)
+      ~&(%sending-tree [%tree pools])
+      ::
+        %goal
+      =/  =pin:gol
+        (got:idx-orm:gol index.store id.type.pok.ask)
+      =/  =pool:gol   (~(got by pools.store) pin)
+      =/  tv  ~(. gol-cli-traverse goals.pool)
+      =/  descendents=(set id:gol)
+        (virtual-progeny:tv id.type.pok.ask)
+      =/  =goals:gol
+         %-  ~(gas by *goals:gol)
+         %+  murn  ~(tap by goals.pool)
+         |=  [=id:gol =goal:gol]
+         ?.  (~(has in descendents) id)
+           ~
+         (some [id goal])
+      =/  =pools:gol
+        (~(put by *pools:gol) pin pool(goals goals))
+      ~&(%sending-tree [%tree pools])
+    ==
+    ::
       %harvest
     ?-    -.type.pok.ask
         %main
@@ -349,8 +392,7 @@
         (filter-tags method.pok.ask tags.pok.ask goals)
       :: order according to order.local.store
       ::
-      ~&  %sending-harvest
-      (emit %give %fact ~[/ask] goal-say+!>([%harvest goals]))
+      ~&(%sending-harvest [%harvest goals])
       ::
         %pool
       =/  pool  (~(got by pools.store) pin.type.pok.ask)
@@ -366,8 +408,7 @@
         (filter-tags method.pok.ask tags.pok.ask goals)
       :: order according to order.local.store
       ::
-      ~&  %sending-harvest
-      (emit %give %fact ~[/ask] goal-say+!>([%harvest goals]))
+      ~&(%sending-harvest [%harvest goals])
       ::
         %goal
       =/  =pin:gol  (got:idx-orm:gol index.store id.type.pok.ask)
@@ -384,8 +425,7 @@
         (filter-tags method.pok.ask tags.pok.ask goals)
       :: order according to order.local.store
       ::
-      ~&  %sending-harvest
-      (emit %give %fact ~[/ask] goal-say+!>([%harvest goals]))
+      ~&(%sending-harvest [%harvest goals])
     ==
     ::
       %list-view
@@ -416,8 +456,7 @@
         (filter-tags method.pok.ask tags.pok.ask goals)
       :: order according to order.local.store
       ::
-      ~&  %list-view
-      (emit %give %fact ~[/ask] goal-say+!>([%list-view goals]))
+      ~&(%sending-list-view [%list-view goals])
       ::
         %pool
       =/  pool  (~(got by pools.store) pin.type.pok.ask)
@@ -446,8 +485,7 @@
         (filter-tags method.pok.ask tags.pok.ask goals)
       :: order according to order.local.store
       ::
-      ~&  %list-view
-      (emit %give %fact ~[/ask] goal-say+!>([%list-view goals]))
+      ~&(%sending-list-view [%list-view goals])
       ::
         %goal
       =/  =pin:gol  (got:idx-orm:gol index.store id.type.pok.ask)
@@ -482,8 +520,7 @@
         (filter-tags method.pok.ask tags.pok.ask goals)
       :: order according to order.local.store
       ::
-      ~&  %list-view
-      (emit %give %fact ~[/ask] goal-say+!>([%list-view goals]))
+      ~&(%sending-list-view [%list-view goals])
     ==
   ==
 ::
