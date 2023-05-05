@@ -86,6 +86,7 @@ export default function IconMenu({
   onEditPoolNote,
   onEditGoalNote,
   view = "main",
+  editTitleCb,
 }: {
   actionable?: any;
   complete?: boolean;
@@ -106,6 +107,7 @@ export default function IconMenu({
   onEditGoalNote?: Function;
 
   view?: "main" | "harvest" | "list";
+  editTitleCb?: Function | undefined;
 }) {
   const navigate = useNavigate();
   const setPools = useStore((store: any) => store.setPools);
@@ -420,8 +422,6 @@ export default function IconMenu({
     }
   };
   const goTo = (destination: string) => {
-    //clear the pools in the store to prevent flickering when navigating
-    setPools([]);
     navigate(destination);
   };
   const renderTreeGoalMenu = () => {
@@ -449,6 +449,15 @@ export default function IconMenu({
           disableRipple
         >
           go to page
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            editTitleCb && setTimeout(() => editTitleCb(), 200);
+          }}
+          disableRipple
+        >
+          edit
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -677,6 +686,15 @@ export default function IconMenu({
             >
               <PeopleAltOutlinedIcon fontSize="small" />
               go to page{" "}
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                editTitleCb && setTimeout(() => editTitleCb(), 200);
+              }}
+              disableRipple
+            >
+              edit
             </MenuItem>
             <MenuItem
               onClick={() => {

@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Loading } from "../types/types";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
@@ -30,12 +30,12 @@ import Box from "@mui/material/Box";
 //TODO: move click navigation to ctrl + click
 //TODO: quick actions should contain complete(if applicable)/archive/go to page
 //TODO: Important: reduce render load by adding a programtic on hover event to projects/goals (quick action render gate)
-//TODO: mobile exp (add edit goal/pool title, reduce indentation, hide somethings all together, improve header spacing when broken down...)
-//TODO: remember user's choice of theme
 //TODO: display loading/error states in harvest/list views
+//TODO: move scrollbar inside views?
 //Waiting on Thomas:
-//TODO: sort and filter (complete...) harvest and list view
+//TODO: sort and filter (remove filter by actionable, complete should be easy filter flat list gtg  ) harvest and list view
 //TODO: fix perm issues in harvest/list views (pool perm not found)
+//TODO: go to parent goal | go to parent pool buttons next to nacvigate home
 function Main({
   fetchInitialCallback,
   displayPools,
@@ -48,6 +48,12 @@ function Main({
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  const location = useLocation();
+  useEffect(() => {
+    //clear the pools in the store to prevent flickering when navigating
+    setPoolStore([]);
+  }, [location.pathname]);
 
   const order = useStore((store) => store.order);
   const setRoleMap = useStore((store) => store.setRoleMap);
@@ -257,8 +263,6 @@ function Main({
 
         <Button
           onClick={() => {
-            //clear the pools in the store to prevent flickering when navigating
-            setPoolStore([]);
             navigate("/apps/gol-cli");
           }}
           sx={{ fontWeight: "bold" }}
@@ -266,27 +270,19 @@ function Main({
           {" "}
           Navigate Home
         </Button>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Box>
           <Tabs
             value={value}
             onChange={handleChange}
             aria-label="basic tabs example"
           >
+            <Tab sx={{ fontWeight: "bold" }} label="Tree" {...a11yProps(0)} />
             <Tab
               sx={{ fontWeight: "bold" }}
-              label="Tree View"
-              {...a11yProps(0)}
-            />
-            <Tab
-              sx={{ fontWeight: "bold" }}
-              label="Harvest View"
+              label="Harvest"
               {...a11yProps(1)}
             />
-            <Tab
-              sx={{ fontWeight: "bold" }}
-              label="List View"
-              {...a11yProps(2)}
-            />
+            <Tab sx={{ fontWeight: "bold" }} label="List" {...a11yProps(2)} />
           </Tabs>
         </Box>
 

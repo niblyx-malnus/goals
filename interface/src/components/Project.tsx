@@ -56,6 +56,8 @@ const Project = memo(
     const trying: any = getTrying(pin.birth);
     const setTrying = useStore((store) => store.setTrying);
 
+    const [hovering, setHovering] = useState<boolean>(false);
+
     const [noteValue, setNoteValue] = useState<string>("");
     const [editingNote, setEditingNote] = useState<boolean>(false);
     const onNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,6 +117,7 @@ const Project = memo(
               setEditingNote(!editingNote);
               setNoteValue(note);
             }}
+            editTitleCb={() => setEditingTitle(true)}
           />
         );
       }
@@ -122,10 +125,8 @@ const Project = memo(
     const ctrlPressed = useStore((store) => store.ctrlPressed);
 
     const renderQuickActions = () => {
-      
-      if (!ctrlPressed) return;
       if (trying) return;
-      if (!disableActions) {
+      if (!disableActions && ctrlPressed && hovering) {
         return (
           <QuickActions
             poolData={{ title, permList, pin }}
@@ -227,6 +228,8 @@ const Project = memo(
     return (
       <Box sx={{ marginBottom: 1 }}>
         <StyledTreeItem
+          onMouseOver={() => setHovering(true)}
+          onMouseOut={() => setHovering(false)}
           sx={{
             "&:hover": {
               cursor: "pointer",
@@ -260,7 +263,7 @@ const Project = memo(
               )}
             </Box>
           )}
-      {renderTitle()}
+          {renderTitle()}
           {renderArchivedTag()}
           {renderIconMenu()}
           {renderAddButton()}
@@ -347,7 +350,7 @@ const Project = memo(
           </Stack>
         )}
         <Box
-          sx={{ paddingLeft: 4 }}
+          sx={{ paddingLeft: { xs: "18px", sm: "24px", md: "24px" } }}
           style={{
             height: !isOpen ? "0px" : "auto",
             overflow: !isOpen ? "hidden" : "visible",

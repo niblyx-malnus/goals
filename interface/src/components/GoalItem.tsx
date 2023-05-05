@@ -101,6 +101,7 @@ const GoalItem = memo(
 
     const [noteValue, setNoteValue] = useState<string>("");
     const [editingNote, setEditingNote] = useState<boolean>(false);
+    const [hovering, setHovering] = useState<boolean>(false);
     const onNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       setNoteValue(event.target.value);
     };
@@ -221,18 +222,18 @@ const GoalItem = memo(
               setNoteValue("note");
             }}
             view={view}
+            editTitleCb={() => setEditingTitle(true)}
           />
         );
       }
     };
     const renderQuickActions = () => {
-      if (!ctrlPressed) return;
       if ((poolRole === "spawn" || poolRole === null) && !isChief) return;
       if (poolRole !== "owner" && poolRole !== "admin" && goal.isArchived)
         return;
       if (trying) return;
 
-      if (!disableActions) {
+      if (!disableActions && ctrlPressed && hovering) {
         return (
           <QuickActions
             type="goal"
@@ -322,22 +323,56 @@ const GoalItem = memo(
         </Typography>
       </Box>
     );
+    const renderExpandIcon = () => {
+      if (!trying)
+        return (
+          <Box
+            sx={{
+              position: "absolute",
+              left: -24,
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+
+              height: "100%",
+            }}
+          >
+            {children && children.length > 0 && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+                className="icon-container"
+                onClick={() => toggleItemOpen(!isOpen)}
+              >
+                {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
+              </Box>
+            )}
+          </Box>
+        );
+    };
     const renderTitle = () => {
       if ((poolRole === "spawn" || poolRole === null) && !isChief)
         return noEditPermTitle;
       return !editingTitle ? (
         <Box
           sx={{
+            position: "relative",
             backgroundColor: getColor(),
             margin: 0.2,
             paddingLeft: 1,
             paddingRight: 1,
             borderRadius: 1,
           }}
-          onClick={() => {
+          onClick={(e) => {
             updateSelectedGoal(idObject, !selected);
           }}
         >
+          {renderExpandIcon()}
           <Typography
             variant="h6"
             //TODO: we want adding a goal to not put on disabled text (maybe?)
@@ -434,6 +469,8 @@ const GoalItem = memo(
         }}
       >
         <StyledTreeItem
+          onMouseOver={() => setHovering(true)}
+          onMouseOut={() => setHovering(false)}
           sx={{
             "&:hover": {
               cursor: "pointer",
@@ -446,30 +483,6 @@ const GoalItem = memo(
           flexWrap={"wrap"}
         >
           <>
-            {!trying && (
-              <Box
-                sx={{
-                  position: "absolute",
-                  left: -24,
-                  display: "flex",
-                  flexDirection: "row",
-                }}
-              >
-                {children && children.length > 0 && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                    className="icon-container"
-                    onClick={() => toggleItemOpen(!isOpen)}
-                  >
-                    {isOpen ? <ExpandMoreIcon /> : <ChevronRightIcon />}
-                  </Box>
-                )}
-              </Box>
-            )}
             <Box ref={drag}>{renderTitle()}</Box>
 
             {tags.map((tag: any) => {
@@ -500,6 +513,7 @@ const GoalItem = memo(
             {renderIconMenu()}
 
             {renderAddButton()}
+
             {renderProgress()}
 
             {renderQuickActions()}
@@ -587,7 +601,7 @@ const GoalItem = memo(
           </Stack>
         )}
         <Box
-          sx={{ paddingLeft: "24px" }}
+          sx={{ paddingLeft: { xs: "18px", sm: "24px", md: "24px" } }}
           style={{
             position: "relative",
             height: !isOpen ? "0px" : "auto",

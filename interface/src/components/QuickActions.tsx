@@ -6,21 +6,13 @@ import Stack from "@mui/material/Stack";
 
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
-import LogoutIcon from "@mui/icons-material/Logout";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import PlayForWorkIcon from "@mui/icons-material/PlayForWork";
-import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
-import FolderCopyOutlinedIcon from "@mui/icons-material/FolderCopyOutlined";
-import AgricultureOutlinedIcon from "@mui/icons-material/AgricultureOutlined";
-import OpenWithOutlinedIcon from "@mui/icons-material/OpenWithOutlined";
-import LinkOutlinedIcon from "@mui/icons-material/LinkOutlined";
 import RestoreOutlinedIcon from "@mui/icons-material/RestoreOutlined";
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 import LaunchIcon from "@mui/icons-material/Launch";
-import Divider from "@mui/material/Divider";
-import Box from "@mui/material/Box";
+
 import { GoalId, PinId } from "../types/types";
-import { log, uuid } from "../helpers";
+import { log } from "../helpers";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
 
@@ -531,12 +523,7 @@ export default function QuickActions({
     );
   };
   return (
-    <Stack
-      direction="row"
-      className="show-on-hover"
-      sx={{ opacity: 0 }}
-      marginLeft={1}
-    >
+    <Stack direction="row" marginLeft={1}>
       {type === "goal" ? renderGoalMenu() : renderPoolMenu()}
     </Stack>
   );
