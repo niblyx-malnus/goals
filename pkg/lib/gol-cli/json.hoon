@@ -51,10 +51,11 @@
   |^  ^-  json
   %-   pairs
   :~  [%path (path path.say)]
+      :-  %data
       ?-    -.data.say
-        %tree       [%tree (enjs-pools pools.data.say)]
-        %harvest    [%harvest a+(turn goals.data.say enjs-id-pin-goal)]
-        %list-view  [%list-view a+(turn goals.data.say enjs-id-pin-goal)]
+        %tree       (frond %tree (enjs-pools pools.data.say))
+        %harvest    (frond %harvest a+(turn goals.data.say enjs-id-pin-goal))
+        %list-view  (frond %list-view a+(turn goals.data.say enjs-id-pin-goal))
       ==
   ==
   ++  enjs-id-pin-goal
