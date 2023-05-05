@@ -229,7 +229,7 @@
   =,  enjs:format
   |=  =send:views
   ?-  -.send
-    %dot        (frond %dot ~)
+    %dot        s+%dot
     %tree       (frond %tree ~) 
     %harvest    (frond %harvest ~)
     %list-view  (frond %list-view ~)
@@ -479,8 +479,18 @@
   ^-  json
   =-  o/(malt -)
   %+  turn  ~(tap by views)
-  |=  [k=@uv p=parm:^views data:^views]
-  [(scot %uv k) `json`(enjs-view-parm p)]
+  |=  [k=@uv v=view:^views]
+  [(scot %uv k) `json`(enjs-view v)]
+::
+++  enjs-view
+  =,  enjs:format
+  |=  =view:views
+  ^-  json
+  %-  pairs
+  :~  [%ack b+ack.view]
+      [%parm (enjs-view-parm parm.view)]
+      [%data s+%enjs-not-implemented]
+  ==
 ::
 ++  enjs-view-parm
   =,  enjs:format

@@ -238,7 +238,8 @@
     =<  views
     |%
     +$  vid  @uv
-    +$  views  (map vid [=parm =data])
+    +$  views  (map vid view)
+    +$  view  [ack=_| =parm =data]
     +$  parm
       $%  [%tree parm:tree]
           [%harvest parm:harvest]

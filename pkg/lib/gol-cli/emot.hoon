@@ -8,6 +8,7 @@
     gols   ~(. gol-cli-goals store)
     etch   ~(. gol-cli-etch store)
     vzn    vzn:gol
+    vyu    views:gol
 +$  card  card:agent:gall
 ++  abet  [(flop cards) state]
 ++  emit  |=(=card this(cards [card cards]))
@@ -66,24 +67,24 @@
   this(log (put:log-orm log.state now [%updt [[pin mod pid] upd]]))
 ::
 ++  view-diff
-  |=  $:  =parm:views:gol
-          =data:views:gol 
+  |=  $:  =parm:vyu
+          =data:vyu
           =update:gol
       ==
-  ^-  diff:views:gol
+  ^-  diff:vyu
   [%tree ~]
 ::
 ++  views-emit
   |=  upd=update:gol
-  =/  view-list=(list [=vid:views:gol =parm:views:gol =data:views:gol])
-    ~(tap by views)
+  ^-  _this
+  =/  view-list=(list [=vid:vyu view:vyu])  ~(tap by views)
   |-  ?~  view-list  this
   %=    $
       view-list  t.view-list
       this
-    =/  =diff:views:gol
-      (view-diff parm.i.view-list data.i.view-list upd)
-    =/  =path  /view/(scot %uv vid.i.view-list)
+    =,  i.view-list
+    =/  =diff:vyu  (view-diff parm data upd)
+    =/  =path  /view/(scot %uv vid)
     ~&  [%emitting-diff path diff]
     (emit %give %fact ~[path] goal-view-send+!>(diff))
   ==

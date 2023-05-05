@@ -9,6 +9,7 @@
 /=  mak-  /mar/goal/ask
 /=  mgs-  /mar/goal/say
 /=  mvs-  /mar/goal/view-send
+/=  vak-  /mar/view-ack
 ::
 |%
 +$  state-0  state-0:gol
@@ -114,6 +115,11 @@
       |=  [duct =ship =path]
       ?.(?=([%goals ~] path) ~ (some ship))
     ==
+    ::
+      %view-ack
+    =/  =vid:views:gol  !<(vid:views:gol vase)
+    =/  =view:views:gol  (~(got by views) vid)
+    `this(views (~(put by views) vid view(ack &)))
     ::
       %goal-ask
     =/  =ask:gol  !<(ask:gol vase)
@@ -324,10 +330,32 @@
   ==
 ::
 ++  on-arvo
-  |=  [=wire =sign-arvo]
+  |=  [=(pole knot) =sign-arvo]
   ^-  (quip card _this)
-  ?+  wire  (on-arvo:def wire sign-arvo)
-    [%bind-ask ~]  ?>(?=([%eyre %bound %.y *] sign-arvo) `this)
+  ?+    pole  (on-arvo:def pole sign-arvo)
+      [%send-dot v=@ ~]
+    ?+    sign-arvo  (on-arvo pole sign-arvo)
+        [%behn %wake *]
+      ~&  %sending-dot
+      :_  this
+      =/  view-path=path  /view/[v.pole]
+      =/  cack-path=path  /check-ack/[v.pole]
+      :~  [%give %fact ~[view-path] goal-view-send+!>([%dot ~])]
+          [%pass cack-path %arvo %b %wait (add now.bowl ~m1)]
+      ==
+    ==
+    ::
+      [%check-ack v=@ ~]
+    =/  =vid:views:gol  (slav %uv v.pole)
+    ?+    sign-arvo  (on-arvo pole sign-arvo)
+        [%behn %wake *]
+      ~&  %checking-ack
+      ?:  ack:(~(got by views) vid)
+        =/  next=@da  (add now.bowl ~m1)
+        :_(this [%pass /send-dot/[v.pole] %arvo %b %wait next]~)
+      :_  this(views (~(del by views) vid))
+      [%give %kick ~[/view/[v.pole]] ~]~
+    ==
   ==
 ::
 ++  on-fail   on-fail:def
@@ -342,10 +370,13 @@
   |=  =ask:gol
   ^-  _core
   =/  =vid:views:gol  (sham [now eny]:bowl)
-  =/  =path  /view/(scot %uv vid)
+  =/  view-path=path  /view/(scot %uv vid)
   =;  =data:views:gol
-    =.  views  (~(put by views) vid [pok.ask data])
-    (emit %give %fact ~[/ask] goal-say+!>([path data]))
+    =.  views  (~(put by views) vid [| pok.ask data])
+    =/  time-path=path  /send-dot/(scot %uv vid)
+    =/  next=@da  (add now.bowl ~m1)
+    =.  core  (emit %pass time-path %arvo %b %wait next)
+    (emit:core %give %fact ~[/ask] goal-say+!>([view-path data]))
   ?-    -.pok.ask
       %tree
     ?-    -.type.pok.ask
