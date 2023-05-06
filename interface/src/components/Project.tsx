@@ -21,6 +21,8 @@ import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
 import QuickActions from "./QuickActions";
 import { useNavigate } from "react-router-dom";
+import { useDrag, useDrop } from "react-dnd";
+import { grey } from "@mui/material/colors";
 
 const Project = memo(
   ({
@@ -55,6 +57,39 @@ const Project = memo(
     const getTrying: any = useStore((store) => store.getTrying);
     const trying: any = getTrying(pin.birth);
     const setTrying = useStore((store) => store.setTrying);
+    const toggleSnackBar = useStore((store) => store.toggleSnackBar);
+
+    const moveGoal = async (targetGoalId: any) => {
+      try {
+        const result = await api.moveGoal(pin, targetGoalId, null);
+        toggleSnackBar(true, {
+          message: "successfully moved goal",
+          severity: "success",
+        });
+
+        log("moveGoal result =>", result);
+      } catch (e) {
+        log("moveGoal error =>", e);
+        toggleSnackBar(true, {
+          message: "failed to move goal",
+          severity: "error",
+        });
+      }
+    };
+    const [{ isOver, canDrop }, drop] = useDrop(
+      () => ({
+        accept: "goal",
+        drop: async (data: any) => {
+          const incomingId = data.fullGoalId;
+          moveGoal(incomingId);
+        },
+        collect: (monitor: any) => ({
+          isOver: !!monitor.isOver(),
+          canDrop: !!monitor.canDrop(),
+        }),
+      }),
+      []
+    );
 
     const [hovering, setHovering] = useState<boolean>(false);
 
@@ -238,6 +273,7 @@ const Project = memo(
               },
             },
           }}
+          ref={drop}
         >
           {!trying && (
             <Box
@@ -263,7 +299,9 @@ const Project = memo(
               )}
             </Box>
           )}
-          {renderTitle()}
+          <Box sx={{ backgroundColor: isOver ? grey[400] : "transparent" }}>
+            {renderTitle()}
+          </Box>
           {renderArchivedTag()}
           {renderIconMenu()}
           {renderAddButton()}

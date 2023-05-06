@@ -22,7 +22,6 @@ import Box from "@mui/material/Box";
 //TODO: handle sub kick/error
 //TODO: add relay to edit inputs also and test the other pokes
 //TODO: Don't allow to drop goal over itself
-//TODO: make the highlighting grey?(drag and drop)
 //TODO: add tooltips to header buttons
 //TODO: fix groups scry
 //TODO: add loading state to reordering

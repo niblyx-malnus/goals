@@ -530,23 +530,6 @@ export default function IconMenu({
         {!harvestGoal && (
           <>
             <Divider />
-            <MenuItem onClick={handleMove} disableRipple>
-              <OpenWithOutlinedIcon fontSize="small" />
-              move
-            </MenuItem>
-            <MenuItem onClick={moveGoalToRoot} disableRipple>
-              <OpenWithOutlinedIcon fontSize="small" />
-              move to root
-            </MenuItem>
-            <Divider />
-            {/* <MenuItem onClick={handlePriortize} disableRipple>
-        <LinkOutlinedIcon fontSize="small" />
-        prioritize
-      </MenuItem>
-      <MenuItem onClick={handlePrecede} disableRipple>
-        <LinkOutlinedIcon fontSize="small" />
-        precede
-  </MenuItem>*/}
             <MenuItem onClick={handleNest} disableRipple>
               <LinkOutlinedIcon fontSize="small" />
               virtually nest

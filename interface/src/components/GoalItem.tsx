@@ -18,7 +18,7 @@ import Stack from "@mui/material/Stack";
 import Badge from "@mui/material/Badge";
 import TextField from "@mui/material/TextField";
 import { log, shipName, getRoleTitle } from "../helpers";
-import { blue, orange, green, red, purple } from "@mui/material/colors";
+import { blue, orange, green, red, purple, grey } from "@mui/material/colors";
 import api from "../api";
 import { useDrag, useDrop } from "react-dnd";
 import QuickActions from "./QuickActions";
@@ -69,7 +69,7 @@ const GoalItem = memo(
   GoalItemProps) => {
     const [{ isDragging }, drag] = useDrag(() => ({
       type: "goal",
-      item: { goalId: virtualId ? virtualId : id },
+      item: { goalId: virtualId ? virtualId : id, fullGoalId: idObject },
       collect: (monitor: any) => ({
         isDragging: !!monitor.isDragging(),
       }),
@@ -82,13 +82,28 @@ const GoalItem = memo(
         setDraggingParentId(null);
       }
     }, [isDragging]);
+
+    const [{ isOver, canDrop }, drop] = useDrop(
+      () => ({
+        accept: "goal",
+        drop: async (data: any) => {
+          const currentId = idObject;
+          const incomingId = data.fullGoalId;
+          moveGoal(currentId, incomingId);
+        },
+        collect: (monitor: any) => ({
+          isOver: !!monitor.isOver(),
+          canDrop: !!monitor.canDrop(),
+        }),
+      }),
+      []
+    );
     const [isOpen, toggleItemOpen] = useState<boolean | null>(null);
     const [selected, setSelected] = useState(isSelected);
     const [yoking, setYoking] = useState<boolean>(false);
     const [addingGoal, setAddingGoal] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const setTrying = useStore((store) => store.setTrying);
-
     const getTrying: any = useStore((store) => store.getTrying);
     const trying: any = getTrying(id);
     const [isChief, setIsChief] = useState<boolean>(false);
@@ -106,7 +121,25 @@ const GoalItem = memo(
       setNoteValue(event.target.value);
     };
     const ctrlPressed = useStore((store) => store.ctrlPressed);
+    const toggleSnackBar = useStore((store) => store.toggleSnackBar);
 
+    const moveGoal = async (targetGoalId: any, currentGoalId: any) => {
+      try {
+        const result = await api.moveGoal(pin, currentGoalId, targetGoalId);
+        toggleSnackBar(true, {
+          message: "successfully moved goal",
+          severity: "success",
+        });
+
+        log("moveGoal result =>", result);
+      } catch (e) {
+        log("moveGoal error =>", e);
+        toggleSnackBar(true, {
+          message: "failed to move goal",
+          severity: "error",
+        });
+      }
+    };
     const handleNoteKeyDown = (
       event: React.KeyboardEvent<HTMLInputElement>
     ) => {
@@ -481,9 +514,15 @@ const GoalItem = memo(
           }}
           direction={"row"}
           flexWrap={"wrap"}
+          ref={view === "main" ? drop : null}
         >
           <>
-            <Box ref={drag}>{renderTitle()}</Box>
+            <Box
+              ref={view === "main" ? drag : null}
+              sx={{ backgroundColor: isOver ? grey[200] : "transparent" }}
+            >
+              {renderTitle()}
+            </Box>
 
             {tags.map((tag: any) => {
               return (
