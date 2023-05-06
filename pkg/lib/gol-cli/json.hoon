@@ -1,36 +1,31 @@
 /-  *goal
 /+  *gol-cli-util
 |%
-++  dejs-ask
+++  dejs-view-parm
   =,  dejs:format
-  |=  jon=json
-  |^  ^-  ask
-  :-  vzn
-  %.  jon
-  %-  ot
-  :~  pid+so
-      :-  %pok
-      %-  of
-      :~  :-  %harvest
-          %-  ot
-          :~  type+dejs-harvest-type
-              method+dejs-method
-              tags+(as dejs-tag)
-          ==
-          :-  %list-view
-          %-  ot
-          :~  type+dejs-list-view-type
-              first-gen-only+bo
-              actionable-only+bo
-              method+dejs-method
-              tags+(as dejs-tag)
-          ==
+  ^-  $-(json parm:views)
+  |^  %-  of
+  :~  [%tree (ot ~[type+dejs-tree-type])]
+      :-  %harvest
+      %-  ot
+      :~  type+dejs-harvest-type
+          method+dejs-method
+          tags+(as dejs-tag)
+      ==
+      :-  %list-view
+      %-  ot
+      :~  type+dejs-list-view-type
+          first-gen-only+bo
+          actionable-only+bo
+          method+dejs-method
+          tags+(as dejs-tag)
       ==
   ==
   ++  dejs-method
     =/  cuk  |=(=@t ;;(?(%any %all) t))
     =/  par  ;~(pose (jest 'any') (jest 'all'))
     (su (cook cuk par))
+  ++  dejs-tree-type  dejs-harvest-type
   ++  dejs-harvest-type
     %-  of
     :~  main+|=(jon=json ?>(?=(~ jon) ~))
@@ -44,14 +39,24 @@
         goal+(ot ~[id+dejs-id ignore-virtual+bo])
     ==
 --
+++  dejs-ask
+  =,  dejs:format
+  |=  jon=json
+  ~|  json-ask+(en-json:html jon)
+  `ask`[vzn %.(jon (ot ~[pid+so pok+dejs-view-parm]))]
 ::
 ++  enjs-say
   =,  enjs:format
   |=  =say
   |^  ^-  json
-  ?-    -.say
-    %harvest    (frond %harvest a+(turn goals.say enjs-id-pin-goal))
-    %list-view  (frond %list-view a+(turn goals.say enjs-id-pin-goal))
+  %-   pairs
+  :~  [%path (path path.say)]
+      :-  %data
+      ?-    -.data.say
+        %tree       (frond %tree (enjs-pools pools.data.say))
+        %harvest    (frond %harvest a+(turn goals.data.say enjs-id-pin-goal))
+        %list-view  (frond %list-view a+(turn goals.data.say enjs-id-pin-goal))
+      ==
   ==
   ++  enjs-id-pin-goal
     |=  [=id =pin =goal]
@@ -219,6 +224,16 @@
   %-  pairs
   :~  [%id (enjs-id id)]
       [%tags a+(turn ~(tap in tags) enjs-tag)]
+  ==
+::
+++  enjs-view-send
+  =,  enjs:format
+  |=  =send:views
+  ?-  -.send
+    %dot        s+%dot
+    %tree       (frond %tree ~) 
+    %harvest    (frond %harvest ~)
+    %list-view  (frond %list-view ~)
   ==
 ::
 ++  enjs-home-update
@@ -414,12 +429,9 @@
   |=  pyk=peek
   ^-  json
   ?-    -.pyk
-      %store
-    %+  frond
-      %store
-    %-  pairs
-    :~  [%store (enjs-store store.pyk)]
-    ==
+    %store  (frond %store (enjs-store store.pyk))
+    %views  (frond %views (enjs-views views.pyk))
+    ::
       %initial
     %-  pairs
     :~  [%store (enjs-store store.pyk)]
@@ -461,6 +473,72 @@
     %pool-hitch  (frond pool-hitch+(enjs-pool-hitch ph.pyk))
     %goal-hitch  (frond goal-hitch+(enjs-goal-hitch gh.pyk))
   ==
+::
+++  enjs-views
+  =,  enjs:format
+  |=  =views
+  ^-  json
+  =-  o/(malt -)
+  %+  turn  ~(tap by views)
+  |=  [k=@uv v=view:^views]
+  [(scot %uv k) `json`(enjs-view v)]
+::
+++  enjs-view
+  =,  enjs:format
+  |=  =view:views
+  ^-  json
+  %-  pairs
+  :~  [%ack b+ack.view]
+      [%parm (enjs-view-parm parm.view)]
+      [%data s+%enjs-not-implemented]
+  ==
+::
+++  enjs-view-parm
+  =,  enjs:format
+  |=  =parm:views
+  |^  ^-  json
+  ?-    -.parm
+    %tree  (frond [%type (enjs-tree-type type.parm)])
+      %harvest
+    %-  pairs
+    :~  [%type (enjs-harvest-type type.parm)]
+        [%method s+method.parm]
+        [%tags a+(turn ~(tap in tags.parm) enjs-tag)]
+    ==
+    ::
+      %list-view
+    %-  pairs
+    :~  [%type (enjs-list-view-type type.parm)]
+        [%first-gen-only b+first-gen-only.parm]
+        [%actionable-only b+actionable-only.parm]
+        [%method s+method.parm]
+        [%tags a+(turn ~(tap in tags.parm) enjs-tag)]
+    ==
+  ==
+  ++  enjs-tree-type  enjs-harvest-type
+  ++  enjs-harvest-type
+    |=  =type:harvest:views
+    ^-  json
+    ?-  -.type
+      %main  (frond %main ~)
+      %pool  (frond %pool (enjs-pin pin.type))
+      %goal  (frond %goal (enjs-id id.type))
+    ==
+  ++  enjs-list-view-type
+    |=  =type:list-view:views
+    ^-  json
+    ?-    -.type
+      %main  (frond %main ~)
+      %pool  (frond %pool (enjs-pin pin.type))
+      ::
+        %goal
+      %+  frond  %goal
+      %-  pairs
+      :~  [%id (enjs-id id.type)]
+          [%ignore-virtual b+ignore-virtual.type]
+      ==
+    ==
+  --
 ::
 ++  enjs-store
   =,  enjs:format

@@ -1,13 +1,15 @@
 /-  gol=goal
 /+  *gol-cli-util, pl=gol-cli-pool, nd=gol-cli-node, tv=gol-cli-traverse,
-    gol-cli-etch, fl=gol-cli-inflater, gol-cli-goals
+    gol-cli-etch, gol-cli-view, fl=gol-cli-inflater, gol-cli-goals
 ::
 |_  [=bowl:gall cards=(list card:agent:gall) state-5:gol]
 +*  this   .
     state  +<+>
     gols   ~(. gol-cli-goals store)
     etch   ~(. gol-cli-etch store)
+    view   ~(. gol-cli-view store)
     vzn    vzn:gol
+    vyu    views:gol
 +$  card  card:agent:gall
 ++  abet  [(flop cards) state]
 ++  emit  |=(=card this(cards [card cards]))
@@ -29,7 +31,7 @@
   $(unix-ms (add unix-ms 1))
 ::
 ++  en-pool-path
-  |=(=pin:gol `path`/(scot %p owner.pin)/(scot %da birth.pin))
+  |=(=pin:gol `path`/pool/(scot %p owner.pin)/(scot %da birth.pin))
 ::
 ++  de-pool-path
   |=  =path
@@ -65,10 +67,26 @@
   =/  now=@  (unique-time now.bowl log)
   this(log (put:log-orm log.state now [%updt [[pin mod pid] upd]]))
 ::
+++  views-emit
+  |=  upd=update:gol
+  ^-  _this
+  =/  view-list=(list [=vid:vyu view:vyu])  ~(tap by views)
+  |-  ?~  view-list  this
+  %=    $
+      view-list  t.view-list
+      this
+    =,  i.view-list
+    =/  =diff:vyu  (view-diff:view parm data upd)
+    =/  =path  /view/(scot %uv vid)
+    ~&  [%emitting-diff path diff]
+    (emit %give %fact ~[path] goal-view-send+!>(diff))
+  ==
+::
 ++  home-emit
   |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
   ^-  _this
-  (emit %give %fact ~[/goals] goal-home-update+!>([[pin mod pid] upd]))
+  =.  this  (views-emit upd)
+  (emit:this %give %fact ~[/goals] goal-home-update+!>([[pin mod pid] upd]))
 ::
 ++  away-emit
   |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
@@ -280,6 +298,23 @@
   ?~  upd  this
   (send-home-update [pin our.bowl 0] u.upd)
 ::
+++  handle-ask
+  |=  =ask:gol
+  ^-  _this
+  =/  =vid:views:gol  (sham [now eny]:bowl)
+  =/  view-path=path  /view/(scot %uv vid)
+  =/  =data:views:gol  (view-data:view pok.ask)
+  =.  views  (~(put by views) vid [| pok.ask data])
+  =/  time-path=path  /send-dot/(scot %uv vid)
+  =/  next=@da  (add now.bowl ~m1)
+  =.  this  (emit %pass time-path %arvo %b %wait next)
+  ~&  ?-  -.data
+        %tree       %sending-tree
+        %harvest    %sending-harvest
+        %list-view  %sending-list-view
+      ==
+  (emit:this %give %fact ~[/ask] goal-say+!>([view-path data]))
+::
 ++  handle-etch-pool-update
   |=  [=pin:gol [mod=ship pid=@] upd=update:gol]
   ?.  =(vzn -.upd)  :: assert updates are correct version
@@ -287,7 +322,7 @@
   =.  store  (etch:etch pin upd)
   (send-home-update [pin mod 0] upd)
 ::
-++  handle-poke
+++  handle-action
   |=  axn=action:gol
   ^-  _this
   =/  mod  src.bowl
@@ -419,8 +454,7 @@
       this
     :: owner responsible for resulting completions
     =.  src.bowl  our.bowl
-    (handle-poke:this [vzn pid.axn %mark-complete u.par])
-
+    (handle-action:this [vzn pid.axn %mark-complete u.par])
     ::
       %unmark-actionable
     =+  pok.axn

@@ -1,10 +1,15 @@
 /-  *group, ms=metadata-store :: need to keep for historical reasons
 /+  *gol-cli-util
 |%
+:: TODO:
+:: - Update ask to include sorting as a parameter
+:: - Include pin in goal initial
+:: - Include pool role in harvest and list view
+:: - Add young to roots in trace for a goal page initial
 ::
 ++  vzn  %5
 ::
-+$  state-5  [%5 =store:s5 =log:s5]
++$  state-5  [%5 =store:s5 =views:s5 =log:s5]
 +$  state-4  [%4 =store:s4 =groups =log:s4]
 +$  state-3  [%3 =store:s3]
 +$  state-2  [%2 =store:s2]
@@ -51,6 +56,8 @@
 ++  idx-orm       idx-orm:s5
 ::
 +$  store         store:s5
+::
+++  views         views:s5
 ::
 +$  nux           nux:s5
 +$  nex           nex:s5
@@ -219,6 +226,89 @@
         cache=pools
         =local
     ==
+  :: a view is a distorted view of the store, a perspective,
+  :: a transformation
+  ::
+  :: TODO:
+  :: - include sorting as a parameter
+  :: - Include pin in goal initial (for tree view?)
+  :: - Include pool role in harvest and list view
+  :: - Add young to roots in trace for a goal page initial
+  ++  views
+    =<  views
+    |%
+    +$  vid  @uv
+    +$  views  (map vid view)
+    +$  view  [ack=_| =parm =data]
+    +$  parm
+      $%  [%tree parm:tree]
+          [%harvest parm:harvest]
+          [%list-view parm:list-view]
+      ==
+    +$  data
+      $%  [%tree data:tree]
+          [%harvest data:harvest]
+          [%list-view data:list-view]
+      ==
+    :: dots must be acked
+    ::
+    +$  send  $%([%dot ~] diff)
+    +$  diff
+      $%  [%tree diff:tree]
+          [%harvest diff:harvest]
+          [%list-view diff:list-view]
+      ==
+    ++  tree
+      |%
+      +$  parm  $:(=type)
+      +$  type  $%([%main ~] [%pool =pin] [%goal =id])
+      +$  data  $:(=pools)
+      +$  diff  ~
+      --
+    ++  harvest
+      |%
+      +$  parm
+        $:  =type
+            method=?(%any %all)
+            tags=(set tag)
+        ==
+      +$  type  $%([%main ~] [%pool =pin] [%goal =id])
+      +$  data  $:(goals=(list [id pack]))
+      +$  pack  [pin goal]
+      +$  diff  ~
+      ::  $:  pool-role=(unit pool-role)
+      ::      nexus=goal-nexus
+      ::      trace=goal-trace
+      ::      hitch=goal-hitch
+      ::  ==
+      --
+    ++  list-view
+      |%
+      +$  parm
+        $:  =type
+            first-gen-only=_|
+            actionable-only=_|
+            method=?(%any %all)
+            tags=(set tag)
+        ==
+      +$  type
+        $%  [%main ~]
+            [%pool =pin]
+            [%goal =id ignore-virtual=_|]
+        ==
+      +$  data  $:(goals=(list [id pack]))
+      +$  pack  [pin goal]
+      +$  diff  ~
+      ::  $:  pool-role=(unit pool-role)
+      ::      nexus=goal-nexus
+      ::      trace=goal-trace
+      ::      hitch=goal-hitch
+      ::  ==
+      --
+    --
+  ::
+  +$  ask  [%5 pid=@ pok=parm:views]
+  +$  say  [=path =data:views]
   ::
   +$  nux  [goal-nexus goal-trace]
   +$  nex  (map id nux)
@@ -287,6 +377,7 @@
   +$  peek
     $%  [%initial =store]
         [%store =store]
+        [%views =views]
         [%updates =(list logged)]
         [%pool-keys keys=(set pin)]
         [%all-goal-keys keys=(set id)]
@@ -297,36 +388,6 @@
         [%pools =pools]
         [%pool-hitch ph=pool-hitch]
         [%goal-hitch gh=goal-hitch]
-    ==
-  ::
-  ++  ask
-    =<  ask
-    |%
-    +$  ask  [%5 pid=@ pok=unver-ask]
-    +$  unver-ask
-      $%  $:  %harvest
-              type=?([%main ~] [%pool =pin] [%goal =id])
-              method=?(%any %all)
-              tags=(set tag)
-          ==
-          $:  %list-view
-              type=list-view-type
-              first-gen-only=_|
-              actionable-only=_|
-              method=?(%any %all)
-              tags=(set tag)
-          ==
-      ==
-    +$  list-view-type
-      $%  [%main ~]
-          [%pool =pin]
-          [%goal =id ignore-virtual=_|]
-      ==
-    --
-  ::
-  +$  say
-    $%  [%harvest goals=(list [id pin goal])]
-        [%list-view goals=(list [id pin goal])]
     ==
   ::
   +$  core-yoke     core-yoke:s4
@@ -420,7 +481,9 @@
 ++  convert-4-to-5
   |=  =state-4
   ^-  state-5
-  *state-5  :: TODO: ACTUALLY IMPLEMENT
+  :: TODO: ACTUALLY IMPLEMENT
+  ::       DON'T FORGET TO CONVERT SUB PATHS!!!
+  *state-5 
 ::
 ++  s4
   |%
