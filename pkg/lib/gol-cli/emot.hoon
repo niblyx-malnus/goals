@@ -70,13 +70,16 @@
 ++  views-emit
   |=  upd=update:gol
   ^-  _this
-  =/  view-list=(list [=vid:vyu view:vyu])  ~(tap by views)
+  =/  view-list=(list [=vid:vyu weiv=view:vyu])
+     %+  turn  ~(tap by views)
+     |=  [=vid:vyu ack=_| =view:vyu]
+     [vid view]
   |-  ?~  view-list  this
   %=    $
       view-list  t.view-list
       this
-    =,  i.view-list
-    =/  diff=(unit diff:vyu)  (view-diff:view parm data upd)
+    =,  i.view-list  :: exposes weiv
+    =/  diff=(unit diff:vyu)  (view-diff:view weiv upd)
     ?~  diff  this :: if diff is null, update not relevant to view
     =/  =path  /view/(scot %uv vid)
     ~&  [%emitting-diff path u.diff]
@@ -305,7 +308,7 @@
   =/  =vid:views:gol  (sham [now eny]:bowl)
   =/  view-path=path  /view/(scot %uv vid)
   =/  =data:views:gol  (view-data:view pok.ask)
-  =.  views  (~(put by views) vid [| pok.ask data])
+  =.  views  (~(put by views) vid [| (grab-view:view pok.ask)])
   =/  time-path=path  /send-dot/(scot %uv vid)
   =/  next=@da  (add now.bowl ~m1)
   =.  this  (emit %pass time-path %arvo %b %wait next)

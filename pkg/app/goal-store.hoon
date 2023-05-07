@@ -118,8 +118,8 @@
     ::
       %view-ack
     =/  =vid:views:gol  !<(vid:views:gol vase)
-    =/  =view:views:gol  (~(got by views) vid)
-    `this(views (~(put by views) vid view(ack &)))
+    =/  [ack=_| =view:views:gol]  (~(got by views) vid)
+    `this(views (~(put by views) vid [& view]))
     ::
       %goal-ask
     =/  =ask:gol  !<(ask:gol vase)

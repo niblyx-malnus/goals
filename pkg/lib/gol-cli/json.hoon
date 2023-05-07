@@ -50,14 +50,25 @@
   =,  enjs:format
   |=  =say
   |^  ^-  json
-  %-   pairs
-  :~  [%path (path path.say)]
-      :-  %data
-      ?-    -.data.say
-        %tree       (frond %tree (enjs-pools pools.data.say))
-        %harvest    (frond %harvest a+(turn goals.data.say enjs-id-pin-goal))
-        %list-view  (frond %list-view a+(turn goals.data.say enjs-id-pin-goal))
-      ==
+  %+  frond  -.data.say
+  ?-    -.data.say
+      %tree
+    %-  pairs
+    :~  [%path (path path.say)]
+        [%data (frond %tree (enjs-pools pools.data.say))]
+    ==
+    ::
+      %harvest
+    %-  pairs
+    :~  [%path (path path.say)]
+        [%data (frond %harvest a+(turn goals.data.say enjs-id-pin-goal))]
+    ==
+    ::
+      %list-view
+    %-  pairs
+    :~  [%path (path path.say)]
+        [%data (frond %list-view a+(turn goals.data.say enjs-id-pin-goal))]
+    ==
   ==
   ++  enjs-id-pin-goal
     |=  [=id =pin =goal]
@@ -481,16 +492,20 @@
   ^-  json
   =-  o/(malt -)
   %+  turn  ~(tap by views)
-  |=  [k=@uv v=view:^views]
-  [(scot %uv k) `json`(enjs-view v)]
+  |=  [k=@uv ack=_| v=view:^views]
+  :-  (scot %uv k)
+  ^-  json
+  %-  pairs
+  :~  [%ack b+ack]
+      [%view (enjs-view v)]
+  ==
 ::
 ++  enjs-view
   =,  enjs:format
   |=  =view:views
   ^-  json
   %-  pairs
-  :~  [%ack b+ack.view]
-      [%parm (enjs-view-parm parm.view)]
+  :~  [%parm (enjs-view-parm ;;(parm:views [-.view parm.view]))]
       [%data s+%enjs-not-implemented]
   ==
 ::
