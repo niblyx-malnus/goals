@@ -279,12 +279,12 @@
       +$  type  $%([%main ~] [%pool =pin] [%goal =id])
       +$  data  $:(goals=(list [id pack]))
       +$  pack  [pin goal]
-      +$  diff  ~
       ::  $:  pool-role=(unit pool-role)
       ::      nexus=goal-nexus
       ::      trace=goal-trace
       ::      hitch=goal-hitch
       ::  ==
+      +$  diff  $%([%replace data])
       --
     ++  list-view
       |%
@@ -302,12 +302,12 @@
         ==
       +$  data  $:(goals=(list [id pack]))
       +$  pack  [pin goal]
-      +$  diff  ~
       ::  $:  pool-role=(unit pool-role)
       ::      nexus=goal-nexus
       ::      trace=goal-trace
       ::      hitch=goal-hitch
       ::  ==
+      +$  diff  $%([%replace data])
       --
     --
   ::

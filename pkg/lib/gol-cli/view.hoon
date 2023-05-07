@@ -14,11 +14,6 @@
     %list-view  (bind (view-diff:list-view parm.view data.view update) (lead %list-view))
   ==
 ::
-++  etch-diff
-  |=  [=data:vyu =diff:vyu]
-  ^-  data:vyu
-  *data:vyu
-::
 ++  grab-view
   |=  =parm:vyu
   ^-  view:vyu
@@ -73,13 +68,38 @@
             =update:gol
         ==
     ^-  (unit diff:tree:vyu)
-    :: =;  diff=(unit diff:tree:vyu)
-    ::   ~|  "non-equivalent-view-diff"
-    ::   =/  check=?
-    ::     ?~  diff  =(data (view-data parm))
-    ::     =((view-data parm) (etch-diff data u.diff))
-    ::   ?>(check diff)
-    ~
+    =;  diff=(unit diff:tree:vyu)
+      ~|  "non-equivalent-tree-view-diff"
+      =/  check=?
+        ?~  diff  =(data (view-data parm))
+        =((view-data parm) (etch-diff data u.diff))
+      ?>(check diff)
+    ?+    +<.update  ~
+        %spawn-pool  ~
+        %cache-pool  ~
+        %renew-pool  ~
+        %waste-pool  ~
+        %trash-pool  ~
+        %spawn-goal  ~
+        %waste-goal  ~
+        %cache-goal  ~
+        %renew-goal  ~
+        %trash-goal  ~
+        %pool-perms  ~
+        %pool-hitch  ~
+        %pool-nexus  ~
+        %goal-dates  ~
+        %goal-perms  ~
+        %goal-roots  ~
+        %goal-young  ~
+        %goal-hitch  ~
+        %goal-togls  ~
+    ==
+  ::
+  ++  etch-diff
+    |=  [=data:tree:vyu =diff:tree:vyu]
+    ^-  data:tree:vyu
+    *data:tree:vyu
   --
 ::
 ++  harvest
@@ -143,7 +163,20 @@
             =update:gol
         ==
     ^-  (unit diff:harvest:vyu)
-    ~
+    =;  diff=(unit diff:harvest:vyu)
+      ~|  "non-equivalent-harvest-view-diff"
+      =/  check=?
+        ?~  diff  =(data (view-data parm))
+        =((view-data parm) (etch-diff data u.diff))
+      ?>(check diff)
+    =/  atad=data:harvest:vyu  (view-data parm)
+    ?:  =(data atad)  ~
+    (some `diff:harvest:vyu`[%replace atad])
+  ::
+  ++  etch-diff
+    |=  [=data:harvest:vyu =diff:harvest:vyu]
+    ^-  data:harvest:vyu
+    ?>(?=(%replace -.diff) +.diff)
   --
 ::
 ++  list-view
@@ -251,7 +284,20 @@
             =update:gol
         ==
     ^-  (unit diff:list-view:vyu)
-    ~
+    =;  diff=(unit diff:list-view:vyu)
+      ~|  "non-equivalent-list-view-diff"
+      =/  check=?
+        ?~  diff  =(data (view-data parm))
+        =((view-data parm) (etch-diff data u.diff))
+      ?>(check diff)
+    =/  atad=data:harvest:vyu  (view-data parm)
+    ?:  =(data atad)  ~
+    (some [%replace atad])
+  ::
+  ++  etch-diff
+    |=  [=data:list-view:vyu =diff:list-view:vyu]
+    ^-  data:list-view:vyu
+    ?>(?=(%replace -.diff) +.diff)
   --
 ::
 ++  filter-tags
