@@ -3,19 +3,21 @@
 |_  =store:gol
 +*  vyu   views:gol
     etch  ~(. gol-cli-etch store)
+:: Convert an update into a diff for a given view
 ::
 ++  view-diff
   |=  $:  =parm:vyu
           =data:vyu
           =update:gol
       ==
-  ^-  diff:vyu
-  =;  =diff:vyu
-    :: ~|  "non-equivalent-view-diff"
-    :: =/  check=?  =((view-data parm) (etch-diff data diff))
-    :: ?>(check diff)
-    diff
-  [%tree ~]
+  ^-  (unit diff:vyu)
+  =;  diff=(unit diff:vyu)
+    ~|  "non-equivalent-view-diff"
+    =/  check=?
+      ?~  diff  =(data (view-data parm))
+      =((view-data parm) (etch-diff data u.diff))
+    ?>(check diff)
+  ~
 ::
 ++  etch-diff
   |=  [=data:vyu =diff:vyu]

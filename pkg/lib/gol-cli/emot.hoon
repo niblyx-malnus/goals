@@ -76,10 +76,11 @@
       view-list  t.view-list
       this
     =,  i.view-list
-    =/  =diff:vyu  (view-diff:view parm data upd)
+    =/  diff=(unit diff:vyu)  (view-diff:view parm data upd)
+    ?~  diff  this :: if diff is null, update not relevant to view
     =/  =path  /view/(scot %uv vid)
-    ~&  [%emitting-diff path diff]
-    (emit %give %fact ~[path] goal-view-send+!>(diff))
+    ~&  [%emitting-diff path u.diff]
+    (emit %give %fact ~[path] goal-view-send+!>(u.diff))
   ==
 ::
 ++  home-emit

@@ -1,6 +1,12 @@
 /-  *goal
 /+  *gol-cli-util
 |%
+++  dejs-ask
+  =,  dejs:format
+  |=  jon=json
+  ~|  json-ask+(en-json:html jon)
+  `ask`[vzn %.(jon (ot ~[pid+so pok+dejs-view-parm]))]
+::
 ++  dejs-view-parm
   =,  dejs:format
   ^-  $-(json parm:views)
@@ -39,11 +45,6 @@
         goal+(ot ~[id+dejs-id ignore-virtual+bo])
     ==
 --
-++  dejs-ask
-  =,  dejs:format
-  |=  jon=json
-  ~|  json-ask+(en-json:html jon)
-  `ask`[vzn %.(jon (ot ~[pid+so pok+dejs-view-parm]))]
 ::
 ++  enjs-say
   =,  enjs:format
