@@ -68,7 +68,7 @@
   this(log (put:log-orm log.state now [%updt [[pin mod pid] upd]]))
 ::
 ++  views-emit
-  |=  upd=update:gol
+  |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
   ^-  _this
   =/  view-list=(list [=vid:vyu weiv=view:vyu])
      %+  turn  ~(tap by views)
@@ -79,7 +79,7 @@
       view-list  t.view-list
       this
     =,  i.view-list  :: exposes weiv
-    =/  diff=(unit diff:vyu)  (view-diff:view weiv upd)
+    =/  diff=(unit diff:vyu)  (view-diff:view weiv [[pin mod pid] upd])
     ?~  diff  this :: if diff is null, update not relevant to view
     =/  =path  /view/(scot %uv vid)
     ~&  [%emitting-diff path u.diff]
@@ -89,7 +89,7 @@
 ++  home-emit
   |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
   ^-  _this
-  =.  this  (views-emit upd)
+  =.  this  (views-emit [pin mod pid] upd)
   (emit:this %give %fact ~[/goals] goal-home-update+!>([[pin mod pid] upd]))
 ::
 ++  away-emit

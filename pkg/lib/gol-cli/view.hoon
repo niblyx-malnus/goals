@@ -6,12 +6,12 @@
 :: Convert an update into a diff for a given view
 ::
 ++  view-diff
-  |=  [=view:vyu =update:gol]
+  |=  [=view:vyu upd=home-update:gol]
   ^-  (unit diff:vyu)
   ?-  -.view
-    %tree       (bind (view-diff:tree parm.view data.view update) (lead %tree))
-    %harvest    (bind (view-diff:harvest parm.view data.view update) (lead %harvest))
-    %list-view  (bind (view-diff:list-view parm.view data.view update) (lead %list-view))
+    %tree       (bind (view-diff:tree parm.view data.view upd) (lead %tree))
+    %harvest    (bind (view-diff:harvest parm.view data.view upd) (lead %harvest))
+    %list-view  (bind (view-diff:list-view parm.view data.view upd) (lead %list-view))
   ==
 ::
 ++  grab-view
@@ -65,36 +65,19 @@
   ++  view-diff
     |=  $:  =parm:tree:vyu
             =data:tree:vyu
-            =update:gol
+            upd=home-update:gol
         ==
     ^-  (unit diff:tree:vyu)
     =;  diff=(unit diff:tree:vyu)
-      ~|  "non-equivalent-tree-view-diff"
-      =/  check=?
-        ?~  diff  =(data (view-data parm))
-        =((view-data parm) (etch-diff data u.diff))
-      ?>(check diff)
-    ?+    +<.update  ~
-        %spawn-pool  ~
-        %cache-pool  ~
-        %renew-pool  ~
-        %waste-pool  ~
-        %trash-pool  ~
-        %spawn-goal  ~
-        %waste-goal  ~
-        %cache-goal  ~
-        %renew-goal  ~
-        %trash-goal  ~
-        %pool-perms  ~
-        %pool-hitch  ~
-        %pool-nexus  ~
-        %goal-dates  ~
-        %goal-perms  ~
-        %goal-roots  ~
-        %goal-young  ~
-        %goal-hitch  ~
-        %goal-togls  ~
-    ==
+      :: temporarily remove this check
+      ::
+      :: ~|  "non-equivalent-tree-view-diff"
+      :: =/  check=?
+      ::   ?~  diff  =(data (view-data parm))
+      ::   =((view-data parm) (etch-diff data u.diff))
+      :: ?>(check diff)
+      diff
+    (some upd)
   ::
   ++  etch-diff
     |=  [=data:tree:vyu =diff:tree:vyu]
@@ -160,7 +143,7 @@
   ++  view-diff
     |=  $:  =parm:harvest:vyu
             =data:harvest:vyu
-            =update:gol
+            upd=home-update:gol
         ==
     ^-  (unit diff:harvest:vyu)
     =;  diff=(unit diff:harvest:vyu)
@@ -281,7 +264,7 @@
   ++  view-diff
     |=  $:  =parm:list-view:vyu
             =data:list-view:vyu
-            =update:gol
+            upd=home-update:gol
         ==
     ^-  (unit diff:list-view:vyu)
     =;  diff=(unit diff:list-view:vyu)

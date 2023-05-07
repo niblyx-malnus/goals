@@ -49,7 +49,7 @@
 ++  enjs-say
   =,  enjs:format
   |=  =say
-  |^  ^-  json
+  ^-  json
   %+  frond  -.data.say
   ?-    -.data.say
       %tree
@@ -70,14 +70,15 @@
         [%data (frond %list-view a+(turn goals.data.say enjs-id-pin-goal))]
     ==
   ==
-  ++  enjs-id-pin-goal
-    |=  [=id =pin =goal]
-    %-  pairs
-    :~  [%id (enjs-id id)]
-        [%pin (enjs-pin pin)]
-        [%goal (enjs-goal goal)]
-    ==
-  --
+::
+++  enjs-id-pin-goal
+  =,  enjs:format
+  |=  [=id =pin =goal]
+  %-  pairs
+  :~  [%id (enjs-id id)]
+      [%pin (enjs-pin pin)]
+      [%goal (enjs-goal goal)]
+  ==
 ::
 ++  dejs-action
   =,  dejs:format
@@ -241,11 +242,18 @@
 ++  enjs-view-send
   =,  enjs:format
   |=  =send:views
-  ?-  -.send
+  ?-    -.send
     %dot        s+%dot
-    %tree       (frond %tree ~) 
-    %harvest    (frond %harvest ~)
-    %list-view  (frond %list-view ~)
+    %tree       (frond %tree (enjs-home-update +.send)) 
+      %harvest
+    %+  frond  %harvest
+    ?>  ?=(%replace +<.send)
+    a+(turn `(list [id pin goal])`+>.send enjs-id-pin-goal)
+    ::
+      %list-view
+    %+  frond  %list-view
+    ?>  ?=(%replace +<.send)
+    a+(turn `(list [id pin goal])`+>.send enjs-id-pin-goal)
   ==
 ::
 ++  enjs-home-update
