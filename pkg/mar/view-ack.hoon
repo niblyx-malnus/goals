@@ -8,6 +8,9 @@
   |%
   ++  noun  vid:views
   ++  json
+    |=  jon=^json
+    ^-  vid:views
+    %.  jon
     %-  su:dejs:format
     %+  cook
       |=  [@t t=tape]
