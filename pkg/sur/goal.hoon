@@ -104,8 +104,8 @@
         spawn=(set ship)
     ==
   +$  goal-froze    goal-froze:s4
-  ::
   :: values implied by the data structure
+  ::
   +$  goal-trace
     $:  =stock
         =ranks
@@ -164,6 +164,7 @@
   ::
   +$  pool-perms   pool-perms:s4
   :: goals have changed...
+  ::
   +$  pool-nexus
     $:  =goals
         cache=goals
@@ -266,8 +267,10 @@
       |%
       +$  parm  $:(=type)
       +$  type  $%([%main ~] [%pool =pin] [%goal =id])
-      +$  data  $:(=pools cache=pools)
-      +$  diff  home-update
+      +$  data  $:(pools=tree-pools cache=tree-pools)
+      +$  diff  [[=pin mod=ship pid=@] update]
+      +$  tree-pool   pool
+      +$  tree-pools  (map pin tree-pool)
       --
     ++  harvest
       |%

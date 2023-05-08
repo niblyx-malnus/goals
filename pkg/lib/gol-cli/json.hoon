@@ -246,6 +246,7 @@
 ++  enjs-view-send
   =,  enjs:format
   |=  =send:views
+  ^-  json
   ?-    -.send
     %dot        (frond %dot (path path.send))
     %tree       (enjs-home-update +.send)

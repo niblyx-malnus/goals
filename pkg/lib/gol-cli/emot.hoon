@@ -36,8 +36,8 @@
 ++  de-pool-path
   |=  =path
   ^-  pin:gol
-  ?>  ?=([@ta @ta ~] path)
-  [%pin (slav %p i.path) (slav %da i.t.path)]
+  ?>  ?=([%pool @ta @ta ~] path)
+  [%pin (slav %p i.t.path) (slav %da i.t.t.path)]
 ::
 ++  en-relay-wire
   |=  [pid=@ =pin:gol =term]
