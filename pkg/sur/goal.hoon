@@ -227,8 +227,7 @@
         cache=pools
         =local
     ==
-  :: a view is a distorted view of the store, a perspective,
-  :: a transformation
+  :: a view is a distorted view of the store, a perspective, a transformation
   ::
   :: TODO:
   :: - include sorting as a parameter
@@ -269,6 +268,8 @@
       +$  type  $%([%main ~] [%pool =pin] [%goal =id])
       +$  data  $:(pools=tree-pools cache=tree-pools)
       +$  diff  [[=pin mod=ship pid=@] update]
+      :: trying to slowly sever this from underlying DS
+      ::
       +$  tree-pool   pool
       +$  tree-pools  (map pin tree-pool)
       --

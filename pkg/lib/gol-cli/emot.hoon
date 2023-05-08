@@ -105,7 +105,7 @@
   %-  emil
   %+  murn  ~(val by sup.bowl)
   |=  [=ship =path]
-  ?.  ?=([@ta @ta ~] path)  ~
+  ?.  ?=([%pool @ta @ta ~] path)  ~
   =/  =pin:gol  (de-pool-path path)
   =/  =pool:gol  (~(got by pools.store) pin)
   ?:  (~(has by perms.pool) ship)  ~
