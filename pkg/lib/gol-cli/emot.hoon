@@ -19,17 +19,6 @@
 ++  pile  |=(=pin:gol (~(got by cools) pin))
 ++  pind  |=(=id:gol `pin:gol`(got:idx-orm:gol index.store id))
 ::
-++  log-orm  ((on @ log-update:gol) lth)
-++  unique-time
-  |=  [=time =log:gol]
-  ^-  @
-  =/  unix-ms=@
-    (unm:chrono:userlib time)
-  |-
-  ?.  (has:log-orm log unix-ms)
-    unix-ms
-  $(unix-ms (add unix-ms 1))
-::
 ++  en-pool-path
   |=(=pin:gol `path`/pool/(scot %p owner.pin)/(scot %da birth.pin))
 ::
@@ -60,12 +49,6 @@
   =/  =wire  (en-relay-wire pid.axn pin -.pok.axn)
   =/  =dock  [owner.pin dap.bowl]
   (emit %pass wire %agent dock %poke goal-action+!>(axn))
-::
-++  log-update
-  |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
-  ^-  _this
-  =/  now=@  (unique-time now.bowl log)
-  this(log (put:log-orm log.state now [%updt [[pin mod pid] upd]]))
 ::
 ++  views-emit
   |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
@@ -113,13 +96,11 @@
 ++  send-home-update
   |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
   ^-  _this
-  =.  this  (log-update [pin mod pid] upd)
   (home-emit:this [pin mod pid] upd)
 ::
 ++  send-away-update
   |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
   ^-  _this
-  =.  this  (log-update [pin mod pid] upd)
   =.  this  (home-emit:this [pin mod pid] upd)
   =.  this  (away-emit:this [pin mod pid] upd)
   (kick-unwelcome:this pin)
@@ -681,7 +662,6 @@
     =/  =goal:gol  (~(got by goals.pool) id)
     =/  upd=update:gol
       [vzn %goal-hitch id %put-tags (~(uni in tags) tags.goal)]
-    =.  this  (log-update [pin our.bowl pid.axn] upd)
     (home-emit:this [pin our.bowl pid.axn] upd)
     ::
       %add-field-data

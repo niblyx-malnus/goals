@@ -1,8 +1,5 @@
 /-  gol=goal
-/+  dbug, default-agent, verb, agentio,
-    pl=gol-cli-pool, gol-cli-goals, gol-cli-pools,
-    gol-cli-emot, gol-cli-node, gol-cli-traverse,
-    gol-cli-etch, fl=gol-cli-inflater,
+/+  dbug, default-agent, verb, agentio, gol-cli-emot, fl=gol-cli-inflater,
 :: import during development to force compilation
 ::
     gol-cli-json
@@ -27,16 +24,6 @@
       state-5
   ==
 +$  card  card:agent:gall
-++  log-orm  ((on @ log-update:gol) lth)
-++  unique-time
-  |=  [=time =log:gol]
-  ^-  @
-  =/  unix-ms=@
-    (unm:chrono:userlib time)
-  |-
-  ?.  (has:log-orm log unix-ms)
-    unix-ms
-  $(unix-ms (add unix-ms 1))
 --
 =|  state-5
 =*  state  -
@@ -52,19 +39,9 @@
     io    ~(. agentio bowl)
     hc    ~(. +> [bowl ~])
     cc    |=(cards=(list card) ~(. +> [bowl cards]))
-    gols  ~(. gol-cli-goals store)
-    puls  ~(. gol-cli-pools store)
-    etch  ~(. gol-cli-etch store)
     emot  ~(. gol-cli-emot bowl ~ state)
-    index   index.store
-    pools   pools.store
-    cache   cache.store
 ::
-++  on-init   
-  ^-  (quip card _this)
-  =/  now=@  (unique-time now.bowl log)
-  `this(log (put:log-orm *log:gol now [%init store]))
-::
+++  on-init   on-init:def
 ++  on-save   !>(state)
 ::
 ++  on-load
@@ -76,7 +53,9 @@
       %5
     :: TODO: Reload pool subpaths according to new format
     :: TODO: Clear out views and view-related subpaths
-    =.  old
+    :-  ~
+    %=    this
+        state
       %=  old
         pools.store
           %-  ~(gas by *pools:gol)
@@ -84,8 +63,7 @@
           |=  [=pin:gol =pool:gol]
           [pin (inflate-pool:fl pool)]
       ==
-    =/  now=@  (unique-time now.bowl log)
-    `this(state old(log (put:log-orm *log:gol now [%init store.old])))
+    ==
     ::
       %4
     $(old (convert-4-to-5:gol old))
@@ -244,7 +222,6 @@
 --
 |_  [=bowl:gall cards=(list card)]
 +*  core  .
-    etch  ~(. gol-cli-etch store)
 ++  abet  [(flop cards) state]
 ++  emit  |=(=card core(cards [card cards]))
 ++  emil  |=(cadz=(list card) core(cards (weld cadz cards)))

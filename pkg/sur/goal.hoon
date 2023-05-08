@@ -9,7 +9,7 @@
 ::
 ++  vzn  %5
 ::
-+$  state-5  [%5 =store:s5 =views:s5 =log:s5]
++$  state-5  [%5 =store:s5 =views:s5]
 +$  state-4  [%4 =store:s4 =groups =log:s4]
 +$  state-3  [%3 =store:s3]
 +$  state-2  [%2 =store:s2]
@@ -65,9 +65,6 @@
 +$  update        update:s5
 +$  home-update   home-update:s5
 +$  away-update   away-update:s5
-+$  log-update    log-update:s5
-+$  logged        logged:s5
-+$  log           log:s5
 ::
 +$  ask           ask:s5
 +$  say           say:s5
@@ -378,24 +375,10 @@
   +$  update        [%5 unver-update]
   +$  away-update   [[mod=ship pid=@] update]
   +$  home-update   [[=pin mod=ship pid=@] update]
-  +$  log-update    $%([%updt upd=home-update] [%init =store])
-  +$  log           ((mop @ log-update) lth)
-  +$  logged        (pair @ log-update)
   ::
   +$  peek
-    $%  [%initial =store]
-        [%store =store]
+    $%  [%store =store]
         [%views =views]
-        [%updates =(list logged)]
-        [%pool-keys keys=(set pin)]
-        [%all-goal-keys keys=(set id)]
-        [%harvest harvest=(list id)]
-        [%full-harvest harvest=(list [id goal])]
-        [%pool =pool]
-        [%goals =goals]
-        [%pools =pools]
-        [%pool-hitch ph=pool-hitch]
-        [%goal-hitch gh=goal-hitch]
     ==
   ::
   +$  core-yoke     core-yoke:s4

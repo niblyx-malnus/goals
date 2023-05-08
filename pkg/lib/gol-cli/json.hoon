@@ -474,47 +474,6 @@
   ?-    -.pyk
     %store  (frond %store (enjs-store store.pyk))
     %views  (frond %views (enjs-views views.pyk))
-    ::
-      %initial
-    %-  pairs
-    :~  [%store (enjs-store store.pyk)]
-    ==
-      %updates
-    %+  frond
-      %updates
-    a+(turn list.pyk enjs-logged)
-    ::
-      %pool-keys
-    %+  frond
-      %pool-keys
-    a+(turn ~(tap in keys.pyk) enjs-pin)
-    ::
-      %all-goal-keys
-    %+  frond
-      %all-goal-keys
-    a+(turn ~(tap in keys.pyk) enjs-id)
-    ::
-      %harvest
-    %+  frond
-      %harvest
-    a+(turn harvest.pyk enjs-id)
-    ::
-      %full-harvest
-    %+  frond
-      %full-harvest
-    :-  %a
-    %+  turn  harvest.pyk
-    |=  [=id =goal] 
-    %-  pairs
-    :~  [%id (enjs-id id)]
-        [%goal (enjs-goal goal)]
-    ==
-    ::
-    %pool   (frond pool+(enjs-pool pool.pyk))
-    %goals  (frond goals+(enjs-goals goals.pyk))
-    %pools  (frond pools+(enjs-pools pools.pyk))
-    %pool-hitch  (frond pool-hitch+(enjs-pool-hitch ph.pyk))
-    %goal-hitch  (frond goal-hitch+(enjs-goal-hitch gh.pyk))
   ==
 ::
 ++  enjs-views
@@ -596,19 +555,6 @@
       [%pools (enjs-pools pools.store)]
       [%cache (enjs-pools cache.store)]
       [%local a+(turn order.local.store enjs-id)]
-  ==
-::
-++  enjs-logged
-  =,  enjs:format
-  |=  =logged
-  (pairs ~[[%time (numb p.logged)] [%entry (enjs-log-update q.logged)]])
-::
-++  enjs-log-update
-  =,  enjs:format
-  |=  =log-update
-  ?-  -.log-update
-    %init  (frond %init (enjs-store +.log-update))
-    %updt  (frond %updt (enjs-home-update +.log-update))
   ==
 ::
 ++  enjs-index
