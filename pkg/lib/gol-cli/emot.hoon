@@ -82,7 +82,6 @@
     =/  diff=(unit diff:vyu)  (view-diff:view weiv [[pin mod pid] upd])
     ?~  diff  this :: if diff is null, update not relevant to view
     =/  =path  /view/(scot %uv vid)
-    ~&  [%emitting-diff path u.diff]
     (emit %give %fact ~[path] goal-view-send+!>(u.diff))
   ==
 ::
