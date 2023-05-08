@@ -18,14 +18,14 @@ import {
   deleteArchivedPoolAction,
   nexusListAction,
   updatePoolPax,
-  updateGoalYoung
+  updateGoalYoung,
 } from "../store/actions";
-const setLogList = useStore.getState().setLogList;
+import api from "../api";
 
 const updateHandler = (update: any) => {
-  log("update", update);
+  log("main update handler => ", update);
   //check if the given update contains a id we can use to toggle loading state false (poke relay)
-  if (update.hed.pid) {
+  if (update.hed?.pid) {
     const tryingMap = useStore.getState().tryingMap;
     const setTrying = useStore.getState().setTrying;
 
@@ -33,13 +33,11 @@ const updateHandler = (update: any) => {
       setTrying(update.hed.pid, false);
     }
   }
+  if (update.dot) {
+    api.viewAck(update.dot);
+    return;
+  }
   const actionName: any = Object.keys(update.tel)[0];
-
-  //add this update to our logList
-  setLogList({
-    actionName,
-    ship: update.hed?.mod,
-  });
 
   if (actionName) {
     switch (actionName) {
@@ -215,4 +213,15 @@ const updates = {
   err: () => log("Subscription rejected"),
   quit: () => log("Kicked from subscription"),
 };
-export default updates;
+function dynamicUpdate(path: string) {
+  const updateData = {
+    app: apiApp,
+    path: path,
+    event: updateHandler,
+    //TODO: handle sub death/kick/err
+    err: () => log("Subscription rejected"),
+    quit: () => log("Kicked from subscription"),
+  };
+  return updateData;
+}
+export { updates, dynamicUpdate };

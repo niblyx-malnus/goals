@@ -1,7 +1,7 @@
 import memoize from "lodash/memoize";
 import Urbit from "@urbit/http-api";
 import { isDev, log } from "./helpers";
-import updates from "./subscriptions/updates";
+import { updates, dynamicUpdate } from "./subscriptions/updates";
 import askUpdates from "./subscriptions/askUpdates";
 const apiApp = process.env.REACT_APP_APP;
 const apiMark = process.env.REACT_APP_MARK;
@@ -25,7 +25,6 @@ const api = {
     urb.onOpen = () => log("urbit onOpen");
     urb.onRetry = () => log("urbit onRetry");
     //sub to our frontend updates
-    urb.subscribe(updates);
     urb.subscribe(askUpdates);
     urb.connect();
 
@@ -590,6 +589,44 @@ const api = {
       mark: "goal-ask",
       json,
       pokeId: "12345",
+    });
+  },
+  treeAsk: async (type = "main", id, tags = []) => {
+    log("type", type);
+    let bodyType;
+    if (type === "main") {
+      bodyType = { main: null };
+    } else if (type === "pool") {
+      bodyType = { pool: id };
+    } else if (type === "goal") {
+      bodyType = { goal: id };
+    }
+    const json = {
+      tree: {
+        type: bodyType,
+        "first-gen-only": false,
+        "actionable-only": false,
+        method: "any", // can be "any" or "all"
+        tags,
+      },
+    };
+    return api.poke({
+      app: apiApp,
+      mark: "goal-ask",
+      json,
+      pokeId: "12345",
+    });
+  },
+  sub: (path) => {
+    const updateData = dynamicUpdate(path);
+    log("updateData", updateData);
+    return api.createApi().subscribe(updateData);
+  },
+  viewAck: (path) => {
+    return api.createApi().poke({
+      app: apiApp,
+      mark: "view-ack",
+      json: path,
     });
   },
 };

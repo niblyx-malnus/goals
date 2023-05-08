@@ -26,7 +26,8 @@ export default function Home({}) {
     try {
       const result = await api.getData();
       log("fetchInitial result => ", result);
-
+      const askResult = await api.treeAsk();
+      log("askResult", askResult);
       // {author: 'zod', birth: 1682115616821, owner: 'zod'}
       harvestAskAction("main", null);
       listAskAction("main", null);
