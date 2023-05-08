@@ -121,7 +121,6 @@
   ^-  (quip card _this)
   ?+    pole  (on-watch:def pole)
       [%ask ~]    ~&(%watching-ask ?>(=(src our):bowl `this)) :: one-off ui requests
-      [%goals ~]  ~&(%watching-goals ?>(=(src our):bowl `this))
       ::
       [%pool @ @ ~]
     =^  cards  state
@@ -138,8 +137,6 @@
   |=  =(pole knot)
   ?+    pole  (on-leave:def pole)
       [%ask ~]    ~&(%leaving-ask `this) :: one-off ui requests
-      [%goals ~]  ~&(%leaving-goals `this)
-      :: TODO: implement on leave for a pool
   ==
 ::
 ++  on-peek
