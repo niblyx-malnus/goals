@@ -256,7 +256,7 @@
       ==
     :: dots must be acked
     ::
-    +$  send  $%([%dot ~] diff)
+    +$  send  $%([%dot =path] diff)
     +$  diff
       $%  [%tree diff:tree]
           [%harvest diff:harvest]
@@ -284,7 +284,7 @@
       ::      trace=goal-trace
       ::      hitch=goal-hitch
       ::  ==
-      +$  diff  $%([%replace data])
+      +$  diff  [[=pin mod=ship pid=@] $%([%replace data])]
       --
     ++  list-view
       |%
@@ -307,7 +307,7 @@
       ::      trace=goal-trace
       ::      hitch=goal-hitch
       ::  ==
-      +$  diff  $%([%replace data])
+      +$  diff  [[=pin mod=ship pid=@] $%([%replace data])]
       --
     --
   ::

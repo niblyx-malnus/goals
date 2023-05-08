@@ -55,19 +55,19 @@
       %tree
     %-  pairs
     :~  [%path (path path.say)]
-        [%data (frond %tree (enjs-pools pools.data.say))]
+        [%data (enjs-pools pools.data.say)]
     ==
     ::
       %harvest
     %-  pairs
     :~  [%path (path path.say)]
-        [%data (frond %harvest a+(turn goals.data.say enjs-id-pin-goal))]
+        [%data a+(turn goals.data.say enjs-id-pin-goal)]
     ==
     ::
       %list-view
     %-  pairs
     :~  [%path (path path.say)]
-        [%data (frond %list-view a+(turn goals.data.say enjs-id-pin-goal))]
+        [%data a+(turn goals.data.say enjs-id-pin-goal)]
     ==
   ==
 ::
@@ -243,17 +243,34 @@
   =,  enjs:format
   |=  =send:views
   ?-    -.send
-    %dot        s+%dot
-    %tree       (frond %tree (enjs-home-update +.send)) 
+    %dot        (frond %dot (path path.send))
+    %tree       (enjs-home-update +.send)
       %harvest
-    %+  frond  %harvest
-    ?>  ?=(%replace +<.send)
-    a+(turn `(list [id pin goal])`+>.send enjs-id-pin-goal)
+    %-  pairs
+    :~  :-  %hed
+        %-  pairs
+        :~  [%pin (enjs-pin pin.send)]
+            [%mod (ship mod.send)]
+            [%pid s+`@t`pid.send]
+        ==
+        :-  %tel
+        %+  frond  %harvest
+        ?>  ?=(%replace +>-.send)
+        a+(turn `(list [id pin goal])`+>+.send enjs-id-pin-goal)
+    ==
     ::
       %list-view
-    %+  frond  %list-view
-    ?>  ?=(%replace +<.send)
-    a+(turn `(list [id pin goal])`+>.send enjs-id-pin-goal)
+    :~  :-  %hed
+        %-  pairs
+        :~  [%pin (enjs-pin pin.send)]
+            [%mod (ship mod.send)]
+            [%pid s+`@t`pid.send]
+        ==
+        :-  %tel
+        %+  frond  %list-view
+        ?>  ?=(%replace +>-.send)
+        a+(turn `(list [id pin goal])`+>+.send enjs-id-pin-goal)
+    ==
   ==
 ::
 ++  enjs-home-update

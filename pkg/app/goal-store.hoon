@@ -341,7 +341,7 @@
       :_  this
       =/  view-path=path  /view/[v.pole]
       =/  cack-path=path  /check-ack/[v.pole]
-      :~  [%give %fact ~[view-path] goal-view-send+!>([%dot ~])]
+      :~  [%give %fact ~[view-path] goal-view-send+!>([%dot view-path])]
           [%pass cack-path %arvo %b %wait (add now.bowl ~m1)]
       ==
     ==

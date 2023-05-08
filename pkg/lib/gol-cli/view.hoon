@@ -154,12 +154,12 @@
       ?>(check diff)
     =/  atad=data:harvest:vyu  (view-data parm)
     ?:  =(data atad)  ~
-    (some `diff:harvest:vyu`[%replace atad])
+    (some [[pin mod pid]:upd %replace atad])
   ::
   ++  etch-diff
     |=  [=data:harvest:vyu =diff:harvest:vyu]
     ^-  data:harvest:vyu
-    ?>(?=(%replace -.diff) +.diff)
+    ?>(?=(%replace +<.diff) +>.diff)
   --
 ::
 ++  list-view
@@ -275,12 +275,12 @@
       ?>(check diff)
     =/  atad=data:harvest:vyu  (view-data parm)
     ?:  =(data atad)  ~
-    (some [%replace atad])
+    (some [[pin mod pid]:upd %replace atad])
   ::
   ++  etch-diff
     |=  [=data:list-view:vyu =diff:list-view:vyu]
     ^-  data:list-view:vyu
-    ?>(?=(%replace -.diff) +.diff)
+    ?>(?=(%replace +<.diff) +>.diff)
   --
 ::
 ++  filter-tags
