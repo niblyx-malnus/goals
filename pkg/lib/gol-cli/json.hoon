@@ -55,7 +55,11 @@
       %tree
     %-  pairs
     :~  [%path (path path.say)]
-        [%data (enjs-pools pools.data.say)]
+        :-  %data 
+        %-  pairs
+        :~  [%pools (enjs-pools pools.data.say)]
+            [%cache (enjs-pools cache.data.say)]
+        ==
     ==
     ::
       %harvest
@@ -260,6 +264,7 @@
     ==
     ::
       %list-view
+    %-  pairs
     :~  :-  %hed
         %-  pairs
         :~  [%pin (enjs-pin pin.send)]

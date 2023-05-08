@@ -266,7 +266,7 @@
       |%
       +$  parm  $:(=type)
       +$  type  $%([%main ~] [%pool =pin] [%goal =id])
-      +$  data  $:(=pools)
+      +$  data  $:(=pools cache=pools)
       +$  diff  home-update
       --
     ++  harvest

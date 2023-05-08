@@ -34,13 +34,17 @@
 ::
 ++  tree
   |%
+  :: TODO: Sever this data structure from the core backend data
+  :: structure
   ++  view-data
     |=  =parm:tree:vyu
     ^-  data:tree:vyu
     ?-    -.type.parm
-      %main  pools.store
+      %main  [(unify-pools-tags pools) (unify-pools-tags cache)]:[store .]
       ::
         %pool
+      :_  ~
+      %-  unify-pools-tags
       %+  ~(put by *pools:gol)
         pin.type.parm
       (~(got by pools.store) pin.type.parm)
@@ -60,7 +64,7 @@
            ~
          (some [id goal])
       ::
-      (~(put by *pools:gol) pin pool(goals goals))
+      :_(~ (unify-pools-tags (~(put by *pools:gol) pin pool(goals goals))))
     ==
   ++  view-diff
     |=  $:  =parm:tree:vyu
@@ -301,6 +305,14 @@
     =-  ?.(- ~ (some id pin goal))
     =(tags (~(int in tags) tags.goal))
   ==
+::
+++  unify-pools-tags
+  |=  =pools:gol
+  ^-  pools:gol
+  %-  ~(gas by *pools:gol)
+  %+  turn  ~(tap by pools)
+  |=  [=pin:gol =pool:gol]
+  [pin pool(goals (unify-tags goals.pool))]
 ::
 ++  unify-tags
   |=  =goals:gol
