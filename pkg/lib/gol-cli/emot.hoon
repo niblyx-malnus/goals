@@ -7,7 +7,7 @@
     state  +<+>
     gols   ~(. gol-cli-goals store)
     etch   ~(. gol-cli-etch store)
-    view   ~(. gol-cli-view store)
+    view   ~(. gol-cli-view store bowl)
     vzn    vzn:gol
     vyu    views:gol
 +$  card  card:agent:gall

@@ -1,6 +1,6 @@
 /-  gol=goal
 /+  gol-cli-etch, gol-cli-traverse
-|_  =store:gol
+|_  [=store:gol =bowl:gall]
 +*  vyu   views:gol
     etch  ~(. gol-cli-etch store)
 ++  view-data
@@ -96,7 +96,9 @@
   ^-  pack:harvest:vyu
   =/  =pin:gol  (got:idx-orm:gol index.store id)
   =/  =pool:gol  (~(got by pools.store) pin)
-  =/  pool-role=(unit pool-role:gol)  (~(got by perms.pool) ~zod)
+  =/  pool-role=(unit ?(%owner pool-role:gol))
+    ?:  =(our.bowl owner.pin)  (some %owner)
+    (~(got by perms.pool) our.bowl)
   [pin pool-role (unify-tags id)]
 ::
 ++  filter-tags

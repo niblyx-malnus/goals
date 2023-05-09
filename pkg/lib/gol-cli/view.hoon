@@ -2,12 +2,12 @@
 /+  gol-cli-etch, gol-cli-node, gol-cli-traverse,
     gol-cli-views-tree, gol-cli-views-harvest, gol-cli-views-list-view,
     gol-cli-views-page
-|_  =store:gol
+|_  [=store:gol =bowl:gall]
 +*  vyu   views:gol
     etch  ~(. gol-cli-etch store)
     tree  ~(. gol-cli-views-tree store)
-    harv  ~(. gol-cli-views-harvest store)
-    livy  ~(. gol-cli-views-list-view store)
+    harv  ~(. gol-cli-views-harvest store bowl)
+    livy  ~(. gol-cli-views-list-view store bowl)
     page  ~(. gol-cli-views-page store)
 :: Convert an update into a diff for a given view
 ::
