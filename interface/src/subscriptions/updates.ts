@@ -21,13 +21,16 @@ import {
   updateGoalYoung,
 } from "../store/actions";
 import api from "../api";
-
+const store = useStore.getState();
+const setListGoals = store.setListGoals;
+const setHarvestGoals = store.setHarvestGoals;
+const setPoolStore = store.setPools;
 const updateHandler = (update: any) => {
   log("main update handler => ", update);
   //check if the given update contains a id we can use to toggle loading state false (poke relay)
   if (update.hed?.pid) {
-    const tryingMap = useStore.getState().tryingMap;
-    const setTrying = useStore.getState().setTrying;
+    const tryingMap = store.tryingMap;
+    const setTrying = store.setTrying;
 
     if (tryingMap.has(update.hed.pid)) {
       setTrying(update.hed.pid, false);
@@ -38,7 +41,7 @@ const updateHandler = (update: any) => {
     return;
   }
   const actionName: any = Object.keys(update.tel)[0];
-
+  log("actionName", actionName);
   if (actionName) {
     switch (actionName) {
       case "spawn-goal": {
@@ -192,6 +195,14 @@ const updateHandler = (update: any) => {
 
         updateGoalYoung(hed.pin, id, young);
 
+        break;
+      }
+      case "harvest": {
+        setHarvestGoals(update.tel[actionName]);
+        break;
+      }
+      case "list-view": {
+        setListGoals(update.tel[actionName]);
         break;
       }
       /* case "goal-nexus": {
