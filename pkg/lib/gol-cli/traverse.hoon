@@ -472,21 +472,15 @@
     harvest     (~(uni in harvest) (~(got by vis) i.root-nodes))
   ==
 ::
-:: harvest with full goals
-++  full-harvest
+++  ordered-harvest
   |=  [=id:gol order=(list id:gol)]
-  ^-  (list [id:gol goal:gol])
-  %+  turn
-    (fix-list-and-sort %p (precedents-map %d %k) order (harvest id))
-  |=(=id:gol [id (~(got by goals) id)])
-:: pool-harvest with full goals
+  ^-  (list id:gol)
+  (fix-list-and-sort %p (precedents-map %d %k) order (harvest id))
 ::
-++  full-goals-harvest
+++  ordered-goals-harvest
   |=  order=(list id:gol)
-  ^-  (list [id:gol goal:gol])
-  %+  turn
-    (fix-list-and-sort %p (precedents-map %d %k) order (goals-harvest))
-  |=(=id:gol [id (~(got by goals) id)])
+  ^-  (list id:gol)
+  (fix-list-and-sort %p (precedents-map %d %k) order (goals-harvest))
 ::
 :: get priority of a given goal - highest priority is 0
 :: priority is the number of unique goals which must be started

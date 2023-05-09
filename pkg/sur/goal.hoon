@@ -283,7 +283,7 @@
         ==
       +$  type  $%([%main ~] [%pool =pin] [%goal =id])
       +$  data  $:(goals=(list [id pack]))
-      +$  pack  [pin goal]
+      +$  pack  [=pin pool-role=(unit pool-role) goal]
       ::  $:  pool-role=(unit pool-role)
       ::      nexus=goal-nexus
       ::      trace=goal-trace
@@ -306,7 +306,7 @@
             [%goal =id ignore-virtual=_|]
         ==
       +$  data  $:(goals=(list [id pack]))
-      +$  pack  [pin goal]
+      +$  pack  [=pin pool-role=(unit pool-role) goal]
       ::  $:  pool-role=(unit pool-role)
       ::      nexus=goal-nexus
       ::      trace=goal-trace

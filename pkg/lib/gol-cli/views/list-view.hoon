@@ -8,58 +8,56 @@
   ^-  data:list-view:vyu
   ?-    -.type.parm
       %main
-    =/  all-goals  (unify-tags all-goals:etch)
-    =/  tv  ~(. gol-cli-traverse all-goals)
-    =/  nd  ~(. gol-cli-node all-goals)
+    =/  tv  ~(. gol-cli-traverse all-goals:etch)
+    =/  nd  ~(. gol-cli-node all-goals:etch)
     ::
-    =/  goals=(list [id:gol pin:gol goal:gol])
+    =/  goals=(list [id:gol pack:list-view:vyu])
       :: first-gen-only?
       ::
       ?:  first-gen-only.parm
-        %+  turn  (waif-goals:nd)
-        |=  =id:gol
-        [id (got:idx-orm:gol index.store id) (~(got by all-goals) id)]
-      %+  turn  ~(tap by all-goals)
-      |=  [=id:gol =goal:gol]
-      [id (got:idx-orm:gol index.store id) goal]
+        (turn (waif-goals:nd) |=(=id:gol [id (id-to-pack id)]))
+      %+  turn  ~(tap in ~(key by all-goals:etch))
+      |=(=id:gol [id (id-to-pack id)])
     :: actionable-only?
     ::
     =?  goals  actionable-only.parm
       %+  murn  goals
-      |=  [id:gol pin:gol =goal:gol]
-      ?.(actionable.goal ~ (some +<))
+      |=  [id:gol pack:list-view:vyu]
+      ?.(actionable ~ (some +<))
     ::
     =?  goals  !=(~ tags.parm)
-      (filter-tags method.parm tags.parm goals)
+      %+  murn  goals
+      |=  [=id:gol =pack:list-view:vyu]
+      ?.  (filter-tags id method.parm tags.parm)  ~
+      (some [id pack]) 
     :: order according to order.local.store
     ::
     goals
     ::
       %pool
     =/  pool  (~(got by pools.store) pin.type.parm)
-    =.  goals.pool  (unify-tags goals.pool)
     =/  tv  ~(. gol-cli-traverse goals.pool)
     =/  nd  ~(. gol-cli-node goals.pool)
     ::
-    =/  goals=(list [id:gol pin:gol goal:gol])
+    =/  goals=(list [id:gol pack:list-view:vyu])
       :: first-gen-only?
       ::
       ?:  first-gen-only.parm
-        %+  turn  (waif-goals:nd)
-        |=  =id:gol
-        [id pin.type.parm (~(got by goals.pool) id)]
-      %+  turn  ~(tap by goals.pool)
-      |=  [=id:gol =goal:gol]
-      [id pin.type.parm goal]
+        (turn (waif-goals:nd) |=(=id:gol [id (id-to-pack id)]))
+      %+  turn  ~(tap in ~(key by goals.pool))
+      |=(=id:gol [id (id-to-pack id)])
     :: actionable-only?
     ::
     =?  goals  actionable-only.parm
       %+  murn  goals
-      |=  [id:gol pin:gol =goal:gol]
-      ?.(actionable.goal ~ (some +<))
+      |=  [id:gol pack:list-view:vyu]
+      ?.(actionable ~ (some +<))
     ::
     =?  goals  !=(~ tags.parm)
-      (filter-tags method.parm tags.parm goals)
+      %+  murn  goals
+      |=  [=id:gol =pack:list-view:vyu]
+      ?.  (filter-tags id method.parm tags.parm)  ~
+      (some [id pack]) 
     :: order according to order.local.store
     ::
     goals
@@ -67,15 +65,12 @@
       %goal
     =/  =pin:gol  (got:idx-orm:gol index.store id.type.parm)
     =/  pool  (~(got by pools.store) pin)
-    =.  goals.pool  (unify-tags goals.pool)
     =/  tv  ~(. gol-cli-traverse goals.pool)
     =/  nd  ~(. gol-cli-node goals.pool)
     ::
-    =/  goals=(list [id:gol pin:gol goal:gol])
+    =/  goals=(list [id:gol pack:list-view:vyu])
       =;  ids=(set id:gol)
-        %+  turn  ~(tap in ids)
-        |=  =id:gol
-        [id pin (~(got by goals.pool) id)]
+        (turn ~(tap in ids) |=(=id:gol [id (id-to-pack id)]))
       :: first-gen-only? ignore-virtual?
       ::
       ?:  =([& &] [first-gen-only ignore-virtual.type]:parm)
@@ -90,11 +85,14 @@
     ::
     =?  goals  actionable-only.parm
       %+  murn  goals
-      |=  [id:gol pin:gol =goal:gol]
-      ?.(actionable.goal ~ (some +<))
+      |=  [id:gol pack:list-view:vyu]
+      ?.(actionable ~ (some +<))
     ::
     =?  goals  !=(~ tags.parm)
-      (filter-tags method.parm tags.parm goals)
+      %+  murn  goals
+      |=  [=id:gol =pack:list-view:vyu]
+      ?.  (filter-tags id method.parm tags.parm)  ~
+      (some [id pack]) 
     :: order according to order.local.store
     ::
     goals
@@ -121,38 +119,38 @@
   ^-  data:list-view:vyu
   ?>(?=(%replace +<.diff) +>.diff)
 ::
-++  filter-tags
-  |=  $:  method=?(%any %all)
-          tags=(set tag:gol)
-          goals=(list [id:gol pin:gol goal:gol])
-      ==
-  ^-  (list [id:gol pin:gol goal:gol])
-  %+  murn  goals
-  |=  [=id:gol =pin:gol =goal:gol]
-  ^-  (unit [id:gol pin:gol goal:gol])
-  ?-    method
-      %any
-    =-  ?:(- ~ (some id pin goal))
-    =(~ (~(int in tags) tags.goal))
-    ::
-      %all
-    =-  ?.(- ~ (some id pin goal))
-    =(tags (~(int in tags) tags.goal))
-  ==
-::
 ++  unify-tags
-  |=  =goals:gol
-  ^-  goals:gol
-  %-  ~(gas by *goals:gol)
-  %+  turn  ~(tap by goals)
-  |=  [=id:gol =goal:gol]
-  ^-  [id:gol goal:gol]
-  :-  id
+  |=  =id:gol
+  ^-  goal:gol
+  =/  =pin:gol  (got:idx-orm:gol index.store id)
+  =/  =pool:gol  (~(got by pools.store) pin)
+  =/  =goal:gol  (~(got by goals.pool) id)
   %=    goal
       tags
-   %-  ~(uni in tags.goal)
-   ?~  get=(~(get by goals.local.store) id)
-     ~
-   tags.u.get
+    %-  ~(uni in tags:(~(got by goals.pool) id))
+    =+  get=(~(get by goals.local.store) id)
+    ?~(get ~ tags.u.get)
+  ==
+::
+++  id-to-pack
+  |=  =id:gol
+  ^-  pack:list-view:vyu
+  =/  =pin:gol  (got:idx-orm:gol index.store id)
+  =/  =pool:gol  (~(got by pools.store) pin)
+  =/  pool-role=(unit pool-role:gol)  (~(got by perms.pool) ~zod)
+  [pin pool-role (unify-tags id)]
+::
+++  filter-tags
+  |=  $:  =id:gol
+          method=?(%any %all)
+          tags=(set tag:gol)
+      ==
+  ^-  ?
+  =/  =pin:gol   (got:idx-orm:gol index.store id)
+  =/  =pool:gol  (~(got by pools.store) pin)
+  =/  =goal:gol  (~(got by goals.pool) id)
+  ?-  method
+    %any  !=(~ (~(int in tags) tags.goal))
+    %all  =(tags (~(int in tags) tags.goal))
   ==
 --

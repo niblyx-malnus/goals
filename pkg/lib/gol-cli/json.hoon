@@ -67,13 +67,13 @@
       %harvest
     %-  pairs
     :~  [%path (path path.say)]
-        [%data a+(turn goals.data.say enjs-id-pin-goal)]
+        [%data a+(turn goals.data.say enjs-id-harvest-pack)]
     ==
     ::
       %list-view
     %-  pairs
     :~  [%path (path path.say)]
-        [%data a+(turn goals.data.say enjs-id-pin-goal)]
+        [%data a+(turn goals.data.say enjs-id-list-view-pack)]
     ==
     ::
       %page
@@ -98,13 +98,24 @@
     ==
   ==
 ::
-++  enjs-id-pin-goal
+++  enjs-id-harvest-pack
   =,  enjs:format
-  |=  [=id =pin =goal]
+  |=  [=id =pack:harvest:views]
   %-  pairs
   :~  [%id (enjs-id id)]
-      [%pin (enjs-pin pin)]
-      [%goal (enjs-goal goal)]
+      [%pin (enjs-pin pin.pack)]
+      [%pool-role ?~(pool-role.pack ~ s+u.pool-role.pack)]
+      [%goal (enjs-goal +>.pack)]
+  ==
+::
+++  enjs-id-list-view-pack
+  =,  enjs:format
+  |=  [=id =pack:list-view:views]
+  %-  pairs
+  :~  [%id (enjs-id id)]
+      [%pin (enjs-pin pin.pack)]
+      [%pool-role ?~(pool-role.pack ~ s+u.pool-role.pack)]
+      [%goal (enjs-goal +>.pack)]
   ==
 ::
 ++  dejs-action
@@ -284,7 +295,10 @@
         :-  %tel
         %+  frond  %harvest
         ?>  ?=(%replace +>-.send)
-        a+(turn `(list [id pin goal])`+>+.send enjs-id-pin-goal)
+        :-  %a
+        %+  turn
+          `(list [id pack:harvest:views])`+>+.send
+        enjs-id-harvest-pack
     ==
     ::
       %list-view
@@ -298,7 +312,10 @@
         :-  %tel
         %+  frond  %list-view
         ?>  ?=(%replace +>-.send)
-        a+(turn `(list [id pin goal])`+>+.send enjs-id-pin-goal)
+        :-  %a
+        %+  turn
+          `(list [id pack:list-view:views])`+>+.send
+        enjs-id-list-view-pack
     ==
     ::
       %page

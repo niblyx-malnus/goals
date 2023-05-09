@@ -8,32 +8,32 @@
   ^-  data:harvest:vyu
   ?-    -.type.parm
       %main
-    =/  all-goals  (unify-tags all-goals:etch)
-    =/  tv  ~(. gol-cli-traverse all-goals)
-    =/  goals=(list [id:gol pin:gol goal:gol])
-      %+  turn  (full-goals-harvest:tv order.local.store)
-      |=  [=id:gol =goal:gol]
-      ^-  [id:gol pin:gol goal:gol]
-      [id (got:idx-orm:gol index.store id) goal]
+    =/  tv  ~(. gol-cli-traverse all-goals:etch)
+    =/  harvest=(list id:gol)  (ordered-goals-harvest:tv order.local.store)
+    =/  goals=(list [id:gol pack:harvest:vyu])
+      (turn harvest |=(=id:gol [id (id-to-pack id)]))
     ::
     =?  goals  !=(~ tags.parm)
-      (filter-tags method.parm tags.parm goals)
+      %+  murn  goals
+      |=  [=id:gol =pack:harvest:vyu]
+      ?.  (filter-tags id method.parm tags.parm)  ~
+      (some [id pack]) 
     :: order according to order.local.store
     ::
     goals
     ::
       %pool
     =/  pool  (~(got by pools.store) pin.type.parm)
-    =.  goals.pool  (unify-tags goals.pool)
     =/  tv  ~(. gol-cli-traverse goals.pool)
-    =/  goals=(list [id:gol pin:gol goal:gol])
-      %+  turn  (full-goals-harvest:tv order.local.store)
-      |=  [=id:gol =goal:gol]
-      ^-  [id:gol pin:gol goal:gol]
-      [id pin.type.parm goal]
+    =/  harvest=(list id:gol)  (ordered-goals-harvest:tv order.local.store)
+    =/  goals=(list [id:gol pack:harvest:vyu])
+      (turn harvest |=(=id:gol [id (id-to-pack id)]))
     ::
     =?  goals  !=(~ tags.parm)
-      (filter-tags method.parm tags.parm goals)
+      %+  murn  goals
+      |=  [=id:gol =pack:harvest:vyu]
+      ?.  (filter-tags id method.parm tags.parm)  ~
+      (some [id pack]) 
     :: order according to order.local.store
     ::
     goals
@@ -41,16 +41,17 @@
       %goal
     =/  =pin:gol  (got:idx-orm:gol index.store id.type.parm)
     =/  pool  (~(got by pools.store) pin)
-    =.  goals.pool  (unify-tags goals.pool)
     =/  tv  ~(. gol-cli-traverse goals.pool)
-    =/  goals=(list [id:gol pin:gol goal:gol])
-      %+  turn  (full-harvest:tv id.type.parm order.local.store)
-      |=  [=id:gol =goal:gol]
-      ^-  [id:gol pin:gol goal:gol]
-      [id pin goal]
+    =/  harvest=(list id:gol)
+      (ordered-harvest:tv id.type.parm order.local.store)
+    =/  goals=(list [id:gol pack:harvest:vyu])
+      (turn harvest |=(=id:gol [id (id-to-pack id)]))
     ::
     =?  goals  !=(~ tags.parm)
-      (filter-tags method.parm tags.parm goals)
+      %+  murn  goals
+      |=  [=id:gol =pack:harvest:vyu]
+      ?.  (filter-tags id method.parm tags.parm)  ~
+      (some [id pack]) 
     :: order according to order.local.store
     ::
     goals
@@ -77,38 +78,38 @@
   ^-  data:harvest:vyu
   ?>(?=(%replace +<.diff) +>.diff)
 ::
-++  filter-tags
-  |=  $:  method=?(%any %all)
-          tags=(set tag:gol)
-          goals=(list [id:gol pin:gol goal:gol])
-      ==
-  ^-  (list [id:gol pin:gol goal:gol])
-  %+  murn  goals
-  |=  [=id:gol =pin:gol =goal:gol]
-  ^-  (unit [id:gol pin:gol goal:gol])
-  ?-    method
-      %any
-    =-  ?:(- ~ (some id pin goal))
-    =(~ (~(int in tags) tags.goal))
-    ::
-      %all
-    =-  ?.(- ~ (some id pin goal))
-    =(tags (~(int in tags) tags.goal))
-  ==
-::
 ++  unify-tags
-  |=  =goals:gol
-  ^-  goals:gol
-  %-  ~(gas by *goals:gol)
-  %+  turn  ~(tap by goals)
-  |=  [=id:gol =goal:gol]
-  ^-  [id:gol goal:gol]
-  :-  id
+  |=  =id:gol
+  ^-  goal:gol
+  =/  =pin:gol  (got:idx-orm:gol index.store id)
+  =/  =pool:gol  (~(got by pools.store) pin)
+  =/  =goal:gol  (~(got by goals.pool) id)
   %=    goal
       tags
-   %-  ~(uni in tags.goal)
-   ?~  get=(~(get by goals.local.store) id)
-     ~
-   tags.u.get
+    %-  ~(uni in tags:(~(got by goals.pool) id))
+    =+  get=(~(get by goals.local.store) id)
+    ?~(get ~ tags.u.get)
+  ==
+::
+++  id-to-pack
+  |=  =id:gol
+  ^-  pack:harvest:vyu
+  =/  =pin:gol  (got:idx-orm:gol index.store id)
+  =/  =pool:gol  (~(got by pools.store) pin)
+  =/  pool-role=(unit pool-role:gol)  (~(got by perms.pool) ~zod)
+  [pin pool-role (unify-tags id)]
+::
+++  filter-tags
+  |=  $:  =id:gol
+          method=?(%any %all)
+          tags=(set tag:gol)
+      ==
+  ^-  ?
+  =/  =pin:gol   (got:idx-orm:gol index.store id)
+  =/  =pool:gol  (~(got by pools.store) pin)
+  =/  =goal:gol  (~(got by goals.pool) id)
+  ?-  method
+    %any  !=(~ (~(int in tags) tags.goal))
+    %all  =(tags (~(int in tags) tags.goal))
   ==
 --
