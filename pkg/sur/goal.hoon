@@ -240,16 +240,19 @@
       $%  [%tree =parm:tree =data:tree]
           [%harvest =parm:harvest =data:harvest]
           [%list-view =parm:list-view =data:list-view]
+          [%page =parm:page =data:page]
       ==
     +$  parm
       $%  [%tree parm:tree]
           [%harvest parm:harvest]
           [%list-view parm:list-view]
+          [%page parm:page]
       ==
     +$  data
       $%  [%tree data:tree]
           [%harvest data:harvest]
           [%list-view data:list-view]
+          [%page data:page]
       ==
     :: dots must be acked
     ::
@@ -258,6 +261,7 @@
       $%  [%tree diff:tree]
           [%harvest diff:harvest]
           [%list-view diff:list-view]
+          [%page diff:page]
       ==
     ++  tree
       |%
@@ -308,6 +312,27 @@
       ::      trace=goal-trace
       ::      hitch=goal-hitch
       ::  ==
+      +$  diff  [[=pin mod=ship pid=@] $%([%replace data])]
+      --
+    ++  page
+      |%
+      +$  parm  $:(=type)
+      +$  type  $%([%main ~] [%pool =pin] [%goal =id])
+      +$  data  pack
+      +$  pack
+        $%  [%main ~]
+            $:  %pool
+                title=@t
+                note=@t
+            ==
+            $:  %goal
+                par-pool=pin
+                par-goal=(unit id)
+                desc=@t
+                note=@t
+                tags=(set tag)
+            ==
+        ==
       +$  diff  [[=pin mod=ship pid=@] $%([%replace data])]
       --
     --

@@ -12,6 +12,7 @@
   ^-  $-(json parm:views)
   |^  %-  of
   :~  [%tree (ot ~[type+dejs-tree-type])]
+      [%page (ot ~[type+dejs-page-type])]
       :-  %harvest
       %-  ot
       :~  type+dejs-harvest-type
@@ -32,6 +33,7 @@
     =/  par  ;~(pose (jest 'any') (jest 'all'))
     (su (cook cuk par))
   ++  dejs-tree-type  dejs-harvest-type
+  ++  dejs-page-type  dejs-harvest-type
   ++  dejs-harvest-type
     %-  of
     :~  main+|=(jon=json ?>(?=(~ jon) ~))
@@ -72,6 +74,27 @@
     %-  pairs
     :~  [%path (path path.say)]
         [%data a+(turn goals.data.say enjs-id-pin-goal)]
+    ==
+    ::
+      %page
+    ?-    +<.data.say
+      %main  (frond %main ~)
+        %pool
+      %+  frond  %pool
+      %-  pairs
+      :~  [%title s+title.data.say]
+          [%note s+note.data.say]
+      ==
+      ::
+        %goal
+      %+  frond  %goal
+      %-  pairs
+      :~  [%par-pool (enjs-pin par-pool.data.say)]
+          [%par-goal ?~(par-goal.data.say ~ (enjs-id u.par-goal.data.say))]
+          [%desc s+desc.data.say]
+          [%note s+note.data.say]
+          [%tags a+(turn ~(tap in tags.data.say) enjs-tag)]
+      ==
     ==
   ==
 ::
@@ -276,6 +299,40 @@
         %+  frond  %list-view
         ?>  ?=(%replace +>-.send)
         a+(turn `(list [id pin goal])`+>+.send enjs-id-pin-goal)
+    ==
+    ::
+      %page
+    =/  =diff:page:views  ;;(diff:page:views +.send)
+    %-  pairs
+    :~  :-  %hed
+        %-  pairs
+        :~  [%pin (enjs-pin pin.diff)]
+            [%mod (ship mod.diff)]
+            [%pid s+`@t`pid.diff]
+        ==
+        :-  %tel
+        %+  frond  %page
+        ?>  ?=(%replace +<.diff)
+        =/  =data:page:views  +>.diff
+        ?-    -.data
+          %main  (frond %main ~)
+            %pool
+          %+  frond  %pool
+          %-  pairs
+          :~  [%title s+title.data]
+              [%note s+note.data]
+          ==
+          ::
+            %goal
+          %+  frond  %goal
+          %-  pairs
+          :~  [%par-pool (enjs-pin par-pool.data)]
+              [%par-goal ?~(par-goal.data ~ (enjs-id u.par-goal.data))]
+              [%desc s+desc.data]
+              [%note s+note.data]
+              [%tags a+(turn ~(tap in tags.data) enjs-tag)]
+          ==
+        ==
     ==
   ==
 ::
@@ -520,8 +577,11 @@
         [%method s+method.parm]
         [%tags a+(turn ~(tap in tags.parm) enjs-tag)]
     ==
+    ::
+    %page  (frond [%type (enjs-page-type type.parm)])
   ==
   ++  enjs-tree-type  enjs-harvest-type
+  ++  enjs-page-type  enjs-harvest-type
   ++  enjs-harvest-type
     |=  =type:harvest:views
     ^-  json

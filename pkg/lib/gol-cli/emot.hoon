@@ -296,6 +296,7 @@
         %tree       %sending-tree
         %harvest    %sending-harvest
         %list-view  %sending-list-view
+        %page       %sending-page
       ==
   (emit:this %give %fact ~[/ask] goal-say+!>([view-path data]))
 ::
