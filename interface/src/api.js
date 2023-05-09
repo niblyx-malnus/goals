@@ -619,7 +619,7 @@ const api = {
   },
   sub: (path) => {
     const updateData = dynamicUpdate(path);
-    log("updateData", updateData);
+
     return api.createApi().subscribe(updateData);
   },
   viewAck: (path) => {

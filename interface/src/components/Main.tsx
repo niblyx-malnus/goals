@@ -58,6 +58,7 @@ function Main({
   const setRoleMap = useStore((store) => store.setRoleMap);
   const fetchedPools = useStore((store) => store.pools);
   const setPoolStore = useStore((store: any) => store.setPools);
+  const filterGoals = useStore((store) => store.filterGoals);
 
   const setGroupsData = useStore((store) => store.setGroupsData);
   const setPals = useStore((store) => store.setPals);
@@ -109,7 +110,19 @@ function Main({
       //create a map of goal to id(birth)
 
       const goalsMap = new Map();
-      pool.nexus.goals.forEach((item: any) => {
+      //apply filters if any
+      const newGoals = poolItem.pool.nexus.goals.filter(
+        (goalItem: any, goalIndex: any) => {
+          if (
+            (goalItem.goal.nexus.complete && filterGoals === "complete") ||
+            (!goalItem.goal.nexus.complete && filterGoals === "incomplete")
+          ) {
+            return false;
+          }
+          return true;
+        }
+      );
+      newGoals.forEach((item: any) => {
         goalsMap.set(item.id.birth, item);
         item.goal.hitch.tags?.forEach((element: any) => {
           if (!allTagsSet.has(element.text)) {
@@ -158,7 +171,7 @@ function Main({
           }
         );
       }
-      pool.nexus.goals.forEach((shallowGoal: any) => {
+      newGoals.forEach((shallowGoal: any) => {
         /**
          * if we have nest left, we have virtual children;
          * so we make a copy of the goal assicoated with them
@@ -199,7 +212,7 @@ function Main({
       //merge the current pool's goals with virtual children if any
 
       const newNestedGoals = createDataTree(
-        [...pool.nexus.goals, ...virtualChildren],
+        [...newGoals, ...virtualChildren],
         selectOrderList(order, poolItem.pool.trace, true).map((item: any) => {
           return item.birth;
         }),
@@ -214,7 +227,7 @@ function Main({
     setPools(newProjects);
     setRoleMap(roleMap);
     setAllTags(allTags);
-  }, [fetchedPools, order]);
+  }, [fetchedPools, order, filterGoals]);
 
   const roleMap = useStore((store: any) => store.roleMap);
   const selectionMode = useStore((store) => store.selectionMode);

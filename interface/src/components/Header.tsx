@@ -49,7 +49,7 @@ import { useTheme } from "@mui/material/styles";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 
-const filterOptions = () => ["Complete", "Incomplete", "Actionable"];
+const filterOptions = () => ["Complete", "Incomplete"];
 
 export default function Header({
   disableAddPool = false,
@@ -133,9 +133,6 @@ export default function Header({
     } else if (newValue === "Incomplete") {
       //activate the incomplete filter
       setFilterGoals("complete");
-    } else if (newValue === "Actionable") {
-      //activate the actionable filter
-      setFilterGoals("actionable");
     }
   };
 
@@ -205,7 +202,7 @@ export default function Header({
         alignItems={{ sm: "flex-start", md: "center" }}
         flexWrap={"wrap"}
         spacing={{ xs: 1.5, md: 1 }}
-        direction={{xs:'column', sm: "row", md: "row" }}
+        direction={{ xs: "column", sm: "row", md: "row" }}
       >
         <Stack direction="row" spacing={1}>
           {!disableAddPool && (

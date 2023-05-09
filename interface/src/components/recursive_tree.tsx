@@ -85,18 +85,10 @@ const RecursiveTree = ({
   yokingGoalId,
   poolArchived,
 }: any) => {
-  const filterGoals = useStore((store) => store.filterGoals);
   const createTree = (goal: any) => {
     const currentGoal = goal.goal;
     const currentGoalId = goal.id.birth;
     const childGoals = goal.childNodes;
-    //filter out goals based on fitlerGoals value
-    if (
-      (!currentGoal.nexus.actionable && filterGoals === "actionable") ||
-      (currentGoal.nexus.complete && filterGoals === "complete") ||
-      (!currentGoal.nexus.complete && filterGoals === "incomplete")
-    )
-      return null;
 
     return (
       <Box position={"relative"} key={currentGoalId}>

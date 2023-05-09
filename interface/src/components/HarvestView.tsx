@@ -21,8 +21,25 @@ function HarvestView({
   pageType: PageType;
   pageId: any;
 }) {
+  const [displayGoals, setDisplayGoals] = useState<any>([]); //we have this for filtering;
   const harvestGoals = useStore((store) => store.harvestGoals);
+  const filterGoals = useStore((store) => store.filterGoals);
   const tagFilterArray = useStore((store) => store.tagFilterArray);
+
+  useEffect(() => {
+    //we apply the filter if any to our harvestGoals
+    const newDisplayGoals = harvestGoals.filter((goalItem: any) => {
+      if (
+        (goalItem.goal.nexus.complete && filterGoals === "complete") ||
+        (!goalItem.goal.nexus.complete && filterGoals === "incomplete")
+      )
+        return false;
+      return true;
+    });
+
+    setDisplayGoals(newDisplayGoals);
+  }, [harvestGoals, filterGoals]);
+
   useEffect(() => {
     //everytime we get a new filter set we ask for new data
     if (pageId !== "main" && !pageId) return;
@@ -47,7 +64,7 @@ function HarvestView({
         </Tooltip>
       </Stack>
       <Stack direction={"column"}>
-        {harvestGoals?.map((goal: any) => {
+        {displayGoals?.map((goal: any) => {
           const currentGoal = goal.goal;
           const currentGoalId = goal.id.birth;
           return (
@@ -55,7 +72,7 @@ function HarvestView({
               parentId=""
               children={[]}
               goal={currentGoal}
-              poolRole={harvestGoals.role}
+              poolRole={displayGoals.role}
               id={currentGoalId}
               isSelected={currentGoal.selected}
               key={"harvest-" + currentGoalId}
@@ -63,7 +80,7 @@ function HarvestView({
               label={currentGoal.hitch.desc}
               disabled={true}
               inSelectionMode={false}
-              pin={harvestGoals.pin}
+              pin={displayGoals.pin}
               harvestGoal={true}
               yokingGoalId={"not in selection mode, so I wont use this"}
               note={currentGoal.hitch.note}
@@ -72,7 +89,7 @@ function HarvestView({
             />
           );
         })}
-        {harvestGoals?.length === 0 && (
+        {displayGoals?.length === 0 && (
           <Typography color={"text.primary"} variant="h6">
             Nothing to harvest
           </Typography>
