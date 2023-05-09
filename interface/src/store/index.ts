@@ -475,8 +475,8 @@ const useStore = create<Store>((set, get) => ({
     set(() => ({ draggingParentId })),
 
   mainLoading: {
-    trying: true,
-    success: false,
+    trying: false,
+    success: true, 
     error: false,
   },
   setMainLoading: (mainLoading: Loading) => set(() => ({ mainLoading })),

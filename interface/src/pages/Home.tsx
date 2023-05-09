@@ -22,12 +22,10 @@ export default function Home({}) {
   const setMainLoading = useStore((store) => store.setMainLoading);
 
   const fetchInitial = async () => {
-    setMainLoading({ trying: true, success: false, error: false });
+ //   setMainLoading({ trying: true, success: false, error: false });
     try {
-      const result = await api.getData();
-      log("fetchInitial result => ", result);
-      const askResult = await api.treeAsk();
-      log("askResult", askResult);
+      const treeAsk = await api.treeAsk();
+      log("treeAsk", treeAsk);
       // {author: 'zod', birth: 1682115616821, owner: 'zod'}
       harvestAskAction("main", null);
       listAskAction("main", null);
@@ -35,7 +33,7 @@ export default function Home({}) {
       //  const listView = await api.listViewAsk();
 
       //  log("listView", listView);
-      const resultProjects = result.store.pools;
+      //const resultProjects = result.store.pools;
       //add an alternate step (if selected, should be the default setting) order is decided
       //here we enforce asc order for pool to not confuse the users
       /*   const preOrderedPools = resultProjects.sort((aey: any, bee: any) => {
@@ -44,7 +42,7 @@ export default function Home({}) {
       const orderedPools = orderPools(preOrderedPools, order);
       */
       //save the cached pools also in a seperate list
-      setArchivedPools(
+      /*   setArchivedPools(
         result.store.cache.map((poolItem: any) => {
           return { ...poolItem, pool: { ...poolItem.pool, isArchived: true } };
         })
@@ -55,9 +53,10 @@ export default function Home({}) {
       } else {
         setMainLoading({ trying: false, success: false, error: true });
       }
+      */
     } catch (e) {
       log("fetchInitial error => ", e);
-      setMainLoading({ trying: false, success: false, error: true });
+    //  setMainLoading({ trying: false, success: false, error: true });
     }
   };
 
