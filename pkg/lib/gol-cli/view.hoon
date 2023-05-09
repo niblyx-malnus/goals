@@ -40,4 +40,39 @@
     %list-view  [%list-view (view-data:livy +.parm)]
     %page       [%page (view-data:page +.parm)]
   ==
+::
+++  dejs
+  |%
+  ++  view-parm
+    ^-  $-(json parm:vyu)
+    %-  of:dejs:format
+    :~  [%tree view-parm:dejs:tree]
+        [%harvest view-parm:dejs:harv]
+        [%list-view view-parm:dejs:livy]
+        [%page view-parm:dejs:page]
+    ==
+  --
+::
+++  enjs
+  |%
+  ++  view-data
+    |=  =data:vyu
+    ^-  json
+    ?-  -.data
+      %tree       (view-data:enjs:tree +.data)
+      %harvest    (view-data:enjs:harv +.data)
+      %list-view  (view-data:enjs:livy +.data)
+      %page       (view-data:enjs:page +.data)
+    ==
+  ::
+  ++  view-diff
+    |=  =diff:vyu
+    ^-  json
+    ?-  -.diff
+      %tree       (view-diff:enjs:tree +.diff)
+      %harvest    (view-diff:enjs:harv +.diff)
+      %list-view  (view-diff:enjs:livy +.diff)
+      %page       (view-diff:enjs:page +.diff)
+    ==
+  --
 --

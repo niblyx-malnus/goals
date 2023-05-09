@@ -1,10 +1,19 @@
 /-  *goal
-/+  *gol-cli-json
+/+  v=gol-cli-view
 |_  =say
 ++  grow
   |%
   ++  noun  say
-  ++  json  (enjs-say say)
+  ++  json
+    =,  enjs:format
+    %.  say
+    |=  =^say
+    ^-  ^json
+    %+  frond  -.data.say
+    %-  pairs
+    :~  [%path (path path.say)]
+        [%data (view-data:enjs:v data.say)]
+    ==
   --
 ++  grab
   |%

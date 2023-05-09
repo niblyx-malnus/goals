@@ -1,5 +1,5 @@
 /-  *goal
-/+  *gol-cli-json
+/+  v=gol-cli-view
 |_  =ask
 ++  grow
   |%
@@ -8,7 +8,11 @@
 ++  grab
   |%
   ++  noun  ^ask
-  ++  json  dejs-ask
+  ++  json
+    =,  dejs:format
+    |=  jon=json
+    ~|  json-ask+(en-json:html jon)
+    `^ask`[vzn %.(jon (ot ~[pid+so pok+view-parm:dejs:v]))]
   --
 ++  grad  %noun
 --

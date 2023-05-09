@@ -1,4 +1,5 @@
 /-  gol=goal
+/+  gol-cli-json
 |_  =store:gol
 +*  vyu   views:gol
 ++  view-data
@@ -52,4 +53,84 @@
      ~
    tags.u.get
   ==
+::
+++  dejs
+  =,  gol-cli-json
+  =,  dejs:format
+  |%
+  ++  view-parm
+    ^-  $-(json parm:page:vyu)
+    (ot ~[type+type])
+  ::
+  ++  type
+    ^-  $-(json type:page:vyu)
+    %-  of
+    :~  main+|=(jon=json ?>(?=(~ jon) ~))
+        pool+dejs-pin
+        goal+dejs-id
+    ==
+  --
+::
+++  enjs
+  =,  gol-cli-json
+  =,  enjs:format
+  |%
+  ++  view-data
+    |=  =data:page:vyu
+    ^-  json
+    ?-    -.data
+      %main  (frond %main ~)
+        %pool
+      %+  frond  %pool
+      %-  pairs
+      :~  [%title s+title.data]
+          [%note s+note.data]
+      ==
+      ::
+        %goal
+      %+  frond  %goal
+      %-  pairs
+      :~  [%par-pool (enjs-pin par-pool.data)]
+          [%par-goal ?~(par-goal.data ~ (enjs-id u.par-goal.data))]
+          [%desc s+desc.data]
+          [%note s+note.data]
+          [%tags a+(turn ~(tap in tags.data) enjs-tag)]
+      ==
+    ==
+  ::
+  ++  view-diff
+    |=  =diff:page:vyu
+    ^-  json
+    %-  pairs
+    :~  :-  %hed
+        %-  pairs
+        :~  [%pin (enjs-pin pin.diff)]
+            [%mod (ship mod.diff)]
+            [%pid s+`@t`pid.diff]
+        ==
+        :-  %tel
+        %+  frond  %page
+        ?>  ?=(%replace +<.diff)
+        =/  =data:page:views  +>.diff
+        ?-    -.data
+          %main  (frond %main ~)
+            %pool
+          %+  frond  %pool
+          %-  pairs
+          :~  [%title s+title.data]
+              [%note s+note.data]
+          ==
+          ::
+            %goal
+          %+  frond  %goal
+          %-  pairs
+          :~  [%par-pool (enjs-pin par-pool.data)]
+              [%par-goal ?~(par-goal.data ~ (enjs-id u.par-goal.data))]
+              [%desc s+desc.data]
+              [%note s+note.data]
+              [%tags a+(turn ~(tap in tags.data) enjs-tag)]
+          ==
+        ==
+    ==
+  --
 --

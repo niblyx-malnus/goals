@@ -68,12 +68,6 @@
     (emit %give %fact ~[path] goal-view-send+!>(u.diff))
   ==
 ::
-++  home-emit
-  |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
-  ^-  _this
-  =.  this  (views-emit [pin mod pid] upd)
-  (emit:this %give %fact ~[/goals] goal-home-update+!>([[pin mod pid] upd]))
-::
 ++  away-emit
   |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
   ^-  _this
@@ -93,15 +87,10 @@
   ?:  (~(has by perms.pool) ship)  ~
   (some [%give %kick ~[path] `ship])
 ::
-++  send-home-update
-  |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
-  ^-  _this
-  (home-emit:this [pin mod pid] upd)
-::
 ++  send-away-update
   |=  [[=pin:gol mod=ship pid=@] upd=update:gol]
   ^-  _this
-  =.  this  (home-emit:this [pin mod pid] upd)
+  =.  this  (views-emit [pin mod pid] upd)
   =.  this  (away-emit:this [pin mod pid] upd)
   (kick-unwelcome:this pin)
 ::
@@ -259,7 +248,7 @@
   =/  [pid=@ =pin:gol =term]  (de-relay-wire wire)
   ?>  =(src.bowl owner.pin)
   =/  upd=update:gol  [vzn %poke-error tang]
-  (send-home-update [pin src.bowl pid] upd)
+  (views-emit [pin src.bowl pid] upd)
 ::
 ++  handle-watch
   |=  =path
@@ -280,7 +269,7 @@
   =?  upd  (~(has by cache.store) pin)
     (some [vzn %trash-pool ~])
   ?~  upd  this
-  (send-home-update [pin our.bowl 0] u.upd)
+  (views-emit [pin our.bowl 0] u.upd)
 ::
 ++  handle-ask
   |=  =ask:gol
@@ -305,7 +294,7 @@
   ?.  =(vzn -.upd)  :: assert updates are correct version
     ~|("incompatible version" !!)
   =.  store  (etch:etch pin upd)
-  (send-home-update [pin mod 0] upd)
+  (views-emit [pin mod 0] upd)
 ::
 ++  handle-action
   |=  axn=action:gol
@@ -663,7 +652,7 @@
     =/  =goal:gol  (~(got by goals.pool) id)
     =/  upd=update:gol
       [vzn %goal-hitch id %put-tags (~(uni in tags) tags.goal)]
-    (home-emit:this [pin our.bowl pid.axn] upd)
+    (views-emit [pin our.bowl pid.axn] upd)
     ::
       %add-field-data
     =+  pok.axn
@@ -756,7 +745,7 @@
     =/  [=pin:gol =pool:gol]  (spawn-pool title [src now]:bowl)
     =/  upd=update:gol        [vzn %spawn-pool pool]
     =.  store                 (etch:etch pin upd)
-    (send-home-update [pin src.bowl pid.axn] upd)
+    (views-emit [pin src.bowl pid.axn] upd)
     ::
       %clone-pool
     =+  pok.axn
@@ -764,7 +753,7 @@
     =/  [=pin:gol =pool:gol]  (clone-pool pin title [src now]:bowl)
     =/  upd=update:gol        [vzn %spawn-pool pool]
     =.  store                 (etch:etch pin upd)
-    (send-home-update [pin src.bowl pid.axn] upd)
+    (views-emit [pin src.bowl pid.axn] upd)
     ::
       %cache-pool
     =+  pok.axn
@@ -773,7 +762,7 @@
     =.  this            (emit %give %kick ~[(en-pool-path pin)] ~)
     =/  upd=update:gol  [vzn %cache-pool pin]
     =.  store           (etch:etch pin upd)
-    (send-home-update:this [pin src.bowl pid.axn] upd)
+    (views-emit:this [pin src.bowl pid.axn] upd)
     ::
       %renew-pool
     =+  pok.axn
@@ -782,7 +771,7 @@
     =/  =pool:gol       (~(got by cache.store) pin)
     =/  upd=update:gol  [vzn %renew-pool pin pool]
     =.  store           (etch:etch pin upd)
-    (send-home-update [pin src.bowl pid.axn] upd)
+    (views-emit [pin src.bowl pid.axn] upd)
     ::
       %trash-pool
     :: TODO: purge locals; purge index; purge order
@@ -793,11 +782,11 @@
     ?:  (~(has by pools.store) pin)
       =/  upd=update:gol  [vzn %waste-pool ~]
       =.  store           (etch:etch pin upd)
-      (send-home-update:this [pin src.bowl pid.axn] upd)
+      (views-emit:this [pin src.bowl pid.axn] upd)
     ?>  (~(has by cache.store) pin)
     =/  upd=update:gol  [vzn %trash-pool ~]
     =.  store           (etch:etch pin upd)
-    (send-home-update:this [pin src.bowl pid.axn] upd)
+    (views-emit:this [pin src.bowl pid.axn] upd)
     ::
       %slot-above
     =+  pok.axn
@@ -833,6 +822,6 @@
     =/  upd=update:gol
       ?:  (~(has by cache.store) pin)  [vzn %trash-pool ~]
       ?>  (~(has by pools.store) pin)  [vzn %waste-pool ~]
-    (send-home-update:this [pin src.bowl pid.axn] upd)
+    (views-emit:this [pin src.bowl pid.axn] upd)
   ==
 --

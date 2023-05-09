@@ -1,5 +1,5 @@
 /-  gol=goal
-/+  gol-cli-etch, gol-cli-node, gol-cli-traverse
+/+  gol-cli-etch, gol-cli-node, gol-cli-traverse, gol-cli-json
 |_  [=store:gol =bowl:gall]
 +*  vyu   views:gol
     etch  ~(. gol-cli-etch store)
@@ -155,4 +155,72 @@
     %any  !=(~ (~(int in tags) tags.goal))
     %all  =(tags (~(int in tags) tags.goal))
   ==
+::
+++  dejs
+  =,  gol-cli-json
+  =,  dejs:format
+  |%
+  ++  view-parm
+    ^-  $-(json parm:list-view:vyu)
+    %-  ot
+    :~  type+type
+        first-gen-only+bo
+        actionable-only+bo
+        method+method
+        tags+(as dejs-tag)
+    ==
+  ::
+  ++  method
+    ^-  $-(json ?(%any %all))
+    =/  cuk  |=(=@t ;;(?(%any %all) t))
+    =/  par  ;~(pose (jest 'any') (jest 'all'))
+    (su (cook cuk par))
+  ::
+  ++  type
+    ^-  $-(json type:list-view:vyu)
+    %-  of
+    :~  main+|=(jon=json ?>(?=(~ jon) ~))
+        pool+dejs-pin
+        goal+(ot ~[id+dejs-id ignore-virtual+bo])
+    ==
+  --
+::
+++  enjs
+  =,  gol-cli-json
+  =,  enjs:format
+  |%
+  ++  view-data
+    |=  =data:list-view:vyu
+    ^-  json
+    a+(turn goals.data id-pack)
+  ::
+  ++  id-pack
+    |=  [=id =pack:list-view:vyu]
+    ^-  json
+    %-  pairs
+    :~  [%id (enjs-id id)]
+        [%pin (enjs-pin pin.pack)]
+        [%pool-role ?~(pool-role.pack ~ s+u.pool-role.pack)]
+        [%goal (enjs-goal +>.pack)]
+    ==
+  ::
+  ++  view-diff
+    |=  =diff:list-view:vyu
+    ^-  json
+    %-  pairs
+    :~  :-  %hed
+        %-  pairs
+        :~  [%pin (enjs-pin pin.diff)]
+            [%mod (ship mod.diff)]
+            [%pid s+`@t`pid.diff]
+        ==
+        :-  %tel
+        %+  frond  %list-view
+        ?>  ?=(%replace +<.diff)
+        :-  %a
+        %+  turn
+          `(list [id pack:list-view:views])`+>.diff
+        id-pack
+    ==
+  --
 --

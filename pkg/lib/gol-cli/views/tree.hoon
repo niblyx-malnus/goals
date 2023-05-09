@@ -1,5 +1,5 @@
 /-  gol=goal
-/+  gol-cli-traverse
+/+  gol-cli-traverse, gol-cli-json
 |_  =store:gol
 +*  vyu   views:gol
 :: TODO: Sever this data structure from the core backend data
@@ -7,6 +7,7 @@
 ++  view-data
   |=  =parm:tree:vyu
   ^-  data:tree:vyu
+  =-  ~&(- -)
   ?-    -.type.parm
     %main  [(unify-pools-tags pools) (unify-pools-tags cache)]:[store .]
     ::
@@ -34,27 +35,6 @@
     ::
     :_(~ (unify-pools-tags (~(put by *pools:gol) pin pool(goals goals))))
   ==
-++  view-diff
-  |=  $:  =parm:tree:vyu
-          =data:tree:vyu
-          upd=home-update:gol
-      ==
-  ^-  (unit diff:tree:vyu)
-  =;  diff=(unit diff:tree:vyu)
-    :: temporarily remove this check
-    ::
-    :: ~|  "non-equivalent-tree-view-diff"
-    :: =/  check=?
-    ::   ?~  diff  =(data (view-data parm))
-    ::   =((view-data parm) (etch-diff data u.diff))
-    :: ?>(check diff)
-    diff
-  (some upd)
-::
-++  etch-diff
-  |=  [=data:tree:vyu =diff:tree:vyu]
-  ^-  data:tree:vyu
-  *data:tree:vyu
 ::
 ++  unify-pools-tags
   |=  =pools:gol
@@ -79,4 +59,212 @@
      ~
    tags.u.get
   ==
+::
+++  view-diff
+  |=  $:  =parm:tree:vyu
+          =data:tree:vyu
+          upd=home-update:gol
+      ==
+  ^-  (unit diff:tree:vyu)
+  =;  diff=(unit diff:tree:vyu)
+    :: temporarily remove this check
+    ::
+    :: ~|  "non-equivalent-tree-view-diff"
+    :: =/  check=?
+    ::   ?~  diff  =(data (view-data parm))
+    ::   =((view-data parm) (etch-diff data u.diff))
+    :: ?>(check diff)
+    :: ~&  diff
+    diff
+  (some upd)
+::
+++  etch-diff
+  |=  [=data:tree:vyu =diff:tree:vyu]
+  ^-  data:tree:vyu
+  *data:tree:vyu
+::
+++  dejs
+  =,  gol-cli-json
+  =,  dejs:format
+  |%
+  ++  view-parm
+    ^-  $-(json parm:tree:vyu)
+    (ot ~[type+type])
+  ::
+  ++  type
+    ^-  $-(json type:tree:vyu)
+    %-  of
+    :~  main+|=(jon=json ?>(?=(~ jon) ~))
+        pool+dejs-pin
+        goal+dejs-id
+    ==
+  --
+::
+++  enjs
+  =,  gol-cli-json
+  =,  enjs:format
+  |%
+  ++  view-data
+    |=  =data:tree:vyu
+    ^-  json
+    %-  pairs
+    :~  [%pools (enjs-pools pools.data)]
+        [%cache (enjs-pools cache.data)]
+    ==
+  ::
+  ++  view-diff
+    |=  =diff:tree:vyu
+    ^-  json
+    =/  upd=update  +.diff
+    =/  upd  +.upd  :: ignore version
+    %-  pairs
+    :~  :-  %hed
+        %-  pairs
+        :~  [%pin (enjs-pin pin.diff)]
+            [%mod (ship mod.diff)]
+            [%pid s+`@t`pid.diff]
+        ==
+        :-  %tel
+        %+  frond  -.upd
+        ?-    -.upd
+          %poke-error  (frond %tang (enjs-tang tang.upd))
+            %spawn-goal
+          %-  pairs
+          :~  [%pin (enjs-pin pin.diff)]
+              [%pex (enjs-pex pex.upd)]
+              [%nex (enjs-nex nex.upd)]
+              [%id (enjs-id id.upd)]
+              [%goal (enjs-goal goal.upd)]
+          ==
+          ::
+            %waste-goal
+          %-  pairs
+          :~  [%pin (enjs-pin pin.diff)]
+              [%pex (enjs-pex pex.upd)]
+              [%nex (enjs-nex nex.upd)]
+              [%id (enjs-id id.upd)]
+              [%waz a+(turn ~(tap in waz.upd) enjs-id)]
+          ==
+          ::
+            %cache-goal
+          %-  pairs
+          :~  [%pin (enjs-pin pin.diff)]
+              [%pex (enjs-pex pex.upd)]
+              [%nex (enjs-nex nex.upd)]
+              [%id (enjs-id id.upd)]
+              [%cas a+(turn ~(tap in cas.upd) enjs-id)]
+          ==
+          ::
+          %renew-goal  
+          %-  pairs
+          :~  [%pin (enjs-pin pin.diff)]
+              [%pex (enjs-pex pex.upd)]
+              [%id (enjs-id id.upd)]
+              [%ren (enjs-goals ren.upd)]
+          ==
+          ::
+          %trash-goal
+          %-  pairs
+          :~  [%pin (enjs-pin pin.diff)]
+              [%pex (enjs-pex pex.upd)]
+              [%id (enjs-id id.upd)]
+              [%tas a+(turn ~(tap in tas.upd) enjs-id)]
+          ==
+          ::
+          %spawn-pool  (frond %pool (enjs-pool pool.upd))
+          ::
+          %cache-pool  (frond %pin (enjs-pin pin.upd))
+          ::
+            %renew-pool 
+          (pairs ~[[%pin (enjs-pin pin.upd)] [%pool (enjs-pool pool.upd)]])
+          ::
+          %waste-pool  ~
+          %trash-pool  ~
+          ::
+            %pool-perms
+          :-  %a  %+  turn  ~(tap by new.upd) 
+          |=  [chip=@p role=(unit pool-role)] 
+          %-  pairs
+          :~  [%ship (ship chip)]
+              [%role ?~(role ~ s+u.role)]
+          ==
+          ::
+            %pool-hitch
+          ?-  +<.upd
+            %title  (frond +<.upd s+title.upd)
+            %note  (frond +<.upd s+note.upd)
+            %del-field-type  (frond +<.upd s+field.upd)
+              %add-field-type
+            %+  frond  +<.upd
+            %-  pairs
+            :~  [%field s+field.upd]
+                [%field-type (enjs-field-type field-type.upd)]
+            ==
+          ==
+          ::
+            %pool-nexus
+          ?-    +<.upd
+              %yoke
+            %+  frond  +<.upd
+            %-  pairs
+            :~  pex+(enjs-pex pex.upd)
+                nex+(enjs-nex nex.upd)
+            ==
+          ==
+          ::
+            %goal-dates
+          %-  pairs
+          :~  pex+(enjs-pex pex.upd)
+              nex+(enjs-nex nex.upd)
+          ==
+          ::
+            %goal-perms
+          %-  pairs
+          :~  pex+(enjs-pex pex.upd)
+              nex+(enjs-nex nex.upd)
+          ==
+          ::
+            %goal-young
+          %-  pairs
+          :~  [%id (enjs-id id.upd)]
+              [%young a+(turn young.upd enjs-id-v)]
+          ==
+          ::
+            %goal-roots
+          %+  frond  %pex
+          (enjs-pex pex.upd)
+          ::
+            %goal-togls
+          %-  pairs
+          :~  [%id (enjs-id id.upd)]
+              :-  %togls-updated
+              %+  frond
+                +>-.upd
+              ?-  +>-.upd
+                %complete  b+complete.upd
+                %actionable  b+actionable.upd
+              ==
+          ==
+          ::
+            %goal-hitch
+          %-  pairs
+          :~  [%id (enjs-id id.upd)]
+              ?-  +>-.upd
+                %desc  [%desc s+desc.upd]
+                %note  [%note s+note.upd]
+                %add-tag  [%tag (enjs-tag tag.upd)]
+                %del-tag  [%tag (enjs-tag tag.upd)]
+                %put-tags  [%tags a+(turn ~(tap in tags.upd) enjs-tag)]
+                %del-field-data  [%del-field-data s+field.upd]
+                  %add-field-data
+                :-  %add-field-data
+                %-  pairs
+                :~  [%field s+field.upd]
+                    [%field-data (enjs-field-data field-data.upd)]
+                ==
+              ==
+          ==
+        ==
+    ==
+  --
 --
