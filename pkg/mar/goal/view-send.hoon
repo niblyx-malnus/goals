@@ -1,13 +1,13 @@
-/-  *goal
+/-  *views
 /+  v=gol-cli-view
-|_  =send:views
+|_  =send
 ++  grow
   |%
   ++  noun  send
   ++  json
     =,  enjs:format
     %.  send
-    |=  =send:views
+    |=  =^send
     ^-  ^json
     ?:  ?=(%dot -.send)
       (frond %dot (path path.send))
@@ -15,7 +15,7 @@
   --
 ++  grab
   |%
-  ++  noun  send:views
+  ++  noun  ^send
   --
 ++  grad  %noun
 --

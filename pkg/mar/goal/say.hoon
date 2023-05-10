@@ -1,4 +1,4 @@
-/-  *goal
+/-  *views
 /+  v=gol-cli-view
 |_  =say
 ++  grow

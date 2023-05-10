@@ -1,15 +1,15 @@
-/-  *goal
-|_  =vid:views
+/-  *views
+|_  =vid
 ++  grow
   |%
   ++  noun  vid
   --
 ++  grab
   |%
-  ++  noun  vid:views
+  ++  noun  ^vid
   ++  json
     |=  jon=^json
-    ^-  vid:views
+    ^-  ^vid
     %.  jon
     %-  su:dejs:format
     %+  cook

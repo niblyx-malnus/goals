@@ -1,8 +1,7 @@
-/-  gol=goal
-/+  gol-cli-etch, gol-cli-node, gol-cli-traverse, gol-cli-json
+/-  gol=goal, vyu=views
+/+  gol-cli-etch, gol-cli-node, gol-cli-traverse, j=gol-cli-json
 |_  [=store:gol =bowl:gall]
-+*  vyu   views:gol
-    etch  ~(. gol-cli-etch store)
++*  etch  ~(. gol-cli-etch store)
 ++  view-data
   |=  =parm:list-view:vyu
   ^-  data:list-view:vyu
@@ -101,7 +100,7 @@
 ++  view-diff
   |=  $:  =parm:list-view:vyu
           =data:list-view:vyu
-          upd=home-update:gol
+          [[=pin:gol mod=ship pid=@] upd=update:gol]
       ==
   ^-  (unit diff:list-view:vyu)
   =;  diff=(unit diff:list-view:vyu)
@@ -112,7 +111,7 @@
     ?>(check diff)
   =/  atad=data:list-view:vyu  (view-data parm)
   ?:  =(data atad)  ~
-  (some [[pin mod pid]:upd %replace atad])
+  (some [[pin mod pid] %replace atad])
 ::
 ++  etch-diff
   |=  [=data:list-view:vyu =diff:list-view:vyu]
@@ -157,7 +156,6 @@
   ==
 ::
 ++  dejs
-  =,  gol-cli-json
   =,  dejs:format
   |%
   ++  view-parm
@@ -167,7 +165,7 @@
         first-gen-only+bo
         actionable-only+bo
         method+method
-        tags+(as dejs-tag)
+        tags+(as tag:dejs:j)
     ==
   ::
   ++  method
@@ -180,13 +178,12 @@
     ^-  $-(json type:list-view:vyu)
     %-  of
     :~  main+|=(jon=json ?>(?=(~ jon) ~))
-        pool+dejs-pin
-        goal+(ot ~[id+dejs-id ignore-virtual+bo])
+        pool+pin:dejs:j
+        goal+(ot ~[id+id:dejs:j ignore-virtual+bo])
     ==
   --
 ::
 ++  enjs
-  =,  gol-cli-json
   =,  enjs:format
   |%
   ++  view-data
@@ -195,13 +192,13 @@
     a+(turn goals.data id-pack)
   ::
   ++  id-pack
-    |=  [=id =pack:list-view:vyu]
+    |=  [=id:gol =pack:list-view:vyu]
     ^-  json
     %-  pairs
-    :~  [%id (enjs-id id)]
-        [%pin (enjs-pin pin.pack)]
+    :~  [%id (enjs-id:j id)]
+        [%pin (enjs-pin:j pin.pack)]
         [%pool-role ?~(pool-role.pack ~ s+u.pool-role.pack)]
-        [%goal (enjs-goal +>.pack)]
+        [%goal (enjs-goal:j +>.pack)]
     ==
   ::
   ++  view-diff
@@ -210,7 +207,7 @@
     %-  pairs
     :~  :-  %hed
         %-  pairs
-        :~  [%pin (enjs-pin pin.diff)]
+        :~  [%pin (enjs-pin:j pin.diff)]
             [%mod (ship mod.diff)]
             [%pid s+`@t`pid.diff]
         ==
@@ -219,8 +216,33 @@
         ?>  ?=(%replace +<.diff)
         :-  %a
         %+  turn
-          `(list [id pack:list-view:views])`+>.diff
+          `(list [id:gol pack:list-view:vyu])`+>.diff
         id-pack
+    ==
+  ::
+  ++  view-parm
+    |=  =parm:list-view:vyu
+    ^-  json
+    %-  pairs
+    :~  [%type (type type.parm)]
+        [%first-gen-only b+first-gen-only.parm]
+        [%actionable-only b+actionable-only.parm]
+        [%method s+method.parm]
+        [%tags a+(turn ~(tap in tags.parm) enjs-tag:j)]
+    ==
+  ++  type
+    |=  =type:list-view:vyu
+    ^-  json
+    ?-    -.type
+      %main  (frond %main ~)
+      %pool  (frond %pool (enjs-pin:j pin.type))
+      ::
+        %goal
+      %+  frond  %goal
+      %-  pairs
+      :~  [%id (enjs-id:j id.type)]
+          [%ignore-virtual b+ignore-virtual.type]
+      ==
     ==
   --
 --

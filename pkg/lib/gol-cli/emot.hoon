@@ -1,15 +1,14 @@
-/-  gol=goal
+/-  gol=goal, vyu=views, act=action
 /+  *gol-cli-util, pl=gol-cli-pool, nd=gol-cli-node, tv=gol-cli-traverse,
     gol-cli-etch, gol-cli-view, fl=gol-cli-inflater, gol-cli-goals
 ::
-|_  [=bowl:gall cards=(list card:agent:gall) state-5:gol]
+|_  [=bowl:gall cards=(list card:agent:gall) [state-5:gol =views:vyu]]
 +*  this   .
     state  +<+>
     gols   ~(. gol-cli-goals store)
     etch   ~(. gol-cli-etch store)
     view   ~(. gol-cli-view store bowl)
     vzn    vzn:gol
-    vyu    views:gol
 +$  card  card:agent:gall
 ++  abet  [(flop cards) state]
 ++  emit  |=(=card this(cards [card cards]))
@@ -43,7 +42,7 @@
   ==
 ::
 ++  relay
-  |=  [=pin:gol axn=action:gol]
+  |=  [=pin:gol axn=action:act]
   ^-  _this
   ?>  =(src our):bowl
   =/  =wire  (en-relay-wire pid.axn pin -.pok.axn)
@@ -272,11 +271,11 @@
   (views-emit [pin our.bowl 0] u.upd)
 ::
 ++  handle-ask
-  |=  =ask:gol
+  |=  =ask:vyu
   ^-  _this
-  =/  =vid:views:gol  (sham [now eny]:bowl)
+  =/  =vid:vyu  (sham [now eny]:bowl)
   =/  view-path=path  /view/(scot %uv vid)
-  =/  =data:views:gol  (view-data:view pok.ask)
+  =/  =data:vyu  (view-data:view pok.ask)
   =.  views  (~(put by views) vid [| (grab-view:view pok.ask)])
   =/  time-path=path  /send-dot/(scot %uv vid)
   =/  next=@da  (add now.bowl ~m1)
@@ -297,7 +296,7 @@
   (views-emit [pin mod 0] upd)
 ::
 ++  handle-action
-  |=  axn=action:gol
+  |=  axn=action:act
   ^-  _this
   =/  mod  src.bowl
   ?-    -.pok.axn
@@ -428,7 +427,7 @@
       this
     :: owner responsible for resulting completions
     =.  src.bowl  our.bowl
-    (handle-action:this [vzn pid.axn %mark-complete u.par])
+    (handle-action:this [pid.axn %mark-complete u.par])
     ::
       %unmark-actionable
     =+  pok.axn

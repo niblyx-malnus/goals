@@ -1,18 +1,16 @@
-/-  gol=goal
-/+  gol-cli-etch, gol-cli-node, gol-cli-traverse,
-    gol-cli-views-tree, gol-cli-views-harvest, gol-cli-views-list-view,
-    gol-cli-views-page
+/-  gol=goal, vyu=views
+/+  gol-cli-node, gol-cli-traverse,
+    gol-cli-views-tree, gol-cli-views-harvest,
+    gol-cli-views-list-view, gol-cli-views-page
 |_  [=store:gol =bowl:gall]
-+*  vyu   views:gol
-    etch  ~(. gol-cli-etch store)
-    tree  ~(. gol-cli-views-tree store)
++*  tree  ~(. gol-cli-views-tree store)
     harv  ~(. gol-cli-views-harvest store bowl)
     livy  ~(. gol-cli-views-list-view store bowl)
     page  ~(. gol-cli-views-page store)
 :: Convert an update into a diff for a given view
 ::
 ++  view-diff
-  |=  [=view:vyu upd=home-update:gol]
+  |=  [=view:vyu upd=[[pin:gol ship @] update:gol]]
   ^-  (unit diff:vyu)
   ?-  -.view
     %tree       (bind (view-diff:tree parm.view data.view upd) (lead %tree))
@@ -54,6 +52,7 @@
   --
 ::
 ++  enjs
+  =,  enjs:format
   |%
   ++  view-data
     |=  =data:vyu
@@ -73,6 +72,38 @@
       %harvest    (view-diff:enjs:harv +.diff)
       %list-view  (view-diff:enjs:livy +.diff)
       %page       (view-diff:enjs:page +.diff)
+    ==
+  ::
+  ++  view-parm
+    |=  =parm:vyu
+    ^-  json
+    ?-  -.parm
+      %tree       (view-parm:enjs:tree +.parm)
+      %harvest    (view-parm:enjs:harv +.parm)
+      %list-view  (view-parm:enjs:livy +.parm)
+      %page       (view-parm:enjs:page +.parm)
+    ==
+  ::
+  ++  view
+    |=  =view:vyu
+    ^-  json
+    %+  frond  -.view
+    %-  pairs
+    :~  [%parm (view-parm ;;(parm:vyu [-.view parm.view]))]
+        [%data (view-data ;;(data:vyu [-.view data.view]))]
+    ==
+  ::
+  ++  views
+    |=  =views:vyu
+    ^-  json
+    =-  o/(malt -)
+    %+  turn  ~(tap by views)
+    |=  [k=@uv ack=_| v=view:vyu]
+    :-  (scot %uv k)
+    ^-  json
+    %-  pairs
+    :~  [%ack b+ack]
+        [%view (view v)]
     ==
   --
 --

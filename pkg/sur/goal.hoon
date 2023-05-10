@@ -1,15 +1,9 @@
 /-  *group, ms=metadata-store :: need to keep for historical reasons
 /+  *gol-cli-util
 |%
-:: TODO:
-:: - Update ask to include sorting as a parameter
-:: - Include pin in goal initial
-:: - Include pool role in harvest and list view
-:: - Add young to roots in trace for a goal page initial
-::
 ++  vzn  %5
 ::
-+$  state-5  [%5 =store:s5 =views:s5]
++$  state-5  [%5 =store:s5]
 +$  state-4  [%4 =store:s4 =groups =log:s4]
 +$  state-3  [%3 =store:s3]
 +$  state-2  [%2 =store:s2]
@@ -57,25 +51,11 @@
 ::
 +$  store         store:s5
 ::
-++  views         views:s5
-::
 +$  nux           nux:s5
 +$  nex           nex:s5
 +$  pex           pex:s5
 +$  update        update:s5
-+$  home-update   home-update:s5
 +$  away-update   away-update:s5
-::
-+$  ask           ask:s5
-+$  say           say:s5
-+$  peek          peek:s5
-::
-+$  core-yoke     core-yoke:s5
-+$  exposed-yoke  exposed-yoke:s5
-+$  nuke          nuke:s5
-+$  plex          plex:s5
-::
-++  action        action:s5
 ::
 ++  s5
   |%
@@ -224,129 +204,6 @@
         cache=pools
         =local
     ==
-  :: a view is a distorted view of the store, a perspective, a transformation
-  ::
-  :: TODO:
-  :: - include sorting as a parameter
-  :: - Include pin in goal initial (for tree view?)
-  :: - Include pool role in harvest and list view
-  :: - Add young to roots in trace for a goal page initial
-  ++  views
-    =<  views
-    |%
-    +$  vid  @uv
-    +$  views  (map vid [ack=_| =view])
-    +$  view
-      $%  [%tree =parm:tree =data:tree]
-          [%harvest =parm:harvest =data:harvest]
-          [%list-view =parm:list-view =data:list-view]
-          [%page =parm:page =data:page]
-      ==
-    +$  parm
-      $%  [%tree parm:tree]
-          [%harvest parm:harvest]
-          [%list-view parm:list-view]
-          [%page parm:page]
-      ==
-    +$  data
-      $%  [%tree data:tree]
-          [%harvest data:harvest]
-          [%list-view data:list-view]
-          [%page data:page]
-      ==
-    :: dots must be acked
-    ::
-    +$  send  $%([%dot =path] diff)
-    +$  diff
-      $%  [%tree diff:tree]
-          [%harvest diff:harvest]
-          [%list-view diff:list-view]
-          [%page diff:page]
-      ==
-    ++  tree
-      |%
-      +$  parm  $:(=type)
-      +$  type  $%([%main ~] [%pool =pin] [%goal =id])
-      +$  data  $:(pools=tree-pools cache=tree-pools)
-      +$  diff  [[=pin mod=ship pid=@] update]
-      :: trying to slowly sever this from underlying DS
-      ::
-      +$  tree-pool   pool
-      +$  tree-pools  (map pin tree-pool)
-      --
-    ++  harvest
-      |%
-      +$  parm
-        $:  =type
-            method=?(%any %all)
-            tags=(set tag)
-        ==
-      +$  type  $%([%main ~] [%pool =pin] [%goal =id])
-      +$  data  $:(goals=(list [id pack]))
-      +$  pack
-        $:  =pin
-            pool-role=(unit ?(%owner pool-role))
-            goal
-        ==
-      ::  $:  pool-role=(unit pool-role)
-      ::      nexus=goal-nexus
-      ::      trace=goal-trace
-      ::      hitch=goal-hitch
-      ::  ==
-      +$  diff  [[=pin mod=ship pid=@] $%([%replace data])]
-      --
-    ++  list-view
-      |%
-      +$  parm
-        $:  =type
-            first-gen-only=_|
-            actionable-only=_|
-            method=?(%any %all)
-            tags=(set tag)
-        ==
-      +$  type
-        $%  [%main ~]
-            [%pool =pin]
-            [%goal =id ignore-virtual=_|]
-        ==
-      +$  data  $:(goals=(list [id pack]))
-      +$  pack
-        $:  =pin
-            pool-role=(unit ?(%owner pool-role))
-            goal
-        ==
-      ::  $:  pool-role=(unit pool-role)
-      ::      nexus=goal-nexus
-      ::      trace=goal-trace
-      ::      hitch=goal-hitch
-      ::  ==
-      +$  diff  [[=pin mod=ship pid=@] $%([%replace data])]
-      --
-    ++  page
-      |%
-      +$  parm  $:(=type)
-      +$  type  $%([%main ~] [%pool =pin] [%goal =id])
-      +$  data  pack
-      +$  pack
-        $%  [%main ~]
-            $:  %pool
-                title=@t
-                note=@t
-            ==
-            $:  %goal
-                par-pool=pin
-                par-goal=(unit id)
-                desc=@t
-                note=@t
-                tags=(set tag)
-            ==
-        ==
-      +$  diff  [[=pin mod=ship pid=@] $%([%replace data])]
-      --
-    --
-  ::
-  +$  ask  [%5 pid=@ pok=parm:views]
-  +$  say  [=path =data:views]
   ::
   +$  nux  [goal-nexus goal-trace]
   +$  nex  (map id nux)
@@ -407,93 +264,6 @@
     ==
   +$  update        [%5 unver-update]
   +$  away-update   [[mod=ship pid=@] update]
-  +$  home-update   [[=pin mod=ship pid=@] update]
-  ::
-  +$  peek
-    $%  [%store =store]
-        [%views =views]
-    ==
-  ::
-  +$  core-yoke     core-yoke:s4
-  +$  exposed-yoke  exposed-yoke:s4
-  +$  nuke          nuke:s4
-  +$  plex          plex:s4
-  ++  action
-    =<  action
-    |%
-    +$  action  [%5 pid=@ pok=$%(util-action pool-action goal-action local-action)]
-    +$  util-action
-      $%  [%subscribe =pin]
-          [%unsubscribe =pin]
-      ==
-    +$  local-action
-      $%  [%slot-above dis=id dat=id]  :: slot dis above dat
-          [%slot-below dis=id dat=id]  :: slot dis below dat
-      ==
-    ++  pool-action
-      =<  pool-action
-      |%
-      +$  pool-action  $%(spawn mutate)
-      +$  spawn  [%spawn-pool title=@t]
-      +$  mutate  $%(life-cycle nexus hitch)
-      +$  life-cycle
-        $%  [%clone-pool =pin title=@t]
-            [%cache-pool =pin]
-            [%renew-pool =pin]
-            [%trash-pool =pin]
-        ==
-      +$  nexus
-        $%  [%yoke =pin yoks=(list plex)]
-            [%update-pool-perms =pin new=pool-perms]
-        ==
-      +$  hitch
-        $%  [%edit-pool-title =pin title=@t]
-            [%edit-pool-note =pin note=@t]
-            [%add-field-type =pin field=@t =field-type]
-            [%del-field-type =pin field=@t]
-        ==
-      --
-    ++  goal-action
-      =<  goal-action
-      |%
-      +$  goal-action  $%(spawn mutate local)
-      +$  spawn  [%spawn-goal =pin upid=(unit id) desc=@t actionable=?]
-      ++  mutate
-        =<  mutate
-        |%
-        +$  mutate  $%(life-cycle nexus hitch)
-        +$  life-cycle
-          $%  [%cache-goal =id]
-              [%renew-goal =id]
-              [%trash-goal =id]
-          ==
-        +$  nexus
-          $%  [%move cid=id upid=(unit id)] :: should probably be in nexus:pool-action
-              [%set-kickoff =id kickoff=(unit @da)]
-              [%set-deadline =id deadline=(unit @da)]
-              [%mark-actionable =id]
-              [%unmark-actionable =id]
-              [%mark-complete =id]
-              [%unmark-complete =id]
-              [%update-goal-perms =id chief=ship rec=_| spawn=(set ship)]
-              [%reorder-roots =pin roots=(list id)]
-              [%reorder-young =id young=(list id)]
-          ==
-        +$  hitch
-          $%  [%edit-goal-desc =id desc=@t]
-              [%edit-goal-note =id note=@t]
-              [%add-goal-tag =id =tag]
-              [%del-goal-tag =id =tag]
-              [%put-goal-tags =id tags=(set tag)]
-              [%add-field-data =id field=@t =field-data]
-              [%del-field-data =id field=@t]
-          ==
-        --
-      +$  local
-        $%  [%put-private-tags =id tags=(set tag)]
-        ==
-      --
-    --
   --
 ::
 :: ============================================================================
@@ -675,91 +445,6 @@
     ==
   +$  log  ((mop @ log-update) lth)
   +$  logged  (pair @ log-update)
-  ::
-  +$  peek
-    $%  [%initial =store]
-        [%updates =(list logged)]
-        [%pool-keys keys=(set pin)]
-        [%all-goal-keys keys=(set id)]
-        [%harvest harvest=(list id)]
-        [%full-harvest harvest=goals]
-        [%get-goal ugoal=(unit goal)]
-        [%get-pin upin=(unit pin)]
-        [%get-pool upool=(unit pool)]
-        [%ryte-bound moment=(unit @da)]
-        [%plumb depth=@ud]
-        [%anchor depth=@ud]
-        [%priority priority=@ud]
-        [%yung yung=(list id)]
-        [%yung-uncompleted yung-uc=(list id)]
-        [%yung-virtual yung-vr=(list id)]
-        [%roots roots=(list id)]
-        [%roots-uncompleted roots-uc=(list id)]
-    ==
-  ::
-  +$  core-yoke
-    $%  [%dag-yoke n1=nid n2=nid]
-        [%dag-rend n1=nid n2=nid]
-    ==
-  ::
-  +$  exposed-yoke  
-    $%  [%prio-rend lid=id rid=id]
-        [%prio-yoke lid=id rid=id]
-        [%prec-rend lid=id rid=id]
-        [%prec-yoke lid=id rid=id]
-        [%nest-rend lid=id rid=id]
-        [%nest-yoke lid=id rid=id]
-        [%hook-rend lid=id rid=id]
-        [%hook-yoke lid=id rid=id]
-        [%held-rend lid=id rid=id]
-        [%held-yoke lid=id rid=id]
-    ==
-  ::
-  +$  nuke
-    $%  [%nuke-prio-left =id]
-        [%nuke-prio-ryte =id]
-        [%nuke-prio =id]
-        [%nuke-prec-left =id]
-        [%nuke-prec-ryte =id]
-        [%nuke-prec =id]
-        [%nuke-prio-prec =id]
-        [%nuke-nest-left =id]
-        [%nuke-nest-ryte =id]
-        [%nuke-nest =id]
-    ==
-  ::
-  +$  plex
-    $%  exposed-yoke
-        nuke
-    ==
-  +$  unver-action
-    $%  [%spawn-pool title=@t]
-        [%clone-pool =pin title=@t]
-        [%cache-pool =pin]
-        [%renew-pool =pin]
-        [%trash-pool =pin]
-        [%spawn-goal =pin upid=(unit id) desc=@t actionable=?] :: actionable no longer used
-        [%cache-goal =id]
-        [%renew-goal =id]
-        [%trash-goal =id]
-        [%yoke =pin yoks=(list plex)]
-        [%move cid=id upid=(unit id)]
-        [%set-kickoff =id kickoff=(unit @da)]
-        [%set-deadline =id deadline=(unit @da)]
-        [%mark-actionable =id]
-        [%unmark-actionable =id]
-        [%mark-complete =id]
-        [%unmark-complete =id]
-        [%update-goal-perms =id chief=ship rec=_| spawn=(set ship)]
-        [%update-pool-perms =pin new=pool-perms]
-        [%edit-goal-desc =id desc=@t]
-        [%edit-pool-title =pin title=@t]
-        [%subscribe =pin]
-        [%unsubscribe =pin]
-        [%kicker =ship =pin]
-    ==
-  ::
-  +$  action  [%4 pid=@ pok=unver-action]
   --
 ::
 ++  convert-3-to-4

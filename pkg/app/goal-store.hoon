@@ -1,4 +1,4 @@
-/-  gol=goal
+/-  gol=goal, vyu=views, act=action
 /+  dbug, default-agent, verb, agentio, gol-cli-emot, fl=gol-cli-inflater,
 :: import during development to force compilation
 ::
@@ -7,6 +7,7 @@
 /=  mgs-  /mar/goal/say
 /=  mvs-  /mar/goal/view-send
 /=  vak-  /mar/view-ack
+/=  pyk-  /mar/goal/peek
 ::
 |%
 +$  state-0  state-0:gol
@@ -23,9 +24,10 @@
       state-4
       state-5
   ==
++$  inflated-state  [state-5 =views:vyu] 
 +$  card  card:agent:gall
 --
-=|  state-5
+=|  inflated-state
 =*  state  -
 =*  vzn  vzn:gol
 ::
@@ -42,7 +44,7 @@
     emot  ~(. gol-cli-emot bowl ~ state)
 ::
 ++  on-init   on-init:def
-++  on-save   !>(state)
+++  on-save   !>(-.state)
 ::
 ++  on-load
   |=  =old=vase
@@ -52,10 +54,11 @@
   ?-    -.old
       %5
     :: TODO: Reload pool subpaths according to new format
-    :: TODO: Clear out views and view-related subpaths
+    :: TODO: Clear out view-related subpaths
     :-  ~
     %=    this
-        state
+      views  ~
+        -.state
       %=  old
         pools.store
           %-  ~(gas by *pools:gol)
@@ -95,22 +98,18 @@
     ==
     ::
       %view-ack
-    =/  =vid:views:gol  !<(vid:views:gol vase)
-    =/  [ack=_| =view:views:gol]  (~(got by views) vid)
+    =/  =vid:vyu  !<(vid:vyu vase)
+    =/  [ack=_| =view:vyu]  (~(got by views) vid)
     `this(views (~(put by views) vid [& view]))
     ::
       %goal-ask
-    =/  =ask:gol  !<(ask:gol vase)
-    ?.  =(vzn -.ask)
-      ~|("incompatible version" !!)
+    =/  =ask:vyu  !<(ask:vyu vase)
     =^  cards  state
       abet:(handle-ask:emot ask)
     [cards this]
     ::
       %goal-action
-    =/  axn=action:gol  !<(action:gol vase)
-    ?.  =(vzn -.axn)
-      ~|("incompatible version" !!)
+    =/  axn=action:act  !<(action:act vase)
     =^  cards  state
       abet:(handle-action:emot axn)
     [cards this]
@@ -203,7 +202,7 @@
     ==
     ::
       [%check-ack v=@ ~]
-    =/  =vid:views:gol  (slav %uv v.pole)
+    =/  =vid:vyu  (slav %uv v.pole)
     ?+    sign-arvo  (on-arvo pole sign-arvo)
         [%behn %wake *]
       ~&  %checking-ack

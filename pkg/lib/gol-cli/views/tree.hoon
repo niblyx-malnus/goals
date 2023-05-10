@@ -1,13 +1,12 @@
-/-  gol=goal
-/+  gol-cli-traverse, gol-cli-json
+/-  gol=goal, vyu=views
+/+  gol-cli-traverse, j=gol-cli-json
 |_  =store:gol
-+*  vyu   views:gol
 :: TODO: Sever this data structure from the core backend data
 :: structure
 ++  view-data
   |=  =parm:tree:vyu
   ^-  data:tree:vyu
-  =-  ~&(- -)
+  :: =-  ~&(- -)
   ?-    -.type.parm
     %main  [(unify-pools-tags pools) (unify-pools-tags cache)]:[store .]
     ::
@@ -63,7 +62,7 @@
 ++  view-diff
   |=  $:  =parm:tree:vyu
           =data:tree:vyu
-          upd=home-update:gol
+          [[=pin:gol mod=ship pid=@] upd=update:gol]
       ==
   ^-  (unit diff:tree:vyu)
   =;  diff=(unit diff:tree:vyu)
@@ -76,7 +75,7 @@
     :: ?>(check diff)
     :: ~&  diff
     diff
-  (some upd)
+  (some [[pin mod pid] upd])
 ::
 ++  etch-diff
   |=  [=data:tree:vyu =diff:tree:vyu]
@@ -84,7 +83,6 @@
   *data:tree:vyu
 ::
 ++  dejs
-  =,  gol-cli-json
   =,  dejs:format
   |%
   ++  view-parm
@@ -95,13 +93,13 @@
     ^-  $-(json type:tree:vyu)
     %-  of
     :~  main+|=(jon=json ?>(?=(~ jon) ~))
-        pool+dejs-pin
-        goal+dejs-id
+        pool+pin:dejs:j
+        goal+id:dejs:j
     ==
   --
 ::
 ++  enjs
-  =,  gol-cli-json
+  =,  j
   =,  enjs:format
   |%
   ++  view-data
@@ -265,6 +263,20 @@
               ==
           ==
         ==
+    ==
+  ::
+  ++  view-parm
+    |=  =parm:tree:vyu
+    ^-  json
+    (frond %type (type type.parm))
+  ::
+  ++  type
+    |=  =type:page:vyu
+    ^-  json
+    ?-  -.type
+      %main  (frond %main ~)
+      %pool  (frond %pool (enjs-pin pin.type))
+      %goal  (frond %goal (enjs-id id.type))
     ==
   --
 --

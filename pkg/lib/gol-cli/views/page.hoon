@@ -1,7 +1,6 @@
-/-  gol=goal
-/+  gol-cli-json
+/-  gol=goal, vyu=views
+/+  j=gol-cli-json
 |_  =store:gol
-+*  vyu   views:gol
 ++  view-data
   |=  =parm:page:vyu
   ^-  data:page:vyu
@@ -20,7 +19,7 @@
 ++  view-diff
   |=  $:  =parm:page:vyu
           =data:page:vyu
-          upd=home-update:gol
+          [[=pin:gol mod=ship pid=@] upd=update:gol]
       ==
   ^-  (unit diff:page:vyu)
   =;  diff=(unit diff:page:vyu)
@@ -31,7 +30,7 @@
     ?>(check diff)
   =/  atad=data:page:vyu  (view-data parm)
   ?:  =(data atad)  ~
-  (some [[pin mod pid]:upd %replace atad])
+  (some [[pin mod pid] %replace atad])
 ::
 ++  etch-diff
   |=  [=data:page:vyu =diff:page:vyu]
@@ -55,7 +54,6 @@
   ==
 ::
 ++  dejs
-  =,  gol-cli-json
   =,  dejs:format
   |%
   ++  view-parm
@@ -66,13 +64,13 @@
     ^-  $-(json type:page:vyu)
     %-  of
     :~  main+|=(jon=json ?>(?=(~ jon) ~))
-        pool+dejs-pin
-        goal+dejs-id
+        pool+pin:dejs:j
+        goal+id:dejs:j
     ==
   --
 ::
 ++  enjs
-  =,  gol-cli-json
+  =,  j
   =,  enjs:format
   |%
   ++  view-data
@@ -111,7 +109,7 @@
         :-  %tel
         %+  frond  %page
         ?>  ?=(%replace +<.diff)
-        =/  =data:page:views  +>.diff
+        =/  =data:page:vyu  +>.diff
         ?-    -.data
           %main  (frond %main ~)
             %pool
@@ -131,6 +129,20 @@
               [%tags a+(turn ~(tap in tags.data) enjs-tag)]
           ==
         ==
+    ==
+  ::
+  ++  view-parm
+    |=  =parm:page:vyu
+    ^-  json
+    (frond %type (type type.parm))
+  ::
+  ++  type
+    |=  =type:page:vyu
+    ^-  json
+    ?-  -.type
+      %main  (frond %main ~)
+      %pool  (frond %pool (enjs-pin pin.type))
+      %goal  (frond %goal (enjs-id id.type))
     ==
   --
 --

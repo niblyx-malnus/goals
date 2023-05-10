@@ -1,8 +1,7 @@
-/-  gol=goal
-/+  gol-cli-etch, gol-cli-traverse, gol-cli-json
+/-  gol=goal, vyu=views
+/+  gol-cli-etch, gol-cli-traverse, j=gol-cli-json
 |_  [=store:gol =bowl:gall]
-+*  vyu   views:gol
-    etch  ~(. gol-cli-etch store)
++*  etch  ~(. gol-cli-etch store)
 ++  view-data
   |=  =parm:harvest:vyu
   ^-  data:harvest:vyu
@@ -60,7 +59,7 @@
 ++  view-diff
   |=  $:  =parm:harvest:vyu
           =data:harvest:vyu
-          upd=home-update:gol
+          [[=pin:gol mod=ship pid=@] upd=update:gol]
       ==
   ^-  (unit diff:harvest:vyu)
   =;  diff=(unit diff:harvest:vyu)
@@ -71,7 +70,7 @@
     ?>(check diff)
   =/  atad=data:harvest:vyu  (view-data parm)
   ?:  =(data atad)  ~
-  (some [[pin mod pid]:upd %replace atad])
+  (some [[pin mod pid] %replace atad])
 ::
 ++  etch-diff
   |=  [=data:harvest:vyu =diff:harvest:vyu]
@@ -116,7 +115,6 @@
   ==
 ::
 ++  dejs
-  =,  gol-cli-json
   =,  dejs:format
   |%
   ++  view-parm
@@ -124,7 +122,7 @@
     %-  ot
     :~  type+type
         method+method
-        tags+(as dejs-tag)
+        tags+(as tag:dejs:j)
     ==
   ::
   ++  method
@@ -137,13 +135,12 @@
     ^-  $-(json type:harvest:vyu)
     %-  of
     :~  main+|=(jon=json ?>(?=(~ jon) ~))
-        pool+dejs-pin
-        goal+dejs-id
+        pool+pin:dejs:j
+        goal+id:dejs:j
     ==
   --
 ::
 ++  enjs
-  =,  gol-cli-json
   =,  enjs:format
   |%
   ++  view-data
@@ -152,21 +149,22 @@
     a+(turn goals.data id-pack)
   ::
   ++  id-pack
-    |=  [=id =pack:harvest:vyu]
+    |=  [=id:gol =pack:harvest:vyu]
     ^-  json
     %-  pairs
-    :~  [%id (enjs-id id)]
-        [%pin (enjs-pin pin.pack)]
+    :~  [%id (enjs-id:j id)]
+        [%pin (enjs-pin:j pin.pack)]
         [%pool-role ?~(pool-role.pack ~ s+u.pool-role.pack)]
-        [%goal (enjs-goal +>.pack)]
+        [%goal (enjs-goal:j +>.pack)]
     ==
   ::
   ++  view-diff
     |=  =diff:harvest:vyu
+    ^-  json
     %-  pairs
     :~  :-  %hed
         %-  pairs
-        :~  [%pin (enjs-pin pin.diff)]
+        :~  [%pin (enjs-pin:j pin.diff)]
             [%mod (ship mod.diff)]
             [%pid s+`@t`pid.diff]
         ==
@@ -175,8 +173,26 @@
         ?>  ?=(%replace +<.diff)
         :-  %a
         %+  turn
-          `(list [id pack:harvest:views])`+>.diff
+          `(list [id:gol pack:harvest:vyu])`+>.diff
         id-pack
+    ==
+  ::
+  ++  view-parm
+    |=  =parm:harvest:vyu
+    ^-  json
+    %-  pairs
+    :~  [%type (type type.parm)]
+        [%method s+method.parm]
+        [%tags a+(turn ~(tap in tags.parm) enjs-tag:j)]
+    ==
+  ::
+  ++  type
+    |=  =type:harvest:vyu
+    ^-  json
+    ?-  -.type
+      %main  (frond %main ~)
+      %pool  (frond %pool (enjs-pin:j pin.type))
+      %goal  (frond %goal (enjs-id:j id.type))
     ==
   --
 --

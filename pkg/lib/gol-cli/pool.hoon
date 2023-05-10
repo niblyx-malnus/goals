@@ -1,4 +1,4 @@
-/-  gol=goal
+/-  gol=goal, act=action
 /+  *gol-cli-util, gol-cli-node, gol-cli-traverse, vd=gol-cli-validate,
     fl=gol-cli-inflater
 |_  p=pool:gol
@@ -357,7 +357,7 @@
   this
 ::
 ++  yoke
-  |=  [yok=exposed-yoke:gol mod=ship]
+  |=  [yok=exposed-yoke:act mod=ship]
   ^-  _this
   =,  yok
   ?-  -.yok
@@ -408,7 +408,7 @@
   ?~(upid (move-to-root kid mod) (move-to-goal kid u.upid mod))
 ::
 ++  yoke-sequence
-  |=  [yoks=(list exposed-yoke:gol) mod=ship]
+  |=  [yoks=(list exposed-yoke:act) mod=ship]
   ^-  _this
   =/  pore  this
   |-
@@ -421,7 +421,7 @@
 ::
 :: perform several simultaneous rends
 ++  nuke
-  |=  [=nuke:gol mod=ship]
+  |=  [=nuke:act mod=ship]
   ^-  _this
   |^
   ::
@@ -444,59 +444,59 @@
     %+  turn
       ~(tap in (prio-left:nd id.nuke))
     |=  =id:gol
-    ^-  exposed-yoke:gol
+    ^-  exposed-yoke:act
     [%prio-rend id id.nuke]
   ::
   ++  prio-ryte
     %+  turn
       ~(tap in (prio-ryte:nd id.nuke))
     |=  =id:gol
-    ^-  exposed-yoke:gol
+    ^-  exposed-yoke:act
     [%prio-rend id.nuke id]
   ::
   ++  prec-left
     %+  turn
       ~(tap in (prec-left:nd id.nuke))
     |=  =id:gol
-    ^-  exposed-yoke:gol
+    ^-  exposed-yoke:act
     [%prec-rend id id.nuke]
   ::
   ++  prec-ryte
     %+  turn
       ~(tap in (prec-ryte:nd id.nuke))
     |=  =id:gol
-    ^-  exposed-yoke:gol
+    ^-  exposed-yoke:act
     [%prec-rend id.nuke id]
   ::
   ++  nest-left
     %+  turn
       ~(tap in (nest-left:nd id.nuke))
     |=  =id:gol
-    ^-  exposed-yoke:gol
+    ^-  exposed-yoke:act
     [%nest-rend id id.nuke]
   ::
   ++  nest-ryte
     %+  turn
       ~(tap in (nest-ryte:nd id.nuke))
     |=  =id:gol
-    ^-  exposed-yoke:gol
+    ^-  exposed-yoke:act
     [%nest-rend id.nuke id]
   --
 ::
 :: composite yokes
 ++  plex
-  |=  [=plex:gol mod=ship]
+  |=  [=plex:act mod=ship]
   ^-  _this
   ?-    plex
-      exposed-yoke:gol
+      exposed-yoke:act
     (yoke plex mod)
-      nuke:gol
+      nuke:act
     (nuke plex mod)
   ==
 ::
 :: sequence of composite yokes
 ++  plex-sequence
-  |=  [plez=(list plex:gol) mod=ship]
+  |=  [plez=(list plex:act) mod=ship]
   ^-  _this
   =/  pore  this
   |-
