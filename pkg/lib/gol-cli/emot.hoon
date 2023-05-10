@@ -277,10 +277,10 @@
       %step
     ?>  ?=([%view @ ~] path.pok.ask)
     =/  =vid:vyu  (slav %uv i.t.path.pok.ask)
-    =/  [ack=_| =view:vyu]  (~(got by views) vid)
-    =/  =data:vyu  (view-data:view parm.pok.ask)
+    =/  [ack=_| *]  (~(got by views) vid)
+    =/  =send:vyu  [%step (view-data:view parm.pok.ask)]
     =.  views  (~(put by views) vid [ack (grab-view:view parm.pok.ask)])
-    (emit ) :: send replacement
+    (emit %give %fact ~[path.pok.ask] goal-view-send+!>(send))
     ::
       %init
     =/  =vid:vyu  (sham [now eny]:bowl)

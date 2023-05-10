@@ -32,7 +32,7 @@
   ==
 :: dots must be acked
 ::
-+$  send  $%([%dot =path] diff)
++$  send  $%([%dot =path] [%step data] diff)
 +$  diff
   $%  [%tree diff:tree]
       [%harvest diff:harvest]
