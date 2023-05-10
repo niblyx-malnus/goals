@@ -273,20 +273,31 @@
 ++  handle-ask
   |=  =ask:vyu
   ^-  _this
-  =/  =vid:vyu  (sham [now eny]:bowl)
-  =/  view-path=path  /view/(scot %uv vid)
-  =/  =data:vyu  (view-data:view pok.ask)
-  =.  views  (~(put by views) vid [| (grab-view:view pok.ask)])
-  =/  time-path=path  /send-dot/(scot %uv vid)
-  =/  next=@da  (add now.bowl ~m1)
-  =.  this  (emit %pass time-path %arvo %b %wait next)
-  ~&  ?-  -.data
-        %tree       %sending-tree
-        %harvest    %sending-harvest
-        %list-view  %sending-list-view
-        %page       %sending-page
-      ==
-  (emit:this %give %fact ~[/ask] goal-say+!>([view-path data]))
+  ?-    -.pok.ask
+      %step
+    ?>  ?=([%view @ ~] path.pok.ask)
+    =/  =vid:vyu  (slav %uv i.t.path.pok.ask)
+    =/  [ack=_| =view:vyu]  (~(got by views) vid)
+    =/  =data:vyu  (view-data:view parm.pok.ask)
+    =.  views  (~(put by views) vid [ack (grab-view:view parm.pok.ask)])
+    (emit ) :: send replacement
+    ::
+      %init
+    =/  =vid:vyu  (sham [now eny]:bowl)
+    =/  view-path=path  /view/(scot %uv vid)
+    =/  =data:vyu  (view-data:view parm.pok.ask)
+    =.  views  (~(put by views) vid [| (grab-view:view parm.pok.ask)])
+    =/  time-path=path  /send-dot/(scot %uv vid)
+    =/  next=@da  (add now.bowl ~m1)
+    =.  this  (emit %pass time-path %arvo %b %wait next)
+    ~&  ?-  -.data
+          %tree       %sending-tree
+          %harvest    %sending-harvest
+          %list-view  %sending-list-view
+          %page       %sending-page
+        ==
+    (emit:this %give %fact ~[/ask] goal-say+!>([view-path data]))
+  ==
 ::
 ++  handle-etch-pool-update
   |=  [=pin:gol [mod=ship pid=@] upd=update:gol]

@@ -3,13 +3,14 @@
 ::
 :: TODO:
 :: - include sorting as a parameter
-:: - Include pin in goal initial (for tree view?)
-:: - Include pool role in harvest and list view
-:: - Add young to roots in trace for a goal page initial
 |%
 +$  vid  @uv
 +$  views  (map vid [ack=_| =view])
-+$  ask  [pid=@ pok=parm:views]
++$  ask  [pid=@ pok=ask-pok]
++$  ask-pok
+  $%  [%init =parm:views]
+      [%step =path =parm:views]
+  ==
 +$  say  [=path =data:views]
 +$  view
   $%  [%tree =parm:tree =data:tree]
@@ -61,13 +62,35 @@
   +$  pack
     $:  =pin
         pool-role=(unit ?(%owner pool-role))
-        goal
+        par=(unit id)
+        kids=(set id)
+        kickoff=node
+        deadline=node
+        complete=_|
+        actionable=?
+        chief=ship
+        spawn=(set ship)
+        owner=ship
+        birth=@da
+        author=ship
+        desc=@t
+        note=@t
+        tags=(set tag) :: $~(tag-bunt (set tag))
+        fields=(map @t field-data)
+        =stock
+        =ranks
+        young=(list [id virtual=?])
+        young-by-precedence=(list [id virtual=?])
+        young-by-kickoff=(list [id virtual=?])
+        young-by-deadline=(list [id virtual=?])
+        progress=[complete=@ total=@]
+        prio-left=(set id)
+        prio-ryte=(set id)
+        prec-left=(set id)
+        prec-ryte=(set id)
+        nest-left=(set id)
+        nest-ryte=(set id)
     ==
-  ::  $:  pool-role=(unit pool-role)
-  ::      nexus=goal-nexus
-  ::      trace=goal-trace
-  ::      hitch=goal-hitch
-  ::  ==
   +$  diff  [[=pin mod=ship pid=@] $%([%replace data])]
   --
 ++  list-view
@@ -88,13 +111,35 @@
   +$  pack
     $:  =pin
         pool-role=(unit ?(%owner pool-role))
-        goal
+        par=(unit id)
+        kids=(set id)
+        kickoff=node
+        deadline=node
+        complete=_|
+        actionable=?
+        chief=ship
+        spawn=(set ship)
+        owner=ship
+        birth=@da
+        author=ship
+        desc=@t
+        note=@t
+        tags=(set tag) :: $~(tag-bunt (set tag))
+        fields=(map @t field-data)
+        =stock
+        =ranks
+        young=(list [id virtual=?])
+        young-by-precedence=(list [id virtual=?])
+        young-by-kickoff=(list [id virtual=?])
+        young-by-deadline=(list [id virtual=?])
+        progress=[complete=@ total=@]
+        prio-left=(set id)
+        prio-ryte=(set id)
+        prec-left=(set id)
+        prec-ryte=(set id)
+        nest-left=(set id)
+        nest-ryte=(set id)
     ==
-  ::  $:  pool-role=(unit pool-role)
-  ::      nexus=goal-nexus
-  ::      trace=goal-trace
-  ::      hitch=goal-hitch
-  ::  ==
   +$  diff  [[=pin mod=ship pid=@] $%([%replace data])]
   --
 ++  page

@@ -8,6 +8,7 @@
 /=  mvs-  /mar/goal/view-send
 /=  vak-  /mar/view-ack
 /=  pyk-  /mar/goal/peek
+/=  pyk-  /mar/goal/action
 ::
 |%
 +$  state-0  state-0:gol
@@ -54,8 +55,11 @@
   ?-    -.old
       %5
     :: TODO: Reload pool subpaths according to new format
-    :: TODO: Clear out view-related subpaths
-    :-  ~
+    :: leave-and-refollow...
+    :-  %+  murn  ~(tap by sup.bowl)
+        |=  [=duct =ship =path]
+        ?.  ?=([%view *] path)  ~
+        (some [%give %kick ~[path] ~])
     %=    this
       views  ~
         -.state
@@ -207,8 +211,10 @@
         [%behn %wake *]
       ~&  %checking-ack
       ?:  ack:(~(got by views) vid)
+        =/  [ack=_| =view:vyu]  (~(got by views) vid)
+        :_  this(views (~(put by views) vid [| view]))
         =/  next=@da  (add now.bowl ~m1)
-        :_(this [%pass /send-dot/[v.pole] %arvo %b %wait next]~)
+        [%pass /send-dot/[v.pole] %arvo %b %wait next]~
       :_  this(views (~(del by views) vid))
       [%give %kick ~[/view/[v.pole]] ~]~
     ==

@@ -1,4 +1,4 @@
-/-  *goal
+/-  *action
 /+  *gol-cli-json
 |_  act=action
 ++  grow

@@ -139,7 +139,38 @@
   =/  pool-role=(unit ?(%owner pool-role:gol))
     ?:  =(our.bowl owner.pin)  (some %owner)
     (~(got by perms.pool) our.bowl)
-  [pin pool-role (unify-tags id)]
+  =/  =goal:gol  (unify-tags id)
+  :*  pin
+      pool-role
+      par.goal
+      kids.goal
+      kickoff.goal
+      deadline.goal
+      complete.goal
+      actionable.goal
+      chief.goal
+      spawn.goal
+      owner.goal
+      birth.goal
+      author.goal
+      desc.goal
+      note.goal
+      tags.goal
+      fields.goal
+      stock.goal
+      ranks.goal
+      young.goal
+      young-by-precedence.goal
+      young-by-kickoff.goal
+      young-by-deadline.goal
+      progress.goal
+      prio-left.goal
+      prio-ryte.goal
+      prec-left.goal
+      prec-ryte.goal
+      nest-left.goal
+      nest-ryte.goal
+  ==
 ::
 ++  filter-tags
   |=  $:  =id:gol
@@ -198,7 +229,41 @@
     :~  [%id (enjs-id:j id)]
         [%pin (enjs-pin:j pin.pack)]
         [%pool-role ?~(pool-role.pack ~ s+u.pool-role.pack)]
-        [%goal (enjs-goal:j +>.pack)]
+        [%goal (enjs-goal:j (convert-to-goal pack))]
+    ==
+  ::
+  ++  convert-to-goal
+    |=  pack:list-view:vyu
+    ^-  goal:gol
+    =|  =goal:gol
+    %=  goal
+      par                  par
+      kids                 kids
+      kickoff              kickoff
+      deadline             deadline
+      complete             complete
+      actionable           actionable
+      chief                chief
+      spawn                spawn
+      owner                owner
+      birth                birth
+      author               author
+      desc                 desc
+      note                 note
+      tags                 tags
+      fields               fields
+      stock                stock
+      ranks                ranks
+      young                young
+      young-by-precedence  young-by-precedence
+      young-by-kickoff     young-by-kickoff
+      young-by-deadline    young-by-deadline
+      progress             progress
+      prio-left            prio-left
+      prio-ryte            prio-ryte
+      prec-left            prec-left
+      prec-ryte            prec-ryte
+      nest-left            nest-ryte
     ==
   ::
   ++  view-diff
