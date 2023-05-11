@@ -19,7 +19,7 @@ function ListView({ pageType, pageId }: { pageType: PageType; pageId: any }) {
   const listGoals = useStore((store) => store.listGoals);
   const tagFilterArray = useStore((store) => store.tagFilterArray);
   const filterGoals = useStore((store) => store.filterGoals);
-  
+
   useEffect(() => {
     //we apply the filter if any to our listGoals
     const newDisplayGoals = listGoals.filter((goalItem: any) => {
@@ -36,8 +36,13 @@ function ListView({ pageType, pageId }: { pageType: PageType; pageId: any }) {
 
   useEffect(() => {
     //everytime we get a new filter set we ask for new data
-    if (pageId !== "main" && !pageId) return;
-    listAskAction(pageType, pageId);
+    if (pageType !== "main" && pageId) {
+      listAskAction(pageType, pageId);
+      return;
+    } else if (pageType === "main") {
+      listAskAction(pageType, pageId);
+      return;
+    }
   }, [tagFilterArray, pageType, pageId]);
   return (
     <Stack direction={"column"}>

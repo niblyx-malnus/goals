@@ -153,6 +153,9 @@ interface Store {
 
   mainLoading: Loading;
   setMainLoading: (mainLoading: Loading) => void;
+
+  activeSubsMap: any;
+  setActiveSubsMap: (newActiveSubsMap: any) => void;
 }
 
 /**
@@ -476,10 +479,14 @@ const useStore = create<Store>((set, get) => ({
 
   mainLoading: {
     trying: false,
-    success: true, 
+    success: true,
     error: false,
   },
   setMainLoading: (mainLoading: Loading) => set(() => ({ mainLoading })),
+
+  activeSubsMap: {},
+  setActiveSubsMap: (newActiveSubsMap: Object) =>
+    set(() => ({ activeSubsMap: newActiveSubsMap })),
 }));
 
 export default useStore;

@@ -29,6 +29,7 @@ const updateHandler = (update: any) => {
   log("main update handler => ", update);
   //check if the given update contains a id we can use to toggle loading state false (poke relay)
   if (update.hed?.pid) {
+    log("update.hed?.pid", update.hed?.pid);
     const tryingMap = store.tryingMap;
     const setTrying = store.setTrying;
 
@@ -40,7 +41,7 @@ const updateHandler = (update: any) => {
     api.viewAck(update.dot);
     return;
   }
-  const actionName: any = Object.keys(update.tel)[0];
+  const actionName: any = Object.keys(update?.tel)[0];
   log("actionName", actionName);
   if (actionName) {
     switch (actionName) {
@@ -230,8 +231,12 @@ function dynamicUpdate(path: string) {
     path: path,
     event: updateHandler,
     //TODO: handle sub death/kick/err
-    err: () => log("Subscription rejected"),
-    quit: () => log("Kicked from subscription"),
+    err: () => {
+      log("Subscription rejected");
+    },
+    quit: () => {
+      log("Kicked from subscription");
+    },
   };
   return updateData;
 }

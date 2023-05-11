@@ -549,14 +549,14 @@ const api = {
       bodyType = { goal: id };
     }
     const json = {
-      harvest: {
-        type: bodyType,
-        method: "any", // can be "any" or "all"
-        tags /*[
+        harvest: {
+          type: bodyType,
+          method: "any", // can be "any" or "all"
+          tags /*[
           { text: "tag1", color: "", private: false },
           { text: "tag2", color: "", private: true },
         ],*/,
-      },
+        },
     };
     return api.poke({
       app: apiApp,
@@ -576,13 +576,13 @@ const api = {
       bodyType = { goal: { id, "ignore-virtual": false } };
     }
     const json = {
-      "list-view": {
-        type: bodyType,
-        "first-gen-only": false,
-        "actionable-only": false,
-        method: "any", // can be "any" or "all"
-        tags,
-      },
+        "list-view": {
+          type: bodyType,
+          "first-gen-only": false,
+          "actionable-only": false,
+          method: "any", // can be "any" or "all"
+          tags,
+        },
     };
     return api.poke({
       app: apiApp,
@@ -602,13 +602,14 @@ const api = {
       bodyType = { goal: id };
     }
     const json = {
-      tree: {
-        type: bodyType,
-        "first-gen-only": false,
-        "actionable-only": false,
-        method: "any", // can be "any" or "all"
-        tags,
-      },
+        tree: {
+          type: bodyType,
+          "first-gen-only": false,
+          "actionable-only": false,
+          method: "any", // can be "any" or "all"
+          tags,
+        },
+      
     };
     return api.poke({
       app: apiApp,
@@ -619,8 +620,12 @@ const api = {
   },
   sub: (path) => {
     const updateData = dynamicUpdate(path);
+    //we want to also add whatever we sub to to a map view => path
 
     return api.createApi().subscribe(updateData);
+  },
+  unsub: (path) => {
+    return api.createApi().unsubscribe(path);
   },
   viewAck: (path) => {
     return api.createApi().poke({

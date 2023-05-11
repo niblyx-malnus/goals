@@ -32,7 +32,6 @@ import Box from "@mui/material/Box";
 //TODO: display loading/error states in harvest/list views
 //TODO: move scrollbar inside views?
 //Waiting on Thomas:
-//TODO: sort and filter (remove filter by actionable, complete should be easy filter flat list gtg  ) harvest and list view
 //TODO: fix perm issues in harvest/list views (pool perm not found)
 //TODO: go to parent goal | go to parent pool buttons next to nacvigate home
 function Main({
@@ -228,7 +227,9 @@ function Main({
     setRoleMap(roleMap);
     setAllTags(allTags);
   }, [fetchedPools, order, filterGoals]);
+  const activeSubsMap = useStore((store) => store.activeSubsMap);
 
+ 
   const roleMap = useStore((store: any) => store.roleMap);
   const selectionMode = useStore((store) => store.selectionMode);
   const selectionModeYokeData = useStore(
