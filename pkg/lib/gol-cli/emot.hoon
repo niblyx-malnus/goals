@@ -64,6 +64,7 @@
     =/  diff=(unit diff:vyu)  (view-diff:view weiv [[pin mod pid] upd])
     ?~  diff  this :: if diff is null, update not relevant to view
     =/  =path  /view/(scot %uv vid)
+    ~&  u.diff
     (emit %give %fact ~[path] goal-view-send+!>(u.diff))
   ==
 ::
@@ -273,31 +274,20 @@
 ++  handle-ask
   |=  =ask:vyu
   ^-  _this
-  ?-    -.pok.ask
-      %step
-    ?>  ?=([%view @ ~] path.pok.ask)
-    =/  =vid:vyu  (slav %uv i.t.path.pok.ask)
-    =/  [ack=_| *]  (~(got by views) vid)
-    =/  =send:vyu  [%step (view-data:view parm.pok.ask)]
-    =.  views  (~(put by views) vid [ack (grab-view:view parm.pok.ask)])
-    (emit %give %fact ~[path.pok.ask] goal-view-send+!>(send))
-    ::
-      %init
-    =/  =vid:vyu  (sham [now eny]:bowl)
-    =/  view-path=path  /view/(scot %uv vid)
-    =/  =data:vyu  (view-data:view parm.pok.ask)
-    =.  views  (~(put by views) vid [| (grab-view:view parm.pok.ask)])
-    =/  time-path=path  /send-dot/(scot %uv vid)
-    =/  next=@da  (add now.bowl ~m1)
-    =.  this  (emit %pass time-path %arvo %b %wait next)
-    ~&  ?-  -.data
-          %tree       %sending-tree
-          %harvest    %sending-harvest
-          %list-view  %sending-list-view
-          %page       %sending-page
-        ==
-    (emit:this %give %fact ~[/ask] goal-say+!>([view-path data]))
-  ==
+  =/  =vid:vyu  (sham [now eny]:bowl)
+  =/  view-path=path  /view/(scot %uv vid)
+  =/  =data:vyu  (view-data:view pok.ask)
+  =.  views  (~(put by views) vid [| (grab-view:view pok.ask)])
+  =/  time-path=path  /send-dot/(scot %uv vid)
+  =/  next=@da  (add now.bowl ~m1)
+  =.  this  (emit %pass time-path %arvo %b %wait next)
+  ~&  ?-  -.data
+        %tree       %sending-tree
+        %harvest    %sending-harvest
+        %list-view  %sending-list-view
+        %page       %sending-page
+      ==
+  (emit:this %give %fact ~[/ask] goal-say+!>([view-path data]))
 ::
 ++  handle-etch-pool-update
   |=  [=pin:gol [mod=ship pid=@] upd=update:gol]

@@ -6,11 +6,7 @@
 |%
 +$  vid  @uv
 +$  views  (map vid [ack=_| =view])
-+$  ask  [pid=@ pok=ask-pok]
-+$  ask-pok
-  $%  [%init =parm:views]
-      [%step =path =parm:views]
-  ==
++$  ask  [pid=@ pok=parm:views]
 +$  say  [=path =data:views]
 +$  view
   $%  [%tree =parm:tree =data:tree]
