@@ -1,7 +1,11 @@
 import { cloneDeep } from "lodash";
 import { log } from "../helpers";
 import useStore from "../store";
-import { newGoalAction, updatePoolPax } from "../store/actions";
+import {
+  newGoalAction,
+  updatePoolPax,
+  subToViewAction,
+} from "../store/actions";
 import api from "../api";
 const store = useStore.getState();
 const setListGoals = store.setListGoals;
@@ -12,7 +16,8 @@ const updateHandler = (update: any) => {
   const actionName: any = Object.keys(update)[0];
   log("ask update => ", update);
   if (update[actionName].path) {
-    api.sub(update[actionName].path);
+    //update the active sub map with the incoming paths we sub to
+    subToViewAction(actionName, update[actionName].path);
   }
   log("actionName", actionName);
 

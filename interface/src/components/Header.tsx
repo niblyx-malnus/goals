@@ -354,9 +354,10 @@ function FilterChips() {
       <Typography fontWeight={"bold"} variant="body1">
         Filtering goals by:{" "}
       </Typography>
-      {chips.map((tag: any) => {
+      {chips.map((tag: any, index: number) => {
         return (
           <Chip
+            key={"filter-chips-" + index}
             size="small"
             label={<Typography fontWeight={"bold"}>{tag.label}</Typography>}
             variant="outlined"

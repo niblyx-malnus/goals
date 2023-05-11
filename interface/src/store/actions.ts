@@ -636,26 +636,57 @@ function reorderGoalsAction(
   }
 }
 function harvestAskAction(type: "main" | "pool" | "goal", id: any) {
-  const state = useStore.getState();
+  const store = useStore.getState();
+  const activeSubsMap = cloneDeep(store.activeSubsMap);
+  if (activeSubsMap.harvest) {
+    // have an active sub already, unsub before sending a new ask
+    api.unsub(activeSubsMap.harvest);
+    //delete it from the activeSubMap
+    delete activeSubsMap.harvest;
+    store.setActiveSubsMap(activeSubsMap);
+  }
+
   //get tags if any and pass them along
-  const tagFilterArray = state.tagFilterArray;
+  const tagFilterArray = store.tagFilterArray;
   let newId;
   if (type !== "main") {
     newId = { owner: id.owner.substring(1), birth: id.birth }; //we have to cut off the first character ~ from the owner
   }
+
   api.harvestAsk(type, newId, tagFilterArray);
 }
 function listAskAction(type: "main" | "pool" | "goal", id: any) {
-  const state = useStore.getState();
+  const store = useStore.getState();
   //get tags if any and pass them along
-  const tagFilterArray = state.tagFilterArray;
+  const activeSubsMap = cloneDeep(store.activeSubsMap);
+  const tagFilterArray = store.tagFilterArray;
+  log('activeSubsMap["list-view"]',activeSubsMap["list-view"])
+  if (activeSubsMap["list-view"]) {
+    // have an active sub already, unsub before sending a new ask
+    api.unsub(activeSubsMap["list-view"]);
+    //delete it from the activeSubMap
+    delete activeSubsMap["list-view"];
+    store.setActiveSubsMap(activeSubsMap);
+  }
   let newId;
   if (type !== "main") {
     newId = { owner: id.owner.substring(1), birth: id.birth }; //we have to cut off the first character ~ from the owner
   }
   api.listAsk(type, newId, tagFilterArray);
 }
+function subToViewAction(view: string, path: string) {
+  const store = useStore.getState();
+  const activeSubsMap = store.activeSubsMap;
 
+  const newActiveSubsMap = {
+    ...activeSubsMap,
+    [view]: path,
+  };
+
+  store.setActiveSubsMap(newActiveSubsMap);
+
+  api.sub(path);
+}
 export {
   deletePoolAction,
   deleteGoalAction,
@@ -676,5 +707,6 @@ export {
   updatePoolPax,
   updateGoalYoung,
   harvestAskAction,
-  listAskAction
+  listAskAction,
+  subToViewAction
 };

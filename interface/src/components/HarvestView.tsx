@@ -42,8 +42,13 @@ function HarvestView({
 
   useEffect(() => {
     //everytime we get a new filter set we ask for new data
-    if (pageId !== "main" && !pageId) return;
-    harvestAskAction(pageType, pageId);
+    if (pageType !== "main" && pageId) {
+      harvestAskAction(pageType, pageId);
+      return;
+    } else if (pageType === "main") {
+      harvestAskAction(pageType, pageId);
+      return;
+    }
   }, [tagFilterArray, pageType, pageId]);
   return (
     <Stack direction={"column"}>
