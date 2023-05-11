@@ -229,7 +229,6 @@ function Main({
   }, [fetchedPools, order, filterGoals]);
   const activeSubsMap = useStore((store) => store.activeSubsMap);
 
- 
   const roleMap = useStore((store: any) => store.roleMap);
   const selectionMode = useStore((store) => store.selectionMode);
   const selectionModeYokeData = useStore(
@@ -272,7 +271,11 @@ function Main({
   return (
     <Container sx={{ paddingBottom: 10 }}>
       <DndProvider backend={HTML5Backend}>
-        <Header disableAddPool={disableAddPool} />
+        <Header
+          disableAddPool={disableAddPool}
+          pageId={pageId}
+          pageType={pageType}
+        />
 
         <Button
           onClick={() => {

@@ -53,8 +53,12 @@ const filterOptions = () => ["Complete", "Incomplete"];
 
 export default function Header({
   disableAddPool = false,
+  pageType,
+  pageId,
 }: {
   disableAddPool: boolean;
+  pageType: string;
+  pageId: string;
 }) {
   const theme = useTheme();
   const setColorMode = useStore((store) => store.setColorMode);
@@ -196,7 +200,7 @@ export default function Header({
       <GroupsShareDialog />
       <JoinPoolDialog />
       <GoalTagsDialog />
-      <FilterTagsDialog />
+      <FilterTagsDialog pageType={pageType} pageId={pageId} />
       <Snackie />
       <Stack
         alignItems={{ sm: "flex-start", md: "center" }}

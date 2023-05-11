@@ -24,7 +24,6 @@ function HarvestView({
   const [displayGoals, setDisplayGoals] = useState<any>([]); //we have this for filtering;
   const harvestGoals = useStore((store) => store.harvestGoals);
   const filterGoals = useStore((store) => store.filterGoals);
-  const tagFilterArray = useStore((store) => store.tagFilterArray);
 
   useEffect(() => {
     //we apply the filter if any to our harvestGoals
@@ -40,16 +39,6 @@ function HarvestView({
     setDisplayGoals(newDisplayGoals);
   }, [harvestGoals, filterGoals]);
 
-  useEffect(() => {
-    //everytime we get a new filter set we ask for new data
-    if (pageType !== "main" && pageId) {
-      harvestAskAction(pageType, pageId);
-      return;
-    } else if (pageType === "main") {
-      harvestAskAction(pageType, pageId);
-      return;
-    }
-  }, [tagFilterArray, pageType, pageId]);
   return (
     <Stack direction={"column"}>
       <Stack direction="row" alignItems={"center"} flexWrap="wrap">

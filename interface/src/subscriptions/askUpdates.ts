@@ -19,7 +19,6 @@ const updateHandler = (update: any) => {
     //update the active sub map with the incoming paths we sub to
     subToViewAction(actionName, update[actionName].path);
   }
-  log("actionName", actionName);
 
   if (actionName) {
     switch (actionName) {

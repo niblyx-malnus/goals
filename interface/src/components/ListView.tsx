@@ -34,16 +34,6 @@ function ListView({ pageType, pageId }: { pageType: PageType; pageId: any }) {
     setDisplayGoals(newDisplayGoals);
   }, [listGoals, filterGoals]);
 
-  useEffect(() => {
-    //everytime we get a new filter set we ask for new data
-    if (pageType !== "main" && pageId) {
-      listAskAction(pageType, pageId);
-      return;
-    } else if (pageType === "main") {
-      listAskAction(pageType, pageId);
-      return;
-    }
-  }, [tagFilterArray, pageType, pageId]);
   return (
     <Stack direction={"column"}>
       <Stack direction="row" alignItems={"center"} flexWrap="wrap">

@@ -638,6 +638,7 @@ function reorderGoalsAction(
 function harvestAskAction(type: "main" | "pool" | "goal", id: any) {
   const store = useStore.getState();
   const activeSubsMap = cloneDeep(store.activeSubsMap);
+  log("activeSubsMap", activeSubsMap);
   if (activeSubsMap.harvest) {
     // have an active sub already, unsub before sending a new ask
     api.unsub(activeSubsMap.harvest);
@@ -660,12 +661,13 @@ function listAskAction(type: "main" | "pool" | "goal", id: any) {
   //get tags if any and pass them along
   const activeSubsMap = cloneDeep(store.activeSubsMap);
   const tagFilterArray = store.tagFilterArray;
-  log('activeSubsMap["list-view"]',activeSubsMap["list-view"])
+
   if (activeSubsMap["list-view"]) {
     // have an active sub already, unsub before sending a new ask
     api.unsub(activeSubsMap["list-view"]);
     //delete it from the activeSubMap
     delete activeSubsMap["list-view"];
+
     store.setActiveSubsMap(activeSubsMap);
   }
   let newId;
@@ -674,18 +676,18 @@ function listAskAction(type: "main" | "pool" | "goal", id: any) {
   }
   api.listAsk(type, newId, tagFilterArray);
 }
-function subToViewAction(view: string, path: string) {
+async function subToViewAction(view: string, path: string) {
   const store = useStore.getState();
-  const activeSubsMap = store.activeSubsMap;
 
-  const newActiveSubsMap = {
-    ...activeSubsMap,
-    [view]: path,
-  };
+  try {
+    const subNumber = await api.sub(path); //we use this to unsub
+    const activeSubsMap = store.activeSubsMap;
+    //TODO: issue with the way updates are patched in so we can not accumlate the values here, so we have to do it with side-effects
 
-  store.setActiveSubsMap(newActiveSubsMap);
-
-  api.sub(path);
+    activeSubsMap[view] = subNumber;
+  } catch (e) {
+    log("subToViewAction error =>", e);
+  }
 }
 export {
   deletePoolAction,
@@ -708,5 +710,5 @@ export {
   updateGoalYoung,
   harvestAskAction,
   listAskAction,
-  subToViewAction
+  subToViewAction,
 };

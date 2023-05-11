@@ -24,12 +24,11 @@ import api from "../api";
 const store = useStore.getState();
 const setListGoals = store.setListGoals;
 const setHarvestGoals = store.setHarvestGoals;
-const setPoolStore = store.setPools;
+
 const updateHandler = (update: any) => {
   log("main update handler => ", update);
   //check if the given update contains a id we can use to toggle loading state false (poke relay)
   if (update.hed?.pid) {
-    log("update.hed?.pid", update.hed?.pid);
     const tryingMap = store.tryingMap;
     const setTrying = store.setTrying;
 
@@ -42,7 +41,6 @@ const updateHandler = (update: any) => {
     return;
   }
   const actionName: any = Object.keys(update?.tel)[0];
-  log("actionName", actionName);
   if (actionName) {
     switch (actionName) {
       case "spawn-goal": {

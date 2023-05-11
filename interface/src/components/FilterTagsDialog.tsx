@@ -10,8 +10,9 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Stack from "@mui/material/Stack";
 import useStore from "../store";
 import { log } from "../helpers";
+import { harvestAskAction, listAskAction } from "../store/actions";
 
-export default function FilterTagsDialog() {
+export default function FilterTagsDialog({ pageType, pageId }: any) {
   const open = useStore((store: any) => store.filterTagsDialogOpen);
   const toggleFilterTagsDialog = useStore(
     (store: any) => store.toggleFilterTagsDialog
@@ -36,8 +37,21 @@ export default function FilterTagsDialog() {
     const newfilterValues = filterValues.map((item: any) => {
       return { text: item.text, private: item.private, color: item.color };
     });
+
     setTagFilterArray(newfilterValues);
-    handleClose();
+    if (pageType !== "main" && pageId) {
+      harvestAskAction(pageType, pageId);
+      listAskAction(pageType, pageId);
+      handleClose();
+
+      return;
+    } else if (pageType === "main") {
+      harvestAskAction(pageType, pageId);
+      listAskAction(pageType, pageId);
+      handleClose();
+
+      return;
+    }
   };
 
   const handleClose = () => {
