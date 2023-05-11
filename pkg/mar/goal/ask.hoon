@@ -17,7 +17,7 @@
     %-  ot
     =-  ~[pid+so pok+-]
     %-  of
-    :~  [%init (ot ~[parm+view-parm:dejs:v])]
+    :~  [%init view-parm:dejs:v]
         [%step (ot ~[path+pa parm+view-parm:dejs:v])]
     ==
   --
