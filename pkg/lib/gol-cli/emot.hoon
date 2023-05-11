@@ -279,7 +279,7 @@
   =/  =data:vyu  (view-data:view pok.ask)
   =.  views  (~(put by views) vid [| (grab-view:view pok.ask)])
   =/  time-path=path  /send-dot/(scot %uv vid)
-  =/  next=@da  (add now.bowl ~m1)
+  =/  next=@da  (add now.bowl ~s1)
   =.  this  (emit %pass time-path %arvo %b %wait next)
   ~&  ?-  -.data
         %tree       %sending-tree
