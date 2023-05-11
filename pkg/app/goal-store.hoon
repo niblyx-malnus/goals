@@ -108,6 +108,7 @@
     ::
       %goal-ask
     =/  =ask:vyu  !<(ask:vyu vase)
+    ~&  received-ask+ask
     =^  cards  state
       abet:(handle-ask:emot ask)
     [cards this]
@@ -201,7 +202,7 @@
       =/  view-path=path  /view/[v.pole]
       =/  cack-path=path  /check-ack/[v.pole]
       :~  [%give %fact ~[view-path] goal-view-send+!>([%dot view-path])]
-          [%pass cack-path %arvo %b %wait (add now.bowl ~s1)]
+          [%pass cack-path %arvo %b %wait (add now.bowl ~s10)]
       ==
     ==
     ::
@@ -213,7 +214,7 @@
       ?:  ack:(~(got by views) vid)
         =/  [ack=_| =view:vyu]  (~(got by views) vid)
         :_  this(views (~(put by views) vid [| view]))
-        =/  next=@da  (add now.bowl ~s1)
+        =/  next=@da  (add now.bowl ~s10)
         [%pass /send-dot/[v.pole] %arvo %b %wait next]~
       :_  this(views (~(del by views) vid))
       [%give %kick ~[/view/[v.pole]] ~]~
