@@ -41,22 +41,6 @@ function HarvestView({
 
   return (
     <Stack direction={"column"}>
-      <Stack direction="row" alignItems={"center"} flexWrap="wrap">
-        <Tooltip
-          title="Click to refresh harvested goals"
-          placement="right"
-          arrow
-        >
-          <Button
-            onClick={() => {
-              harvestAskAction(pageType, pageId);
-            }}
-            sx={{ fontWeight: "bold" }}
-          >
-            Refresh
-          </Button>
-        </Tooltip>
-      </Stack>
       <Stack direction={"column"}>
         {displayGoals?.map((goal: any) => {
           const currentGoal = goal.goal;

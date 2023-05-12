@@ -36,22 +36,6 @@ function ListView({ pageType, pageId }: { pageType: PageType; pageId: any }) {
 
   return (
     <Stack direction={"column"}>
-      <Stack direction="row" alignItems={"center"} flexWrap="wrap">
-        <Tooltip
-          title="Click to refresh harvested goals"
-          placement="right"
-          arrow
-        >
-          <Button
-            onClick={() => {
-              listAskAction(pageType, pageId);
-            }}
-            sx={{ fontWeight: "bold" }}
-          >
-            Refresh
-          </Button>
-        </Tooltip>
-      </Stack>
       <Stack direction={"column"}>
         {displayGoals?.map((goal: any) => {
           const currentGoal = goal.goal;
@@ -80,7 +64,7 @@ function ListView({ pageType, pageId }: { pageType: PageType; pageId: any }) {
         })}
         {displayGoals?.length === 0 && (
           <Typography color={"text.primary"} variant="h6">
-            Nothing to harvest
+            Nothing to list
           </Typography>
         )}
       </Stack>

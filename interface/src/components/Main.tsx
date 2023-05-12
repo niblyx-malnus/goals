@@ -18,6 +18,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
+import { cloneDeep } from "lodash";
 
 //TODO: handle sub kick/error
 //TODO: add relay to edit inputs also and test the other pokes
@@ -79,6 +80,7 @@ function Main({
   };
 
   useEffect(() => {
+    if (pageType !== "main" && !pageId) return; //
     //convert flat goals into nested goals for each pool
     //make our role map
     const roleMap = new Map();
@@ -121,6 +123,58 @@ function Main({
           return true;
         }
       );
+
+      let newRoots = {}; //sometimes empty, sometimes full with replacement youngs
+      if (pageType === "goal") {
+        //#1 find goal we want for it's youngs...
+        const goalWeWant = newGoals.filter((goalItem: any) => {
+          if (goalItem.id.birth === pageId.birth) {
+            return true;
+          }
+          return false;
+        });
+        if (goalWeWant.length > 0) {
+          //we found something, create a replacement map
+          const goalWeWantNexus = cloneDeep(goalWeWant[0].goal.nexus);
+          //#3 we have to remove our root elements nexus.par to work correctly
+          goalWeWant[0].goal.nexus.par = null;
+          //#2 we have to include the current goal in the following listtts
+          goalWeWantNexus.young.unshift({
+            virtual: false,
+            id: goalWeWant[0].id,
+          });
+          goalWeWantNexus["young-by-deadline"].unshift({
+            virtual: false,
+            id: goalWeWant[0].id,
+          });
+          goalWeWantNexus["young-by-kickoff"].unshift({
+            virtual: false,
+            id: goalWeWant[0].id,
+          });
+          goalWeWantNexus["young-by-precedence"].unshift({
+            virtual: false,
+            id: goalWeWant[0].id,
+          });
+          newRoots = {
+            roots: goalWeWantNexus.young,
+            "roots-by-deadline": goalWeWantNexus["young-by-deadline"],
+            "roots-by-kickoff": goalWeWantNexus["young-by-kickoff"],
+            "roots-by-precedence": goalWeWantNexus["young-by-precedence"],
+          };
+        }
+      }
+      //depending on what type of page, we build rootings differently
+      let rootins =
+        pageType === "goal"
+          ? selectOrderList(order, newRoots, true)?.map((item: any) => {
+              return item.id.birth;
+            })
+          : selectOrderList(order, poolItem.pool.trace, true)?.map(
+              (item: any) => {
+                return item.birth;
+              }
+            );
+      log("newRoots", newRoots);
       newGoals.forEach((item: any) => {
         goalsMap.set(item.id.birth, item);
         item.goal.hitch.tags?.forEach((element: any) => {
@@ -181,7 +235,6 @@ function Main({
           //fetch the goal assosicated with this id from our map
           const saGoal = goalsMap.get(item.birth);
           if (saGoal) {
-            log("saGoal", saGoal.goal);
             const parentId = uuidv4();
             //update parent id to be reflect virtualisation
             //update id to avoid duplication and
@@ -212,14 +265,16 @@ function Main({
 
       const newNestedGoals = createDataTree(
         [...newGoals, ...virtualChildren],
-        selectOrderList(order, poolItem.pool.trace, true).map((item: any) => {
-          return item.birth;
-        }),
+        rootins,
         order
       );
       return {
         ...poolItem,
-        pool: { ...pool, nexus: { goals: newNestedGoals } },
+        pool: {
+          ...pool,
+          nexus: { goals: newNestedGoals },
+          trace: { ...poolItem.pool.trace, ...newRoots }, // replace the current pool's roots... with the appropriate goal's youngs if any given, an extra useless step for now
+        },
       };
     });
     setTryingMap(newTryingMap);
@@ -227,7 +282,6 @@ function Main({
     setRoleMap(roleMap);
     setAllTags(allTags);
   }, [fetchedPools, order, filterGoals]);
-  const activeSubsMap = useStore((store) => store.activeSubsMap);
 
   const roleMap = useStore((store: any) => store.roleMap);
   const selectionMode = useStore((store) => store.selectionMode);

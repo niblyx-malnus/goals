@@ -591,8 +591,7 @@ const api = {
       pokeId: "12345",
     });
   },
-  treeAsk: async (type = "main", id, tags = []) => {
-    log("type", type);
+  treeAsk: async (type = "main", id, ) => {
     let bodyType;
     if (type === "main") {
       bodyType = { main: null };
@@ -604,12 +603,10 @@ const api = {
     const json = {
       tree: {
         type: bodyType,
-        "first-gen-only": false,
-        "actionable-only": false,
-        method: "any", // can be "any" or "all"
-        tags,
+
       },
     };
+    log("json", json);
     return api.poke({
       app: apiApp,
       mark: "goal-ask",

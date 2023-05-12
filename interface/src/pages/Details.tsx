@@ -28,29 +28,15 @@ export default function Details({}) {
   }, [id]);
 
   const getDetailsData = async () => {
-    //either fetch goal or pool data depending on type
-   // setMainLoading({ trying: true, success: false, error: false });
+    // setMainLoading({ trying: true, success: false, error: false });
 
     try {
       harvestAskAction(type, id);
       listAskAction(type, id);
-      const treeAsk = await api.treeAsk();
-      log("treeAsk", treeAsk);
-
-      /* const result =
-        type === "pool" ? await api.getPool(id) : await api.getGoal(id);
-      log("getDetailsData result => ", result);
-      if (result) {
-        setMainLoading({ trying: false, success: true, error: false });
-      } else {
-        setMainLoading({ trying: false, success: false, error: true });
-      }
-
-      setFetchedPools(result.pools);
-      */  
+      api.treeAsk(type, id);
     } catch (e) {
       log("getDetailsData error => ", e);
-     // setMainLoading({ trying: false, success: false, error: true });
+      // setMainLoading({ trying: false, success: false, error: true });
     }
   };
 

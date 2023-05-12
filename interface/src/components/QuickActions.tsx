@@ -411,7 +411,7 @@ export default function QuickActions({
           size="small"
           onClick={() => {
             navigate(
-              "/apps/gol-cli/goal/~" + goalId?.owner + "/" + goalId?.birth
+              "/apps/gol-cli/goal/" + goalId?.owner + "/" + goalId?.birth
             );
           }}
         >
@@ -494,7 +494,7 @@ export default function QuickActions({
             aria-label="go to pool page"
             size="small"
             onClick={() => {
-              navigate("/apps/gol-cli/pool/~" + pin?.owner + "/" + pin?.birth);
+              navigate("/apps/gol-cli/pool/" + pin?.owner + "/" + pin?.birth);
             }}
             disableRipple
           >

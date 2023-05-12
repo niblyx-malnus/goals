@@ -637,8 +637,8 @@ function reorderGoalsAction(
 }
 function harvestAskAction(type: "main" | "pool" | "goal", id: any) {
   const store = useStore.getState();
+
   const activeSubsMap = cloneDeep(store.activeSubsMap);
-  log("activeSubsMap", activeSubsMap);
   if (activeSubsMap.harvest) {
     // have an active sub already, unsub before sending a new ask
     api.unsub(activeSubsMap.harvest);
@@ -649,19 +649,15 @@ function harvestAskAction(type: "main" | "pool" | "goal", id: any) {
 
   //get tags if any and pass them along
   const tagFilterArray = store.tagFilterArray;
-  let newId;
-  if (type !== "main") {
-    newId = { owner: id.owner.substring(1), birth: id.birth }; //we have to cut off the first character ~ from the owner
-  }
 
-  api.harvestAsk(type, newId, tagFilterArray);
+  api.harvestAsk(type, id, tagFilterArray);
 }
 function listAskAction(type: "main" | "pool" | "goal", id: any) {
   const store = useStore.getState();
   //get tags if any and pass them along
-  const activeSubsMap = cloneDeep(store.activeSubsMap);
   const tagFilterArray = store.tagFilterArray;
 
+  const activeSubsMap = cloneDeep(store.activeSubsMap);
   if (activeSubsMap["list-view"]) {
     // have an active sub already, unsub before sending a new ask
     api.unsub(activeSubsMap["list-view"]);
@@ -670,11 +666,8 @@ function listAskAction(type: "main" | "pool" | "goal", id: any) {
 
     store.setActiveSubsMap(activeSubsMap);
   }
-  let newId;
-  if (type !== "main") {
-    newId = { owner: id.owner.substring(1), birth: id.birth }; //we have to cut off the first character ~ from the owner
-  }
-  api.listAsk(type, newId, tagFilterArray);
+
+  api.listAsk(type, id, tagFilterArray);
 }
 async function subToViewAction(view: string, path: string) {
   const store = useStore.getState();
@@ -720,5 +713,5 @@ export {
   harvestAskAction,
   listAskAction,
   subToViewAction,
-  updateTryingMap
+  updateTryingMap,
 };

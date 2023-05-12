@@ -444,7 +444,7 @@ export default function IconMenu({
         <MenuItem
           onClick={() => {
             handleClose();
-            goTo("/apps/gol-cli/goal/~" + id?.owner + "/" + id?.birth);
+            goTo("/apps/gol-cli/goal/" + id?.owner + "/" + id?.birth);
           }}
           disableRipple
         >
@@ -558,7 +558,7 @@ export default function IconMenu({
             onClick={() => {
               //navigate to parent goal if any
               goTo(
-                "/apps/gol-cli/goal/~" +
+                "/apps/gol-cli/goal/" +
                   currentGoal?.nexus.par?.owner +
                   "/" +
                   currentGoal?.nexus.par?.birth
@@ -573,7 +573,7 @@ export default function IconMenu({
         <MenuItem
           onClick={() => {
             handleClose();
-            goTo("/apps/gol-cli/goal/~" + id?.owner + "/" + id?.birth);
+            goTo("/apps/gol-cli/goal/" + id?.owner + "/" + id?.birth);
           }}
           disableRipple
         >
@@ -663,7 +663,7 @@ export default function IconMenu({
             <MenuItem
               onClick={() => {
                 handleClose();
-                goTo("/apps/gol-cli/pool/~" + pin?.owner + "/" + pin?.birth);
+                goTo("/apps/gol-cli/pool/" + pin?.owner + "/" + pin?.birth);
               }}
               disableRipple
             >
