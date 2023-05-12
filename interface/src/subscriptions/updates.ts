@@ -19,6 +19,7 @@ import {
   nexusListAction,
   updatePoolPax,
   updateGoalYoung,
+  updateTryingMap,
 } from "../store/actions";
 import api from "../api";
 const store = useStore.getState();
@@ -29,12 +30,7 @@ const updateHandler = (update: any) => {
   log("main update handler => ", update);
   //check if the given update contains a id we can use to toggle loading state false (poke relay)
   if (update.hed?.pid) {
-    const tryingMap = store.tryingMap;
-    const setTrying = store.setTrying;
-
-    if (tryingMap.has(update.hed.pid)) {
-      setTrying(update.hed.pid, false);
-    }
+    updateTryingMap(update.hed.pid);
   }
   if (update.dot) {
     api.viewAck(update.dot);

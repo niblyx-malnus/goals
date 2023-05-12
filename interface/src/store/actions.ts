@@ -689,6 +689,15 @@ async function subToViewAction(view: string, path: string) {
     log("subToViewAction error =>", e);
   }
 }
+function updateTryingMap(id: string) {
+  const store = useStore.getState();
+
+  const tryingMap = store.tryingMap;
+  const setTrying = store.setTrying;
+  if (tryingMap.has(id)) {
+    setTrying(id, false);
+  }
+}
 export {
   deletePoolAction,
   deleteGoalAction,
@@ -711,4 +720,5 @@ export {
   harvestAskAction,
   listAskAction,
   subToViewAction,
+  updateTryingMap
 };
