@@ -115,6 +115,7 @@
     ::
       %goal-action
     =/  axn=action:act  !<(action:act vase)
+    ~&  received-axn+axn
     =^  cards  state
       abet:(handle-action:emot axn)
     [cards this]

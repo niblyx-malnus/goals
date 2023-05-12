@@ -9,9 +9,10 @@
     %.  send
     |=  =^send
     ^-  ^json
-    ?:  ?=(%dot -.send)
-      (frond %dot (path path.send))
-    (view-diff:enjs:v ;;(diff:views send))
+    ?-  -.send
+      %dot   (frond %dot (path path.send))
+      %diff  (view-diff:enjs:v +.send)
+    ==
   --
 ++  grab
   |%

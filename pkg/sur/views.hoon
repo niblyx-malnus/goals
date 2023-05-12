@@ -28,7 +28,7 @@
   ==
 :: dots must be acked
 ::
-+$  send  $%([%dot =path] [%step data] diff)
++$  send  $%([%dot =path] [%diff diff])
 +$  diff
   $%  [%tree diff:tree]
       [%harvest diff:harvest]
