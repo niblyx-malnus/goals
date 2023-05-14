@@ -156,6 +156,9 @@ interface Store {
 
   activeSubsMap: any;
   setActiveSubsMap: (newActiveSubsMap: any) => void;
+
+  pageInfo: any; //obtained from the page ask, relavant info to pool/goal
+  setPageInfo: (newPageInfo: any) => void;
 }
 
 /**
@@ -487,6 +490,9 @@ const useStore = create<Store>((set, get) => ({
   activeSubsMap: {},
   setActiveSubsMap: (newActiveSubsMap: Object) =>
     set(() => ({ activeSubsMap: newActiveSubsMap })),
+
+  pageInfo: null,
+  setPageInfo: (newPageInfo: any) => set(() => ({ pageInfo: newPageInfo })),
 }));
 
 export default useStore;

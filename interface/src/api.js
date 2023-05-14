@@ -591,7 +591,7 @@ const api = {
       pokeId: "12345",
     });
   },
-  treeAsk: async (type = "main", id, ) => {
+  treeAsk: async (type = "main", id) => {
     let bodyType;
     if (type === "main") {
       bodyType = { main: null };
@@ -603,10 +603,33 @@ const api = {
     const json = {
       tree: {
         type: bodyType,
-
       },
     };
-    log("json", json);
+
+    return api.poke({
+      app: apiApp,
+      mark: "goal-ask",
+      json,
+      pokeId: "12345",
+    });
+  },
+  pageAsk: async (type = "main", id) => {
+    log('flying')
+    //we use this to get metadata for a goal/pool
+    let bodyType;
+    if (type === "main") {
+      bodyType = { main: null }; 
+    } else if (type === "pool") {
+      bodyType = { pool: id };
+    } else if (type === "goal") {
+      bodyType = { goal: id };
+    }
+    const json = {
+      page: {
+        type: bodyType,
+      },
+    };
+
     return api.poke({
       app: apiApp,
       mark: "goal-ask",

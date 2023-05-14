@@ -34,6 +34,7 @@ import { cloneDeep } from "lodash";
 //TODO: move scrollbar inside views?
 //Waiting on Thomas:
 //TODO: fix perm issues in harvest/list views (pool perm not found)
+//TODO: reordering goals doesn't work in goals on account of no poolid... (we should have this data now)
 //TODO: go to parent goal | go to parent pool buttons next to nacvigate home
 function Main({
   fetchInitialCallback,
@@ -67,6 +68,8 @@ function Main({
   const setTryingMap = useStore((store) => store.setTryingMap);
 
   const setAllTags = useStore((store) => store.setAllTags);
+
+  const pageInfo = useStore((store) => store.pageInfo);
 
   const [pools, setPools] = useState([]);
 
@@ -321,7 +324,7 @@ function Main({
     fetchPals();
   }, []);
   const navigate = useNavigate();
-
+  log("pageInfo", pageInfo);
   return (
     <Container sx={{ paddingBottom: 10 }}>
       <DndProvider backend={HTML5Backend}>
@@ -330,16 +333,47 @@ function Main({
           pageId={pageId}
           pageType={pageType}
         />
+        {pageType !== "main" && (
+          <Button
+            onClick={() => {
+              navigate("/apps/gol-cli");
+            }}
+            sx={{ fontWeight: "bold" }}
+          >
+            Home
+          </Button>
+        )}
+        {pageInfo.goal?.["par-pool"] && (
+          <Button
+            onClick={() => {
+              navigate(
+                "/apps/gol-cli/pool/" +
+                  pageInfo.goal?.["par-pool"]?.owner +
+                  "/" +
+                  pageInfo.goal?.["par-pool"]?.birth
+              );
+            }}
+            sx={{ fontWeight: "bold" }}
+          >
+            parent pool
+          </Button>
+        )}
+        {pageInfo.goal?.["par-goal"] && (
+          <Button
+            onClick={() => {
+              navigate(
+                "/apps/gol-cli/goal/" +
+                  pageInfo.goal?.["par-goal"]?.owner +
+                  "/" +
+                  pageInfo.goal?.["par-goal"]?.birth
+              );
+            }}
+            sx={{ fontWeight: "bold" }}
+          >
+            parent goal
+          </Button>
+        )}
 
-        <Button
-          onClick={() => {
-            navigate("/apps/gol-cli");
-          }}
-          sx={{ fontWeight: "bold" }}
-        >
-          {" "}
-          Navigate Home
-        </Button>
         <Box>
           <Tabs
             value={value}

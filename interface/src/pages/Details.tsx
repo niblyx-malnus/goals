@@ -33,6 +33,7 @@ export default function Details({}) {
     try {
       harvestAskAction(type, id);
       listAskAction(type, id);
+      api.pageAsk(type, id);
       api.treeAsk(type, id);
     } catch (e) {
       log("getDetailsData error => ", e);
