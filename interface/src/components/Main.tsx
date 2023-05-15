@@ -343,7 +343,7 @@ function Main({
             Home
           </Button>
         )}
-        {pageInfo.goal?.["par-pool"] && (
+        {pageInfo && pageInfo.goal?.["par-pool"] && (
           <Button
             onClick={() => {
               navigate(
@@ -358,7 +358,7 @@ function Main({
             parent pool
           </Button>
         )}
-        {pageInfo.goal?.["par-goal"] && (
+        {pageInfo && pageInfo.goal?.["par-goal"] && (
           <Button
             onClick={() => {
               navigate(
