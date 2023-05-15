@@ -226,6 +226,9 @@
           %-  pairs
           :~  [%id (enjs-id id.upd)]
               [%young a+(turn young.upd enjs-id-v)]
+              [%young-by-precedence a+(turn young-by-precedence.upd enjs-id-v)]
+              [%young-by-kickoff a+(turn young-by-kickoff.upd enjs-id-v)]
+              [%young-by-deadline a+(turn young-by-deadline.upd enjs-id-v)]
           ==
           ::
             %goal-roots
