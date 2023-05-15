@@ -405,7 +405,9 @@
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
     =/  new=pool:gol  abet:(mark-actionable:(apex:pl old) id mod)
-    =/  upd=update:gol  [vzn %goal-togls id %actionable %.y]
+    =/  fd  (full-diff goals.old goals.new)
+    =/  =pex:gol  trace.new
+    =/  upd=update:gol  [vzn %goal-dates pex nex.fd]
     ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
@@ -416,7 +418,9 @@
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
     =/  new=pool:gol  abet:(mark-complete:(apex:pl old) id mod)
-    =/  upd=update:gol  [vzn %goal-togls id %complete %.y]
+    =/  fd  (full-diff goals.old goals.new)
+    =/  =pex:gol  trace.new
+    =/  upd=update:gol  [vzn %goal-dates pex nex.fd]
     ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     =.  this  (send-away-update [pin mod pid.axn] upd)
@@ -435,7 +439,9 @@
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
     =/  new=pool:gol  abet:(unmark-actionable:(apex:pl old) id mod)
-    =/  upd=update:gol  [vzn %goal-togls id %actionable %.n]
+    =/  fd  (full-diff goals.old goals.new)
+    =/  =pex:gol  trace.new
+    =/  upd=update:gol  [vzn %goal-dates pex nex.fd]
     ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
@@ -446,7 +452,9 @@
     ?.  =(owner.pin our.bowl)  (relay pin axn)
     =/  old=pool:gol  (pile pin)
     =/  new=pool:gol  abet:(unmark-complete:(apex:pl old) id mod)
-    =/  upd=update:gol  [vzn %goal-togls id %complete %.n]
+    =/  fd  (full-diff goals.old goals.new)
+    =/  =pex:gol  trace.new
+    =/  upd=update:gol  [vzn %goal-dates pex nex.fd]
     ?.  (check-equivalence new (pool-etch:etch old upd))  ~|("non-equivalent-update" !!)
     =.  pools.store  (~(put by pools.store) pin new)
     (send-away-update [pin mod pid.axn] upd)
