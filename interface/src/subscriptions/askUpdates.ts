@@ -11,6 +11,7 @@ const store = useStore.getState();
 const setListGoals = store.setListGoals;
 const setHarvestGoals = store.setHarvestGoals;
 const setPoolStore = store.setPools;
+const setPageInfo = store.setPageInfo;
 
 const updateHandler = (update: any) => {
   const actionName: any = Object.keys(update)[0];
@@ -32,6 +33,10 @@ const updateHandler = (update: any) => {
       }
       case "tree": {
         setPoolStore(update[actionName].data.pools);
+        break;
+      }
+      case "page": {
+        setPageInfo(update[actionName].data);
         break;
       }
     }
